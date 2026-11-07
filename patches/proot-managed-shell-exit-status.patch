@@ -1,0 +1,14 @@
+--- a/src/tracee/event.c
++++ b/src/tracee/event.c
+@@ -213,0 +214 @@
++static int managed_root_status = -1;
+@@ -370 +371,2 @@
+-	return last_exit_status;
++	return getenv("HARMONY_PROOT_MANAGED_SHELL") && managed_root_status >= 0
++		? managed_root_status : last_exit_status;
+@@ -415,0 +418,2 @@
++		if (tracee->vpid == 1)
++			managed_root_status = last_exit_status;
+@@ -421,0 +426,2 @@
++		if (tracee->vpid == 1)
++			managed_root_status = 128 + WTERMSIG(tracee_status);
