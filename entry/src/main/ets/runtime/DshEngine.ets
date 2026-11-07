@@ -109,6 +109,7 @@ class DshEngine {
     if (fileIo.accessSync(launchFile)) fileIo.unlinkSync(launchFile);
     if (fileIo.accessSync(root + '/tmp/dsh-native-timeline.log')) fileIo.unlinkSync(root + '/tmp/dsh-native-timeline.log');
     this.copyGuest(context, 'dsh-native-web.cjs', root + '/dsh-native-web.cjs');
+    this.copyGuest(context, 'dsh-harmony-sharp.cjs', root + '/dsh-harmony-sharp.cjs');
     this.publish('正在启动本机 DeepSeek Harness…');
     hilog.info(0xD005, 'DSHClient', 'starting native Web ms=%{public}d', Date.now() - started);
     poc.startNative(root);

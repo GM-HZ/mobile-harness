@@ -64,6 +64,9 @@ function installProotSpawn(workspace) {
       if (args.length !== 2 || args[0] !== '-c') throw new Error('Harmony Bash requires one non-interactive command');
       command = args[1];
     }
+    return launchGuest(guest, command);
+  };
+  function launchGuest(guest, command) {
     const launched = bridge.launch(path.dirname(root), guest, command);
     const child = new EventEmitter();
     child.pid = launched.pid;
@@ -102,7 +105,8 @@ function installProotSpawn(workspace) {
       child.emit('exit', child.exitCode, child.signalCode);
     }, 25);
     return child;
-  };
+  }
+  return launchGuest;
 }
 function relativeInWorkspace(root, target) {
   const relative = path.relative(root, target);
@@ -177,7 +181,9 @@ async function main() {
   const subprocessUrl = paths('dsh-subprocess-local/lib/index.js');
   const attachmentUrl = paths('dsh-attachment-local/lib/index.js');
   const searchUrl = paths('dsh-tool-fs-search/lib/index.js');
-  installProotSpawn(workspace);
+  const launchGuest = installProotSpawn(workspace);
+  const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
+  globalThis.__harmonySharp = createSharp(root, launchGuest);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;
@@ -226,6 +232,8 @@ async function main() {
       if (url === attachmentUrl) {
         let patched = replacePinned(source, 'ensureDurableDirectory(home, parse(home).root)',
           'ensureDurableDirectory(home, globalThis.__harmonyAttachmentBoundary(home, parse(home).root))');
+        patched = replacePinned(patched, 'createLazyRequire("sharp", import.meta.url)', '() => globalThis.__harmonySharp');
+        patched = replacePinned(patched, 'await image.raw().toBuffer();', 'await image.verifyDecoded();');
         patched = replacePinned(patched, 'await link(staged.path, target);',
           "try { await link(staged.path, target); } catch (error) { if (error?.code !== 'EACCES') throw error; globalThis.__harmonyWebRename(staged.path, target); }");
         patched = replacePinned(patched, 'await unlink(staged.path);', 'await removeTemporary(staged.path);');

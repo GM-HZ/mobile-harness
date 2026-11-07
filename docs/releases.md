@@ -51,3 +51,9 @@ API 26 Phone 模拟器通过 `exit 7`、同名重复上传、同内容异名上�
 保留 ripgrep 路径筛选，用原生 Node 文件时间排序代替依赖 `/proc` 的排序。API 26 Phone 模拟器经真实模型调用，分别测试指定目录和默认工作区的 glob，两次都按修改时间返回两个文件。清理 Bash 进程退出后的状态管道。
 
 已部署的 unsigned HAP SHA-256 为 `34d4e367cb4679cece57117f804bae65d58a7b046ada5d30800b2809d193dd0d`。本机构建 signed HAP SHA-256 为 `9a493cca1e61228ee95ee3a0a19645682b1c904a6729f7115e5e9a725a1a4493`。
+
+## 0.4.13 图片附件
+
+DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有内容校验、像素限制、方向处理和压缩策略。API 26 Phone 模拟器通过 PNG 无损上传、GIF 转 WebP、大图缩放、损坏图像及 MIME 不符拒绝。后台 Bash 经一次批准启动，`job_output` 回读真实作业输出。 [结果](evidence/emulator-images-and-jobs-0.4.13.json)
+
+已部署的 unsigned HAP SHA-256 为 `01bd4514b1a47c6dba4334b8fe3b56481a8869df6dcb2dc4c4257c3b5a2e9cfa`。本机构建 signed HAP SHA-256 为 `a41267112b8522ade35207524044ca3d7c7473a822259dea30fd61acb7b14a76`。

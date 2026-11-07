@@ -1,0 +1,15 @@
+{
+  "version": "0.4.13",
+  "device": "DevEco Phone emulator API 26 arm64-v8a",
+  "pngByteIdenticalMs": 4751,
+  "gifNormalizedWebPMs": 9337,
+  "widePngNormalized": {
+    "sourceWidth": 25000,
+    "storedWidth": 8192,
+    "mediaType": "image/jpeg",
+    "elapsedMs": 10429
+  },
+  "malformedRejected": true,
+  "mismatchedMimeRejected": true,
+  "backgroundBashWithApprovalAndOutput": true
+}

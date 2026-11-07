@@ -271,6 +271,8 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             { "libguest_busybox.so", "/bin/wc" },
             { "libguest_busybox.so", "/bin/which" },
             { "libguest_rg.so", "/bin/rg" },
+            { "libguest_sharp.so", "/dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node" },
+            { "libguest_vips.so", "/usr/lib/libvips-cpp.so.8.18.7" },
         };
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
         size_t bindings = dsh_test ? sizeof(packaged) / sizeof(*packaged) : node_test ? 9 : 4;
