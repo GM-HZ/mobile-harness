@@ -99,3 +99,9 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 只对包变更命令传安装专用参数。实际 npm 元数据查询进入 fetch，两个 registry 均返回网络失败。通过已装的兼容 fetch 垫片，guest Node 请求同一 npm 元数据和回环 Git 测试服务器均返回 HTTP 200。Git 通过自己的 HTTP helper 访问回环服务器仍超时。
 
 已部署的 unsigned HAP SHA-256 为 `c6907e19ecd1bb08b64e377d27c652e7a5997d244ad6ed692ccebfc9eb99ca08`。本机构建 signed HAP SHA-256 为 `252650e12f03f0f78f6acd0c7b77eddd9ed5dd1b0722e8c61fd5d73fbf3440d8`。
+
+## 0.4.21 插件仓库与启动复测
+
+pnpm 默认直连通过已有 fetch 适配层，保留已有代理、自定义证书处理和依赖完整性校验。API 26 Phone 模拟器从 npm 官方仓库读取真实元数据，并下载纯 JS 测试组合包声明的依赖，安装和激活合计 19.3 秒。Bash 的非零退出码和取消回归通过。
+
+从零应用数据启动到 ArkWeb 加载完成约 15.6 秒，强停后重启约 6.1 秒。全新默认工作区已创建。真机保留 0.4.9。 [设备和制品证据](evidence/emulator-core-0.4.21.json)

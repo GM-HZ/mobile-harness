@@ -33,7 +33,7 @@ function createPackageRunner(root, home, launch) {
     options.cancelSignal?.throwIfAborted();
     const profileHome = guestPath(home);
     const prefix = command === 'pnpm' ? [
-      '/bin/node', '/pnpm-harmony/bin/pnpm.mjs',
+      '/bin/node', '--require', '/dsh-harmony-pnpm-fetch.cjs', '/pnpm-harmony-v2/bin/pnpm.mjs',
     ] : ['/usr/bin/git'];
     const remapped = args.map(arg => {
       const match = /^(file:|link:)?(\/.*)$/.exec(arg);

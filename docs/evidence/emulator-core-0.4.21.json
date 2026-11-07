@@ -1,0 +1,42 @@
+{
+  "version": "0.4.21",
+  "device": "DevEco Phone emulator API 26 arm64-v8a",
+  "fresh": {
+    "archivesMs": {
+      "node-layer.zip": 84,
+      "dsh-layer.zip": 8917,
+      "shell-tools-layer.zip": 164,
+      "pnpm-layer-v2.zip": 165
+    },
+    "archivesExtracted": true,
+    "loopbackMs": 12775,
+    "arkWebCompleteMs": 15633
+  },
+  "forcedRestart": {
+    "archivesMs": {
+      "node-layer.zip": 0,
+      "dsh-layer.zip": 0,
+      "shell-tools-layer.zip": 0,
+      "pnpm-layer-v2.zip": 0
+    },
+    "archivesExtracted": false,
+    "loopbackMs": 3703,
+    "arkWebCompleteMs": 6125
+  },
+  "freshDefaultWorkspace": true,
+  "approvedBashExitSeven": true,
+  "bashCancellationBeforeDelayedWrite": true,
+  "registryReadAndBundleValidation": true,
+  "fixtureBundleRegistryDependencyDownloadedAndActivated": true,
+  "fixtureBundleInstallAndActivateMs": 19321,
+  "unauthenticatedLoopbackHTTP": 401,
+  "otherVersionEvidence": {
+    "localGitInitAddCommitLogAndPythonSqlite": "0.4.15",
+    "oauthSignInPageAndHomeResumeSamePid": "0.4.15",
+    "gitRemoteHttps": "0.4.19 timeout or SIGSEGV, 0.4.20 local HTTP helper timed out",
+    "customSkillEnumeratedAndCalled": "0.4.13",
+    "pluginToggleAndReload": "0.4.18 and 0.4.19"
+  },
+  "signedHapSha256": "febe75a7c6e1c1a7e90515a3da1dffec56f983055603489892a7b821ac53d897",
+  "unsignedHapSha256": "520c7a70e8ff257fae7b6f0a4ff877833b09b2fc3b6d83e00ac9e39987d5f383"
+}
