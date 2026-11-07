@@ -1,0 +1,12 @@
+{
+  "device": "DevEco Phone emulator, API 26, arm64-v8a",
+  "version": "0.4.10",
+  "install": true,
+  "start": true,
+  "nodeToLoopbackReadyMs": 4165,
+  "approvedBashExitSeven": true,
+  "textUploadsVerified": 3,
+  "identicalZipMemberCrcs": false,
+  "unsignedHapSha256": "cde44e69f38a32c7ebf4e05411e13299ac9a1a34d78aff905174e11a8aeed59c",
+  "signedHapSha256": "fee5241c65773c57da4022a430a0a97e182e65811a1fc5a6aad654b21abd81ec"
+}

@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('node:fs');
+const { randomUUID } = require('node:crypto');
 const http = require('node:http');
 const { spawn } = require('node:child_process');
 const { EventEmitter } = require('node:events');
@@ -29,6 +30,10 @@ function addon(name) {
   const module = { exports: {} };
   process.dlopen(module, name);
   return module.exports;
+}
+function replacePinned(source, point, replacement) {
+  if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
+  return source.replace(point, replacement);
 }
 function installProotSpawn(workspace) {
   const bridge = addon('libdshshell.so');
@@ -63,9 +68,20 @@ function installProotSpawn(workspace) {
         clearInterval(timer);
         child.exitCode = result.exitCode < 0 ? null : result.exitCode;
         child.signalCode = signals.get(result.signal) ?? null;
+        if (child.exitCode === 0) {
+          const status = Buffer.alloc(3);
+          const count = fs.readSync(launched.statusFd, status);
+          const text = status.toString();
+          if (count !== 3 || !/^\d{3}$/.test(text) || Number(text) > 255) {
+            throw new Error('Bash exited without a valid command status');
+          }
+          child.exitCode = Number(text);
+        }
+        fs.closeSync(launched.statusFd);
         child.emit('exit', child.exitCode, child.signalCode);
       } catch (error) {
         clearInterval(timer);
+        try { fs.closeSync(launched.statusFd); } catch {}
         child.emit('error', error);
       }
     }, 25);
@@ -117,6 +133,7 @@ async function main() {
   const flockUrl = paths('node-addon-system/lib/flock.js');
   const persistenceUrl = paths('dsh-session-persistence-jsonl/lib/index.js');
   const subprocessUrl = paths('dsh-subprocess-local/lib/index.js');
+  const attachmentUrl = paths('dsh-attachment-local/lib/index.js');
   installProotSpawn(workspace);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
@@ -124,6 +141,19 @@ async function main() {
   globalThis.__harmonyWebRename = (source, target) => {
     const errno = rename(source, target);
     if (errno) throw Object.assign(new Error('exclusive publish failed'), { errno, code: errno === 17 ? 'EEXIST' : 'EIO' });
+  };
+  globalThis.__harmonyAttachmentBoundary = (directory, filesystemRoot) =>
+    directory === home ? root : filesystemRoot;
+  globalThis.__harmonyAttachmentAlias = async (source, target) => {
+    const temporary = path.join(path.dirname(target), '.' + randomUUID() + '.tmp');
+    await fs.promises.copyFile(source, temporary, fs.constants.COPYFILE_EXCL);
+    try {
+      const handle = await fs.promises.open(temporary, 'r');
+      try { await handle.sync(); } finally { await handle.close(); }
+      globalThis.__harmonyWebRename(temporary, target);
+    } finally {
+      await fs.promises.rm(temporary, { force: true });
+    }
   };
   let loadCount = 0;
   let loadMs = 0;
@@ -136,19 +166,26 @@ async function main() {
         loadCount++;
         loadMs += performance.now() - start;
       }
-      if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl) return result;
+      if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl && url !== attachmentUrl) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
       if (url === subprocessUrl) {
-        const point = 'internals = {};';
-        if (source.split(point).length !== 2) throw new Error('Unexpected pinned subprocess spawn seam');
-        return { ...result, source: source.replace(point, 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
+        return { ...result, source: replacePinned(source, 'internals = {};', 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
+      }
+      if (url === attachmentUrl) {
+        let patched = replacePinned(source, 'ensureDurableDirectory(home, parse(home).root)',
+          'ensureDurableDirectory(home, globalThis.__harmonyAttachmentBoundary(home, parse(home).root))');
+        patched = replacePinned(patched, 'await link(staged.path, target);',
+          "try { await link(staged.path, target); } catch (error) { if (error?.code !== 'EACCES') throw error; globalThis.__harmonyWebRename(staged.path, target); }");
+        patched = replacePinned(patched, 'await unlink(staged.path);', 'await removeTemporary(staged.path);');
+        patched = replacePinned(patched, 'await link(source, target);',
+          "try { await link(source, target); } catch (error) { if (error?.code !== 'EACCES') throw error; await globalThis.__harmonyAttachmentAlias(source, target); }");
+        return { ...result, source: patched };
       }
       const point = url === flockUrl ? '    const { platform, arch } = process;' : 'await link(tmp, finalPath);';
       const replacement = url === flockUrl
         ? "    if (process.platform === 'openharmony') return { tryLock: globalThis.__harmonyWebFlock };\n" + point
         : "try { await link(tmp, finalPath); } catch (error) { if (error?.code !== 'EACCES') throw error; globalThis.__harmonyWebRename(tmp, finalPath); }";
-      if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
-      return { ...result, source: source.replace(point, replacement) };
+      return { ...result, source: replacePinned(source, point, replacement) };
     }
   });
   const exit = process.exit;

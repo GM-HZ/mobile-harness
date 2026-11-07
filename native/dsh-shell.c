@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-typedef int (*SpawnShell)(const char *, const char *, const char *, int *, int *, char *, size_t);
+typedef int (*SpawnShell)(const char *, const char *, const char *, int *, int *, int *, char *, size_t);
 
 static int string_arg(napi_env env, napi_value value, char *out, size_t capacity) {
     size_t expected, written;
@@ -39,9 +39,9 @@ static napi_value launch(napi_env env, napi_callback_info info) {
         napi_throw_error(env, NULL, "PRoot launcher is unavailable");
         return NULL;
     }
-    int out, err;
+    int out, err, status;
     char diagnostic[256] = "PRoot could not start";
-    int pid = start(directory, cwd, command, &out, &err, diagnostic, sizeof(diagnostic));
+    int pid = start(directory, cwd, command, &out, &err, &status, diagnostic, sizeof(diagnostic));
     dlclose(poc);
     if (pid < 0) {
         napi_throw_error(env, NULL, diagnostic);
@@ -52,6 +52,7 @@ static napi_value launch(napi_env env, napi_callback_info info) {
     set_number(env, result, "pid", pid);
     set_number(env, result, "stdoutFd", out);
     set_number(env, result, "stderrFd", err);
+    set_number(env, result, "statusFd", status);
     return result;
 }
 

@@ -1,0 +1,19 @@
+{
+  "device": "Mate 60 USB",
+  "versions": {
+    "0.4.8": {
+      "approvedBashPipelineAndWorkspaceWrite": true,
+      "cancelAcceptedBeforeDelayedWrite": true,
+      "textAttachmentUpload": "EACCES opening /data/storage/el2 for fsync",
+      "workspaceRelativeReadOutsideRoot": "../etc/alpine-release returned file contents"
+    },
+    "0.4.9": {
+      "install": true,
+      "start": true,
+      "priorHistoryFound": true,
+      "resumedModelTurnMs": 1445,
+      "resumedModelReply": "HARMONY_WEB_CHAT_OK",
+      "reportedExitSeven": false
+    }
+  }
+}

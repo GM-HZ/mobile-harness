@@ -107,9 +107,10 @@ struct ShellLaunch {
     int pid;
     int stdout_fd;
     int stderr_fd;
+    int status_fd;
 };
 
-static int close_host_descriptors(void) {
+static int close_host_descriptors(int keep) {
     DIR *dir = opendir("/proc/self/fd");
     if (!dir) return errno;
     int own = dirfd(dir);
@@ -117,7 +118,7 @@ static int close_host_descriptors(void) {
     while ((entry = readdir(dir))) {
         char *end;
         long fd = strtol(entry->d_name, &end, 10);
-        if (*end == 0 && fd > STDERR_FILENO && fd != own) close((int)fd);
+        if (*end == 0 && fd > STDERR_FILENO && fd != own && fd != keep) close((int)fd);
     }
     closedir(dir);
     return 0;
@@ -205,8 +206,14 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         guest[8] = "/bin/bash";
         guest[9] = "-c";
         guest[10] = "set -e -o pipefail; printf 'NATIVE_WEB_PROOT_SHELL_OK\n' | grep -Fx NATIVE_WEB_PROOT_SHELL_OK > result.txt; cat result.txt";
-        if (shell) guest[10] = (char *)shell->command;
-        guest[11] = NULL;
+        if (shell) {
+            guest[10] = "/bin/bash -c \"$1\" 3>&-; status=$?; printf '%03d' \"$status\" >&3; exit \"$status\"";
+            guest[11] = "dsh-shell";
+            guest[12] = (char *)shell->command;
+            guest[13] = NULL;
+        } else {
+            guest[11] = NULL;
+        }
     } else if (node_test || dsh_test) {
         guest[8] = "/bin/node";
         int argument = 9;
@@ -321,9 +328,12 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         }
     }
     int shell_stdout[2] = {-1, -1}, shell_stderr[2] = {-1, -1};
-    if (shell && (pipe2(shell_stdout, O_CLOEXEC) < 0 || pipe2(shell_stderr, O_CLOEXEC) < 0)) {
+    int shell_status[2];
+    if (shell && (pipe2(shell_stdout, O_CLOEXEC) < 0 || pipe2(shell_stderr, O_CLOEXEC) < 0 ||
+                  pipe2(shell_status, O_CLOEXEC | O_NONBLOCK) < 0)) {
         snprintf(out, size, "open shell pipes errno=%d", errno);
         if (shell_stdout[0] >= 0) { close(shell_stdout[0]); close(shell_stdout[1]); }
+        if (shell_stderr[0] >= 0) { close(shell_stderr[0]); close(shell_stderr[1]); }
         close(fd);
         return;
     }
@@ -338,10 +348,12 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             if (getppid() != owner) _exit(46);
         }
         if (shell) {
+            const int status_channel = STDERR_FILENO + 1;
             if (setpgid(0, 0) < 0 || dup2(fd, STDIN_FILENO) < 0 ||
                 dup2(shell_stdout[1], STDOUT_FILENO) < 0 ||
-                dup2(shell_stderr[1], STDERR_FILENO) < 0) _exit(47);
-            if (close_host_descriptors() != 0) _exit(48);
+                dup2(shell_stderr[1], STDERR_FILENO) < 0 ||
+                dup2(shell_status[1], status_channel) < 0 || fcntl(status_channel, F_SETFD, 0) < 0) _exit(47);
+            if (close_host_descriptors(status_channel) != 0) _exit(48);
             clearenv();
             setenv("HARMONY_PROOT_MANAGED_SHELL", "1", 1);
             setenv("HOME", "/workspace-native", 1);
@@ -395,15 +407,18 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         close(fd);
         close(shell_stdout[1]);
         close(shell_stderr[1]);
+        close(shell_status[1]);
         if (child < 0) {
             close(shell_stdout[0]);
             close(shell_stderr[0]);
+            close(shell_status[0]);
             snprintf(out, size, "fork errno=%d", fork_error);
         } else {
             setpgid(child, child);
             shell->pid = child;
             shell->stdout_fd = shell_stdout[0];
             shell->stderr_fd = shell_stderr[0];
+            shell->status_fd = shell_status[0];
         }
         return;
     }
@@ -484,12 +499,13 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
 }
 
 int harmony_spawn_shell(const char *directory, const char *cwd, const char *command,
-                        int *stdout_fd, int *stderr_fd, char *error, size_t error_size) {
+                        int *stdout_fd, int *stderr_fd, int *status_fd, char *error, size_t error_size) {
     struct ShellLaunch shell = {.cwd = cwd, .command = command, .pid = -1};
     run_proot("proot-embedded-packaged-dsh-shellbench", directory, error, error_size, &shell);
     if (shell.pid > 0) {
         *stdout_fd = shell.stdout_fd;
         *stderr_fd = shell.stderr_fd;
+        *status_fd = shell.status_fd;
     }
     return shell.pid;
 }
