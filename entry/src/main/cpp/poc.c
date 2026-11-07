@@ -229,53 +229,66 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     }
     int guest_argc = 0;
     while (guest[guest_argc]) ++guest_argc;
-    char bind_options[40][1150];
-    char *bound_guest[100];
+    static const struct { const char *name; const char *guest; } packaged[] = {
+        { "libguest_busybox.so", "/bin/sh" },
+        { "libguest_busybox.so", "/bin/busybox" },
+        { "libguest_musl.so", "/lib/ld-musl-aarch64.so.1" },
+        { "libguest_musl.so", "/lib/libc.musl-aarch64.so.1" },
+        { "libguest_node.so", "/bin/node" },
+        { "libguest_bash.so", "/bin/bash" },
+        { "libguest_gcc.so", "/usr/lib/libgcc_s.so.1" },
+        { "libguest_readline.so", "/usr/lib/libreadline.so.8" },
+        { "libguest_ncurses.so", "/usr/lib/libncursesw.so.6" },
+        { "libguest_publish.so", "/harmony-publish.node" },
+        { "libguest_stdcpp.so", "/usr/lib/libstdc++.so.6" },
+        { "libguest_require_builtin.so", "/dsh/node_modules/node-addon-require-builtin-linux-arm64-musl/prebuilt/linux-arm64-musl-napi-v9.node" },
+        { "libguest_dsh_system.so", "/dsh/node_modules/@deepseek-ai/node-addon-system-linux-arm64/bin/musl/system.node" },
+        { "libguest_koffi.so", "/dsh/node_modules/@koromix/koffi-linux-arm64/musl_arm64/koffi.node" },
+        { "libguest_landlock.so", "/dsh/node_modules/@deepseek-ai/node-addon-system-linux-arm64/bin/landlock-run" },
+        { "libguest_rg.so", "/dsh/node_modules/@vscode/ripgrep-linux-arm64/bin/rg" },
+        { "libguest_busybox.so", "/bin/cat" },
+        { "libguest_busybox.so", "/bin/chmod" },
+        { "libguest_busybox.so", "/bin/cp" },
+        { "libguest_busybox.so", "/bin/cut" },
+        { "libguest_busybox.so", "/bin/diff" },
+        { "libguest_busybox.so", "/bin/env" },
+        { "libguest_busybox.so", "/bin/find" },
+        { "libguest_busybox.so", "/bin/grep" },
+        { "libguest_busybox.so", "/bin/head" },
+        { "libguest_busybox.so", "/bin/ls" },
+        { "libguest_busybox.so", "/bin/mkdir" },
+        { "libguest_busybox.so", "/bin/mv" },
+        { "libguest_busybox.so", "/bin/rm" },
+        { "libguest_busybox.so", "/bin/sed" },
+        { "libguest_busybox.so", "/bin/sort" },
+        { "libguest_busybox.so", "/bin/tail" },
+        { "libguest_busybox.so", "/bin/touch" },
+        { "libguest_busybox.so", "/bin/uname" },
+        { "libguest_busybox.so", "/bin/wc" },
+        { "libguest_busybox.so", "/bin/which" },
+        { "libguest_busybox.so", "/bin/awk" },
+        { "libguest_busybox.so", "/bin/basename" },
+        { "libguest_busybox.so", "/bin/date" },
+        { "libguest_busybox.so", "/bin/dirname" },
+        { "libguest_busybox.so", "/bin/gzip" },
+        { "libguest_busybox.so", "/bin/mktemp" },
+        { "libguest_busybox.so", "/bin/sha256sum" },
+        { "libguest_busybox.so", "/bin/sleep" },
+        { "libguest_busybox.so", "/bin/tar" },
+        { "libguest_busybox.so", "/bin/tr" },
+        { "libguest_busybox.so", "/bin/xargs" },
+        { "libguest_rg.so", "/bin/rg" },
+        { "libguest_sharp.so", "/dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node" },
+        { "libguest_vips.so", "/usr/lib/libvips-cpp.so.8.18.7" },
+#include "guest-tools.inc"
+    };
+    enum { packaged_count = sizeof(packaged) / sizeof(*packaged) };
+    char bind_options[packaged_count][1150];
+    char *bound_guest[packaged_count * 2 + 20];
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
-        const struct { const char *name; const char *guest; } packaged[] = {
-            { "libguest_busybox.so", "/bin/sh" },
-            { "libguest_busybox.so", "/bin/busybox" },
-            { "libguest_musl.so", "/lib/ld-musl-aarch64.so.1" },
-            { "libguest_musl.so", "/lib/libc.musl-aarch64.so.1" },
-            { "libguest_node.so", "/bin/node" },
-            { "libguest_bash.so", "/bin/bash" },
-            { "libguest_gcc.so", "/usr/lib/libgcc_s.so.1" },
-            { "libguest_readline.so", "/usr/lib/libreadline.so.8" },
-            { "libguest_ncurses.so", "/usr/lib/libncursesw.so.6" },
-            { "libguest_publish.so", "/harmony-publish.node" },
-            { "libguest_stdcpp.so", "/usr/lib/libstdc++.so.6" },
-            { "libguest_require_builtin.so", "/dsh/node_modules/node-addon-require-builtin-linux-arm64-musl/prebuilt/linux-arm64-musl-napi-v9.node" },
-            { "libguest_dsh_system.so", "/dsh/node_modules/@deepseek-ai/node-addon-system-linux-arm64/bin/musl/system.node" },
-            { "libguest_koffi.so", "/dsh/node_modules/@koromix/koffi-linux-arm64/musl_arm64/koffi.node" },
-            { "libguest_landlock.so", "/dsh/node_modules/@deepseek-ai/node-addon-system-linux-arm64/bin/landlock-run" },
-            { "libguest_rg.so", "/dsh/node_modules/@vscode/ripgrep-linux-arm64/bin/rg" },
-            { "libguest_busybox.so", "/bin/cat" },
-            { "libguest_busybox.so", "/bin/chmod" },
-            { "libguest_busybox.so", "/bin/cp" },
-            { "libguest_busybox.so", "/bin/cut" },
-            { "libguest_busybox.so", "/bin/diff" },
-            { "libguest_busybox.so", "/bin/env" },
-            { "libguest_busybox.so", "/bin/find" },
-            { "libguest_busybox.so", "/bin/grep" },
-            { "libguest_busybox.so", "/bin/head" },
-            { "libguest_busybox.so", "/bin/ls" },
-            { "libguest_busybox.so", "/bin/mkdir" },
-            { "libguest_busybox.so", "/bin/mv" },
-            { "libguest_busybox.so", "/bin/rm" },
-            { "libguest_busybox.so", "/bin/sed" },
-            { "libguest_busybox.so", "/bin/sort" },
-            { "libguest_busybox.so", "/bin/tail" },
-            { "libguest_busybox.so", "/bin/touch" },
-            { "libguest_busybox.so", "/bin/uname" },
-            { "libguest_busybox.so", "/bin/wc" },
-            { "libguest_busybox.so", "/bin/which" },
-            { "libguest_rg.so", "/bin/rg" },
-            { "libguest_sharp.so", "/dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node" },
-            { "libguest_vips.so", "/usr/lib/libvips-cpp.so.8.18.7" },
-        };
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
-        size_t bindings = dsh_test ? sizeof(packaged) / sizeof(*packaged) : node_test ? 9 : 4;
+        size_t bindings = dsh_test ? packaged_count : node_test ? 9 : 4;
         for (size_t n = 0; n < bindings; ++n) {
             snprintf(bind_options[n], sizeof(bind_options[n]), "%s/%s:%s", native, packaged[n].name, packaged[n].guest);
             bound_guest[bound_count++] = "-b";

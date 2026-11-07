@@ -1,0 +1,155 @@
+{
+  "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+  "packages": [
+    {
+      "name": "brotli-libs",
+      "archive": "brotli-libs-1.1.1-r0.apk",
+      "sha256": "c4ecb26f02ab93c7e41c019c98bf024bd6d90593be308a003bc516806732500e",
+      "bytes": 404438
+    },
+    {
+      "name": "c-ares",
+      "archive": "c-ares-1.34.9-r0.apk",
+      "sha256": "9ff2336ef422f2278e0f854ab914c5115747e5621205f85b4d1290c755923e05",
+      "bytes": 111586
+    },
+    {
+      "name": "ca-certificates-bundle",
+      "archive": "ca-certificates-bundle-20261020-r0.apk",
+      "sha256": "eb15a8dba0e6ae8c540d172836d44fe058d6c64adc4a2fca5d2c6eaffa015f1c",
+      "bytes": 107099
+    },
+    {
+      "name": "gdbm",
+      "archive": "gdbm-1.24-r0.apk",
+      "sha256": "dd9525bc443d995b86bc0671f6ac4384cff9e3e3d28822ac6279d08796ed7acc",
+      "bytes": 33055
+    },
+    {
+      "name": "git",
+      "archive": "git-2.49.1-r0.apk",
+      "sha256": "9d27f0e5e57b234e6d6a8a2b635ba82286e1dd441ea26c280aba4c8e416b4f60",
+      "bytes": 3453676
+    },
+    {
+      "name": "git-init-template",
+      "archive": "git-init-template-2.49.1-r0.apk",
+      "sha256": "94e1f133470fdc35e24304902c88a3bcc8178cdab24c8190edabf89f804f0984",
+      "bytes": 10349
+    },
+    {
+      "name": "libbz2",
+      "archive": "libbz2-1.0.8-r6.apk",
+      "sha256": "1d588037cc45108acafdbb1507e9f683019a8816fb74d9aba9b0a2dc099463c4",
+      "bytes": 35391
+    },
+    {
+      "name": "libcrypto3",
+      "archive": "libcrypto3-3.5.9-r0.apk",
+      "sha256": "ede2ef7eca3b65a42e902aaf7890f9c5647dca0c55123a817179ad9f3bc6ef24",
+      "bytes": 2293157
+    },
+    {
+      "name": "libcurl",
+      "archive": "libcurl-8.14.1-r4.apk",
+      "sha256": "99768d3f61dc96ac3b35049a0df4107d9cc6c51e118e865628fa8fa781e0b419",
+      "bytes": 329994
+    },
+    {
+      "name": "libexpat",
+      "archive": "libexpat-2.10.0-r0.apk",
+      "sha256": "cceec3fb87a26a0d8fb5da40eaeb03db5c688c055bea0eb9502393d32510f37a",
+      "bytes": 63773
+    },
+    {
+      "name": "libffi",
+      "archive": "libffi-3.4.8-r0.apk",
+      "sha256": "9391f60a14c146655deaf65115563bc8dcd749cf0f93ec567e6443f2ed7d3bfc",
+      "bytes": 17599
+    },
+    {
+      "name": "libidn2",
+      "archive": "libidn2-2.3.7-r0.apk",
+      "sha256": "9ddc248988707da96752077d05bacbda751d46cc1f7aa1460b3a40c4fbf66a6e",
+      "bytes": 105191
+    },
+    {
+      "name": "libpanelw",
+      "archive": "libpanelw-6.5_p20250503-r0.apk",
+      "sha256": "e09049ba44385a53ad9c39386a1868ef677c025859ea38fe286072263799537c",
+      "bytes": 5966
+    },
+    {
+      "name": "libpsl",
+      "archive": "libpsl-0.21.5-r3.apk",
+      "sha256": "b9f7270cb2980876f57360f38ca11093aefaf7f5eb4b777dfbc4e5738449e438",
+      "bytes": 55377
+    },
+    {
+      "name": "libssl3",
+      "archive": "libssl3-3.5.9-r0.apk",
+      "sha256": "338c9f6154582b4b76455a59f95538bcea8df039c5c72916dd2d8d0d844c9583",
+      "bytes": 374074
+    },
+    {
+      "name": "libunistring",
+      "archive": "libunistring-1.3-r0.apk",
+      "sha256": "6b6631284b25fa28bb9e63f9d423145e96d0f7aeb55a592f5cd5d54fb39380f7",
+      "bytes": 739708
+    },
+    {
+      "name": "mpdecimal",
+      "archive": "mpdecimal-4.0.1-r0.apk",
+      "sha256": "c299cd2c5d39c452054257965fb13e307562038f948b761030abbc55d1346223",
+      "bytes": 81395
+    },
+    {
+      "name": "ncurses-terminfo-base",
+      "archive": "ncurses-terminfo-base-6.5_p20250503-r0.apk",
+      "sha256": "3d37403e0b5ab9eb0c1ce269444e4a385faec9fe6af452c1c6956806b13d2bd6",
+      "bytes": 21749
+    },
+    {
+      "name": "nghttp2-libs",
+      "archive": "nghttp2-libs-1.69.0-r0.apk",
+      "sha256": "19db967a36f1e041e96240484d94063354f5c837e36d50daa017c2e96393a5e7",
+      "bytes": 63594
+    },
+    {
+      "name": "pcre2",
+      "archive": "pcre2-10.46-r1.apk",
+      "sha256": "7c24699bbfc009e02c23577071a09c80f687c051138f3863eb732eeb45da1f36",
+      "bytes": 295618
+    },
+    {
+      "name": "python3",
+      "archive": "python3-3.12.16-r0.apk",
+      "sha256": "d21dd05b578d14c84a735d66d8623e9454bdc18a1b3841815b37948ce3e2aa92",
+      "bytes": 8093823
+    },
+    {
+      "name": "sqlite-libs",
+      "archive": "sqlite-libs-3.49.2-r1.apk",
+      "sha256": "204910bcbb13df4d517cb01acb178ebe14f12ff0e55a04b38d1565941780ee29",
+      "bytes": 825441
+    },
+    {
+      "name": "xz-libs",
+      "archive": "xz-libs-5.8.4-r0.apk",
+      "sha256": "8a64b55223f29e24f934ccbc8167d535b913bf923dab5e14de7946a7c36091a7",
+      "bytes": 117354
+    },
+    {
+      "name": "zlib",
+      "archive": "zlib-1.4-r0.apk",
+      "sha256": "279972bab4f817182d9617984880bc29471f1d3016f92265be10d71e6f95ca74",
+      "bytes": 55065
+    },
+    {
+      "name": "zstd-libs",
+      "archive": "zstd-libs-1.5.7-r0.apk",
+      "sha256": "a0e92d2225941a514eb0b2325b137fe6444ef9171627aae8129b74a6ad934ac4",
+      "bytes": 362854
+    }
+  ]
+}

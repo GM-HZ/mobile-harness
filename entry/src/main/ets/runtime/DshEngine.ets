@@ -151,7 +151,7 @@ class DshEngine {
       this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
       this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
       this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
-      for (const archive of ['node-layer.zip', 'dsh-layer.zip']) {
+      for (const archive of ['node-layer.zip', 'dsh-layer.zip', 'shell-tools-layer.zip']) {
         const phase = Date.now();
         const extracted = await this.unpack(context, archive, root);
         hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
@@ -162,6 +162,7 @@ class DshEngine {
         this.copyGuest(context, name, root + '/' + name);
       }
       if (!fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
+        this.prepareResolver(root);
         this.runNative(context, root, started);
         nativeStarted = true;
         return;

@@ -57,3 +57,9 @@ API 26 Phone 模拟器通过 `exit 7`、同名重复上传、同内容异名上�
 DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有内容校验、像素限制、方向处理和压缩策略。API 26 Phone 模拟器通过 PNG 无损上传、GIF 转 WebP、大图缩放、损坏图像及 MIME 不符拒绝。后台 Bash 经一次批准启动，`job_output` 回读真实作业输出。 [结果](evidence/emulator-images-and-jobs-0.4.13.json)
 
 已部署的 unsigned HAP SHA-256 为 `01bd4514b1a47c6dba4334b8fe3b56481a8869df6dcb2dc4c4257c3b5a2e9cfa`。本机构建 signed HAP SHA-256 为 `a41267112b8522ade35207524044ca3d7c7473a822259dea30fd61acb7b14a76`。
+
+## 0.4.14 命令行工具包
+
+封装固定版本的 Alpine aarch64 Git 2.49.1、Python 3.12.16 与依赖，以及 BusyBox 常用命令。库和解释器由 HAP 签名后映射到已有 Shell 环境。Python 的 JSON、路径、SQLite、压缩和 SSL 模块导入通过，`sleep` 通过。Git 可启动和创建仓库，`git add` 缺少 `/dev/urandom` 而失败。
+
+已部署的 unsigned HAP SHA-256 为 `67ef69e5d4c4e22eea028f64382b85aee7abe959be3e21e35b02a078fae2b4bd`。本机构建 signed HAP SHA-256 为 `0a79833171c1c6e972e6e2deb7e6f4d3f70cf97451b66ce137dc448c2a11f389`。
