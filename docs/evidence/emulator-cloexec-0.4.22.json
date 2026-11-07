@@ -1,0 +1,13 @@
+{
+  "version": "0.4.22",
+  "device": "DevEco Phone emulator API 26 arm64-v8a",
+  "gitDumbHttpLsRemoteAndClone": true,
+  "gitSmartHttpsWithCertificateValidationLsRemoteAndClone": true,
+  "approvedBashExitSeven": true,
+  "bashCancellationBeforeDelayedWrite": true,
+  "fixtureBundleRegistryDependencyDownloadedAndActivated": true,
+  "fixtureBundleInstallAndActivateMs": 16965,
+  "pythonExecutableLookup": "empty when invoked using PATH, seen by smoke-guest-cloexec.py",
+  "unsignedHapSha256": "1292385c4e3ecdbcf307c919f6e2e30c97328264a85372ce19d9871f97c509bf",
+  "signedHapSha256": "7138da347669ae9e720f9e1b8256895b6cec588c9d90b7b11d79f540a5a7147d"
+}

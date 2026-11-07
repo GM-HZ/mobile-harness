@@ -105,3 +105,7 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 pnpm 默认直连通过已有 fetch 适配层，保留已有代理、自定义证书处理和依赖完整性校验。API 26 Phone 模拟器从 npm 官方仓库读取真实元数据，并下载纯 JS 测试组合包声明的依赖，安装和激活合计 19.3 秒。Bash 的非零退出码和取消回归通过。
 
 从零应用数据启动到 ArkWeb 加载完成约 15.6 秒，强停后重启约 6.1 秒。全新默认工作区已创建。真机保留 0.4.9。 [设备和制品证据](evidence/emulator-core-0.4.21.json)
+
+## 0.4.22 修复嵌入式 exec 文件描述符
+
+PRoot 加载器模拟真正 exec 时的 `FD_CLOEXEC` 行为。模拟器里的普通 Git 通过回环 HTTP 和带证书验证的 smart HTTPS 查询 HEAD、克隆并读取文件。Bash 退出码、取消和从 npm 安装组合包回归通过。Python 通过 PATH 启动时 `sys.executable` 为空，在独立描述符验证里暴露。 [结果和制品校验](evidence/emulator-cloexec-0.4.22.json)
