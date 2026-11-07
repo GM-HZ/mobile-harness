@@ -170,11 +170,18 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     int interactive = strstr(stage, "pty") != NULL;
     int node_test = strstr(stage, "node") != NULL;
     int dsh_test = secprobe || strstr(stage, "dsh") != NULL;
+    int shellbench = strstr(stage, "shellbench") != NULL;
     int client = strstr(stage, "client") != NULL;
     int jitless = strstr(stage, "jitless") != NULL;
     if (interactive) {
         guest[9] = "-i";
         guest[10] = NULL;
+    } else if (shellbench) {
+        guest[7] = "/workspace-native";
+        guest[8] = "/bin/bash";
+        guest[9] = "-c";
+        guest[10] = "set -e -o pipefail; printf 'NATIVE_WEB_PROOT_SHELL_OK\n' | grep -Fx NATIVE_WEB_PROOT_SHELL_OK > result.txt; cat result.txt";
+        guest[11] = NULL;
     } else if (node_test || dsh_test) {
         guest[8] = "/bin/node";
         int argument = 9;
@@ -292,7 +299,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     pid_t child = fork();
     int fork_error = errno;
     if (child == 0) {
-        if (client || secprobe) {
+        if (client || secprobe || shellbench) {
             if (prctl(PR_SET_PDEATHSIG, SIGQUIT, 0, 0, 0) < 0) {
                 dprintf(fd, "PRoot parent-death registration failed: %d\n", errno);
             }
@@ -361,7 +368,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     }
     int status = 0;
     int wait_error = ETIMEDOUT;
-    long long deadline = monotonic_ms() + (secprobe ? 15000 : dsh_test ? 105000 : 12000);
+    long long deadline = monotonic_ms() + (secprobe ? 15000 : shellbench ? 12000 : dsh_test ? 105000 : 12000);
     char launch_file[1100];
     snprintf(launch_file, sizeof(launch_file), "%s/tmp/dsh-client-launch", root);
     long long fast_deadline = monotonic_ms() + 210000;
@@ -554,9 +561,15 @@ static napi_value Run(napi_env env, napi_callback_info info) {
     return promise;
 }
 
+extern napi_value StartNative(napi_env env, napi_callback_info info);
+extern napi_value NativeStatus(napi_env env, napi_callback_info info);
 static napi_value Init(napi_env env, napi_value exports) {
-    napi_property_descriptor method = {"run", NULL, Run, NULL, NULL, NULL, napi_default, NULL};
-    napi_define_properties(env, exports, 1, &method);
+    napi_property_descriptor methods[] = {
+        {"run", NULL, Run, NULL, NULL, NULL, napi_default, NULL},
+        {"startNative", NULL, StartNative, NULL, NULL, NULL, napi_default, NULL},
+        {"nativeStatus", NULL, NativeStatus, NULL, NULL, NULL, napi_default, NULL},
+    };
+    napi_define_properties(env, exports, sizeof(methods) / sizeof(methods[0]), methods);
     return exports;
 }
 static napi_module module = {1, 0, NULL, Init, "poc", NULL, {0}};

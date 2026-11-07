@@ -104,6 +104,40 @@ class DshEngine {
     }
   }
 
+  private runNative(context: common.UIAbilityContext, root: string, started: number): void {
+    const launchFile = root + '/tmp/dsh-client-native-launch';
+    if (fileIo.accessSync(launchFile)) fileIo.unlinkSync(launchFile);
+    if (fileIo.accessSync(root + '/tmp/dsh-native-timeline.log')) fileIo.unlinkSync(root + '/tmp/dsh-native-timeline.log');
+    this.copyGuest(context, 'dsh-native-web.cjs', root + '/dsh-native-web.cjs');
+    this.publish('正在启动鸿蒙原生 DSH 测试…');
+    hilog.info(0xD005, 'DSHClient', 'starting native Web ms=%{public}d', Date.now() - started);
+    poc.startNative(root);
+    const poll = setInterval(() => {
+      if (fileIo.accessSync(launchFile)) {
+        clearInterval(poll);
+        const session = JSON.parse(fileIo.readTextSync(launchFile)) as BrowserSession;
+        if (session.url !== 'http://127.0.0.1:19592/') {
+          this.publish('原生 DSH 会话地址异常。');
+          return;
+        }
+        this.publish('', session);
+        hilog.info(0xD005, 'DSHClient', 'native loopback ready ms=%{public}d', Date.now() - started);
+        const shellStarted = Date.now();
+        poc.run('proot-embedded-packaged-dsh-shellbench', context.filesDir).then(result => {
+          const path = root + '/workspace-native/result.txt';
+          const ok = result.startsWith('exit=0 signal=0 wait_errno=0') && fileIo.accessSync(path) &&
+            fileIo.readTextSync(path).trim() === 'NATIVE_WEB_PROOT_SHELL_OK';
+          hilog.info(0xD005, 'DSHClient', 'native shared workspace shell probe=%{public}s ms=%{public}d',
+            String(ok), Date.now() - shellStarted);
+        }).catch(() => {});
+      } else if (poc.nativeStatus() < 0 || Date.now() - started > 75000) {
+        clearInterval(poll);
+        this.publish('原生 DSH 测试未就绪。');
+        hilog.error(0xD005, 'DSHClient', 'native Web not ready status=%{public}d', poc.nativeStatus());
+      }
+    }, 200);
+  }
+
   private async start(context: common.UIAbilityContext): Promise<void> {
     const started = Date.now();
     const root = context.filesDir + '/alpine';
@@ -128,6 +162,13 @@ class DshEngine {
         'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {
         this.copyGuest(context, name, root + '/' + name);
       }
+      if (fileIo.accessSync(context.filesDir + '/native-web-bench.enabled')) {
+        if (!fileIo.accessSync(root + '/workspace-native')) fileIo.mkdirSync(root + '/workspace-native', true);
+        const probeOutput = root + '/workspace-native/result.txt';
+        if (fileIo.accessSync(probeOutput)) fileIo.unlinkSync(probeOutput);
+        this.runNative(context, root, started);
+        return;
+      }
       this.copyGuest(context, 'dsh-startup-sources.gz', root + '/dsh-startup-sources.gz');
       await this.prepareResolver(root);
       const fast = await this.acceleration(context, modeFile);
@@ -142,7 +183,7 @@ class DshEngine {
       this.publish('本机 DSH 准备失败。重新打开可重试。');
       hilog.error(0xD005, 'DSHClient', 'setup error %{public}s', String(e));
     } finally {
-      this.running = false;
+      if (!fileIo.accessSync(context.filesDir + '/native-web-bench.enabled')) this.running = false;
     }
   }
 

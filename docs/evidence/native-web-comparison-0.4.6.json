@@ -1,0 +1,95 @@
+{
+  "version": "0.4.6",
+  "mate60ExistingArchives": {
+    "prepareToLoopbackMs": 7448,
+    "loopbackToChatMs": 2762,
+    "prepareToChatMs": 10210,
+    "shellProbeMs": 207,
+    "archiveExtraction": [
+      [
+        "node-layer.zip",
+        "false",
+        "1"
+      ],
+      [
+        "dsh-layer.zip",
+        "false",
+        "0"
+      ]
+    ],
+    "native": [
+      {
+        "event": "node-js",
+        "ms": 1,
+        "platform": "openharmony",
+        "node": "v24.14.1"
+      },
+      {
+        "event": "cli-imported",
+        "ms": 166
+      },
+      {
+        "event": "web-announced",
+        "ms": 6372,
+        "loadCount": 5004,
+        "loadMs": 459
+      },
+      {
+        "event": "profile-mounted",
+        "ms": 6508
+      },
+      {
+        "event": "loopback-ready",
+        "ms": 6950,
+        "exchange": 303,
+        "page": 200
+      }
+    ]
+  },
+  "emulatorFreshArchives": {
+    "prepareToLoopbackMs": 12487,
+    "loopbackToChatMs": 2874,
+    "prepareToChatMs": 15361,
+    "shellProbeMs": 222,
+    "archiveExtraction": [
+      [
+        "node-layer.zip",
+        "true",
+        "137"
+      ],
+      [
+        "dsh-layer.zip",
+        "true",
+        "8618"
+      ]
+    ],
+    "native": [
+      {
+        "event": "node-js",
+        "ms": 0,
+        "platform": "openharmony",
+        "node": "v24.14.1"
+      },
+      {
+        "event": "cli-imported",
+        "ms": 66
+      },
+      {
+        "event": "web-announced",
+        "ms": 2907,
+        "loadCount": 5004,
+        "loadMs": 246
+      },
+      {
+        "event": "profile-mounted",
+        "ms": 2977
+      },
+      {
+        "event": "loopback-ready",
+        "ms": 3174,
+        "exchange": 303,
+        "page": 200
+      }
+    ]
+  }
+}

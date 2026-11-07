@@ -1,0 +1,11 @@
+--- /Users/gongmeng/Downloads/harmony-dsh-poc/.build/proot-validation/termux-proot-phone/src/tracee/event.c	2026-11-07 12:55:10
++++ proot-eintr-source/src/tracee/event.c	2026-11-07 21:47:44
+@@ -332,6 +332,8 @@
+ 		/* Wait for the next tracee's stop. */
+ 		pid = waitpid(-1, &tracee_status, __WALL);
+ 		if (pid < 0) {
++			if (errno == EINTR)
++				continue;
+ 			if (errno != ECHILD) {
+ 				note(NULL, ERROR, SYSTEM, "waitpid()");
+ 				return EXIT_FAILURE;
