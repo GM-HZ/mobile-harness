@@ -1,0 +1,66 @@
+--- a/src/tracee/statx.h
++++ b/src/tracee/statx.h
+@@ -8,0 +9,2 @@
++#include <stdlib.h>
++#include <string.h>
+@@ -9,0 +12,13 @@
++static inline bool harmony_signed_git_image(const char *host_path)
++{
++	const char *native = getenv("HARMONY_GUEST_LIB_DIR");
++	if (!native || !*native)
++		return false;
++	size_t length = strlen(native);
++	if (strncmp(host_path, native, length) != 0 || host_path[length] != '/')
++		return false;
++	const char *file = host_path + length + 1;
++	return strcmp(file, "libguest_cli_e5ef41a4c9c4.so") == 0 ||
++		strcmp(file, "libguest_cli_30c86bf72a0d.so") == 0;
++}
++
+--- a/src/tracee/statx.c
++++ b/src/tracee/statx.c
+@@ -131,0 +132,6 @@
++	if ((mask & STATX_MODE) && S_ISREG(state.statx_buf.stx_mode) &&
++	    harmony_signed_git_image(state.host_path)) {
++		state.statx_buf.stx_mode |= S_IXUSR;
++		state.updated_stats = true;
++	}
++
+--- a/src/syscall/exit.c
++++ b/src/syscall/exit.c
+@@ -542,0 +543,19 @@
++#if defined(__aarch64__)
++	case PR_newfstatat:
++		if (syscall_result == 0) {
++			char host_path[PATH_MAX];
++			word_t name = peek_reg(tracee, MODIFIED, SYSARG_2);
++			word_t address = peek_reg(tracee, ORIGINAL, SYSARG_3);
++			/* AArch64 kernel struct stat uses a 32-bit mode at byte 16. */
++			uint32_t mode;
++			if (read_path(tracee, host_path, name) >= 0 &&
++			    harmony_signed_git_image(host_path) &&
++			    read_data(tracee, &mode, address + 16, sizeof(mode)) == 0 &&
++			    S_ISREG(mode)) {
++				mode |= S_IXUSR;
++				write_data(tracee, address + 16, &mode, sizeof(mode));
++			}
++		}
++		goto end;
++#endif
++
+--- a/src/execve/enter.c
++++ b/src/execve/enter.c
+@@ -716 +715,0 @@
+-	note(tracee, INFO, USER, "POC loader=%s rewrite_status=%d", loader_path, status);
+@@ -717,0 +717,2 @@
++		note(tracee, WARNING, USER, "POC loader=%s rewrite_status=%d", loader_path, status);
++	if (status < 0)
+--- a/src/execve/exit.c
++++ b/src/execve/exit.c
+@@ -571 +571 @@
+-		note(tracee, INFO, USER, "HARMONY_PRELOAD handoff");
++		VERBOSE(tracee, 1, "HARMONY_PRELOAD handoff");
+--- a/src/loader/loader.c
++++ b/src/loader/loader.c
+@@ -120 +119,0 @@
+-    REPORT("HARMONY_PRELOAD loader entered\n");

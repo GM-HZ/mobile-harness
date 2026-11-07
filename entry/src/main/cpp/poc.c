@@ -374,6 +374,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             if (close_host_descriptors(status_channel) != 0) _exit(48);
             clearenv();
             setenv("HARMONY_PROOT_MANAGED_SHELL", "1", 1);
+            setenv("HARMONY_GUEST_LIB_DIR", native, 1);
             setenv("HOME", "/workspace-native", 1);
             setenv("LANG", "C.UTF-8", 1);
             setenv("NO_COLOR", "1", 1);

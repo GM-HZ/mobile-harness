@@ -75,3 +75,9 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 指定 Git 已打包的 helper 和模板路径。模拟器能直接运行 helper，但 Git 自己仍找不到它。Git 在查找 PATH 时检查 `stat()` 的执行位，而 HAP 安装的签名库显示为 0644。另验证通过 Shell 运行内置 Node JS 脚本。pnpm 11 即使使用 hoisted 和 copy，仍试图为 store 注册项目软链接，触发 EACCES。
 
 已部署的 unsigned HAP SHA-256 为 `e790c2921a50f951f42eea46df3f4adc4da13926060bd1f23958392aba1c32ab`。本机构建 signed HAP SHA-256 为 `1c18c581c171000e59785cfffe5ce72bfa0f10b2f1f6dd0e6a9cb2ac20360ffb`。
+
+## 0.4.17 签名 Git 映射验证
+
+尝试只为两个签名 Git 文件返回虚拟执行位。实际 Git HTTPS 仍未找到 helper，准备继续核对 stat 路径。工具的 stderr 已保留错误并去掉正常 PRoot 加载日志。独立模拟器验证，去掉 pnpm 的 store 项目软链接登记后，hoisted 和 copy 能在该文件系统安装本地纯 JS 依赖。该 pnpm 实验尚未进入此版本 HAP。
+
+已部署的 unsigned HAP SHA-256 为 `e38061d2e59634de9fc1e0a3273b4cbe250af50699de0769731c8d2e58bde42c`。本机构建 signed HAP SHA-256 为 `1425f5fb0b2079f9d7927be710c9cd0dc0007530b496844a8075866b1a449c67`。
