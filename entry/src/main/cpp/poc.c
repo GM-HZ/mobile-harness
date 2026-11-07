@@ -379,6 +379,8 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             setenv("NO_COLOR", "1", 1);
             setenv("PAGER", "cat", 1);
             setenv("NODE_OPTIONS", "--jitless", 1);
+            setenv("GIT_EXEC_PATH", "/usr/libexec/git-core", 1);
+            setenv("GIT_TEMPLATE_DIR", "/usr/share/git-core/templates", 1);
         } else if (use_pty) {
             close(master);
             if (setsid() < 0 || ioctl(slave, TIOCSCTTY, 0) < 0) {

@@ -69,3 +69,9 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 为 PRoot 增加单独的 `/dev/urandom` 映射。API 26 Phone 模拟器经实际一次性批准完成 Git 建仓、暂存、提交和日志，随后运行 Python SQLite 和 BusyBox。Git HTTPS 远端测试仍找不到 helper。ArkWeb 打开了 DeepSeek 官方登录页，验收停在登录凭据输入前。回到主屏再启动后复用同一进程。
 
 已部署的 unsigned HAP SHA-256 为 `974ef14f11d9b4c3fcfe6598b8319745b9fb9a0b4efa1b429289bcd6c5680972`。本机构建 signed HAP SHA-256 为 `896c2f048ffebdaa530a426ef7f0b0e51b1e36a3f8e1c4687153a70cfe9b982e`。
+
+## 0.4.16 Git helper 路径验证
+
+指定 Git 已打包的 helper 和模板路径。模拟器能直接运行 helper，但 Git 自己仍找不到它。Git 在查找 PATH 时检查 `stat()` 的执行位，而 HAP 安装的签名库显示为 0644。另验证通过 Shell 运行内置 Node JS 脚本。pnpm 11 即使使用 hoisted 和 copy，仍试图为 store 注册项目软链接，触发 EACCES。
+
+已部署的 unsigned HAP SHA-256 为 `e790c2921a50f951f42eea46df3f4adc4da13926060bd1f23958392aba1c32ab`。本机构建 signed HAP SHA-256 为 `1c18c581c171000e59785cfffe5ce72bfa0f10b2f1f6dd0e6a9cb2ac20360ffb`。
