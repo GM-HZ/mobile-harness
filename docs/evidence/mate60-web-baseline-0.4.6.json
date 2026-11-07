@@ -1,0 +1,12 @@
+{
+  "version": "0.4.6",
+  "device": "Mate 60",
+  "runtime": "native Web",
+  "provider": "deepseek-official",
+  "model": "deepseek-flash",
+  "chatMs": 1431,
+  "fileWriteAndReadMs": 4371,
+  "defaultBashRefused": true,
+  "defaultBashReason": "no usable workspace-write sandbox",
+  "historyEvents": 54
+}

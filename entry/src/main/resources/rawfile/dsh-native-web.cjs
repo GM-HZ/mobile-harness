@@ -1,6 +1,9 @@
 'use strict';
 const fs = require('node:fs');
 const http = require('node:http');
+const { spawn } = require('node:child_process');
+const { EventEmitter } = require('node:events');
+const { constants } = require('node:os');
 const { Module, registerHooks } = require('node:module');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
@@ -26,6 +29,48 @@ function addon(name) {
   const module = { exports: {} };
   process.dlopen(module, name);
   return module.exports;
+}
+function installProotSpawn(workspace) {
+  const bridge = addon('libdshshell.so');
+  const allowedRoot = fs.realpathSync(workspace);
+  const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
+  globalThis.__harmonyProotSpawn = (program, args, options) => {
+    if (program !== 'bash') return spawn(program, args, options);
+    if (args.length !== 2 || args[0] !== '-c' ||
+        options.stdio.join(',') !== 'ignore,pipe,pipe') {
+      throw new Error('Harmony Bash currently accepts one non-interactive command with captured output');
+    }
+    const cwd = fs.realpathSync(options.cwd);
+    const relative = path.relative(allowedRoot, cwd);
+    if (relative === '..' || relative.startsWith('../') || path.isAbsolute(relative)) {
+      throw new Error('Harmony Bash requires a directory in the native DSH workspace');
+    }
+    const guest = path.posix.join('/workspace-native', relative);
+    const launched = bridge.launch(path.dirname(root), guest, args[1]);
+    const child = new EventEmitter();
+    child.pid = launched.pid;
+    child.exitCode = null;
+    child.signalCode = null;
+    child.stdin = null;
+    child.stdout = fs.createReadStream(null, { fd: launched.stdoutFd });
+    child.stderr = fs.createReadStream(null, { fd: launched.stderrFd });
+    child.stdio = [child.stdin, child.stdout, child.stderr];
+    child.kill = (signal = 'SIGTERM') => process.kill(-child.pid, signal);
+    const timer = setInterval(() => {
+      try {
+        const result = bridge.pollExit(child.pid);
+        if (!result) return;
+        clearInterval(timer);
+        child.exitCode = result.exitCode < 0 ? null : result.exitCode;
+        child.signalCode = signals.get(result.signal) ?? null;
+        child.emit('exit', child.exitCode, child.signalCode);
+      } catch (error) {
+        clearInterval(timer);
+        child.emit('error', error);
+      }
+    }, 25);
+    return child;
+  };
 }
 function httpGet(url, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -71,6 +116,8 @@ async function main() {
   const paths = name => pathToFileURL(path.join(dsh, '@deepseek-ai', name)).href;
   const flockUrl = paths('node-addon-system/lib/flock.js');
   const persistenceUrl = paths('dsh-session-persistence-jsonl/lib/index.js');
+  const subprocessUrl = paths('dsh-subprocess-local/lib/index.js');
+  installProotSpawn(workspace);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;
@@ -89,8 +136,13 @@ async function main() {
         loadCount++;
         loadMs += performance.now() - start;
       }
-      if (url !== flockUrl && url !== persistenceUrl) return result;
+      if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+      if (url === subprocessUrl) {
+        const point = 'internals = {};';
+        if (source.split(point).length !== 2) throw new Error('Unexpected pinned subprocess spawn seam');
+        return { ...result, source: source.replace(point, 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
+      }
       const point = url === flockUrl ? '    const { platform, arch } = process;' : 'await link(tmp, finalPath);';
       const replacement = url === flockUrl
         ? "    if (process.platform === 'openharmony') return { tryLock: globalThis.__harmonyWebFlock };\n" + point
@@ -115,7 +167,9 @@ async function main() {
     }
     print(...args);
   };
-  process.argv = ['node', cli, '--patch', path.join(root, 'dsh-client.patch.yml'),
+  const nativePatch = path.join(root, 'tmp/dsh-native.patch.yml');
+  fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n', { mode: 0o600 });
+  process.argv = ['node', cli, '--patch', path.join(root, 'dsh-client.patch.yml'), '--patch', nativePatch,
     '--profile', 'web', '--host', '127.0.0.1', '--port', '19592', '--no-open'];
   const { runCli } = await import(pathToFileURL(cli).href);
   mark('cli-imported');

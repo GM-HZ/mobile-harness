@@ -1,0 +1,9 @@
+--- a/src/tracee/event.c
++++ b/src/tracee/event.c
+@@ -282,0 +283,6 @@
++		case SIGTERM:
++			if (getenv("HARMONY_PROOT_MANAGED_SHELL") == NULL) {
++				signal_action.sa_sigaction = (void *)SIG_IGN;
++				break;
++			}
++			/* fall through */

@@ -2,6 +2,7 @@
 #include <napi/native_api.h>
 #include <hilog/log.h>
 #include <dlfcn.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -100,7 +101,29 @@ static int map_rx(const char *path) {
     return error;
 }
 
-static void run_proot(const char *stage, const char *directory, char *out, size_t size) {
+struct ShellLaunch {
+    const char *cwd;
+    const char *command;
+    int pid;
+    int stdout_fd;
+    int stderr_fd;
+};
+
+static int close_host_descriptors(void) {
+    DIR *dir = opendir("/proc/self/fd");
+    if (!dir) return errno;
+    int own = dirfd(dir);
+    struct dirent *entry;
+    while ((entry = readdir(dir))) {
+        char *end;
+        long fd = strtol(entry->d_name, &end, 10);
+        if (*end == 0 && fd > STDERR_FILENO && fd != own) close((int)fd);
+    }
+    closedir(dir);
+    return 0;
+}
+
+static void run_proot(const char *stage, const char *directory, char *out, size_t size, struct ShellLaunch *shell) {
     Dl_info self;
     if (!dladdr((void *)run_proot, &self) || !self.dli_fname) {
         snprintf(out, size, "cannot find package library path");
@@ -140,8 +163,9 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     LOG("native=%{public}s proot X_OK errno=%{public}d loader X_OK errno=%{public}d", native, e, l);
     char marker[1100];
     snprintf(marker, sizeof(marker), "%s/marker", root);
-    unlink(marker);
-    int fd = open(log_path, O_RDWR | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
+    if (!shell) unlink(marker);
+    int fd = shell ? open("/dev/null", O_RDONLY | O_CLOEXEC) :
+        open(log_path, O_RDWR | O_CREAT | O_TRUNC | O_CLOEXEC, 0600);
     if (fd < 0) {
         snprintf(out, size, "open output errno=%d", errno);
         return;
@@ -177,10 +201,11 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         guest[9] = "-i";
         guest[10] = NULL;
     } else if (shellbench) {
-        guest[7] = "/workspace-native";
+        guest[7] = shell ? (char *)shell->cwd : "/workspace-native";
         guest[8] = "/bin/bash";
         guest[9] = "-c";
         guest[10] = "set -e -o pipefail; printf 'NATIVE_WEB_PROOT_SHELL_OK\n' | grep -Fx NATIVE_WEB_PROOT_SHELL_OK > result.txt; cat result.txt";
+        if (shell) guest[10] = (char *)shell->command;
         guest[11] = NULL;
     } else if (node_test || dsh_test) {
         guest[8] = "/bin/node";
@@ -295,6 +320,13 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             return;
         }
     }
+    int shell_stdout[2] = {-1, -1}, shell_stderr[2] = {-1, -1};
+    if (shell && (pipe2(shell_stdout, O_CLOEXEC) < 0 || pipe2(shell_stderr, O_CLOEXEC) < 0)) {
+        snprintf(out, size, "open shell pipes errno=%d", errno);
+        if (shell_stdout[0] >= 0) { close(shell_stdout[0]); close(shell_stdout[1]); }
+        close(fd);
+        return;
+    }
     pid_t owner = getpid();
     pid_t child = fork();
     int fork_error = errno;
@@ -305,7 +337,18 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             }
             if (getppid() != owner) _exit(46);
         }
-        if (use_pty) {
+        if (shell) {
+            if (setpgid(0, 0) < 0 || dup2(fd, STDIN_FILENO) < 0 ||
+                dup2(shell_stdout[1], STDOUT_FILENO) < 0 ||
+                dup2(shell_stderr[1], STDERR_FILENO) < 0) _exit(47);
+            if (close_host_descriptors() != 0) _exit(48);
+            clearenv();
+            setenv("HARMONY_PROOT_MANAGED_SHELL", "1", 1);
+            setenv("HOME", "/workspace-native", 1);
+            setenv("LANG", "C.UTF-8", 1);
+            setenv("NO_COLOR", "1", 1);
+            setenv("PAGER", "cat", 1);
+        } else if (use_pty) {
             close(master);
             if (setsid() < 0 || ioctl(slave, TIOCSCTTY, 0) < 0) {
                 dprintf(fd, "PTY_CTTY errno=%d\n", errno);
@@ -335,7 +378,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             if (loader_entry) setenv("HARMONY_PROOT_LOADER_ENTRY", address, 1);
             setenv("PROOT_TMP_DIR", directory, 1);
             setenv("PATH", "/bin:/usr/bin", 1);
-            setenv("TERM", "xterm", 1);
+            setenv("TERM", shell ? "dumb" : "xterm", 1);
             setenv("UV_USE_IO_URING", "0", 1);
             setenv("TMPDIR", "/tmp", 1);
             setenv("DSH_HOME", "/tmp/dsh-poc-home", 1);
@@ -424,6 +467,17 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     }
 }
 
+int harmony_spawn_shell(const char *directory, const char *cwd, const char *command,
+                        int *stdout_fd, int *stderr_fd, char *error, size_t error_size) {
+    struct ShellLaunch shell = {.cwd = cwd, .command = command, .pid = -1};
+    run_proot("proot-embedded-packaged-dsh-shellbench", directory, error, error_size, &shell);
+    if (shell.pid > 0) {
+        *stdout_fd = shell.stdout_fd;
+        *stderr_fd = shell.stderr_fd;
+    }
+    return shell.pid;
+}
+
 static void run_probe(const char *stage, const char *directory, char *out, size_t size) {
     char label[160] = "unreadable";
     FILE *file = fopen("/proc/self/attr/current", "r");
@@ -434,7 +488,7 @@ static void run_probe(const char *stage, const char *directory, char *out, size_
     LOG("begin stage=%{public}s uid=%{public}u pid=%{public}d domain=%{public}s",
         stage, getuid(), getpid(), label);
     if (strncmp(stage, "proot-", 6) == 0) {
-        run_proot(stage, directory, out, size);
+        run_proot(stage, directory, out, size, NULL);
         return;
     }
     int is_trace = strcmp(stage, "trace") == 0;
