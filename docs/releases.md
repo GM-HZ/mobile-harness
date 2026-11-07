@@ -87,3 +87,9 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 固定 pnpm 11.28.5，通过 DSH 插件管理服务调用。适配应用私有目录的软链接限制，使用 hoisted 和 copy，跳过非必要的项目软链接登记。安装生命周期脚本保持关闭。模拟器经 `pluginManager/installBundle` 安装本地纯 JS 测试组合包，6.4 秒包安装，14.3 秒内完成安装与启用，插件状态为 active。
 
 已部署的 unsigned HAP SHA-256 为 `9d51c6fce9bfb75cd6fbc225f3e8d80976c574c50ca2178f04894248642d8af8`。本机构建 signed HAP SHA-256 为 `3f4559b3370e8e9b709339d9d8ec5583fb8d4ffc09acb52cc175f4bbbe4dde85`。
+
+## 0.4.19 ARM64 Git helper 探测
+
+将签名 Git 文件的虚拟执行位补到 ARM64 实际使用的 `fstatat64` 路径。Git 远程查询已越过找不到 helper，默认等待超时，限时测试收到 SIGSEGV。DNS 查询有结果，HTTPS 尚未通过。0.4.18 的纯 JS 插件禁用、启用和覆盖安装后恢复通过。npm 元数据探测发现查询命令不接受安装参数。
+
+已部署的 unsigned HAP SHA-256 为 `965b0a0e875abe7bdcd06fd8ea0562e3c4520d5d45314c5ce3d495dece207e0c`。本机构建 signed HAP SHA-256 为 `55255abd13655bacd77d5c137ce92ce4f74e6a3dc3a087e277b455f33b7b6671`。

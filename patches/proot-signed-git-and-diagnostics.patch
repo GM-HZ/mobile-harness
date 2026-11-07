@@ -28,8 +28,10 @@
 +
 --- a/src/syscall/exit.c
 +++ b/src/syscall/exit.c
-@@ -542,0 +543,19 @@
+@@ -541,0 +542,20 @@
++
 +#if defined(__aarch64__)
++	case PR_fstatat64:
 +	case PR_newfstatat:
 +		if (syscall_result == 0) {
 +			char host_path[PATH_MAX];
@@ -47,7 +49,6 @@
 +		}
 +		goto end;
 +#endif
-+
 --- a/src/execve/enter.c
 +++ b/src/execve/enter.c
 @@ -716 +715,0 @@
