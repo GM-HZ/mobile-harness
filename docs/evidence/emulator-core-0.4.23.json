@@ -1,0 +1,57 @@
+{
+  "version": "0.4.23",
+  "device": "DevEco Phone emulator API 26 arm64-v8a",
+  "fresh": {
+    "arkWebCompleteMs": 15633,
+    "loopbackMs": 12773,
+    "archives": {
+      "node-layer.zip": {
+        "extracted": true,
+        "ms": 82
+      },
+      "dsh-layer.zip": {
+        "extracted": true,
+        "ms": 8932
+      },
+      "shell-tools-layer.zip": {
+        "extracted": true,
+        "ms": 130
+      },
+      "pnpm-layer-v2.zip": {
+        "extracted": true,
+        "ms": 164
+      }
+    }
+  },
+  "forcedRestart": {
+    "arkWebCompleteMs": 5957,
+    "loopbackMs": 3497,
+    "archives": {
+      "node-layer.zip": {
+        "extracted": false,
+        "ms": 0
+      },
+      "dsh-layer.zip": {
+        "extracted": false,
+        "ms": 0
+      },
+      "shell-tools-layer.zip": {
+        "extracted": false,
+        "ms": 0
+      },
+      "pnpm-layer-v2.zip": {
+        "extracted": false,
+        "ms": 0
+      }
+    }
+  },
+  "freshDefaultWorkspace": true,
+  "unauthenticatedLoopbackHTTP": 401,
+  "temporaryCredentialCleared": true,
+  "pythonPathResolutionAndReexec": true,
+  "cloexecFd200Closed": true,
+  "inheritableFd201Preserved": true,
+  "gitSmartHttpsCertificateValidatedLsRemoteAndClone": true,
+  "signedHapSha256": "b9383d22b107e12df170eef7012b4050f00eb4950c40c9c718228c015ca2d9a4",
+  "unsignedHapSha256": "d1a6d89ac184ffa124501d115315260c88242170545ea16ccacfd4f8e12de6cf"
+}

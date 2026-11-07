@@ -44,3 +44,11 @@
 | 待验或未通过 | Git 远端传输仍失败。DeepSeek 账号完成授权、外部视觉模型读取附件和最新签名包真机回归待验。Phone Use 与系统 PTY 已延期 |
 
 [最新模拟器验收证据](evidence/emulator-core-0.4.21.json)
+
+## 0.4.22 与 0.4.23 补验
+
+- 0.4.22 修复嵌入式 exec 的描述符关闭语义。普通 Git 在回环 HTTP 测试仓库完成查询和克隆。0.4.22 和 0.4.23 均通过带证书校验的回环 smart HTTPS 查询和克隆。公网 GitHub 有超时历史，当前验收依据可复现的受控 HTTPS 服务。
+- 0.4.23 通过 Python 解释器路径和高编号文件描述符的重新执行回归。从零应用数据到 ArkWeb 加载完成 15.633 秒，强停重启 5.957 秒。0.4.22 重新验证 Bash 非零退出码、取消、图片格式校验和 npm 依赖安装。
+- 正常启动用鸿蒙原生 Node 运行本机 DSH Host。Bash、ripgrep、部分 Linux 工具和兼容组件按需使用 PRoot。Bash 默认权限在系统沙箱不可用时拒绝，需通过 DSH 审批。系统 PTY、Phone Use、账号完整授权和最新 HAP 真机结果仍需单独验收。
+
+[0.4.22 兼容性证据](evidence/emulator-cloexec-0.4.22.json) · [0.4.23 启动与制品证据](evidence/emulator-core-0.4.23.json)
