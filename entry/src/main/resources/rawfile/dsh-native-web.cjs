@@ -75,8 +75,9 @@ function installProotSpawn(workspace) {
     child.stdio = [child.stdin, child.stdout, child.stderr];
     child.kill = (signal = 'SIGTERM') => process.kill(-child.pid, signal);
     const timer = setInterval(() => {
+      let result;
       try {
-        const result = bridge.pollExit(child.pid);
+        result = bridge.pollExit(child.pid);
         if (!result) return;
         clearInterval(timer);
         child.exitCode = result.exitCode < 0 ? null : result.exitCode;
@@ -90,13 +91,15 @@ function installProotSpawn(workspace) {
           }
           child.exitCode = Number(text);
         }
-        fs.closeSync(launched.statusFd);
-        child.emit('exit', child.exitCode, child.signalCode);
       } catch (error) {
         clearInterval(timer);
-        try { fs.closeSync(launched.statusFd); } catch {}
+        if (!result) fs.closeSync(launched.statusFd);
         child.emit('error', error);
+        return;
+      } finally {
+        if (result) fs.closeSync(launched.statusFd);
       }
+      child.emit('exit', child.exitCode, child.signalCode);
     }, 25);
     return child;
   };
@@ -107,6 +110,25 @@ function relativeInWorkspace(root, target) {
     throw new Error('Harmony tool requires a path in the native DSH workspace');
   }
   return relative;
+}
+async function sortGlobPaths(paths, workdir, signal) {
+  const entries = [];
+  for (let offset = 0; offset < paths.length; offset += 32) {
+    signal.throwIfAborted();
+    const batch = await Promise.all(paths.slice(offset, offset + 32).map(async file => {
+      try {
+        const info = await fs.promises.lstat(path.resolve(workdir, file), { bigint: true });
+        return { file, modified: info.mtimeNs };
+      } catch (error) {
+        if (error?.code !== 'ENOENT' && error?.code !== 'ENOTDIR') throw error;
+        return null;
+      }
+    }));
+    entries.push(...batch.filter(Boolean));
+  }
+  signal.throwIfAborted();
+  entries.sort((a, b) => a.modified < b.modified ? -1 : a.modified > b.modified ? 1 : 0);
+  return entries.map(entry => entry.file);
 }
 function httpGet(url, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -160,6 +182,7 @@ async function main() {
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;
   globalThis.__harmonyPackagedRg = ripgrep;
+  globalThis.__harmonySortGlobPaths = sortGlobPaths;
   globalThis.__harmonyWebRename = (source, target) => {
     const errno = rename(source, target);
     if (errno) throw Object.assign(new Error('exclusive publish failed'), { errno, code: errno === 17 ? 'EEXIST' : 'EIO' });
@@ -195,7 +218,10 @@ async function main() {
         return { ...result, source: replacePinned(source, 'internals = {};', 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
       }
       if (url === searchUrl) {
-        return { ...result, source: replacePinned(source, '(await import("@vscode/ripgrep")).rgPath', 'globalThis.__harmonyPackagedRg') };
+        let patched = replacePinned(source, '(await import("@vscode/ripgrep")).rgPath', 'globalThis.__harmonyPackagedRg');
+        patched = replacePinned(patched, '\t\t"--sort=modified",\n', '');
+        patched = replacePinned(patched, 'paths: all', 'paths: await globalThis.__harmonySortGlobPaths(all, run.workdir, exec.signal)');
+        return { ...result, source: patched };
       }
       if (url === attachmentUrl) {
         let patched = replacePinned(source, 'ensureDurableDirectory(home, parse(home).root)',

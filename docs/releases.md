@@ -45,3 +45,9 @@ API 26 Phone 模拟器通过 `exit 7`、同名重复上传、同内容异名上�
 `grep` 通过已有子进程接口调用包内 ripgrep，真实模型调用搜到工作区文件。工作区外搜索被拒，默认文件写权限同样拒绝写入工作区外。 `glob` 仍因 ripgrep 的修改时间排序依赖 `/proc/self/exe` 失败。图片上传重现 Sharp 无法加载。
 
 已部署的 unsigned HAP SHA-256 为 `f9de68e9a40db69f761645163a2e36068cb81933647d4f7d9c90730293917fbc`。本机构建 signed HAP SHA-256 为 `2eed67ed10b43ceef55f2e5c1cd05c6a16da679187fef22daddb01d30775a1df`。
+
+## 0.4.12 glob 排序
+
+保留 ripgrep 路径筛选，用原生 Node 文件时间排序代替依赖 `/proc` 的排序。API 26 Phone 模拟器经真实模型调用，分别测试指定目录和默认工作区的 glob，两次都按修改时间返回两个文件。清理 Bash 进程退出后的状态管道。
+
+已部署的 unsigned HAP SHA-256 为 `34d4e367cb4679cece57117f804bae65d58a7b046ada5d30800b2809d193dd0d`。本机构建 signed HAP SHA-256 为 `9a493cca1e61228ee95ee3a0a19645682b1c904a6729f7115e5e9a725a1a4493`。
