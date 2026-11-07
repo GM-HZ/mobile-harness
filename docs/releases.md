@@ -63,3 +63,9 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 封装固定版本的 Alpine aarch64 Git 2.49.1、Python 3.12.16 与依赖，以及 BusyBox 常用命令。库和解释器由 HAP 签名后映射到已有 Shell 环境。Python 的 JSON、路径、SQLite、压缩和 SSL 模块导入通过，`sleep` 通过。Git 可启动和创建仓库，`git add` 缺少 `/dev/urandom` 而失败。
 
 已部署的 unsigned HAP SHA-256 为 `67ef69e5d4c4e22eea028f64382b85aee7abe959be3e21e35b02a078fae2b4bd`。本机构建 signed HAP SHA-256 为 `0a79833171c1c6e972e6e2deb7e6f4d3f70cf97451b66ce137dc448c2a11f389`。
+
+## 0.4.15 Git 本地工作流
+
+为 PRoot 增加单独的 `/dev/urandom` 映射。API 26 Phone 模拟器经实际一次性批准完成 Git 建仓、暂存、提交和日志，随后运行 Python SQLite 和 BusyBox。Git HTTPS 远端测试仍找不到 helper。ArkWeb 打开了 DeepSeek 官方登录页，验收停在登录凭据输入前。回到主屏再启动后复用同一进程。
+
+已部署的 unsigned HAP SHA-256 为 `974ef14f11d9b4c3fcfe6598b8319745b9fb9a0b4efa1b429289bcd6c5680972`。本机构建 signed HAP SHA-256 为 `896c2f048ffebdaa530a426ef7f0b0e51b1e36a3f8e1c4687153a70cfe9b982e`。

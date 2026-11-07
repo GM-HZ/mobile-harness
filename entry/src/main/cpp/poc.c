@@ -297,6 +297,8 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         if (dsh_test) {
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = "/dev/null:/dev/null";
+            bound_guest[bound_count++] = "-b";
+            bound_guest[bound_count++] = "/dev/urandom:/dev/urandom";
         }
         for (int n = 8; n < guest_argc; ++n) bound_guest[bound_count++] = guest[n];
         bound_guest[bound_count] = NULL;
@@ -376,6 +378,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             setenv("LANG", "C.UTF-8", 1);
             setenv("NO_COLOR", "1", 1);
             setenv("PAGER", "cat", 1);
+            setenv("NODE_OPTIONS", "--jitless", 1);
         } else if (use_pty) {
             close(master);
             if (setsid() < 0 || ioctl(slave, TIOCSCTTY, 0) < 0) {
