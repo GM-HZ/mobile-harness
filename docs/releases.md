@@ -93,3 +93,9 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 将签名 Git 文件的虚拟执行位补到 ARM64 实际使用的 `fstatat64` 路径。Git 远程查询已越过找不到 helper，默认等待超时，限时测试收到 SIGSEGV。DNS 查询有结果，HTTPS 尚未通过。0.4.18 的纯 JS 插件禁用、启用和覆盖安装后恢复通过。npm 元数据探测发现查询命令不接受安装参数。
 
 已部署的 unsigned HAP SHA-256 为 `965b0a0e875abe7bdcd06fd8ea0562e3c4520d5d45314c5ce3d495dece207e0c`。本机构建 signed HAP SHA-256 为 `55255abd13655bacd77d5c137ce92ce4f74e6a3dc3a087e277b455f33b7b6671`。
+
+## 0.4.20 区分插件查询与安装
+
+只对包变更命令传安装专用参数。实际 npm 元数据查询进入 fetch，两个 registry 均返回网络失败。通过已装的兼容 fetch 垫片，guest Node 请求同一 npm 元数据和回环 Git 测试服务器均返回 HTTP 200。Git 通过自己的 HTTP helper 访问回环服务器仍超时。
+
+已部署的 unsigned HAP SHA-256 为 `c6907e19ecd1bb08b64e377d27c652e7a5997d244ad6ed692ccebfc9eb99ca08`。本机构建 signed HAP SHA-256 为 `252650e12f03f0f78f6acd0c7b77eddd9ed5dd1b0722e8c61fd5d73fbf3440d8`。

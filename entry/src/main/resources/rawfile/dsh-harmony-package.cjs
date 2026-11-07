@@ -23,6 +23,13 @@ function createPackageRunner(root, home, launch) {
     }
     const cwd = fs.realpathSync(options.cwd);
     inside(home, cwd);
+    for (const name of ['stdout', 'stderr']) {
+      const file = options[name]?.file;
+      if (file) {
+        inside(home, path.resolve(file));
+        inside(home, fs.realpathSync(path.dirname(file)));
+      }
+    }
     options.cancelSignal?.throwIfAborted();
     const profileHome = guestPath(home);
     const prefix = command === 'pnpm' ? [
@@ -33,7 +40,8 @@ function createPackageRunner(root, home, launch) {
       if (!match) return arg;
       return (match[1] || '') + guestPath(fs.realpathSync(match[2]));
     });
-    if (command === 'pnpm') {
+    const packageAction = args.find(arg => !arg.startsWith('-'));
+    if (command === 'pnpm' && ['add', 'install', 'remove', 'update'].includes(packageAction)) {
       remapped.push('--config.node-linker=hoisted', '--config.package-import-method=copy',
         '--store-dir=' + profileHome + '/package-store', '--ignore-scripts');
     }
@@ -58,7 +66,6 @@ function createPackageRunner(root, home, launch) {
       const mode = options[name] ?? 'pipe';
       const readable = child[name];
       if (mode && typeof mode === 'object' && typeof mode.file === 'string') {
-        inside(home, path.resolve(mode.file));
         return { exposed: null, done: pipeline(readable, fs.createWriteStream(mode.file, {
           flags: mode.append ? 'a' : 'w', mode: 0o600,
         })) };
