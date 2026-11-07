@@ -1,0 +1,29 @@
+{
+  "apiType": "stageMode",
+  "buildOption": {
+    "externalNativeOptions": {
+      "path": "./src/main/cpp/CMakeLists.txt",
+      "arguments": "",
+      "cppFlags": "",
+      "abiFilters": [
+        "arm64-v8a"
+      ]
+    },
+    "nativeLib": {
+      "debugSymbol": {
+        "strip": true,
+        "exclude": [
+          "**/libnode.so",
+          "**/libguest_gcc.so",
+          "**/libguest_readline.so",
+          "**/libguest_ncurses.so"
+        ]
+      }
+    }
+  },
+  "targets": [
+    {
+      "name": "default"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "DSH 手机试用"
+    },
+    {
+      "name": "module_desc",
+      "value": "DeepSeek Harness 客户端试用"
+    }
+  ]
+}

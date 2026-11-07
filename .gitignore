@@ -1,0 +1,17 @@
+/build-profile.json5
+/.hvigor/
+/.build/
+/oh_modules/
+/entry/build/
+/entry/.cxx/
+/releases/
+/entry/libs/
+/entry/src/main/resources/rawfile/*.zip
+/entry/src/main/resources/rawfile/*.gz
+/entry/src/main/resources/rawfile/*.node
+/entry/src/main/resources/rawfile/alpine-busybox
+/entry/src/main/resources/rawfile/alpine-ld-musl
+*.p7b
+*.p12
+*.cer
+*.hap
