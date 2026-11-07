@@ -110,6 +110,7 @@ class DshEngine {
     if (fileIo.accessSync(root + '/tmp/dsh-native-timeline.log')) fileIo.unlinkSync(root + '/tmp/dsh-native-timeline.log');
     this.copyGuest(context, 'dsh-native-web.cjs', root + '/dsh-native-web.cjs');
     this.copyGuest(context, 'dsh-harmony-sharp.cjs', root + '/dsh-harmony-sharp.cjs');
+    this.copyGuest(context, 'dsh-harmony-package.cjs', root + '/dsh-harmony-package.cjs');
     this.publish('正在启动本机 DeepSeek Harness…');
     hilog.info(0xD005, 'DSHClient', 'starting native Web ms=%{public}d', Date.now() - started);
     poc.startNative(root);
@@ -151,7 +152,7 @@ class DshEngine {
       this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
       this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
       this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
-      for (const archive of ['node-layer.zip', 'dsh-layer.zip', 'shell-tools-layer.zip']) {
+      for (const archive of ['node-layer.zip', 'dsh-layer.zip', 'shell-tools-layer.zip', 'pnpm-layer.zip']) {
         const phase = Date.now();
         const extracted = await this.unpack(context, archive, root);
         hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',

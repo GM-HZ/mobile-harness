@@ -81,3 +81,9 @@ DSH 原有 Sharp 通过短生命周期的 PRoot 子进程运行，沿用原有�
 尝试只为两个签名 Git 文件返回虚拟执行位。实际 Git HTTPS 仍未找到 helper，准备继续核对 stat 路径。工具的 stderr 已保留错误并去掉正常 PRoot 加载日志。独立模拟器验证，去掉 pnpm 的 store 项目软链接登记后，hoisted 和 copy 能在该文件系统安装本地纯 JS 依赖。该 pnpm 实验尚未进入此版本 HAP。
 
 已部署的 unsigned HAP SHA-256 为 `e38061d2e59634de9fc1e0a3273b4cbe250af50699de0769731c8d2e58bde42c`。本机构建 signed HAP SHA-256 为 `1425f5fb0b2079f9d7927be710c9cd0dc0007530b496844a8075866b1a449c67`。
+
+## 0.4.18 纯 JavaScript 组合包
+
+固定 pnpm 11.28.5，通过 DSH 插件管理服务调用。适配应用私有目录的软链接限制，使用 hoisted 和 copy，跳过非必要的项目软链接登记。安装生命周期脚本保持关闭。模拟器经 `pluginManager/installBundle` 安装本地纯 JS 测试组合包，6.4 秒包安装，14.3 秒内完成安装与启用，插件状态为 active。
+
+已部署的 unsigned HAP SHA-256 为 `9d51c6fce9bfb75cd6fbc225f3e8d80976c574c50ca2178f04894248642d8af8`。本机构建 signed HAP SHA-256 为 `3f4559b3370e8e9b709339d9d8ec5583fb8d4ffc09acb52cc175f4bbbe4dde85`。

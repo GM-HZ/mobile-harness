@@ -181,9 +181,12 @@ async function main() {
   const subprocessUrl = paths('dsh-subprocess-local/lib/index.js');
   const attachmentUrl = paths('dsh-attachment-local/lib/index.js');
   const searchUrl = paths('dsh-tool-fs-search/lib/index.js');
+  const packageUrl = paths('dsh-plugin-manager/lib/index.js');
   const launchGuest = installProotSpawn(workspace);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
+  const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
   globalThis.__harmonySharp = createSharp(root, launchGuest);
+  globalThis.__harmonyPackageRunner = createPackageRunner(root, home, launchGuest);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;
@@ -218,7 +221,7 @@ async function main() {
         loadMs += performance.now() - start;
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
-          url !== attachmentUrl && url !== searchUrl) return result;
+          url !== attachmentUrl && url !== searchUrl && url !== packageUrl) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
       if (url === subprocessUrl) {
         return { ...result, source: replacePinned(source, 'internals = {};', 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
@@ -228,6 +231,10 @@ async function main() {
         patched = replacePinned(patched, '\t\t"--sort=modified",\n', '');
         patched = replacePinned(patched, 'paths: all', 'paths: await globalThis.__harmonySortGlobPaths(all, run.workdir, exec.signal)');
         return { ...result, source: patched };
+      }
+      if (url === packageUrl) {
+        return { ...result, source: replacePinned(source, 'import { execa } from "execa";',
+          'const execa = globalThis.__harmonyPackageRunner;') };
       }
       if (url === attachmentUrl) {
         let patched = replacePinned(source, 'ensureDurableDirectory(home, parse(home).root)',
