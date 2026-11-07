@@ -15,6 +15,7 @@ const dsh = path.join(root, 'dsh/node_modules');
 const cli = path.join(dsh, '@deepseek-ai/dsh/lib/bin.js');
 const home = path.join(root, 'native-benchmark-home');
 const workspace = path.join(root, 'workspace-native');
+const ripgrep = path.join(dsh, '@vscode/ripgrep-linux-arm64/bin/rg');
 const timeline = path.join(root, 'tmp/dsh-native-timeline.log');
 const launchFile = path.join(root, 'tmp/dsh-client-native-launch');
 const base = 'http://127.0.0.1:19592/';
@@ -40,18 +41,30 @@ function installProotSpawn(workspace) {
   const allowedRoot = fs.realpathSync(workspace);
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
   globalThis.__harmonyProotSpawn = (program, args, options) => {
-    if (program !== 'bash') return spawn(program, args, options);
-    if (args.length !== 2 || args[0] !== '-c' ||
-        options.stdio.join(',') !== 'ignore,pipe,pipe') {
-      throw new Error('Harmony Bash currently accepts one non-interactive command with captured output');
-    }
+    if (program !== 'bash' && program !== ripgrep) return spawn(program, args, options);
+    if (options.stdio.join(',') !== 'ignore,pipe,pipe') throw new Error('Harmony tools require captured output');
     const cwd = fs.realpathSync(options.cwd);
-    const relative = path.relative(allowedRoot, cwd);
-    if (relative === '..' || relative.startsWith('../') || path.isAbsolute(relative)) {
-      throw new Error('Harmony Bash requires a directory in the native DSH workspace');
+    const guest = path.posix.join('/workspace-native', relativeInWorkspace(allowedRoot, cwd));
+    let command;
+    if (program === ripgrep) {
+      const separator = args.indexOf('--');
+      const flags = separator < 0 ? args : args.slice(0, separator);
+      if (flags[0] !== '--no-config' || !['--files', '--json'].includes(flags[1]) ||
+          flags.slice(2).some(value => !/^--(?:glob=|regexp=|sort=modified$|no-ignore$|hidden$)/.test(value)) ||
+          (separator >= 0 && args.length !== separator + 2)) {
+        throw new Error('Unsupported Harmony ripgrep argument vector');
+      }
+      if (separator >= 0) {
+        const requested = fs.realpathSync(path.resolve(cwd, args[separator + 1]));
+        relativeInWorkspace(allowedRoot, requested);
+        flags.push('--', './' + (path.relative(cwd, requested) || '.'));
+      }
+      command = 'exec /bin/rg ' + flags.map(value => "'" + value.replaceAll("'", "'\\''") + "'").join(' ');
+    } else {
+      if (args.length !== 2 || args[0] !== '-c') throw new Error('Harmony Bash requires one non-interactive command');
+      command = args[1];
     }
-    const guest = path.posix.join('/workspace-native', relative);
-    const launched = bridge.launch(path.dirname(root), guest, args[1]);
+    const launched = bridge.launch(path.dirname(root), guest, command);
     const child = new EventEmitter();
     child.pid = launched.pid;
     child.exitCode = null;
@@ -87,6 +100,13 @@ function installProotSpawn(workspace) {
     }, 25);
     return child;
   };
+}
+function relativeInWorkspace(root, target) {
+  const relative = path.relative(root, target);
+  if (relative === '..' || relative.startsWith('../') || path.isAbsolute(relative)) {
+    throw new Error('Harmony tool requires a path in the native DSH workspace');
+  }
+  return relative;
 }
 function httpGet(url, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -134,10 +154,12 @@ async function main() {
   const persistenceUrl = paths('dsh-session-persistence-jsonl/lib/index.js');
   const subprocessUrl = paths('dsh-subprocess-local/lib/index.js');
   const attachmentUrl = paths('dsh-attachment-local/lib/index.js');
+  const searchUrl = paths('dsh-tool-fs-search/lib/index.js');
   installProotSpawn(workspace);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;
+  globalThis.__harmonyPackagedRg = ripgrep;
   globalThis.__harmonyWebRename = (source, target) => {
     const errno = rename(source, target);
     if (errno) throw Object.assign(new Error('exclusive publish failed'), { errno, code: errno === 17 ? 'EEXIST' : 'EIO' });
@@ -166,10 +188,14 @@ async function main() {
         loadCount++;
         loadMs += performance.now() - start;
       }
-      if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl && url !== attachmentUrl) return result;
+      if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
+          url !== attachmentUrl && url !== searchUrl) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
       if (url === subprocessUrl) {
         return { ...result, source: replacePinned(source, 'internals = {};', 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
+      }
+      if (url === searchUrl) {
+        return { ...result, source: replacePinned(source, '(await import("@vscode/ripgrep")).rgPath', 'globalThis.__harmonyPackagedRg') };
       }
       if (url === attachmentUrl) {
         let patched = replacePinned(source, 'ensureDurableDirectory(home, parse(home).root)',

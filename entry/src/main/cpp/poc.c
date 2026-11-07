@@ -229,8 +229,8 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     }
     int guest_argc = 0;
     while (guest[guest_argc]) ++guest_argc;
-    char bind_options[36][1150];
-    char *bound_guest[88];
+    char bind_options[40][1150];
+    char *bound_guest[100];
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
         const struct { const char *name; const char *guest; } packaged[] = {
@@ -270,6 +270,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             { "libguest_busybox.so", "/bin/uname" },
             { "libguest_busybox.so", "/bin/wc" },
             { "libguest_busybox.so", "/bin/which" },
+            { "libguest_rg.so", "/bin/rg" },
         };
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
         size_t bindings = dsh_test ? sizeof(packaged) / sizeof(*packaged) : node_test ? 9 : 4;
