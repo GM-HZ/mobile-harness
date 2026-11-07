@@ -391,6 +391,22 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         dprintf(STDERR_FILENO, "execve proot errno=%d (%s)\n", error, strerror(error));
         _exit(44);
     }
+    if (shell) {
+        close(fd);
+        close(shell_stdout[1]);
+        close(shell_stderr[1]);
+        if (child < 0) {
+            close(shell_stdout[0]);
+            close(shell_stderr[0]);
+            snprintf(out, size, "fork errno=%d", fork_error);
+        } else {
+            setpgid(child, child);
+            shell->pid = child;
+            shell->stdout_fd = shell_stdout[0];
+            shell->stderr_fd = shell_stderr[0];
+        }
+        return;
+    }
     if (child < 0) {
         snprintf(out, size, "fork errno=%d (%s)", fork_error, strerror(fork_error));
         close(fd);
