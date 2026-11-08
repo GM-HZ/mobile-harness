@@ -1,0 +1,114 @@
+{
+  "date": "2026-11-08",
+  "sourceCommit": "202f78d93a71fe85ce7cd3156ad1c4aa196deda0",
+  "device": {
+    "model": "HUAWEI Mate 60 (BRA-AL00)",
+    "api": 26,
+    "connection": "HDC USB",
+    "bundle": "org.sayact.nodepoc"
+  },
+  "artifacts": {
+    "ordinarySigned": {
+      "file": "DSH-Phone-Native-Web-0.4.25-Mate60-Bench.hap",
+      "sha256": "e9f4b80c9e58f2779796b036b5c0fc7756ecadeab5abd15e860f0012a42de83b"
+    },
+    "isolatedDataProbeSigned": {
+      "file": "DSH-Phone-Native-Web-0.4.25-Mate60-Host-Process-Probe.hap",
+      "sha256": "ad1bb921b40bcc42ff1f2334b732e139a229da450da4608ec7d851d9a06e7bc4",
+      "stagingOverrides": {
+        "bundle": "org.sayact.nodepoc",
+        "reuseOrdinaryDebugSigning": true,
+        "appPrivateDataSubdirectory": "mobile-harness-process-probe-0425",
+        "experimentalHostProcess": true
+      }
+    }
+  },
+  "normal": {
+    "upgrade": {
+      "readyWaitMs": 8251,
+      "authenticated": 200,
+      "arkWebComplete": true,
+      "oldSessions": {
+        "original": true,
+        "recent": true
+      },
+      "fixturePluginActive": true,
+      "anonymous": 401
+    },
+    "safe": {
+      "readyWaitMs": 8128,
+      "authenticated": 200,
+      "processReplaced": true,
+      "arkWebComplete": true,
+      "oldSessions": {
+        "original": true,
+        "recent": true
+      },
+      "fixturePluginActive": false
+    },
+    "normalRestored": {
+      "readyWaitMs": 7930,
+      "authenticated": 200,
+      "processReplaced": true,
+      "arkWebComplete": true,
+      "oldSessions": {
+        "original": true,
+        "recent": true
+      },
+      "fixturePluginActive": true
+    },
+    "testKeyAbsent": true,
+    "previousVersion": "0.4.24",
+    "testedVersion": "0.4.25",
+    "retainedData": true
+  },
+  "probe": {
+    "initialUiPid": 11623,
+    "initialHostPid": 11951,
+    "initialDistinctPids": true,
+    "processStartWaitMs": 14275,
+    "initialAuthenticated": 200,
+    "initialReadyWaitMs": 8053,
+    "initialArkWebComplete": true,
+    "replacementUiPid": 11623,
+    "replacementHostPid": 12252,
+    "replacementStartWaitMs": 644,
+    "oldHostExited": true,
+    "uiStayedAlive": true,
+    "newHostStarted": true,
+    "replacementAuthenticated": 200,
+    "replacementReadyWaitMs": 6936,
+    "replacementArkWebComplete": true,
+    "sigkillObserved": true,
+    "ordinaryProfilePolicyUnchanged": true,
+    "publicChildProcessSupport": {
+      "native": false,
+      "ark": false
+    },
+    "bundlePidListEmptyAfterForceStop": true
+  },
+  "restoredOrdinaryPackage": {
+    "installAndStartSucceeded": true,
+    "forceStopToArkWebCompleteMs": 11717,
+    "runtimeArchivesReused": true,
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "oldSessionsRetained": true,
+    "bash": {
+      "oneTimeApproval": true,
+      "pipelineAndVersions": [
+        "HARMONY_MATE60_SHELL_OK",
+        "git version 2.49.1",
+        "Python 3.12.16",
+        "v24.14.1",
+        "/workspace-native"
+      ]
+    }
+  },
+  "scope": {
+    "ordinaryHostUsesSeparateProcess": false,
+    "probeTerminationWasControlledSigkill": true,
+    "faultingPluginWasInjectedOnThisPhysicalDevice": false,
+    "phoneUseTested": false
+  }
+}

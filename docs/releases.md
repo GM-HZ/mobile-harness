@@ -127,3 +127,9 @@ PRoot 在 Sharp 的库搜索路径绑定 HAP 内的签名 libvips，解决 Mate 
 将鸿蒙 DevEco 工程、DSH Host、bundle 和鸿蒙运行时拆分。DSH、Node、Termux PRoot、DSHM 和 Termony 通过 Git 子模块固定。干净检出可用显式提供并校验过的基线输入完成 HAP 打包。运行时全量源码复建为下一阶段工作。
 
 普通包在 Phone 模拟器上覆盖升级。安装未启用的真实 DSH 测试插件并触发启动故障后，重新打开自动使用安全 profile，跳过故障插件并保留同一会话。原生恢复页可返回正常模式，单次批准后实测 Bash 管道和 Git、Python、Node。独立实验包验证 UI 与 Host 为两个 PID，终止 Host 后 UI 留在原进程，可启动新 Host。进程探针和普通包分别记录。 [制品与回归证据](evidence/emulator-restructure-0.4.25.json)
+
+### 0.4.25 Mate 60 真机补验
+
+签名普通包由 0.4.24 覆盖升级，保留旧会话。原生恢复页可在安全模式和正常模式之间切换，已安装的测试插件在安全模式停用，回到正常模式重新激活。普通包恢复安装后，保留数据强停重启到 ArkWeb 完成用时 11.7 秒，Bash 单次审批与管道通过。
+
+独立制品使用既有调试包名与签名，在应用私有目录下单列数据根。恢复页控制终止旧 Host 后，UI PID 保持，替换 Host 返回 HTTP 200。已恢复普通包。 [真机和制品证据](evidence/mate60-restructure-0.4.25.json)
