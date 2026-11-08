@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-08",
+  "appVersion": "0.4.23",
+  "device": "DevEco Phone emulator API 26 arm64-v8a",
+  "repository": "https://github.com/GM-HZ/agent-dag-workflow",
+  "direct": {
+    "exitCode": 128,
+    "result": "Transfer stalled for 8 seconds"
+  },
+  "viaMacHttpProxy": {
+    "lsRemoteHead": "9e9d006913e067a8bfcab18a063a8b5acd683518",
+    "shallowCloneHead": "9e9d006913e067a8bfcab18a063a8b5acd683518",
+    "branch": "main",
+    "readmeSha256": "6103f63ac29fc83ac094d585423d838318286be87fb4e21ce96b300ec6c5c35e",
+    "readmeMatchedPinnedGitHubRaw": true,
+    "gitTlsCertificateValidationEnabled": true
+  },
+  "sourceRevision": "259627e",
+  "unsignedHapSha256": "d1a6d89ac184ffa124501d115315260c88242170545ea16ccacfd4f8e12de6cf"
+}

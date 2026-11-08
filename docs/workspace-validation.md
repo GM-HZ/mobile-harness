@@ -52,3 +52,7 @@
 - 正常启动用鸿蒙原生 Node 运行本机 DSH Host。Bash、ripgrep、部分 Linux 工具和兼容组件按需使用 PRoot。Bash 默认权限在系统沙箱不可用时拒绝，需通过 DSH 审批。系统 PTY、Phone Use、账号完整授权和最新 HAP 真机结果仍需单独验收。
 
 [0.4.22 兼容性证据](evidence/emulator-cloexec-0.4.22.json) · [0.4.23 启动与制品证据](evidence/emulator-core-0.4.23.json)
+
+## 2026-11-08 公网 GitHub 复测
+
+使用公开仓库 [GM-HZ/agent-dag-workflow](https://github.com/GM-HZ/agent-dag-workflow)。0.4.23 在 Phone 模拟器直接访问 GitHub 时传输超时。通过 HDC 临时接入 Mac 的 HTTP 代理后，DSH 的 Bash 工具执行 `git ls-remote` 和 `git clone --depth 1` 均成功，HEAD 同为 `9e9d006913e067a8bfcab18a063a8b5acd683518`。模拟器上的 README SHA-256 与 GitHub 对应提交的原文件一致。Git 保持 TLS 证书校验。测试结束已移除转发。 [实测证据](evidence/emulator-github-gm-hz-0.4.23.json)
