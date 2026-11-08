@@ -1,0 +1,2 @@
+artifact,node_version,device,metric,value,unit,interpretation
+7be0da2c413135fb82e0d45ae6d93a4b92593f2649f3abd14c4c9fad1c88ece2,24.2.0,Mate60,node_start_to_result_observed,444,ms,Includes ArkUI 500ms poll; not cold start or physical performance
