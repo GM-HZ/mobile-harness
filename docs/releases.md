@@ -121,3 +121,9 @@ PRoot 加载器模拟真正 exec 时的 `FD_CLOEXEC` 行为。模拟器里的普
 PRoot 在 Sharp 的库搜索路径绑定 HAP 内的签名 libvips，解决 Mate 60 从解包目录加载共享库时的权限拒绝。真机覆盖安装后，PNG 上传、GIF 转 WebP、无效数据和 MIME 不匹配校验均通过。
 
 保留数据强停重启到聊天页加载完成耗时 10.4 秒。旧会话、自定义 Skill、已安装插件及审批后的 Bash 管道均通过。真机签名 HAP SHA-256 为 `c43c1b66c0e2e8ad61bfacf924cd6a11f4f70b37f0729acef73d9cc2bb4ff19e`。 [真机和制品证据](evidence/mate60-core-0.4.23-0.4.24.json)
+
+## 0.4.25 工程重构与模拟器恢复回归
+
+将鸿蒙 DevEco 工程、DSH Host、bundle 和鸿蒙运行时拆分。DSH、Node、Termux PRoot、DSHM 和 Termony 通过 Git 子模块固定。干净检出可用显式提供并校验过的基线输入完成 HAP 打包。运行时全量源码复建为下一阶段工作。
+
+普通包在 Phone 模拟器上覆盖升级。安装未启用的真实 DSH 测试插件并触发启动故障后，重新打开自动使用安全 profile，跳过故障插件并保留同一会话。原生恢复页可返回正常模式，单次批准后实测 Bash 管道和 Git、Python、Node。独立实验包验证 UI 与 Host 为两个 PID，终止 Host 后 UI 留在原进程，可启动新 Host。进程探针和普通包分别记录。 [制品与回归证据](evidence/emulator-restructure-0.4.25.json)

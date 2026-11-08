@@ -1,0 +1,100 @@
+{
+  "date": "2026-11-08",
+  "sourceCommit": "947d4aa3c61e3b108c5a8bfac1fc179795368011",
+  "device": {
+    "type": "DevEco Phone emulator",
+    "architecture": "ARM64",
+    "api": 26
+  },
+  "submodules": {
+    "vendor/repos/dsh": "fcc0ad462172522aaf5c93a7b2e01f6b9f0b0159",
+    "vendor/repos/dshm": "1cb0db693ea5121f0dab0208b1144b4c1b8ee2c0",
+    "vendor/repos/node": "d89bb1b482fa09245c4f2cbb3b5b6a70bea6deaf",
+    "vendor/repos/proot": "60485d2646c1e09105099772da4a20deda8d020d",
+    "vendor/repos/termony": "2fe84795201dbe14a586819f7de641db6b6c18b7"
+  },
+  "artifacts": {
+    "defaultUnsigned": {
+      "file": "DSH-Phone-Native-Web-0.4.25-Emulator-unsigned.hap",
+      "sha256": "e4f1d4d99856ea6b270e887e72c837254fbb2af396d99c1383f54fe667813d69"
+    },
+    "managedProcessProbe": {
+      "file": "DSH-Phone-Native-Web-0.4.25-Emulator-Host-Process-Probe.hap",
+      "sha256": "4532e92704bd9e8f5f7ce91ff7775f07449ddcf961040fa9b4ca1748d044eccf"
+    }
+  },
+  "builds": {
+    "default": {
+      "command": "HARMONY_UNSIGNED=1 ./build.sh",
+      "exitCode": 0
+    },
+    "probe": {
+      "command": "HARMONY_EXPERIMENTAL_HOST_PROCESS=1 ./build.sh",
+      "exitCode": 0
+    },
+    "cleanCheckout": {
+      "verifiedUpstreamPins": true,
+      "packagedWithExplicitPinnedBinaryInputs": true,
+      "exitCode": 0,
+      "unsignedHapSha256": "37588e5f6dd7469b397e7f864bf0eeefec26899e8da2c40fd5b6866e1c8be7e5"
+    }
+  },
+  "emulator": {
+    "defaultInstall": {
+      "previousVersion": "0.4.23",
+      "installedVersion": "0.4.25",
+      "retainedData": true
+    },
+    "fatalPluginRecovery": {
+      "normalReadyMs": 5649,
+      "anonymousHttp": 401,
+      "pluginInstalledDisabled": true,
+      "actualPluginCrash": true,
+      "interruptedNormalBoot": {
+        "mode": "normal",
+        "pending": true
+      },
+      "safeReadyMs": 3773,
+      "safeAuthenticatedHttp": 200,
+      "pluginNotLoadedAgain": true,
+      "sameSessionInSafeMode": true,
+      "normalProfileRestored": true
+    },
+    "returnedToNormalViaNativeControls": true,
+    "bashAfterNormalRestart": {
+      "oneTimeApproval": true,
+      "pipelineAndVersions": [
+        "HARMONY_MATE60_SHELL_OK",
+        "git version 2.49.1",
+        "Python 3.12.16",
+        "v24.14.1",
+        "/workspace-native"
+      ]
+    },
+    "managedHostProbe": {
+      "differentHostPid": true,
+      "hostKilledWithSignal9": true,
+      "uiPidUnchanged": true,
+      "newHostPid": 14680,
+      "nativeRecoveryControls": true,
+      "authenticatedHttpAfterRestart": 200,
+      "publicProcessSupport": {
+        "native": false,
+        "ark": false
+      },
+      "uiPid": 12593,
+      "oldHostPid": 13184
+    },
+    "exploratoryDirectExec": {
+      "errno": 13,
+      "interpretation": "Permission denied when launching the bundled test executable"
+    }
+  },
+  "scope": {
+    "retailDeviceTested": false,
+    "fullRuntimeRebuiltFromSource": false,
+    "phoneUseImplemented": false,
+    "defaultUsesSeparateHostProcess": false,
+    "hostPluginActivationTransactionImplemented": false
+  }
+}

@@ -71,3 +71,12 @@ Mate 60（BRA-AL00，API 26）通过 USB 从 0.4.9 依次覆盖到 0.4.23 和 0.
 | 公网 GitHub | 0.4.23 在当前网络直连超时。用临时 Mac HTTP 代理通过 `ls-remote` 和浅克隆，HEAD 与 README 内容均核对。Git 保持 TLS 校验 |
 
 本轮采用临时测试 API Key 验证模型。完整的 DeepSeek 账号授权、模型读取图片内容和清空数据后的首次启动仍待验证。系统交互 PTY 和 Phone Use 已延期。 [真机和制品证据](evidence/mate60-core-0.4.23-0.4.24.json)
+
+## 2026-11-08 0.4.25 Phone 模拟器重构回归
+
+- 干净检出拉取五个源码子模块后，使用显式提供的旧版本原始打包输入完成 DevEco 构建。
+- 普通包保留数据覆盖安装。匿名 Web 请求返回 401。真实 DSH 测试 bundle 以禁用状态安装后，通过测试夹具激活并在加载时中止进程。重新打开自动进安全 profile，鉴权后返回 200，旧会话可读，故障插件未再次运行。夹具恢复正常 profile 文件，原生恢复页成功返回正常模式。随后用真实模型触发单次审批，跑通 Bash 管道并检查 Git、Python 和 Node 版本。
+- 独立实验包在同一模拟器中使用单独的 bundle ID。原生恢复页发送 SIGKILL 终止旧 Host 并启动新 Host，UI PID 保持一致，鉴权请求再次返回 200。公开 Native 和 Ark 子进程能力查询均为 false，另行测试直接执行随包 ELF 返回 EACCES。
+- 真机、完整上游源码重建、Phone Use 和候选插件激活事务仍待验证。默认包继续使用原有进程模型和重开恢复。
+
+[回归证据](evidence/emulator-restructure-0.4.25.json)
