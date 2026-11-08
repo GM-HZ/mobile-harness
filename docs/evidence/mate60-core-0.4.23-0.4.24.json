@@ -1,0 +1,181 @@
+{
+  "date": "2026-11-08",
+  "device": {
+    "model": "HUAWEI Mate 60 (BRA-AL00)",
+    "api": 26,
+    "connection": "HDC USB",
+    "bundle": "org.sayact.nodepoc"
+  },
+  "artifacts": {
+    "0.4.23": {
+      "source": "v0.4.23-bench",
+      "file": "DSH-Phone-Native-Web-0.4.23-Mate60-Bench.hap",
+      "sha256": "b9383d22b107e12df170eef7012b4050f00eb4950c40c9c718228c015ca2d9a4",
+      "installedOver": "0.4.9"
+    },
+    "0.4.24": {
+      "source": "v0.4.24-bench",
+      "file": "DSH-Phone-Native-Web-0.4.24-Mate60-Bench.hap",
+      "sha256": "c43c1b66c0e2e8ad61bfacf924cd6a11f4f70b37f0729acef73d9cc2bb4ff19e",
+      "buildCommand": "./build.sh",
+      "buildExitCode": 0,
+      "deviceVersionCode": 31,
+      "installedOver": "0.4.23"
+    }
+  },
+  "0.4.23": {
+    "webAndModel": {
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "provider": "deepseek-official",
+      "model": "deepseek-flash",
+      "chatPassed": true,
+      "previousHistoryFound": true,
+      "followupPassed": true,
+      "workspacePathMatches": true,
+      "forkCreated": true,
+      "textAttachmentAccepted": true,
+      "textAttachmentReadback": true,
+      "fileToolsPassed": [
+        "edit",
+        "glob",
+        "grep",
+        "read",
+        "write"
+      ],
+      "fileContentMatches": true,
+      "outsideWriteDenied": true,
+      "outsideFileAbsent": true,
+      "renamed": true
+    },
+    "bash": {
+      "alteredCommandApprovalRejected": true,
+      "nonzeroExitSeven": true,
+      "cancelAccepted": true,
+      "cancelledBeforeWrite": true,
+      "turnEnd": [
+        {
+          "kind": "aborted",
+          "reason": {
+            "kind": "user"
+          }
+        }
+      ],
+      "jobStarted": true,
+      "jobOutput": true
+    },
+    "pluginInstall": {
+      "npmDependencyDownloaded": true,
+      "packageExitCode": 0,
+      "application": "applied",
+      "fiberPhase": "active",
+      "elapsedMs": 48672
+    },
+    "pngBeforeFix": {
+      "ok": false,
+      "elapsedMs": 5749,
+      "reason": "INVALID_IMAGE"
+    },
+    "sharpDirectLoadError": "ERR_DLOPEN_FAILED: Error loading shared library libvips-cpp.so.8.18.7: Permission denied (needed by /dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node)",
+    "github": {
+      "repository": "https://github.com/GM-HZ/agent-dag-workflow",
+      "directResult": "[stderr]\nfatal: unable to access 'https://github.com/GM-HZ/agent-dag-workflow.git/': Operation too slow. Less than 1 bytes/sec transferred the last 8 seconds\n[exit code: 128]",
+      "viaTemporaryMacHttpProxy": {
+        "tlsCertificateVerification": true,
+        "lsRemoteAndShallowClone": true,
+        "head": "9e9d006913e067a8bfcab18a063a8b5acd683518",
+        "readmeSha256": "6103f63ac29fc83ac094d585423d838318286be87fb4e21ce96b300ec6c5c35e",
+        "matchesPublicReadme": true
+      }
+    }
+  },
+  "0.4.24": {
+    "restart": {
+      "hostElapsedMs": 10439,
+      "stopped": "force stop process successfully.",
+      "started": "start ability successfully.",
+      "processChanged": true,
+      "milestones": [
+        "startup archive node-layer.zip extracted=false ms=0",
+        "startup archive dsh-layer.zip extracted=false ms=0",
+        "startup archive shell-tools-layer.zip extracted=false ms=1",
+        "startup archive pnpm-layer-v2.zip extracted=false ms=0",
+        "starting native Web ms=7",
+        "native loopback ready ms=7247",
+        "ArkWeb loaded \"{\\\"title\\\":\\\"Mate 60 0.4.23 regression — DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":1340}\""
+      ],
+      "anonymous": 401,
+      "authenticated": 200,
+      "oldSession": true,
+      "upgradeTestSession": true,
+      "testKeyAbsent": true
+    },
+    "imageUpload": {
+      "png": {
+        "ok": true,
+        "elapsedMs": 11433,
+        "mediaType": "image/png",
+        "width": 2,
+        "height": 2,
+        "bytes": 73,
+        "sourceIdentical": true
+      },
+      "gif": {
+        "ok": true,
+        "elapsedMs": 38996,
+        "mediaType": "image/webp",
+        "width": 1,
+        "height": 1,
+        "bytes": 72,
+        "sourceIdentical": false
+      },
+      "widePng": {
+        "ok": true,
+        "elapsedMs": 15212,
+        "mediaType": "image/png",
+        "width": 4500,
+        "height": 2,
+        "bytes": 113,
+        "sourceIdentical": true
+      },
+      "bad": {
+        "ok": false,
+        "elapsedMs": 10759,
+        "reason": "INVALID_IMAGE"
+      },
+      "wrongMedia": {
+        "ok": false,
+        "elapsedMs": 23038,
+        "reason": "IMAGE_TYPE_MISMATCH"
+      }
+    },
+    "bash": {
+      "approvalGrantedOnce": true,
+      "pipelineAndVersions": [
+        "HARMONY_MATE60_SHELL_OK",
+        "git version 2.49.1",
+        "Python 3.12.16",
+        "v24.14.1",
+        "/workspace-native"
+      ]
+    },
+    "pluginAfterRestart": {
+      "bundlePresent": true,
+      "pluginActive": true
+    },
+    "skill": {
+      "listed": true,
+      "skillCalled": true,
+      "bodyLoaded": true,
+      "initialFixtureError": "HDC shell quoting removed the Markdown line breaks. Retried with the fixture copied as a file."
+    }
+  },
+  "scope": {
+    "dataRetained": true,
+    "freshInstallationTiming": null,
+    "modelImageUnderstanding": null,
+    "deepSeekAccountAuthorization": null,
+    "interactiveSystemPty": "deferred",
+    "phoneUse": "deferred"
+  }
+}

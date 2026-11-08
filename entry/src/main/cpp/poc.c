@@ -280,6 +280,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         { "libguest_rg.so", "/bin/rg" },
         { "libguest_sharp.so", "/dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node" },
         { "libguest_vips.so", "/usr/lib/libvips-cpp.so.8.18.7" },
+        { "libguest_vips.so", "/dsh/node_modules/@img/sharp-libvips-linuxmusl-arm64/lib/libvips-cpp.so.8.18.7" },
 #include "guest-tools.inc"
     };
     enum { packaged_count = sizeof(packaged) / sizeof(*packaged) };

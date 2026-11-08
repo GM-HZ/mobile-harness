@@ -56,3 +56,18 @@
 ## 2026-11-08 公网 GitHub 复测
 
 使用公开仓库 [GM-HZ/agent-dag-workflow](https://github.com/GM-HZ/agent-dag-workflow)。0.4.23 在 Phone 模拟器直接访问 GitHub 时传输超时。通过 HDC 临时接入 Mac 的 HTTP 代理后，DSH 的 Bash 工具执行 `git ls-remote` 和 `git clone --depth 1` 均成功，HEAD 同为 `9e9d006913e067a8bfcab18a063a8b5acd683518`。模拟器上的 README SHA-256 与 GitHub 对应提交的原文件一致。Git 保持 TLS 证书校验。测试结束已移除转发。 [实测证据](evidence/emulator-github-gm-hz-0.4.23.json)
+
+## 2026-11-08 Mate 60 真机回归
+
+Mate 60（BRA-AL00，API 26）通过 USB 从 0.4.9 依次覆盖到 0.4.23 和 0.4.24，保留现有数据。
+
+| 功能 | 实测结果 |
+| --- | --- |
+| 启动与回环鉴权 | 0.4.24 强停重启到 ArkWeb 聊天页加载完成 10.439 秒。四个资源包均复用。匿名请求 401，鉴权请求 200 |
+| 模型与会话 | 0.4.23 真实 DeepSeek 对话、旧会话续接、重命名、分支通过。0.4.24 重启后仍可读到升级前后的会话 |
+| 文件与附件 | 0.4.23 验证文本附件回读、文件创建、编辑、读取、搜索及工作区外写入拦截。0.4.24 修复共享库权限，接受有效 PNG 和 GIF，并拒绝损坏图片和声明类型不符的图片 |
+| 命令和作业 | 0.4.23 验证审批拒绝、退出码 7、取消后未写入及后台作业输出。0.4.24 验证单次批准、管道、Git、Python 和 Node 调用 |
+| Skills 与插件 | 0.4.23 从 npm 下载测试插件的依赖并激活。0.4.24 重启后插件仍活跃，自定义 Skill 能被发现并由模型加载 |
+| 公网 GitHub | 0.4.23 在当前网络直连超时。用临时 Mac HTTP 代理通过 `ls-remote` 和浅克隆，HEAD 与 README 内容均核对。Git 保持 TLS 校验 |
+
+本轮采用临时测试 API Key 验证模型。完整的 DeepSeek 账号授权、模型读取图片内容和清空数据后的首次启动仍待验证。系统交互 PTY 和 Phone Use 已延期。 [真机和制品证据](evidence/mate60-core-0.4.23-0.4.24.json)

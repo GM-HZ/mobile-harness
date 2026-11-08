@@ -115,3 +115,9 @@ PRoot 加载器模拟真正 exec 时的 `FD_CLOEXEC` 行为。模拟器里的普
 在 PRoot 的签名可执行文件探测中加入随包 Python。API 26 Phone 模拟器通过 `python3` 查找解释器、使用 `sys.executable` 重新执行、检查关闭描述符 200 并保留可继承描述符 201。再次通过有证书验证的 smart HTTPS Git 查询和克隆。
 
 最终 HAP 从零应用数据启动到 ArkWeb 加载完成约 15.6 秒，强停后重启约 6.0 秒。全新默认工作区创建成功，无凭证访问回环页面返回 401。 [结果和制品校验](evidence/emulator-core-0.4.23.json)
+
+## 0.4.24 Mate 60 图片库加载修复
+
+PRoot 在 Sharp 的库搜索路径绑定 HAP 内的签名 libvips，解决 Mate 60 从解包目录加载共享库时的权限拒绝。真机覆盖安装后，PNG 上传、GIF 转 WebP、无效数据和 MIME 不匹配校验均通过。
+
+保留数据强停重启到聊天页加载完成耗时 10.4 秒。旧会话、自定义 Skill、已安装插件及审批后的 Bash 管道均通过。真机签名 HAP SHA-256 为 `c43c1b66c0e2e8ad61bfacf924cd6a11f4f70b37f0729acef73d9cc2bb4ff19e`。 [真机和制品证据](evidence/mate60-core-0.4.23-0.4.24.json)
