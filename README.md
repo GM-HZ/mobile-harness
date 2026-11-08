@@ -19,4 +19,4 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 | 鸿蒙调研结论、替代方案及历史原件 | [研究索引](docs/research/harmonyos-runtime.md) |
 | 签名包、实测范围及失败记录 | [版本记录](docs/releases.md) · [回归矩阵](docs/workspace-validation.md) · [证据目录](docs/evidence/) |
 
-`entry/` 和 `AppScope/` 是现有 DevEco 鸿蒙原型，`native/`、`patches/` 和 `scripts/` 保存运行时桥接、兼容补丁与构建工具。
+`apps/harmonyos/` 是 DevEco 源工程，`packages/dsh-host/` 和 `packages/bundles/` 持有 DSH 装配，`runtime/harmonyos/` 持有平台代码，`vendor/repos/` 记录上游子模块。构建在 `.build/stage/` 生成可打开的 DevEco 工程。

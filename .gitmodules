@@ -1,0 +1,15 @@
+[submodule "dsh"]
+	path = vendor/repos/dsh
+	url = https://github.com/deepseek-ai/deepseek-harness.git
+[submodule "node"]
+	path = vendor/repos/node
+	url = https://github.com/nodejs/node.git
+[submodule "proot"]
+	path = vendor/repos/proot
+	url = https://github.com/termux/proot.git
+[submodule "dshm"]
+	path = vendor/repos/dshm
+	url = https://github.com/sol5766/dshm.git
+[submodule "termony"]
+	path = vendor/repos/termony
+	url = https://github.com/TermonyHQ/Termony.git

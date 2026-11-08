@@ -4,7 +4,7 @@
 
 2026-11-07。独立 HarmonyOS HAP，使用同一个调试包名 `org.sayact.nodepoc` 和 Mate 60 对应的设备签名。应用启动官方 DSH 0.2.2-rc.1 的 Web profile，由 ArkWeb 通过手机回环地址打开聊天与会话。运行时沿用实测的 Linux ARM64 Node 24.14.1、`--jitless` 和 PRoot 兼容层。模型由用户在 DSH 中配置。
 
-签名 HAP（本机产物 `../dsh-client-preview/releases/DSH-Phone-Preview-0.3.4-Mate60.hap`） · [构建入口](../../../build.sh) · [试用配置](../../../entry/src/main/resources/rawfile/dsh-client.patch.yml)
+签名 HAP（本机产物 `../dsh-client-preview/releases/DSH-Phone-Preview-0.3.4-Mate60.hap`） · [构建入口](../../../build.sh) · [试用配置](../../../packages/bundles/mobile/dsh-client.patch.yml)
 
 试用配置保留聊天、会话、模型设置和工作区选择。工作区可以填 `/workspace`。配置停用 Shell 工具预设、终端、文件浏览和插件设置入口、会话日志上传及产品遥测。会话兼容层仅在文件硬链接返回 `EACCES` 时使用已实测的 `RENAME_NOREPLACE` 路径。HAP 申请 INTERNET 和 GET_NETWORK_INFO，使用手机当前网络配置中的 DNS 服务器。
 

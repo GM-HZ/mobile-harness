@@ -2,7 +2,7 @@
 
 > 历史实验记录。命令与结论适用于当时的环境和版本。原始日志与二进制保存在本机。现行结论见[研究索引](../../research/harmonyos-runtime.md)。
 
-2026-11-07。独立鸿蒙 PoC 使用官方 DeepSeek Harness 0.2.2-rc.1、Linux ARM64 Node 24.14.1 和 PRoot。延续原包的签名、应用标识和 DSH 数据目录，覆盖安装保留会话及登录。标准、Cordis 和 PTC 预设以及文件工具、搜索、Bash、插件设置恢复为官方 Web 配置。系统 PTY、依赖 PTY 的极简预设、会话日志上传和产品遥测仍停用。 [实际配置](../../../entry/src/main/resources/rawfile/dsh-client.patch.yml)
+2026-11-07。独立鸿蒙 PoC 使用官方 DeepSeek Harness 0.2.2-rc.1、Linux ARM64 Node 24.14.1 和 PRoot。延续原包的签名、应用标识和 DSH 数据目录，覆盖安装保留会话及登录。标准、Cordis 和 PTC 预设以及文件工具、搜索、Bash、插件设置恢复为官方 Web 配置。系统 PTY、依赖 PTY 的极简预设、会话日志上传和产品遥测仍停用。 [实际配置](../../../packages/bundles/mobile/dsh-client.patch.yml)
 
 ## 真机与制品
 

@@ -19,7 +19,7 @@ HAP 内的鸿蒙 Node.js / DSH Host
 | 数据 | 会话、工具依赖、配置及默认工作区位于应用私有数据。覆盖安装保留数据；强停重启时复用已展开资源 |
 | 安全边界 | 系统边界由鸿蒙 App 沙箱提供。PRoot 提供工具兼容与路径映射。工作区外写入已验证拒绝；应用私有根内已有文件的读取仍遵循 DSH 策略 |
 
-入口见 [ArkTS 启动与生命周期](../entry/src/main/ets/runtime/DshEngine.ets)、[原生 Node／工具桥](../entry/src/main/cpp/poc.c) 和 [DSH Web 装配](../entry/src/main/resources/rawfile/dsh-native-web.cjs)。[真机与模拟器实测边界](workspace-validation.md)
+入口见 [ArkTS 启动与生命周期](../apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets)、[原生 Node／工具桥](../runtime/harmonyos/native/poc.c) 和 [DSH Web 装配](../packages/dsh-host/dsh-native-web.cjs)。[真机与模拟器实测边界](workspace-validation.md)
 
 ## 跨设备设计方向
 
