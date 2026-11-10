@@ -16,6 +16,8 @@
 
 如果首发就要求在普通零售机上自主完成任意 App 的操作，交付门槛是拿到适用的系统通道并在真机验收。现阶段可以先交付已验证范围内的观察、页面跳转和结构化业务操作。开发者模式下的远端驱动单独标识。
 
+OpenHarmony 系统库、公开原生接口和 HAP 的编译实测见 [OpenHarmony 无障碍库与 HAP 调研](openharmony-acc-hap.md)。
+
 ## 对照 dsh-Go
 
 参考本地 `dsh-Go@8f7dac9`。它在启动时用 bundle patch 注册官方 MCP 客户端，stdio relay 连接原生桥。桥优先使用抽象 Unix socket，按需回落到 loopback TCP。每次引擎启动更新端点凭据。原生 `PhoneCore` 和 `PhoneTasks` 管理串行执行、任务归属、审批、超时和停止。Android 的无障碍服务负责读树和动作，动作绑定本次观察产生的屏幕 ID，执行后回读。安全模式不挂载 Phone 工具。 [PhoneGuest](https://github.com/ccch1mneyyy/dsh-Go/blob/8f7dac94b0c81b7bd26e907770dc0e9ab28d3dfb/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneGuest.kt) · [Android 工具和执行层](https://github.com/ccch1mneyyy/dsh-Go/tree/8f7dac94b0c81b7bd26e907770dc0e9ab28d3dfb/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone)
