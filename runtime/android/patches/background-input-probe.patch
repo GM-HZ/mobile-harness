@@ -1,0 +1,347 @@
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/AdbStarter.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/AdbStarter.kt
+@@ -57,9 +57,15 @@
+     // The slot is held until the last manager call (including cleanup) has returned.
+     private var operation: Operation? = null
+ 
+-    fun status(): AdbStatus = AdbStatus(wirelessDebugging(), pairedFlag.exists(), channel?.alive() == true)
++    fun status(): AdbStatus {
++        val enabled = wirelessDebugging()
++        return AdbStatus(enabled, pairedFlag.exists(), enabled != false && channel?.alive() == true)
++    }
+ 
++    fun wirelessDebuggingDisabled(): Boolean = wirelessDebugging() == false
++
+     fun reason(): String? = when {
++        wirelessDebuggingDisabled() -> AppStrings.get(context, R.string.background_adb_disconnected)
+         channel?.alive() == true -> null
+         !pairedFlag.exists() -> AppStrings.get(context, R.string.background_adb_not_paired)
+         else -> AppStrings.get(context, R.string.background_adb_disconnected)
+@@ -69,7 +75,11 @@
+         // Reported as unknown from API 36 (Android 16) on. AOSP 17 redacts `adb_enabled` to 0 for
+         // third-party apps; `adb_wifi_enabled` is still readable there, so this cutoff is conservative.
+         if (Build.VERSION.SDK_INT >= 36) return@runCatching null
+-        Settings.Global.getInt(context.contentResolver, "adb_wifi_enabled", 0) == 1
++        when (Settings.Global.getString(context.contentResolver, "adb_wifi_enabled")) {
++            "1" -> true
++            "0" -> false
++            else -> null
++        }
+     }.getOrDefault(null)
+ 
+     /** Begins mDNS discovery of the pairing service so [pair] can target the live port. */
+@@ -109,7 +119,7 @@
+     fun connect(port: Int? = null, whenAvailable: (() -> Unit)? = null, mayStart: () -> Boolean = { true }): PrivilegedChannel? {
+         if (port != null && port !in 1..65535) return null
+         val op = synchronized(guard) {
+-            if (!mayStart()) return null
++            if (!mayStart() || wirelessDebuggingDisabled()) return null
+             channel?.takeIf { it.alive() }?.let { return it }
+             operation?.let {
+                 if (whenAvailable != null) it.whenAvailable = whenAvailable
+@@ -152,7 +162,7 @@
+             val probe = value.execute(android.os.Bundle().apply { putString(Proto.OP, Proto.OP_PROBE) })
+             if (!probe.getBoolean(Proto.OK) || probe.getString("revision") != Proto.REVISION) return null
+             synchronized(guard) {
+-                if (!op.valid || !op.mayStart()) return null
++                if (!op.valid || !op.mayStart() || wirelessDebuggingDisabled()) return null
+                 channel = value
+                 op.published = true
+                 value
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundControl.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundControl.kt
+@@ -4,6 +4,7 @@
+ import io.github.ccch1mneyyy.dsh_app.R
+ import android.content.Context
+ import android.content.pm.PackageManager
++import android.hardware.display.DisplayManager
+ import android.os.Build
+ import android.os.Bundle
+ import android.os.Process
+@@ -13,10 +14,12 @@
+ import android.net.NetworkCapabilities
+ import android.net.NetworkRequest
+ import android.provider.Settings
++import android.view.Display
+ import io.github.ccch1mneyyy.dsh_app.phone.PhoneControl
+ import java.util.concurrent.Executors
+ import java.util.concurrent.Future
+ import java.util.concurrent.FutureTask
++import java.util.UUID
+ import io.github.ccch1mneyyy.dsh_app.phone.PhoneRegistry
+ import java.util.concurrent.atomic.AtomicLong
+ 
+@@ -366,7 +369,8 @@
+     // ---- channel plumbing --------------------------------------------------
+ 
+     private fun activeChannel(mayStart: () -> Boolean = { true }, explicit: Boolean = false): PrivilegedChannel? {
+-        if (!mayStart()) return null
++        // A negotiated stream can outlive the system setting that authorized wireless debugging.
++        if (!mayStart() || (mode == "adb" && adb.wirelessDebuggingDisabled())) return null
+         val observed = gate.snapshot
+         channel?.takeIf { it.alive() }?.let { gate.connected(observed, it); return it }
+         if (keep.enabled && !explicit) return null
+@@ -405,7 +409,7 @@
+         val ch = activeChannel(mayStart, explicit = true) ?: return failed(R.string.background_not_ready)
+         if (!gate.current(owner)) return AppStrings.get(app, R.string.background_selection_cancelled)
+         val response = runCatching {
+-            ch.execute(Bundle().apply { putString(Proto.OP, Proto.OP_GATE); putString(Proto.OWNER, "__gate__") })
++            verifyBackgroundInput(ch) { gate.current(owner) }
+         }.getOrNull() ?: return failed(R.string.background_no_response, ch)
+         val completed = gate.update(
+             owner = owner,
+@@ -419,6 +423,64 @@
+             R.string.background_input_probe_busy else R.string.background_selection_cancelled)
+         notifyChanged()
+         return gateReason()
++    }
++
++    /** WindowManager recognizes the installed app process, not the privileged app_process. */
++    private fun verifyBackgroundInput(ch: PrivilegedChannel, mayContinue: () -> Boolean): Bundle {
++        val token = Proto.GATE_OWNER_PREFIX + UUID.randomUUID()
++        fun request(op: String) = Bundle().apply {
++            putString(Proto.OP, op)
++            putString(Proto.OWNER, token)
++        }
++        val response = ch.execute(request(Proto.OP_GATE_CREATE))
++        if (!response.getBoolean(Proto.OK)) return response
++
++        var detail: String? = null
++        val outcome = runCatching {
++            val id = response.getInt(Proto.DISPLAY_ID, Display.INVALID_DISPLAY)
++            if (id <= Display.DEFAULT_DISPLAY) throw InputProbe.Failure("inputWindowNotReady")
++            val manager = app.getSystemService(DisplayManager::class.java)
++                ?: throw InputProbe.Failure("inputWindowNotReady")
++            val deadline = SystemClock.uptimeMillis() + 1_000
++            var display = manager.getDisplay(id)
++            while (display == null && mayContinue() && SystemClock.uptimeMillis() < deadline) {
++                Thread.sleep(25)
++                display = manager.getDisplay(id)
++            }
++            if (!mayContinue()) throw InterruptedException()
++            val probe = BackgroundInputProbe(app, display ?: throw InputProbe.Failure("inputWindowNotReady"))
++            try {
++                probe.verify { target, time ->
++                    if (!mayContinue()) throw InterruptedException()
++                    val reply = ch.execute(request(Proto.OP_GATE_INJECT).apply {
++                        putInt(Proto.PROBE_X, target.x)
++                        putInt(Proto.PROBE_Y, target.y)
++                        putLong(Proto.PROBE_DOWN_TIME, time)
++                    })
++                    if (!reply.getBoolean(Proto.OK))
++                        throw InputProbe.Failure(reply.getString(Proto.ERROR) ?: "inputUnconfirmed")
++                }
++            } finally {
++                try { probe.close() } finally { detail = probe.failureDetail }
++            }
++        }
++        val interrupted = Thread.interrupted() || outcome.exceptionOrNull() is InterruptedException
++        val released = try {
++            runCatching { ch.execute(request(Proto.OP_GATE_RELEASE)).getBoolean(Proto.OK) }.getOrDefault(false)
++        } finally {
++            if (interrupted) Thread.currentThread().interrupt()
++        }
++        val error = when {
++            !released -> "inputProbeCleanupFailed"
++            outcome.isSuccess -> null
++            outcome.exceptionOrNull() is InterruptedException -> "cancelled"
++            else -> (outcome.exceptionOrNull() as? InputProbe.Failure)?.code ?: "inputWindowNotReady"
++        }
++        return response.apply {
++            putBoolean(Proto.INJECT_OK, error == null)
++            if (error != null) putString(Proto.INJECT_ERROR, error)
++            if (detail != null) putString(Proto.ERROR_DETAIL, detail)
++        }
+     }
+ 
+ 
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundInputProbe.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundInputProbe.kt
+@@ -62,7 +62,7 @@
+                         frameRequested = true
+                         probe.entered(InputProbeDiagnostics.Stage.FRAME_COMMIT_WAIT)
+                         viewTreeObserver.registerFrameCommitCallback {
+-                            ui.post {
++                            postOnAnimation {
+                                 if (!closed.get() && isAttachedToWindow && targetDisplay.isValid &&
+                                     this.display?.displayId == targetDisplay.displayId) {
+                                     probe.entered(InputProbeDiagnostics.Stage.TARGET_VALIDATE)
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/PrivilegedDisplayCore.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/PrivilegedDisplayCore.kt
+@@ -25,7 +25,9 @@
+ import android.os.Binder
+ import android.os.Build
+ import android.os.Bundle
++import android.os.Handler
+ import android.os.IBinder
++import android.os.Looper
+ import android.os.Process
+ import android.os.SystemClock
+ import android.text.InputType
+@@ -73,6 +75,9 @@
+     private var width = 0
+     private var height = 0
+     private val released = AtomicBoolean(false)
++    private val probeHandler by lazy { Handler(Looper.getMainLooper()) }
++    private var probeExpiry: Runnable? = null
++    private var probeInjected = false
+ 
+     private class Fault(val code: String) : Exception()
+ 
+@@ -92,11 +97,6 @@
+                 response.putBoolean(Proto.OK, true)
+                 return response
+             }
+-            if (op == Proto.OP_GATE) {
+-                synchronized(lock) { gateProbe(response) }
+-                if (!response.containsKey(Proto.ERROR)) response.putBoolean(Proto.OK, true)
+-                return response
+-            }
+             if (op == Proto.OP_GRANT_SECURE_SETTINGS) {
+                 grantSecureSettings(request.getInt(Proto.USER))
+                 response.putBoolean(Proto.OK, true)
+@@ -128,6 +128,10 @@
+     private fun dispatch(op: String?, request: Bundle, response: Bundle) {
+         val ownerId = request.getString(Proto.OWNER).orEmpty()
+         if (op == null || ownerId.isEmpty()) throw Fault("invalidArguments")
++        if (ownerId.startsWith(Proto.GATE_OWNER_PREFIX)) {
++            dispatchProbe(op, ownerId, request, response)
++            return
++        }
+         if (op == Proto.OP_RELEASE) {
+             if (owner == ownerId) releaseAll()
+             response.putBoolean("released", true)
+@@ -179,34 +183,47 @@
+         }
+     }
+ 
+-    /** Test a real input receiver, not an empty display. Never launches or touches a user app. */
+-    private fun gateProbe(response: Bundle) {
+-        // A settings probe must not replace or release an active task's display.
+-        if (owner != null || display != null) throw Fault("probeBusy")
+-        try {
+-            owner = "__gate__"
+-            createDisplay(Bundle().apply { putInt(Proto.SHORT_SIDE, 360); putInt(Proto.ASPECT_W, 9); putInt(Proto.ASPECT_H, 20) }, probe = true)
+-            response.putInt(Proto.DISPLAY_ID, displayId())
+-            var probeDetail: String? = null
+-            val injection = runCatching {
+-                val window = BackgroundInputProbe(privileged, checkNotNull(display).display)
++    /** The probe lease owns a disposable display and can never launch an activity on it. */
++    private fun dispatchProbe(op: String, token: String, request: Bundle, response: Bundle) {
++        when (op) {
++            Proto.OP_GATE_CREATE -> {
++                if (owner != null || display != null) throw Fault("probeBusy")
++                if (keyguard?.isKeyguardLocked == true) throw Fault("locked")
++                owner = token
+                 try {
+-                    window.verify { target, time ->
+-                        sendMotion(MotionEvent.ACTION_DOWN, target.x, target.y, time, waitForFinish = false)
+-                        sendMotion(MotionEvent.ACTION_UP, target.x, target.y, time, waitForFinish = false)
+-                    }
+-                } finally {
+-                    // Cleanup failure must replace a delivery failure, not be hidden by use().
+-                    try { window.close() } finally { probeDetail = window.failureDetail }
++                    createDisplay(Bundle().apply { putInt(Proto.SHORT_SIDE, 360) }, probe = true)
++                    val expire = Runnable { synchronized(lock) { if (owner == token) releaseAll() } }
++                    probeExpiry = expire
++                    if (!probeHandler.postDelayed(expire, 15_000)) throw Fault("deviceUnavailable")
++                    response.putInt(Proto.DISPLAY_ID, displayId())
++                } catch (e: Throwable) {
++                    releaseAll()
++                    throw e
+                 }
+             }
+-            response.putBoolean(Proto.INJECT_OK, injection.isSuccess)
+-            injection.exceptionOrNull()?.let {
+-                response.putString(Proto.INJECT_ERROR, failureCode(it))
+-                (probeDetail ?: failureDetail(it))?.let { detail -> response.putString(Proto.ERROR_DETAIL, detail) }
++            Proto.OP_GATE_INJECT -> {
++                if (owner != token || probeExpiry == null || probeInjected) throw Fault("identityChanged")
++                // Frame commit precedes publication of the touchable window to InputDispatcher.
++                val wm = windowManager()
++                wm.javaClass.getMethod("syncInputTransactions", Boolean::class.javaPrimitiveType)
++                    .invoke(wm, true)
++                if (keyguard?.isKeyguardLocked == true) throw Fault("locked")
++                if (foregroundPackage() != null) throw Fault("displayTargetChanged")
++                val x = request.getInt(Proto.PROBE_X, -1)
++                val y = request.getInt(Proto.PROBE_Y, -1)
++                val time = request.getLong(Proto.PROBE_DOWN_TIME, -1)
++                if (x !in 1 until width || y !in 1 until height ||
++                    time <= 0 || SystemClock.uptimeMillis() - time !in 0L..2_000L)
++                    throw Fault("invalidArguments")
++                probeInjected = true
++                sendMotion(MotionEvent.ACTION_DOWN, x, y, time, waitForFinish = false)
++                sendMotion(MotionEvent.ACTION_UP, x, y, time, waitForFinish = false)
+             }
+-        } finally {
+-            releaseAll()
++            Proto.OP_GATE_RELEASE -> {
++                if (owner != token || probeExpiry == null) throw Fault("identityChanged")
++                if (!releaseAll()) throw Fault("inputProbeCleanupFailed")
++            }
++            else -> throw Fault("invalidArguments")
+         }
+     }
+ 
+@@ -279,12 +296,15 @@
+         return task?.topActivity?.packageName
+     }
+ 
+-    private fun releaseAll() = synchronized(lock) {
++    private fun releaseAll(): Boolean = synchronized(lock) {
+         owner = null
++        probeExpiry?.let(probeHandler::removeCallbacks)
++        probeExpiry = null
++        probeInjected = false
+         var failed = false
+         try { display?.release() } catch (_: Throwable) { failed = true } finally { display = null }
+         try { reader?.close() } catch (_: Throwable) { failed = true } finally { reader = null }
+-        if (failed) { /* best effort */ }
++        !failed
+     }
+ 
+     // ---- observation (tree + optional screenshot) --------------------------
+@@ -766,11 +786,15 @@
+         if (waitForFinish && !accepted) throw Fault("inputRejected")
+     }
+ 
+-    private fun setImePolicyHide(displayId: Int) {
++    private fun windowManager(): Any {
+         val sm = Class.forName("android.os.ServiceManager")
+         val binder = sm.getMethod("getService", String::class.java).invoke(null, "window") as IBinder
+-        val wm = Class.forName("android.view.IWindowManager\$Stub")
++        return Class.forName("android.view.IWindowManager\$Stub")
+             .getMethod("asInterface", IBinder::class.java).invoke(null, binder)
++    }
++
++    private fun setImePolicyHide(displayId: Int) {
++        val wm = windowManager()
+         // DISPLAY_IME_POLICY_HIDE == 2
+         wm.javaClass.getMethod("setDisplayImePolicy", Int::class.javaPrimitiveType, Int::class.javaPrimitiveType)
+             .invoke(wm, displayId, 2)
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/PrivilegedProtocol.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/PrivilegedProtocol.kt
+@@ -13,7 +13,7 @@
+ // accepts only this fixed verb set — no shell commands, paths or display ids from callers.
+ 
+ object Proto {
+-    const val REVISION = "dsh-vdisplay-1"
++    const val REVISION = "dsh-vdisplay-2"
+ 
+     // request keys
+     const val OP = "op"
+@@ -48,7 +48,13 @@
+     const val OP_TEXT = "text"
+     const val OP_RELEASE = "release"
+     const val OP_DESTROY = "destroy"
+-    const val OP_GATE = "gate"
++    const val OP_GATE_CREATE = "gateCreate"
++    const val OP_GATE_INJECT = "gateInject"
++    const val OP_GATE_RELEASE = "gateRelease"
++    const val GATE_OWNER_PREFIX = "probe:"
++    const val PROBE_X = "probeX"
++    const val PROBE_Y = "probeY"
++    const val PROBE_DOWN_TIME = "probeDownTime"
+ 
+     /** 自动恢复无障碍: grants [APP_PACKAGE] WRITE_SECURE_SETTINGS in [USER]; nothing else is grantable. */
+     const val OP_GRANT_SECURE_SETTINGS = "grantSecureSettings"

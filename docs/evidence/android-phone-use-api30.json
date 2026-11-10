@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-08",
+  "device": {
+    "kind": "Android Emulator",
+    "android": "11",
+    "api": 30,
+    "abi": "arm64-v8a",
+    "build": "RSR1.240422.006",
+    "sdkImageRevision": 16
+  },
+  "debugArtifact": {
+    "package": "org.mobileharness.android",
+    "build": 11081755,
+    "sha256": "4d6c1a27419fd76299a14a1b4be0540d5ff72534a64f882e83462397adfabe36",
+    "runtime": "r15-dsh0.2.2-rc.1-node24.22.1-ubuntu24.04.5-0c7f54d632c6"
+  },
+  "setup": {
+    "engine": "Fresh installation and in-app setup of local DSH",
+    "accessibility": "Granted in Android settings",
+    "model": "Loopback scripted DeepSeek Messages endpoint",
+    "fixtureApkSha256": "64b3c34f296782a839127b407df8a65d658dafaf7a7255cb7873b28f0d2225fd",
+    "adbRole": "Installation, emulator setup, user confirmation and independent diagnostics"
+  },
+  "firstColdRead": "DSH opened the ordinary fixture but returned a secure-window read refusal. A later foreground task read the fixture successfully.",
+  "coldReadRegression": {
+    "tools": ["mcp__phone__open", "mcp__phone__screen"],
+    "fixtureApkSha256": "8eebfbc783702e0c92a080c71e69965343c4d74f420367f54879c618dc490480",
+    "requiredReadback": "Fixture tree on open and fixture tree plus JPEG on the first screen request",
+    "baseline": {
+      "build": 11081819,
+      "noArtificialDelay": {
+        "fixtureApkSha256": "64b3c34f296782a839127b407df8a65d658dafaf7a7255cb7873b28f0d2225fd",
+        "trials": 3,
+        "passed": 3
+      },
+      "launchDelayMs": 2000,
+      "trials": 3,
+      "passed": 0,
+      "result": "Both tools reported a secure window and no JPEG was delivered in any trial"
+    },
+    "intermediate": { "build": 11081839, "rootRetryBudgetMs": 1500, "trials": 3, "passed": 2 },
+    "fixed": {
+      "build": 11081842,
+      "sha256": "4385f8dd95095ce3a55ef69e394d3be425614bccc7fdad3815e7cc400fbbe663",
+      "rootRetryBudgetMs": 2000,
+      "launchDelayMs": 2000,
+      "trials": 3,
+      "passed": 3,
+      "modelResult": "MH_PHONE_COLD_READ_VERIFIED",
+      "screenshot": {
+        "mimeType": "image/jpeg",
+        "width": 585,
+        "height": 1300,
+        "bytes": 46407,
+        "sha256": "d0247939fce597c80792b17ed3a487e179ae0cfe2411b297165eb810d853748b"
+      }
+    },
+    "longerLaunch": {
+      "build": 11081842,
+      "launchDelayMs": 4000,
+      "open": "Secure-window refusal while the window was still unreadable",
+      "screen": "Returned the fixture tree and JPEG once the root became readable",
+      "jpegSha256": "ec7c5526674b1813ad4484883eaf140eabde0b297897a121fc3b210dd624b58b"
+    },
+    "flagSecure": {
+      "build": 11081842,
+      "setup": "DSH tapped Protect fixture window after Allow once",
+      "screenshotRefused": true,
+      "imageInToolResult": false,
+      "imageInModelRequest": false,
+      "modelResult": "MH_PHONE_SECURE_VERIFIED"
+    }
+  },
+  "foregroundLaunchRetry": {
+    "build": 11081912,
+    "sha256": "94798aa63a65d638af2682b3993da040e18124ea6b0e3337e3b7e536f3c1b51d",
+    "fixtureApkSha256": "82028d6f44b21e1c4e1fdf59035503e3674fe1501caf369fb96ca80316e4d30f",
+    "fixtureLaunchDelayMs": 2000,
+    "trials": 2,
+    "passed": 2,
+    "modelResult": "MH_PHONE_COLD_READ_VERIFIED",
+    "screenshots": [
+      { "tag": "a91e449ef983", "bytes": 46719, "sha256": "7f2b5adc4b4bb43cfd719397d8f66c6607aa1a4650ba7f3462982410f8f9d88e" },
+      { "tag": "7df206b47a4e", "bytes": 46786, "sha256": "4689188362a8ceacf42149ad36938af5479866b4411bb72c478c4656c94b812a" }
+    ],
+    "flagSecure": {
+      "screenshotRefused": true,
+      "imageInToolResult": false,
+      "imageInModelRequest": false,
+      "modelResult": "MH_PHONE_SECURE_VERIFIED"
+    }
+  },
+  "foregroundTap": {
+    "tool": "mcp__phone__tap",
+    "approval": "Allow once",
+    "modelResult": "MH_PHONE_VERIFIED_SAMPLE_ON",
+    "independentFixtureStorage": { "sample_on": true }
+  },
+  "foregroundSwipe": {
+    "captureApi": "AccessibilityService.takeScreenshot on the default display",
+    "tool": "mcp__phone__swipe_xy",
+    "approval": "Allow once for each attempt",
+    "stale": { "observation": "s8", "refused": true, "fixtureHits": 0 },
+    "fresh": {
+      "observation": "s11",
+      "path": [[97, 520], [310, 520]],
+      "jpegSha256": "83a603848bc77f131b086dddc824e2a6934dad924aaed9f455f3f020d310a249",
+      "jpegBytes": 46683
+    },
+    "modelResult": "MH_PHONE_SWIPE_VERIFIED",
+    "independentFixtureStorage": { "swipe_hits": 1, "swipe_dx": 393 }
+  },
+  "secureWindow": {
+    "setup": "DSH tapped the fixture button that sets FLAG_SECURE",
+    "screenshotRefused": true,
+    "imageInModelRequest": false,
+    "modelResult": "MH_PHONE_SECURE_VERIFIED"
+  },
+  "backgroundBaseline": {
+    "build": 11081755,
+    "backgroundOpenRejected": true,
+    "fixtureProcessStarted": false,
+    "reasonShown": "Background mode is off, with instructions to enable it"
+  },
+  "backgroundVersionMessage": {
+    "fixedDebugBuild": 11081819,
+    "sha256": "caedb7bc58222419bb6a631004eb4c0e610dfd25e6840e6c11d8e5ec1f33d95f",
+    "backgroundOpenRejected": true,
+    "fixtureProcessStarted": false,
+    "reasonShown": "不打扰模式（后台屏）需要 Android 14 或更高版本。可以改用主屏操作。",
+    "subsequentForegroundTap": {
+      "modelResult": "MH_PHONE_VERIFIED_SAMPLE_ON",
+      "independentFixtureStorage": { "sample_on": true }
+    }
+  },
+  "releaseForm": {
+    "build": 11081801,
+    "sha256": "d539815177fba112330bec24a32426a408c4818bcf06f3740193bcb7e664c6e7",
+    "install": "Installed over the debug build and kept the accessibility grant",
+    "screenshot": {
+      "bytes": 46511,
+      "sha256": "820268604a338b8eec448e62ee387b446603d10d2b488b85f568568e5e050bba"
+    },
+    "tools": ["mcp__phone__screen", "mcp__phone__type", "mcp__phone__scroll", "mcp__phone__tap"],
+    "modelResult": "MH_PHONE_FORM_VERIFIED",
+    "independentFixtureStorage": { "saved_note": "Mobile Harness 测试" }
+  }
+}

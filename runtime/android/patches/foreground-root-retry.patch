@@ -1,0 +1,147 @@
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt
+index 27431bd..b33507a 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt
+@@ -137,6 +137,10 @@ interface PhoneDriver {
+ 
+     fun observe(detail: Boolean, image: Boolean): ScreenSnapshot
+ 
++    /** Read the app requested by a foreground launch, if it is ready to observe. */
++    fun observeAfterLaunch(packageName: String): ScreenSnapshot? =
++        observe(detail = false, image = false).takeIf { it.packageName == packageName || it.secure }
++
+     fun collect(screenId: String, listElementId: Int, maxPages: Int, until: String?): CollectResult
+ 
+     /**
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt
+index d3de571..f3a5b1b 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt
+@@ -222,7 +222,12 @@ class PhoneCore(
+             return Out(it.message, error = true, app = app.label, summary = ui.get("phone_log_open_app", "打开 %1\$s", app.packageName), decision = "refused:${it.rule}") // l10n:keep test default
+         }
+         if (!background) {
+-            return afterSystem(env.system().launch(app), ui.get("phone_log_open_app", "打开 %1\$s", app.packageName), app.label) // l10n:keep test default
++            return afterSystem(
++                env.system().launch(app),
++                ui.get("phone_log_open_app", "打开 %1\$s", app.packageName), // l10n:keep test default
++                app.label,
++                launchedPackage = app.packageName,
++            )
+         }
+         val driver = env.driver(PhoneScreen.BACKGROUND)
+             ?: return Out(env.backgroundUnavailable(), error = true, app = app.label, summary = ui.get("phone_log_open_background", "后台屏打开 %1\$s", app.packageName), decision = "unavailable") // l10n:keep test default
+@@ -246,18 +251,20 @@ class PhoneCore(
+     }
+ 
+     /** A system action that brought up another app's UI: attach the new main screen when we can read it. */
+-    private fun afterSystem(r: SysResult, summary: String, app: String?): Out {
++    private fun afterSystem(r: SysResult, summary: String, app: String?, launchedPackage: String? = null): Out {
+         if (r.ok) tasks.setApp(r.appLabel ?: app)
+-        val screen = if (r.ok) mainScreenAfter(SETTLE_AFTER_LAUNCH_MS) else null
++        val screen = if (r.ok) mainScreenAfter(SETTLE_AFTER_LAUNCH_MS, launchedPackage) else null
+         return Out(r.message, error = !r.ok, screen = screen, app = r.appLabel ?: app, summary = summary, decision = if (r.ok) "ok" else "failed")
+     }
+ 
+-    private fun mainScreenAfter(settleMs: Long): ScreenSnapshot? {
++    private fun mainScreenAfter(settleMs: Long, launchedPackage: String? = null): ScreenSnapshot? {
+         val d = env.driver(PhoneScreen.MAIN) ?: return null
+         if (!d.availability().ok) return null
+         return try {
+             env.sleep(settleMs)
+-            safety.filterScreen(d.observe(detail = false, image = false))
++            val snap = if (launchedPackage == null) d.observe(detail = false, image = false)
++                       else d.observeAfterLaunch(launchedPackage)
++            snap?.let { safety.filterScreen(it) }
+         } catch (e: InterruptedException) {
+             throw e
+         } catch (_: Exception) {
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt
+index 9130501..11c4c46 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt
+@@ -104,19 +104,50 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
+ 
+     override fun foregroundPackage(): String? = TreeCapture.foregroundPackage(service, screenBox())
+ 
+-    override fun observe(detail: Boolean, image: Boolean): ScreenSnapshot = synchronized(lock) {
++    override fun observe(detail: Boolean, image: Boolean): ScreenSnapshot =
++        observe(detail, image, launchedPackage = null)
++
++    override fun observeAfterLaunch(packageName: String): ScreenSnapshot =
++        observe(detail = false, image = false, launchedPackage = packageName)
++
++    private fun observe(detail: Boolean, image: Boolean, launchedPackage: String?): ScreenSnapshot = synchronized(lock) {
+         val start = SystemClock.uptimeMillis()
+         availability().let { if (!it.ok) return blank(it.reason!!) }
+-        val cap = capture()
++        val gen = abortGen
++        var cap = capture()
+         try {
++            val retryMs = if (launchedPackage == null) WINDOW_RETRY_MS else LAUNCH_WINDOW_RETRY_MS
++            val retryUntil = start + retryMs
++            while (needsWindowRetry(cap, launchedPackage)) {
++                if (retryUntil - SystemClock.uptimeMillis() <= WINDOW_POLL_MS) break
++                clock.pause(WINDOW_POLL_MS) { cancelled(gen) }
++                if (cancelled(gen)) throw InterruptedException()
++                val left = retryUntil - SystemClock.uptimeMillis()
++                if (left <= 0) break
++                val next = capture(left)
++                // An empty enumeration cannot clear a known hidden window.
++                if (next.windows.isEmpty() && next.hiddenWindowTitle == null) {
++                    next.recycle()
++                    continue
++                }
++                cap.recycle()
++                cap = next
++            }
++            if (cancelled(gen)) throw InterruptedException()
++            if (launchedPackage != null && cap.packageName != launchedPackage && cap.hiddenWindowTitle == null) {
++                // l10n:keep agent screen result
++                return blank("目标应用尚未显示可读窗口，请稍后用 screen 查看。")
++            }
+             val snap = publish(cap, detail)
+             val text = StringBuilder(snap.screen.text)
+             var bytes: ByteArray? = null
+             var mime: String? = null
+             var secure = false
+-            if (image) {
++            if (image && !snap.hidden) {
+                 val left = OBSERVE_MS - (SystemClock.uptimeMillis() - start)
+                 when {
++                    // l10n:keep agent screen result
++                    cap.windows.isEmpty() -> text.append("\n提示：前台窗口不可读，这次没有附截图。")
+                     // l10n:keep agent screen result
+                     snap.ownApp && !lifted.ownApp -> text.append("\n提示：DSH 自己的界面不截图。")
+                     // l10n:keep agent screen result
+@@ -147,6 +178,11 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
+         } finally { cap.recycle() }
+     }
+ 
++    private fun needsWindowRetry(cap: Capture, launchedPackage: String?): Boolean =
++        cap.hiddenWindowTitle != null || cap.windows.isEmpty() ||
++            (launchedPackage != null &&
++                (cap.packageName != launchedPackage || !WindowContent.usable(cap.windows.first().root)))
++
+     override fun target(screenId: String, elementId: Int): TargetInfo? = synchronized(lock) {
+         val snap = latest ?: return null
+         if (snap.id != screenId) return null
+@@ -616,7 +652,7 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
+ 
+     // ---- snapshots --------------------------------------------------------------------------------
+ 
+-    private fun capture(): Capture = TreeCapture.capture(service, screenBox(), ownPackage, CAPTURE_MS)
++    private fun capture(budgetMs: Long = CAPTURE_MS): Capture = TreeCapture.capture(service, screenBox(), ownPackage, budgetMs)
+ 
+     private fun unavailable(cap: Capture) = WindowContent.unavailable(cap.hiddenWindowTitle != null, cap.unreadableWindowTitle != null, cap.windows)
+ 
+@@ -750,6 +786,9 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
+         private val counter = java.util.concurrent.atomic.AtomicInteger()
+         private const val OBSERVE_MS = 4_800L
+         private const val CAPTURE_MS = 2_000L
++        private const val WINDOW_RETRY_MS = 2_000L
++        private const val LAUNCH_WINDOW_RETRY_MS = 3_000L
++        private const val WINDOW_POLL_MS = 200L
+         private const val COLLECT_MS = 100_000L
+         private const val COLLECT_CHARS = 60_000
+     }

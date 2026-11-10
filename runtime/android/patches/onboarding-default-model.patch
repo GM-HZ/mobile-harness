@@ -1,0 +1,68 @@
+diff --git a/app/lib/ui/onboarding/connect_page.dart b/app/lib/ui/onboarding/connect_page.dart
+index 06f8c5a..5d84b8b 100644
+--- a/app/lib/ui/onboarding/connect_page.dart
++++ b/app/lib/ui/onboarding/connect_page.dart
+@@ -1,11 +1,15 @@
+ import 'dart:async';
+ 
++import 'package:dsh_client/dsh_client.dart';
+ import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
+ 
+ import '../../l10n/l10n.dart';
+ import '../../runtime/runtime_state.dart';
+ import '../../state/account_state.dart';
++import '../../state/connection_state.dart';
++import '../../state/model_defaults_state.dart';
++import '../../state/models_state.dart';
+ import '../../state/onboarding_state.dart';
+ import '../account/account_widgets.dart';
+ import '../common/progress_halo.dart';
+@@ -162,8 +166,46 @@ class _ConnectPageState extends ConsumerState<ConnectPage> {
+     ref.read(accountProvider.notifier).dismissFailure();
+     final id = await Navigator.of(context).push<String>(MaterialPageRoute(builder: (_) => const ProviderFormPage()));
+     if (id == null || !mounted) return;
++    var defaultReady = false;
++    try {
++      defaultReady = await _setUpDefaultModel(id);
++    } catch (_) {
++      // The provider is already saved. Leave it available in Models for retry.
++    }
++    if (!mounted) return;
++    if (!defaultReady) {
++      ScaffoldMessenger.of(context)
++          .showSnackBar(SnackBar(content: Text(context.l10n.engineNewChatDefaultsUnconfirmed)));
++    }
+     await ref.read(onboardingPrefsProvider.notifier).setKeySkipped(true);
+-    widget.onDone();
++    if (mounted) widget.onDone();
++  }
++
++  /// Start new chats on the just-configured route when the bundled default has no credential.
++  Future<bool> _setUpDefaultModel(String provider) async {
++    final connection = ref.read(activeConnectionProvider).value;
++    if (connection == null || !connection.isLocal) return false;
++    final client = connection.client;
++    final scope = ref.read(modelSelectionScopeProvider);
++    bool current() => mounted && identical(ref.read(modelSelectionScopeProvider), scope);
++
++    final section = await client.settingsSection(defaultModelSettingsNs);
++    if (!current() || section == null) return false;
++    final catalog = await client.listModels();
++    if (!current()) return false;
++    if (isValidModelSelection(catalog, ModelSelection.fromJson(section.value))) return true;
++    final model = catalog.models.where((model) => model.provider == provider).firstOrNull;
++    if (!section.writable || model == null) return false;
++
++    final selection = ModelSelection(provider: provider, model: model.id, reasoningEffort: startingEffort(model));
++    final saved = await client.mutateSettings(
++      defaultModelSettingsNs,
++      defaultModelOps(selection),
++      expectedRevision: section.revision,
++    );
++    if (!current()) return false;
++    ref.invalidate(modelCatalogProvider);
++    return jsonEquals(ModelSelection.fromJson(saved.value)?.toJson(), selection.toJson());
+   }
+ 
+   @override

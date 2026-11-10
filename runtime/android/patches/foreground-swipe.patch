@@ -1,0 +1,489 @@
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt
+index 08a9853..27431bd 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneContracts.kt
+@@ -90,6 +90,16 @@ sealed interface PhoneAction {
+     /** Flash only: a point on a numbered screenshot ([screenId] is the observation it came from). Always confirmed. */
+     data class TapXY(override val screenId: String, val x: Int, val y: Int) : PhoneAction
+ 
++    /** A straight gesture in the approved foreground app, using pixels from one screenshot. */
++    data class SwipeXY(
++        override val screenId: String,
++        val x: Int,
++        val y: Int,
++        val endX: Int,
++        val endY: Int,
++        val expectedPackage: String? = null,
++    ) : PhoneAction
++
+     enum class Direction { UP, DOWN, LEFT, RIGHT }
+ 
+     enum class GlobalKey { BACK, HOME, RECENTS, NOTIFICATIONS }
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneControl.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneControl.kt
+index 3b227bd..86448b0 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneControl.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneControl.kt
+@@ -68,6 +68,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
+             "phone_status_type" -> R.string.phone_status_type
+             "phone_status_scroll" -> R.string.phone_status_scroll
+             "phone_status_tap_xy" -> R.string.phone_status_tap_xy
++            "phone_status_swipe_xy" -> R.string.phone_status_swipe_xy
+             "phone_status_key" -> R.string.phone_status_key
+             "phone_status_press" -> R.string.phone_status_press
+             "phone_key_back" -> R.string.phone_key_back
+@@ -81,6 +82,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
+             "phone_confirm_type" -> R.string.phone_confirm_type
+             "phone_confirm_submit" -> R.string.phone_confirm_submit
+             "phone_confirm_tap_xy" -> R.string.phone_confirm_tap_xy
++            "phone_confirm_swipe_xy" -> R.string.phone_confirm_swipe_xy
+             "phone_confirm_scroll" -> R.string.phone_confirm_scroll
+             "phone_confirm_key" -> R.string.phone_confirm_key
+             "phone_current_app" -> R.string.phone_current_app
+@@ -97,6 +99,7 @@ class PhoneControl private constructor(private val app: Context) : PhoneEnv, Con
+             "phone_log_collect" -> R.string.phone_log_collect
+             "phone_log_scroll" -> R.string.phone_log_scroll
+             "phone_log_tap_xy" -> R.string.phone_log_tap_xy
++            "phone_log_swipe_xy" -> R.string.phone_log_swipe_xy
+             "phone_log_key" -> R.string.phone_log_key
+             "phone_log_handoff" -> R.string.phone_log_handoff
+             "phone_log_long_tap" -> R.string.phone_log_long_tap
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt
+index afe0b47..d3de571 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneCore.kt
+@@ -156,7 +156,8 @@ class PhoneCore(
+             PhoneToolCatalog.CLIPBOARD -> clipboard(a)
+             PhoneToolCatalog.SCREEN -> screen(a)
+             PhoneToolCatalog.COLLECT -> collect(a)
+-            PhoneToolCatalog.TAP, PhoneToolCatalog.TYPE, PhoneToolCatalog.SCROLL, PhoneToolCatalog.TAP_XY -> act(name, a, scope)
++            PhoneToolCatalog.TAP, PhoneToolCatalog.TYPE, PhoneToolCatalog.SCROLL,
++            PhoneToolCatalog.TAP_XY, PhoneToolCatalog.SWIPE_XY -> act(name, a, scope)
+             PhoneToolCatalog.KEY -> key(a)
+             PhoneToolCatalog.HANDOFF -> handoff(a, scope)
+             // l10n:keep agent tool result
+@@ -425,21 +426,23 @@ class PhoneCore(
+         return Out(text, screen = screen, app = screen?.appLabel ?: pkg, summary = summary, decision = "ok")
+     }
+ 
+-    /** tap / type / scroll / tap_xy: route, resolve, gate, perform. */
++    /** Route, resolve, authorize and perform a screen write. */
+     private fun act(name: String, a: Args, scope: SerialWorker.Scope): Out {
+-        val screenParameter = if (name == PhoneToolCatalog.TAP_XY) "observation" else "screen"
++        val coordinates = name == PhoneToolCatalog.TAP_XY || name == PhoneToolCatalog.SWIPE_XY
++        val screenParameter = if (coordinates) "observation" else "screen"
+         val sid = a.str(screenParameter)
+         val which = when (val r = routeScreenId(sid, screenParameter)) {
+             is Either.Left -> return Out(r.value, error = true)
+             is Either.Right -> r.value
+         }
+         sid!!
+-        val id = a.int("id")
++        val id = if (coordinates) null else a.int("id")
+         val action: PhoneAction
+         val kind: WriteKind
+         var typed: String? = null
+         var submit = false
+         var point: Pair<Int, Int>? = null
++        var endPoint: Pair<Int, Int>? = null
+         var summary: String
+         when (name) {
+             PhoneToolCatalog.TAP -> {
+@@ -474,6 +477,25 @@ class PhoneCore(
+                 kind = WriteKind.SCROLL
+                 summary = ui.get("phone_log_scroll", "滚动 %1\$s %2\$s", sid.toString(), dir.name.lowercase()) // l10n:keep test default
+             }
++            PhoneToolCatalog.SWIPE_XY -> {
++                // l10n:keep agent tool result
++                if (which != PhoneScreen.MAIN) return Out("swipe_xy 只支持主屏的应用窗口。", error = true)
++                val x = a.int("x")
++                val y = a.int("y")
++                val endX = a.int("end_x")
++                val endY = a.int("end_y")
++                if (x == null || y == null || endX == null || endY == null ||
++                    minOf(x, y, endX, endY) < 0 || (x == endX && y == endY)
++                ) {
++                    // l10n:keep agent tool result
++                    return Out("swipe_xy 需要两个不同的非负整数坐标点。", error = true)
++                }
++                point = x to y
++                endPoint = endX to endY
++                action = PhoneAction.SwipeXY(sid, x, y, endX, endY)
++                kind = WriteKind.SWIPE_XY
++                summary = ui.get("phone_log_swipe_xy", "滑动 %1\$s (%2\$d,%3\$d) → (%4\$d,%5\$d)", sid, x, y, endX, endY) // l10n:keep test default
++            }
+             else -> {
+                 val x = a.int("x")
+                 val y = a.int("y")
+@@ -491,7 +513,7 @@ class PhoneCore(
+         }
+         if (env.isLocked()) return locked(summary)
+         lastScreen = which
+-        val target: TargetInfo? = if (id != null && kind != WriteKind.TAP_XY) {
++        val target: TargetInfo? = if (id != null) {
+             driver.target(sid, id) ?: return stale(driver, sid, summary)
+         } else {
+             null
+@@ -504,7 +526,7 @@ class PhoneCore(
+         val appLabel = target?.appLabel
+         val app = appLabel ?: pkg
+         val owner = tasks.activeOwner() ?: return stoppedOut(summary)
+-        val verdict = safety.checkWrite(kind, target, pkg, appLabel, typed, submit, point)
++        val verdict = safety.checkWrite(kind, target, pkg, appLabel, typed, submit, point, endPoint)
+         val decision = when (val r = safety.resolve(verdict, scope)) {
+             is SafetyGate.Result.No -> return Out(r.message, error = true, app = app, summary = summary, decision = r.decision)
+             is SafetyGate.Result.Go -> r.decision
+@@ -512,7 +534,7 @@ class PhoneCore(
+         if (!tasks.isCurrent(owner) || Thread.currentThread().isInterrupted) return stoppedOut(summary)
+         tasks.setApp(appLabel ?: pkg)
+         say(ui.get("phone_acting", "DSH 正在操作 · %1\$s", statusLine(kind, target, if (secret) SafetyRules.MASK else typed))) // l10n:keep test default
+-        val res = driver.perform(action)
++        val res = driver.perform(if (action is PhoneAction.SwipeXY) action.copy(expectedPackage = pkg) else action)
+         return Out(
+             res.message,
+             error = !res.ok,
+@@ -535,6 +557,7 @@ class PhoneCore(
+             WriteKind.TYPE -> ui.get("phone_status_type", "输入「%1\$s」", if (typed == SafetyRules.MASK) typed else SafetyRules.quoteText(typed ?: "", 16)) // l10n:keep test default
+             WriteKind.SCROLL -> ui.get("phone_status_scroll", "滚动") // l10n:keep test default
+             WriteKind.TAP_XY -> ui.get("phone_status_tap_xy", "点截图上的位置") // l10n:keep test default
++            WriteKind.SWIPE_XY -> ui.get("phone_status_swipe_xy", "按截图坐标滑动") // l10n:keep test default
+             WriteKind.KEY -> ui.get("phone_status_key", "按键") // l10n:keep test default
+         }
+     }
+@@ -642,7 +665,7 @@ class PhoneCore(
+         const val HANDOFF_MS = 600_000L
+ 
+         /** Tools whose success means the agent got past whatever refused it before. */
+-        private val WRITES = setOf(PhoneToolCatalog.TAP, PhoneToolCatalog.TYPE, PhoneToolCatalog.TAP_XY, PhoneToolCatalog.OPEN)
++        private val WRITES = setOf(PhoneToolCatalog.TAP, PhoneToolCatalog.TYPE, PhoneToolCatalog.TAP_XY, PhoneToolCatalog.SWIPE_XY, PhoneToolCatalog.OPEN)
+         private val DONE = setOf("ok", "allowed", "confirmed", "confirmed-app", "confirmed-task")
+         const val SETTLE_AFTER_LAUNCH_MS = 1200L
+         const val MAX_APPS = 150
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolCatalog.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolCatalog.kt
+index f778a50..afee46c 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolCatalog.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolCatalog.kt
+@@ -22,6 +22,7 @@ object PhoneToolCatalog {
+     const val KEY = "key"
+     const val TAP_XY = "tap_xy"
+     const val HANDOFF = "handoff"
++    const val SWIPE_XY = "swipe_xy"
+ 
+     class Tool(val name: String, val description: String, val properties: Map<String, Any?>, val required: List<String>) {
+         fun toJson(): Map<String, Any?> = linkedMapOf(
+@@ -245,6 +246,24 @@ object PhoneToolCatalog {
+             linkedMapOf("reason" to str("要用户做什么，一句话")),
+             listOf("reason"),
+         ),
++        Tool(
++            SWIPE_XY,
++            // l10n:keep agent tool catalog
++            "在主屏前台应用内按最新标号截图的像素坐标滑动。用于没有可滚动元素的画布或轮播区域。默认需用户确认；请避开屏幕边缘和键盘。",
++            linkedMapOf(
++                // l10n:keep agent tool catalog
++                "observation" to str("那张截图的屏幕号"),
++                // l10n:keep agent tool catalog
++                "x" to int("起点横坐标（像素，从 0 开始）"),
++                // l10n:keep agent tool catalog
++                "y" to int("起点纵坐标（像素，从 0 开始）"),
++                // l10n:keep agent tool catalog
++                "end_x" to int("终点横坐标（像素，从 0 开始）"),
++                // l10n:keep agent tool catalog
++                "end_y" to int("终点纵坐标（像素，从 0 开始）"),
++            ),
++            listOf("observation", "x", "y", "end_x", "end_y"),
++        ),
+     )
+ 
+     val names: List<String> = tools.map { it.name }
+@@ -252,5 +271,5 @@ object PhoneToolCatalog {
+     fun listJson(): List<Map<String, Any?>> = tools.map { it.toJson() }
+ 
+     /** Tools that act on a screen through a [PhoneDriver] (need accessibility or the background display). */
+-    val SCREEN_TOOLS = setOf(SCREEN, COLLECT, TAP, TYPE, SCROLL, KEY, TAP_XY, HANDOFF)
++    val SCREEN_TOOLS = setOf(SCREEN, COLLECT, TAP, TYPE, SCROLL, KEY, TAP_XY, HANDOFF, SWIPE_XY)
+ }
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/SafetyGate.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/SafetyGate.kt
+index cd75c1e..d46faa7 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/SafetyGate.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/SafetyGate.kt
+@@ -163,7 +163,7 @@ object SafetyRules {
+ }
+ 
+ /** The kinds of writes the gate distinguishes. */
+-enum class WriteKind { TAP, LONG_TAP, TYPE, TAP_XY, SCROLL, KEY }
++enum class WriteKind { TAP, LONG_TAP, TYPE, TAP_XY, SWIPE_XY, SCROLL, KEY }
+ 
+ /**
+  * Applies the safety rules to one action and asks the person when a rule says so, through [gate]
+@@ -223,6 +223,7 @@ class SafetyGate(
+         typed: String? = null,
+         submit: Boolean = false,
+         point: Pair<Int, Int>? = null,
++        endPoint: Pair<Int, Int>? = null,
+     ): Verdict {
+         val app = labelOf(pkg, appLabel)
+         if (kind == WriteKind.KEY) return Verdict.Allow // back / home / recents / shade: always a way out
+@@ -246,9 +247,10 @@ class SafetyGate(
+         val firstInApp = !everyWrite && (pkg == null || !tasks.isApproved(pkg))
+         val word = if (kind == WriteKind.TAP || kind == WriteKind.LONG_TAP) SafetyRules.sensitiveWord(target?.label, target?.viewId) else null
+         val actionApp = appLabel ?: pkg ?: uiText.get("phone_current_app", "当前应用") // l10n:keep test default
+-        val action = describe(kind, target, actionApp, if (secret) SafetyRules.MASK else typed, submit, point)
++        val action = describe(kind, target, actionApp, if (secret) SafetyRules.MASK else typed, submit, point, endPoint)
+         val reason = when {
+             kind == WriteKind.TAP_XY -> "tap_xy"
++            kind == WriteKind.SWIPE_XY -> "swipe_xy"
+             kind == WriteKind.TYPE && submit -> "submit"
+             word != null -> "sensitive:$word"
+             everyWrite -> "every-write"
+@@ -342,13 +344,14 @@ class SafetyGate(
+         return s.copy(text = "屏幕 ${s.id}$app\n$refusal", image = null, imageMime = null)
+     }
+ 
+-    private fun describe(kind: WriteKind, t: TargetInfo?, app: String, typed: String?, submit: Boolean, point: Pair<Int, Int>?): String {
++    private fun describe(kind: WriteKind, t: TargetInfo?, app: String, typed: String?, submit: Boolean, point: Pair<Int, Int>?, endPoint: Pair<Int, Int>?): String {
+         val label = t?.label?.takeIf { it.isNotBlank() }?.let { SafetyRules.quoteText(it, 30) } ?: t?.role?.let(uiText::role) ?: uiText.get("phone_confirm_element", "元素") // l10n:keep test default
+         return when (kind) {
+             WriteKind.TAP -> uiText.get("phone_confirm_tap", "在「%1\$s」点「%2\$s」", app, label) // l10n:keep test default
+             WriteKind.LONG_TAP -> uiText.get("phone_confirm_long_tap", "在「%1\$s」长按「%2\$s」", app, label) // l10n:keep test default
+             WriteKind.TYPE -> uiText.get("phone_confirm_type", "在「%1\$s」的「%2\$s」输入：\"%3\$s\"", app, label, if (typed == SafetyRules.MASK) typed else SafetyRules.quoteText(typed ?: "")) + if (submit) uiText.get("phone_confirm_submit", "，然后发送 / 提交") else "" // l10n:keep test default
+             WriteKind.TAP_XY -> uiText.get("phone_confirm_tap_xy", "在「%1\$s」点截图上的位置 (%2\$s, %3\$s)", app, point?.first.toString(), point?.second.toString()) // l10n:keep test default
++            WriteKind.SWIPE_XY -> uiText.get("phone_confirm_swipe_xy", "在「%1\$s」从 (%2\$s, %3\$s) 滑动到 (%4\$s, %5\$s)", app, point?.first.toString(), point?.second.toString(), endPoint?.first.toString(), endPoint?.second.toString()) // l10n:keep test default
+             WriteKind.SCROLL -> uiText.get("phone_confirm_scroll", "在「%1\$s」滚动", app) // l10n:keep test default
+             WriteKind.KEY -> uiText.get("phone_confirm_key", "按系统键") // l10n:keep test default
+         }
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt
+index 3140d29..9130501 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/a11y/MainScreenDriver.kt
+@@ -1,7 +1,7 @@
+ // Portions derived from Phase (https://github.com/CikeSeven/phase), used with the author's permission. See THIRD_PARTY_NOTICES.md.
+ // Local changes: the screen text format instead of JSON; fingerprints re-checked against a fresh
+ // capture; password fields marked rather than failing the screen; collect, open, numbered
+-// screenshots, tap_xy; blocking calls with time budgets.
++// screenshots, coordinate gestures; blocking calls with time budgets.
+ 
+ package io.github.ccch1mneyyy.dsh_app.phone.a11y
+ 
+@@ -16,6 +16,7 @@ import android.os.PowerManager
+ import android.os.SystemClock
+ import android.util.Log
+ import android.view.Display
++import android.view.ViewConfiguration
+ import android.view.accessibility.AccessibilityNodeInfo
+ import io.github.ccch1mneyyy.dsh_app.phone.ActionResult
+ import io.github.ccch1mneyyy.dsh_app.phone.Availability
+@@ -32,6 +33,7 @@ import java.text.SimpleDateFormat
+ import java.util.Date
+ import java.util.Locale
+ import java.util.concurrent.ConcurrentHashMap
++import kotlin.math.abs
+ 
+ /**
+  * The main screen, read and driven through [PhoneA11yService]. Calls block (bridge worker
+@@ -133,7 +135,7 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
+                             mime = shot.mime
+                             snap.image = shot.geometry
+                             // l10n:keep agent screen result
+-                            text.append("\n截图上的数字是元素编号；tap_xy 用截图像素（${shot.geometry!!.width}×${shot.geometry.height}）。")
++                            text.append("\n截图上的数字是元素编号；tap_xy / swipe_xy 用截图像素（${shot.geometry!!.width}×${shot.geometry.height}）。")
+                             // l10n:keep agent screen result
+                             shot.takenAtMillis?.let { text.append("\n截图时间：${shotClock.format(Date(it))}（系统截图时间戳，设备时钟）。") }
+                         // l10n:keep agent screen result
+@@ -177,7 +179,8 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
+                 is PhoneAction.Tap -> tap(action, gen)
+                 is PhoneAction.Type -> type(action, gen)
+                 is PhoneAction.Scroll -> scroll(action, gen)
+-                is PhoneAction.TapXY -> tapXY(action, gen)
++                is PhoneAction.TapXY -> coordinateGesture(action.screenId, action.x, action.y, gen)
++                is PhoneAction.SwipeXY -> coordinateGesture(action.screenId, action.x, action.y, gen, action)
+             }
+         }
+     }
+@@ -463,36 +466,74 @@ internal class MainScreenDriver(private val service: PhoneA11yService, private v
+         return after(before, latest, gen, what)
+     }
+ 
+-    private fun tapXY(a: PhoneAction.TapXY, gen: Long): ActionResult {
++    private fun coordinateGesture(id: String, x: Int, y: Int, gen: Long, swipe: PhoneAction.SwipeXY? = null): ActionResult {
++        val verb = if (swipe == null) "点击" else "滑动"
+         val snap = latest
+-        if (snap == null || snap.id != a.screenId) {
++        if (snap == null || snap.id != id) {
+             val now = observeQuiet()
+             // l10n:keep agent screen result
+-            return ActionResult(false, "屏幕编号 ${a.screenId} 已过期，坐标对不上了。请重新 screen 加 image 再点。", now)
++            return ActionResult(false, "屏幕编号 $id 已过期，坐标对不上了。请重新 screen 加 image 再操作。", now)
+         }
+         // l10n:keep agent screen result
+-        val geometry = snap.image ?: return ActionResult(false, "屏幕 ${a.screenId} 没有截图。坐标点击要先用 screen 加 image 拿一张标号截图。")
+-        val point = geometry.toScreen(a.x, a.y)
++        val geometry = snap.image ?: return ActionResult(false, "屏幕 $id 没有截图。坐标$verb 要先用 screen 加 image 拿一张标号截图。")
++        val point = geometry.toScreen(x, y)
+             // l10n:keep agent screen result
+-            ?: return ActionResult(false, "坐标 (${a.x}, ${a.y}) 不在这张截图里（${geometry.width}×${geometry.height}）。")
++            ?: return ActionResult(false, "坐标 ($x, $y) 不在这张截图里（${geometry.width}×${geometry.height}）。")
++        val end = swipe?.let {
++            // l10n:keep agent screen result
++            geometry.toScreen(it.endX, it.endY)
++                ?: return ActionResult(false, "终点不在这张截图里（${geometry.width}×${geometry.height}）。")
++        }
+         // l10n:keep agent screen result
+         if (snap.ownApp && !lifted.ownApp) return ActionResult(false, "这是 DSH 自己的界面，不操作。")
+         // l10n:keep agent screen result
+-        if (snap.protectedPage && !lifted.systemPages) return ActionResult(false, "这是系统权限 / 安全相关页面，DSH 不在这里点击。需要的话请用 handoff 交给用户。")
++        if (snap.protectedPage && !lifted.systemPages) return ActionResult(false, "这是系统权限 / 安全相关页面，DSH 不在这里$verb。需要的话请用 handoff 交给用户。")
+         // l10n:keep agent screen result
+-        if (snap.hidden || snap.unreadable) return ActionResult(false, "这一屏读不到内容（可能受敏感视图策略限制），不盲点。请 handoff。", observeQuiet())
++        if (snap.hidden || snap.unreadable) return ActionResult(false, "这一屏读不到内容（可能受敏感视图策略限制），不盲目操作。请 handoff。", observeQuiet())
+         val cap = capture()
+         try {
+             // l10n:keep agent screen result
+-            if (unavailable(cap)) return ActionResult(false, "这一屏读不到内容（可能受敏感视图策略限制），不盲点。请 handoff。", toSnapshot(publish(cap, false)))
+-            // l10n:keep agent screen result
+-            if (!observation(cap).reusableCoordinates(snap.observation)) return ActionResult(false, "无法确认当前界面仍与截图一致，没有点击。请重新看屏幕。", toSnapshot(publish(cap, false)))
++            if (unavailable(cap)) return ActionResult(false, "这一屏读不到内容（可能受敏感视图策略限制），不盲目操作。请 handoff。", toSnapshot(publish(cap, false)))
++            // l10n:keep agent screen result
++            if (!observation(cap).reusableCoordinates(snap.observation)) return ActionResult(false, "无法确认当前界面仍与截图一致，没有$verb。请重新看屏幕。", toSnapshot(publish(cap, false)))
++            if (swipe != null && end != null) {
++                val window = cap.windows.first()
++                val pkg = swipe.expectedPackage
++                // Keep both endpoints, and thus the straight line between them, away from system gesture edges.
++                val margin = (48 * service.resources.displayMetrics.density).toInt()
++                val viewport = window.bounds.intersect(Box(cap.screen.left + margin, cap.screen.top + margin,
++                    cap.screen.right - margin, cap.screen.bottom - margin))
++                val (sx, sy) = point
++                val (ex, ey) = end
++                if (pkg == null || cap.packageName != pkg || window.kind != WindowKind.APP || cap.keyboardShown != false ||
++                    !viewport.contains(sx, sy) || !viewport.contains(ex, ey)
++                ) {
++                    // l10n:keep agent screen result
++                    return ActionResult(false, "滑动必须留在获准的前台应用窗口内，请关闭键盘并避开屏幕边缘。")
++                }
++                if (maxOf(abs(ex - sx), abs(ey - sy)) <= ViewConfiguration.get(service).scaledTouchSlop) {
++                    // l10n:keep agent screen result
++                    return ActionResult(false, "滑动距离太短，请重新选择起点和终点。")
++                }
++                val pathBounds = Box(minOf(sx, ex), minOf(sy, ey), maxOf(sx, ex) + 1, maxOf(sy, ey) + 1)
++                if (ScreenShooter.sensitiveBounds(cap.windows).any { !it.intersect(pathBounds).isEmpty }) {
++                    // l10n:keep agent screen result
++                    return ActionResult(false, "这次滑动可能经过敏感内容，请 handoff。")
++                }
++            }
+         } finally { cap.recycle() }
++        if (cancelled(gen)) throw InterruptedException()
+         val before = clock.count
++        if (swipe != null && end != null) {
++            // l10n:keep agent screen result
++            if (!actuator.swipe(point.first, point.second, end.first, end.second)) return ActionResult(false, "系统没有接受这次滑动。", observeQuiet())
++            // l10n:keep agent screen result
++            return after(before, snap, gen, "已提交从 ($x, $y) 到 (${swipe.endX}, ${swipe.endY}) 的滑动。")
++        }
+         // l10n:keep agent screen result
+         if (!actuator.tap(point.first, point.second)) return ActionResult(false, "系统没有接受这次点击。", observeQuiet())
+         // l10n:keep agent screen result
+-        return after(before, snap, gen, "已提交点击截图上的 (${a.x}, ${a.y})。")
++        return after(before, snap, gen, "已提交点击截图上的 ($x, $y)。")
+     }
+ 
+     /** Waits for the UI to settle, reads the new screen (`+` marks) and says whether anything changed. */
+diff --git a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundDisplay.kt b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundDisplay.kt
+index d0d323a..0404d03 100644
+--- a/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundDisplay.kt
++++ b/app/android/app/src/main/kotlin/io/github/ccch1mneyyy/dsh_app/phone/background/BackgroundDisplay.kt
+@@ -155,7 +155,7 @@ class BackgroundDisplay(
+                 request.putString(Proto.DIR, "back")
+             }
+             // l10n:keep agent screen protocol
+-            is PhoneAction.TapXY -> return ActionResult(false, "后台屏按元素编号操作，不用坐标")
++            is PhoneAction.TapXY, is PhoneAction.SwipeXY -> return ActionResult(false, "后台屏按元素编号操作，不用坐标")
+         }
+         // l10n:keep agent screen protocol
+         return toResult(channel().execute(request), "已在后台屏执行")
+diff --git a/app/android/app/src/main/res/values-zh/i18n_strings.xml b/app/android/app/src/main/res/values-zh/i18n_strings.xml
+index 06d8adc..c2297c8 100644
+--- a/app/android/app/src/main/res/values-zh/i18n_strings.xml
++++ b/app/android/app/src/main/res/values-zh/i18n_strings.xml
+@@ -180,6 +180,7 @@
+     <string name="phone_status_type">输入「%1$s」</string>
+     <string name="phone_status_scroll">滚动</string>
+     <string name="phone_status_tap_xy">点截图上的位置</string>
++    <string name="phone_status_swipe_xy">按截图坐标滑动</string>
+     <string name="phone_status_key">按键</string>
+     <string name="phone_status_press">DSH 正在操作 · 按%1$s</string>
+     <string name="phone_key_back">返回</string>
+@@ -193,6 +194,7 @@
+     <string name="phone_confirm_type">在「%1$s」的「%2$s」输入：\"%3$s\"</string>
+     <string name="phone_confirm_submit">，然后发送 / 提交</string>
+     <string name="phone_confirm_tap_xy">在「%1$s」点截图上的位置 (%2$s, %3$s)</string>
++    <string name="phone_confirm_swipe_xy">在「%1$s」从 (%2$s, %3$s) 滑动到 (%4$s, %5$s)</string>
+     <string name="phone_confirm_scroll">在「%1$s」滚动</string>
+     <string name="phone_confirm_key">按系统键</string>
+     <string name="phone_current_app">当前应用</string>
+@@ -227,6 +229,7 @@
+     <string name="phone_log_collect">收集 %1$s#%2$d</string>
+     <string name="phone_log_scroll">滚动 %1$s %2$s</string>
+     <string name="phone_log_tap_xy">点坐标 %1$s (%2$d,%3$d)</string>
++    <string name="phone_log_swipe_xy">滑动 %1$s (%2$d,%3$d) → (%4$d,%5$d)</string>
+     <string name="phone_log_key">按键 %1$s</string>
+     <string name="phone_log_handoff">交还用户</string>
+     <string name="phone_log_long_tap">长按 %1$s#%2$d</string>
+diff --git a/app/android/app/src/main/res/values/i18n_strings.xml b/app/android/app/src/main/res/values/i18n_strings.xml
+index 9866d12..526ed1b 100644
+--- a/app/android/app/src/main/res/values/i18n_strings.xml
++++ b/app/android/app/src/main/res/values/i18n_strings.xml
+@@ -185,6 +185,7 @@
+     <string name="phone_status_type">Type “%1$s”</string>
+     <string name="phone_status_scroll">Scroll</string>
+     <string name="phone_status_tap_xy">Tap a point on the screenshot</string>
++    <string name="phone_status_swipe_xy">Swipe using screenshot coordinates</string>
+     <string name="phone_status_key">Press a key</string>
+     <string name="phone_status_press">DSH is acting · Press %1$s</string>
+     <string name="phone_key_back">Back</string>
+@@ -198,6 +199,7 @@
+     <string name="phone_confirm_type">Type “%3$s” in “%2$s” in “%1$s”</string>
+     <string name="phone_confirm_submit">, then send / submit</string>
+     <string name="phone_confirm_tap_xy">Tap (%2$s, %3$s) on the screenshot in “%1$s”</string>
++    <string name="phone_confirm_swipe_xy">Swipe from (%2$s, %3$s) to (%4$s, %5$s) in “%1$s”</string>
+     <string name="phone_confirm_scroll">Scroll in “%1$s”</string>
+     <string name="phone_confirm_key">Press a system key</string>
+     <string name="phone_current_app">current app</string>
+@@ -232,6 +234,7 @@
+     <string name="phone_log_collect">Collect %1$s#%2$d</string>
+     <string name="phone_log_scroll">Scroll %1$s %2$s</string>
+     <string name="phone_log_tap_xy">Tap %1$s (%2$d,%3$d)</string>
++    <string name="phone_log_swipe_xy">Swipe %1$s (%2$d,%3$d) → (%4$d,%5$d)</string>
+     <string name="phone_log_key">Press %1$s</string>
+     <string name="phone_log_handoff">Hand over to you</string>
+     <string name="phone_log_long_tap">Press and hold %1$s#%2$d</string>
+diff --git a/app/android/app/src/test/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolSchemaTest.kt b/app/android/app/src/test/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolSchemaTest.kt
+index 93909cd..e853ded 100644
+--- a/app/android/app/src/test/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolSchemaTest.kt
++++ b/app/android/app/src/test/kotlin/io/github/ccch1mneyyy/dsh_app/phone/PhoneToolSchemaTest.kt
+@@ -58,7 +58,7 @@ class PhoneToolSchemaTest {
+         val json = Json.write(PhoneToolCatalog.listJson())
+         assertFalse(json.contains("\"minimum\""))
+         assertFalse(json.contains("\"maximum\""))
+-        assertEquals(13, PhoneToolCatalog.tools.size)
++        assertEquals(14, PhoneToolCatalog.tools.size)
+         val tap = PhoneToolCatalog.tools.single { it.name == PhoneToolCatalog.TAP_XY }
+         assertEquals(listOf("observation", "x", "y"), tap.required)
+         assertEquals(setOf("observation", "x", "y"), tap.properties.keys)
+@@ -119,4 +119,18 @@ class PhoneToolSchemaTest {
+         assertEquals(listOf(PhoneAction.TapXY("s1", 0, 0)), actions)
+         assertEquals(1, confirmations)
+     }
++
++    @Test fun swipeXYValidatesEndpointsAndBindsTheApprovedApp() {
++        val args = mapOf("observation" to "s1", "x" to 10, "y" to 20, "end_x" to 80, "end_y" to 20)
++        for (invalid in listOf(
++            args - "end_x", args + ("end_x" to -1), args + ("end_x" to 10), args + ("observation" to "b1"),
++        )) {
++            assertTrue(core.call(PhoneToolCatalog.SWIPE_XY, invalid).isError)
++        }
++        assertTrue(actions.isEmpty())
++        assertEquals(0, confirmations)
++        assertFalse(core.call(PhoneToolCatalog.SWIPE_XY, args).isError)
++        assertEquals(listOf(PhoneAction.SwipeXY("s1", 10, 20, 80, 20, "example.app")), actions)
++        assertEquals(1, confirmations)
++    }
+ }

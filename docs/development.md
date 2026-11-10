@@ -9,7 +9,7 @@ git submodule update --init --depth=1
 ./scripts/vendor/verify.sh
 ```
 
-父仓库 Git 链接固定每个组件的完整提交。当前直接子模块为 DSH、Node、Termux PRoot、DSHM 和 Termony。构建只读取锁定的子模块，DSHM 的 fetch shim 与许可证直接取自相应子模块。Termony 的嵌套终端组件在当前路径未使用。升级子模块时先提交并推送上游改动，再更新父仓库的 Git 链接。
+父仓库 Git 链接固定每个组件的完整提交。鸿蒙使用 DSH、Node、Termux PRoot、DSHM 和 Termony，Android 使用 dsh-Go。构建只读取锁定的子模块，DSHM 的 fetch shim 与许可证直接取自相应子模块。Termony 的嵌套终端组件在当前路径未使用。升级子模块时先提交并推送上游改动，再更新父仓库的 Git 链接。 [Android 构建](android.md)
 
 ## 准备输入并打包
 

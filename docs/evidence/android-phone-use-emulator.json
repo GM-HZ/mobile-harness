@@ -1,0 +1,581 @@
+{
+  "date": "2026-11-08",
+  "device": {
+    "kind": "Android Emulator",
+    "android": "15",
+    "api": 35,
+    "abi": "arm64-v8a",
+    "build": "AE3A.240806.043"
+  },
+  "artifact": {
+    "package": "org.mobileharness.android",
+    "version": "0.1.0",
+    "build": 11081519,
+    "signing": "Android debug",
+    "sha256": "a40e3bccdcd6e71e68472c7207b68113f2eb326cc95af25256303e9f923d8a54",
+    "sourceCommit": "d5ad25c5bc4c66ecacee76b3c5378db45e1db3fa",
+    "runtime": "r15-dsh0.2.2-rc.1-node24.22.1-ubuntu24.04.5-0c7f54d632c6",
+    "embeddedRuntimeChecksumsVerified": true
+  },
+  "fixture": {
+    "package": "org.mobileharness.phonefixture",
+    "model": "Scripted DeepSeek Messages endpoint on loopback",
+    "entryPoint": "Mobile Harness native DSH conversation",
+    "driver": "Android AccessibilityService",
+    "adbRole": "Install, test setup, user confirmation controls and post-turn diagnostics"
+  },
+  "approval": {
+    "mode": "Ask me at key steps",
+    "choice": "Allow once",
+    "calls": [
+      { "tool": "mcp__phone__open", "target": "org.mobileharness.phonefixture" },
+      { "tool": "mcp__phone__screen", "screen": "s4", "state": "SAMPLE_OFF", "buttonId": 3 },
+      { "tool": "mcp__phone__tap", "screen": "s4", "id": 3, "target": "Toggle sample" },
+      { "tool": "mcp__phone__screen", "screen": "s6", "state": "SAMPLE_ON" }
+    ],
+    "modelResult": "MH_PHONE_VERIFIED_SAMPLE_ON",
+    "independentUiReadback": "SAMPLE_ON"
+  },
+  "negativeCases": {
+    "reject": { "dshToolError": true, "independentUiReadback": "SAMPLE_OFF" },
+    "stop": { "dshTurn": "aborted by user", "independentUiReadback": "SAMPLE_OFF" },
+    "revokeAccessibility": {
+      "dshScreenToolError": "Accessibility service off",
+      "tapRequested": false,
+      "independentUiReadback": "SAMPLE_OFF"
+    }
+  },
+  "formWorkflow": {
+    "fixtureApkSha256": "372ff62249ad254ead821cf199b187809c008e48b7d5352645fdf2879e6d6c1d",
+    "choice": "Allow this app for this task",
+    "screenshot": {
+      "tool": "mcp__phone__screen",
+      "mimeType": "image/jpeg",
+      "width": 585,
+      "height": 1300,
+      "bytes": 24825,
+      "sha256": "ff550532b3c479a804be12a70165a8e8ad91ce269e6ddbc85e68fb756648aed0",
+      "modelRequest": "References the JPEG received by the loopback Files API"
+    },
+    "type": { "tool": "mcp__phone__type", "field": "Fixture note", "readback": "Mobile Harness 测试" },
+    "scroll": { "tool": "mcp__phone__scroll", "direction": "down", "revealed": "Save fixture note" },
+    "save": { "tool": "mcp__phone__tap", "readback": "FORM_SAVED Mobile Harness 测试" },
+    "modelResult": "MH_PHONE_FORM_VERIFIED",
+    "independentFixtureStorage": { "saved_note": "Mobile Harness 测试" }
+  },
+  "localShell": {
+    "tool": "bash",
+    "defaultWorkspaceWrite": "Refused because no sandbox backend was usable in this emulator",
+    "retryApproval": "Allow once",
+    "toolOutput": "MH_HARNESS_SHELL\nLinux"
+  },
+  "workspaceReport": {
+    "appBuild": 11081722,
+    "runId": "96f21f9784ab",
+    "entryPoint": "New Mobile Harness conversation on This phone",
+    "phoneState": {
+      "approval": "Allow once",
+      "toolReadback": "SAMPLE_ON",
+      "independentFixtureStorage": { "sample_on": true }
+    },
+    "fileTools": ["write", "read"],
+    "workspaceFile": "mh-phone-report-96f21f9784ab.txt",
+    "modelResult": "MH_PHONE_REPORT_VERIFIED 96f21f9784ab",
+    "nativePreview": ["Mobile Harness 验证", "report_id=96f21f9784ab", "fixture_state=SAMPLE_ON"],
+    "afterForceStop": "Manually restarted the local engine and reopened the same conversation and file",
+    "export": {
+      "destination": "Download/DSH-Go/mh-phone-report-96f21f9784ab.txt",
+      "bytes": 69,
+      "sha256": "4f9d7b97f4c1d924c7db2a8b9db40a8435566a3df2ce419bf4bfb2a12e27358c",
+      "independentByteComparison": "Exact match with the expected UTF-8 report"
+    }
+  },
+  "sshHost": {
+    "host": "macOS loopback SSH fixture",
+    "dshVersion": "0.2.2-rc.1",
+    "authentication": "Temporary Ed25519 key, host fingerprint verified",
+    "remoteEngine": "Started by Android client, then reached through an SSH tunnel",
+    "toolOutput": "MH_HARNESS_SHELL\nDarwin",
+    "afterClientRestart": "Reconnected and restored the same conversation with the completed turn",
+    "firstTrust": {
+      "confirmationDelaySeconds": 35,
+      "baselineBuild": 11081722,
+      "baselineResult": "The original connection closed before confirmation and Android reported SSH connection interrupted",
+      "fixedDebugBuild": 11081755,
+      "fixedDebugApkSha256": "4d6c1a27419fd76299a14a1b4be0540d5ff72534a64f882e83462397adfabe36",
+      "whileWaiting": "The unauthenticated probe closed and the host accepted no login",
+      "afterConfirmation": "A fresh connection authenticated with the confirmed key and started DSH",
+      "savedHostResult": "The saved host opened without prompting again and completed MH_SSH_REPORT_VERIFIED 661989d826ef",
+      "keyRotatedDuringConfirmation": {
+        "clientResult": "Host fingerprint changed. Disconnected.",
+        "hostResult": "Connection closed before authentication"
+      },
+      "flutterTestsPassed": 40,
+      "release": {
+        "appBuild": 11081801,
+        "appApkSha256": "d539815177fba112330bec24a32426a408c4818bcf06f3740193bcb7e664c6e7",
+        "signatureSchemesVerified": ["v2", "v3"],
+        "debuggable": false,
+        "embeddedRuntimeChecksumsVerified": true,
+        "confirmationDelaySeconds": 35,
+        "authenticationAfterConfirmation": true,
+        "savedHostResult": "MH_SSH_REPORT_VERIFIED 72e4c2e9fe12"
+      }
+    },
+    "workspaceReport": {
+      "appBuild": 11081722,
+      "runId": "c894bceeccd2",
+      "sessionId": "e5279455-fe4a-4f37-b9f1-bcd5ddeb6233",
+      "entryPoint": "New conversation on the SSH host in Android release",
+      "fileToolsInHostSessionLog": ["write", "read"],
+      "workspaceFile": "mh-ssh-report-c894bceeccd2.txt",
+      "modelResult": "MH_SSH_REPORT_VERIFIED c894bceeccd2",
+      "nativePreview": ["Mobile Harness 远端报告", "report_id=c894bceeccd2", "workspace=ssh-fixture"],
+      "export": {
+        "destination": "Download/DSH-Go/mh-ssh-report-c894bceeccd2.txt",
+        "bytes": 73,
+        "sha256": "203ff8ca68176266bb53130cc5b2b0e2808cc2973a2dfcf48e299a6ebea41555",
+        "independentByteComparison": "Exact match with the file on the SSH host"
+      }
+    },
+    "interruptedTurn": {
+      "appBuild": 11081638,
+      "fixtureRun": "b6addfd0299e",
+      "sessionId": "ecd009cb-10e8-40cc-a108-6a9817c2f260",
+      "interruption": "Removed the emulator port mapping and terminated the established fixture SSH connection while Bash was running",
+      "clientDuringInterruption": "Reconnecting",
+      "remoteEngineStayedRunning": true,
+      "hostCompletedBeforeRestoringTunnel": true,
+      "persistedToolCalls": 1,
+      "persistedToolResults": 1,
+      "persistedTurnEnds": 1,
+      "workspaceEvents": ["START", "FINISH"],
+      "clientAfterRestoringTunnel": "Automatically reconnected and displayed MH_SSH_RESUME_VERIFIED b6addfd0299e in the original conversation"
+    },
+    "cancelledTurn": {
+      "appBuild": 11081638,
+      "fixtureRun": "c51706001393",
+      "sessionId": "203e7860-7c95-4bc6-8f52-d57860cf4713",
+      "clientAction": "Stop generating",
+      "clientStatus": "Stopped",
+      "remoteJobStatus": "killed by SIGTERM",
+      "turnEnd": "aborted by user",
+      "persistedToolCalls": 1,
+      "workspaceEventsAfterRelease": ["START"]
+    },
+    "approval": {
+      "appBuild": 11081638,
+      "request": "Bash permission escalation for a single test marker inside the isolated SSH workspace",
+      "allowedAfterReconnect": {
+        "fixtureRun": "20008adb392d",
+        "sessionId": "a02c48d8-389a-464c-b406-126bf71a000a",
+        "clientDuringInterruption": "Reconnecting with the original pending command visible",
+        "markerPresentBeforeDecision": false,
+        "decision": "allowed-once",
+        "requestAndDecisionMatched": true,
+        "jobRegisteredAfterDecision": true,
+        "workspaceMarkerLines": ["APPROVED"],
+        "clientResult": "MH_SSH_APPROVAL_VERIFIED 20008adb392d"
+      },
+      "rejected": {
+        "fixtureRun": "f8bf2656f57f",
+        "sessionId": "181605ac-ee84-456b-9077-275a2918479b",
+        "decision": "rejected",
+        "requestAndDecisionMatched": true,
+        "jobRegistered": false,
+        "workspaceMarkerPresent": false,
+        "toolResult": "The user rejected escalating the command"
+      }
+    }
+  },
+  "releaseUpgrade": {
+    "version": "0.1.0",
+    "build": 11081552,
+    "sha256": "5aa6e3e1292eac6cea78cd39648c372ebe9c82cb32e2db7946ff7c3561f3f810",
+    "signing": "Local Android test certificate, shared with debug build 11081519",
+    "signatureSchemesVerified": ["v2", "v3"],
+    "r8MappingProduced": true,
+    "debuggable": false,
+    "embeddedRuntimeChecksumsVerified": true,
+    "install": "Installed over debug build with app data retained",
+    "accessibilityGrantRetained": true,
+    "engine": { "startedManually": true, "unauthenticatedHttpStatus": 401 },
+    "restoredConversationResult": "MH_PHONE_FORM_VERIFIED",
+    "freshConversationResult": "MH_PHONE_FORM_VERIFIED",
+    "independentFixtureStorage": { "saved_note": "Mobile Harness 测试" }
+  },
+  "coordinateGesture": {
+    "appBuild": 11081552,
+    "fixtureApkSha256": "7e3ba360e60aa3fdae49fa41d448014c94d6f19ad6d916d1e16f0eb4c5d04cbb",
+    "target": "Magenta view with no accessibility node or click action",
+    "tool": "mcp__phone__tap_xy",
+    "approval": "Allow once for each attempt",
+    "stale": {
+      "observation": "s11",
+      "point": [117, 301],
+      "outcome": "DSH refused the expired screenshot ID",
+      "fixtureHits": 0
+    },
+    "fresh": {
+      "observation": "s14",
+      "point": [117, 301],
+      "jpegSha256": "5075fe56c927caa0f44c7234f24d414319ca8a6e7f1e0def4c0f21657436d5c3",
+      "outcome": "Android gesture reached the target and DSH read COORD_HITS_1"
+    },
+    "modelResult": "MH_PHONE_COORD_VERIFIED",
+    "independentFixtureStorage": { "hits": 1 }
+  },
+  "coordinateSwipe": {
+    "appBuild": 11081715,
+    "appApkSha256": "08627b93f6322a3a21501e47b9af72cd56df0db791efaea2dc010660e3b92bb7",
+    "fixtureApkSha256": "64b3c34f296782a839127b407df8a65d658dafaf7a7255cb7873b28f0d2225fd",
+    "setup": "Fresh Android 15 ARM64 emulator with an in-app accessibility setup and loopback model",
+    "tool": "mcp__phone__swipe_xy",
+    "target": "Cyan view with no accessibility node or scroll action",
+    "approval": "Allow once for each attempt",
+    "stale": {
+      "observation": "s8",
+      "outcome": "DSH refused the expired screenshot ID",
+      "fixtureHits": 0
+    },
+    "fresh": {
+      "observation": "s11",
+      "path": [[97, 406], [310, 406]],
+      "jpegSha256": "40c7d431c0634a91d2d001485fc9ce8b127f0cf7febf21b1c2f83e532c25ef5d",
+      "outcome": "Android delivered DOWN, MOVE and UP, and DSH read SWIPE_HITS_1"
+    },
+    "modelResult": "MH_PHONE_SWIPE_VERIFIED",
+    "independentFixtureStorage": { "swipe_hits": 1, "swipe_dx": 393 },
+    "tapRegression": {
+      "staleObservationRefused": true,
+      "modelResult": "MH_PHONE_COORD_VERIFIED",
+      "independentFixtureStorage": { "hits": 1, "swipe_hits": 1 }
+    },
+    "phoneJvmTestsPassed": 359
+  },
+  "releaseCoordinateSwipe": {
+    "appBuild": 11081722,
+    "upgradedFromDebugBuild": 11081715,
+    "appApkSha256": "8aa467e23978848c8a565c8fc8d20536fa799c4e6c747032ea82d88489298bab",
+    "signing": "Same local Android test certificate as the installed debug build",
+    "signatureSchemesVerified": ["v2", "v3"],
+    "debuggable": false,
+    "r8MappingProduced": true,
+    "embeddedRuntimeChecksumsVerified": true,
+    "accessibilityGrantRetained": true,
+    "restoredConversationResult": "MH_PHONE_COORD_VERIFIED",
+    "freshSemanticTap": {
+      "modelResult": "MH_PHONE_VERIFIED_SAMPLE_ON",
+      "independentFixtureStorage": { "sample_on": true }
+    },
+    "swipeSetup": "Temporarily set emulator font scale to 1.1 to obtain a different fixture image after earlier runs lacked a usable JPEG, then restored 1.0",
+    "staleObservation": "s17",
+    "staleObservationRefused": true,
+    "freshObservation": "s20",
+    "freshPath": [[97, 414], [310, 414]],
+    "jpegSha256": "6c6c870fa581a17351d014a5ca67d5470acaf2195edcfdb87c370135411f4607",
+    "modelResult": "MH_PHONE_SWIPE_VERIFIED",
+    "independentFixtureStorage": { "swipe_hits": 1, "swipe_dx": 393 },
+    "handoff": {
+      "tool": "mcp__phone__handoff",
+      "continued": {
+        "clientAction": "Continue",
+        "tapRequestedBeforeContinue": false,
+        "screenReadAfterContinue": true,
+        "tapApproval": "Allow once",
+        "modelResult": "MH_PHONE_HANDOFF_VERIFIED",
+        "independentFixtureStorage": { "sample_on": true }
+      },
+      "stopped": {
+        "clientAction": "Stop task",
+        "clientStatus": "Stopped",
+        "tapRequested": false,
+        "sampleSaved": false
+      }
+    }
+  },
+  "secureWindow": {
+    "appBuild": 11081552,
+    "fixtureApkSha256": "73bccf59ac05444ed2a7c33598058ad6cea98d6ed82e87d079d60c5f3e42cf98",
+    "setup": "DSH tapped the fixture button that sets Android FLAG_SECURE",
+    "request": { "tool": "mcp__phone__screen", "image": true },
+    "toolError": "Secure window",
+    "imageInModelRequest": false,
+    "modelResult": "MH_PHONE_SECURE_VERIFIED"
+  },
+  "backgroundDisplay": {
+    "appBuild": 11081552,
+    "fixtureApkSha256": "df976eeaa5d68c79636ecbb7130e7fa93bd5285065b919d38be8a5c83560d8d1",
+    "channel": "In-app Direct ADB pairing with Android Wireless debugging on the isolated emulator",
+    "foreground": { "displayId": 0, "package": "org.mobileharness.android" },
+    "fixture": { "displayId": 4, "package": "org.mobileharness.phonefixture" },
+    "tools": ["mcp__phone__open", "mcp__phone__screen", "mcp__phone__tap", "mcp__phone__screen"],
+    "approval": "Allow once",
+    "modelResult": "MH_PHONE_BACKGROUND_VERIFIED",
+    "independentFixtureStorage": { "sample_on": true },
+    "displayReleasedAfterTurn": true,
+    "firstRun": "Cold launch succeeded, but the first background tree read returned an error",
+    "readinessProbe": {
+      "displayCreatedAndReleased": true,
+      "injected": false,
+      "diagnostic": "probe-v1;stage=presentation_create;type=SecurityException",
+      "platformLog": "WindowManager refused to attach the shell app_process window context because its process was not registered",
+      "settingsStatus": "Not ready despite a successful separate background task"
+    }
+  },
+  "backgroundReadinessFix": {
+    "version": "0.1.0",
+    "build": 11081630,
+    "sha256": "387009b5f78a31b01c5b0016441aab4155bea35bb07c924f4572d2e886bd2d93",
+    "signatureSchemesVerified": ["v2", "v3"],
+    "embeddedRuntimeChecksumsVerified": true,
+    "channel": "Direct ADB, existing emulator pairing",
+    "receiver": "Presentation in the installed Mobile Harness process",
+    "delivery": "The privileged process synchronized WindowManager input transactions before a single down/up pair",
+    "settings": {
+      "result": "Ready and In use on both enable attempts",
+      "probeDisplayIdsCreatedAndReleased": [7, 8]
+    },
+    "backgroundRegression": {
+      "foregroundDisplayId": 0,
+      "fixtureDisplayId": 9,
+      "tapCalls": 1,
+      "modelResult": "MH_PHONE_BACKGROUND_VERIFIED",
+      "independentFixtureStorage": { "sample_on": true },
+      "displayReleasedAfterTurn": true
+    }
+  },
+  "backgroundRevocation": {
+    "version": "0.1.0",
+    "build": 11081638,
+    "sha256": "41525514dd07c5821b3c7c4d3a3b9421c8fecccf43c6392c682997f1e9bcd190",
+    "signatureSchemesVerified": ["v2", "v3"],
+    "embeddedRuntimeChecksumsVerified": true,
+    "enabled": {
+      "settings": "Ready and In use",
+      "fixtureDisplayId": 12,
+      "modelResult": "MH_PHONE_BACKGROUND_VERIFIED",
+      "independentFixtureStorage": { "sample_on": true },
+      "displayReleasedAfterTurn": true
+    },
+    "disabledDuringApproval": {
+      "androidSetting": "adb_wifi_enabled=0",
+      "choiceAfterDisabling": "Allow once",
+      "modelResult": "MH_PHONE_FAILED_TOOL",
+      "sampleSaved": false,
+      "displayReleasedAfterTurn": true
+    },
+    "disabledBeforeLaunch": {
+      "modelResult": "MH_PHONE_FAILED_TOOL",
+      "fixtureProcessStarted": false
+    },
+    "foregroundWhileDisabled": {
+      "modelResult": "MH_PHONE_VERIFIED_SAMPLE_ON",
+      "independentFixtureStorage": { "sample_on": true }
+    }
+  },
+  "currentSignedRelease": {
+    "build": 11081847,
+    "sha256": "4be1cd2e28829e63359e41a8177976ef076af7e8f09aa0346a6b0b56cceab281",
+    "signing": "Android debug test certificate used for the release build",
+    "sourceCommit": "d5ad25c5bc4c66ecacee76b3c5378db45e1db3fa",
+    "upgrade": "Installed over build 11081801 and preserved the accessibility grant and saved SSH identity",
+    "foregroundTap": {
+      "tools": ["mcp__phone__open", "mcp__phone__screen", "mcp__phone__tap", "mcp__phone__screen"],
+      "approval": "Allow once",
+      "modelResult": "MH_PHONE_VERIFIED_SAMPLE_ON",
+      "independentFixtureStorage": { "sample_on": true }
+    },
+    "coldRead": {
+      "ordinaryLaunch": "Open returned the fixture tree and the client tool trajectory displayed the first screenshot. The loopback model did not resolve the screenshot in that run.",
+      "delayedLaunch": {
+        "launchDelayMs": 1400,
+        "activityDisplayedAfterMs": 2163,
+        "openResult": "Unknown application with no readable windows or controls",
+        "modelResult": "MH_PHONE_COLD_READ_FAILED"
+      }
+    },
+    "directSsh": {
+      "clientRoute": "Emulator virtual network to 10.0.2.2:18775",
+      "hostListener": "Isolated macOS OpenSSH on host loopback",
+      "adbReverseForSsh": false,
+      "firstTrust": "Fingerprint matched the host public key and public-key authentication occurred after confirmation",
+      "resume": {
+        "runId": "f092765cf842",
+        "serverSession": "session-28baf352-79a1-4e9a-aba0-3950d43d8d42",
+        "outage": "Emulator airplane mode on and Wi-Fi off. Independent TCP probe returned Network is unreachable.",
+        "clientDuringOutage": "Reconnecting",
+        "hostDuringOutage": "Finished the task with the same DSH server PID",
+        "restoration": "Airplane mode off and Wi-Fi on. Android authenticated a new SSH session and displayed the result in the existing conversation.",
+        "modelResult": "MH_SSH_RESUME_VERIFIED f092765cf842",
+        "hostEvents": ["START", "FINISH"],
+        "toolCalls": 1,
+        "toolResults": 1,
+        "turnEnd": "completed"
+      },
+      "report": {
+        "runId": "bcc05a5595b0",
+        "tools": ["write", "read"],
+        "modelResult": "MH_SSH_REPORT_VERIFIED bcc05a5595b0",
+        "nativePreview": true,
+        "destination": "Download/DSH-Go/mh-ssh-report-bcc05a5595b0.txt",
+        "bytes": 73,
+        "sha256": "a4561ff0e6573fcaddd1a2650a25d594159237990b9100cf3006aeb2cd6f95f4",
+        "independentByteComparison": "Exact match with the file on the SSH host"
+      }
+    }
+  },
+  "foregroundLaunchRetry": {
+    "fixtureApkSha256": "82028d6f44b21e1c4e1fdf59035503e3674fe1501caf369fb96ca80316e4d30f",
+    "fixtureLaunchDelayMs": 1400,
+    "requiredReadback": "Both tools returned the fixture tree with the same per-trial tag. The first screen JPEG resolved in the model request.",
+    "baseline": { "build": 11081847, "trials": 2, "passed": 1, "failedOpen": "Unknown app and no readable controls" },
+    "windowOnly": { "build": 11081903, "trials": 3, "passed": 2, "failedOpen": "Android still reported Mobile Harness as the front app" },
+    "debug": {
+      "build": 11081912,
+      "sha256": "94798aa63a65d638af2682b3993da040e18124ea6b0e3337e3b7e536f3c1b51d",
+      "launchRetryMs": 3000,
+      "screenRetryMs": 2000,
+      "trials": 3,
+      "passed": 3,
+      "modelResult": "MH_PHONE_COLD_READ_VERIFIED",
+      "screenshots": [
+        { "tag": "f01fc29d069f", "bytes": 38723, "sha256": "d324dfb022c859e556369e90da0d8a6bac3010a35d0c1bb2f58eefdd76bd1da8" },
+        { "tag": "516526d55bcc", "bytes": 39199, "sha256": "b149538757f6237f80c54be7679e7dcb93add1202897e1ddc7483260addc816f" },
+        { "tag": "41d9988a7069", "bytes": 39719, "sha256": "4c7762df9489750d3bdfd6bdc2ee6017022248f3e7cb5e64276289818474d342" }
+      ]
+    },
+    "longerLaunch": {
+      "build": 11081912,
+      "fixtureLaunchDelayMs": 4000,
+      "open": "Reported that the target window was not yet readable and omitted the preceding app",
+      "screen": "Returned the fixture tree and JPEG once readable",
+      "jpegSha256": "fb4f3266e99affeffb1e19f7be8c68a3e1bd5d047a7b87faabd63c7db25044cf"
+    },
+    "flagSecure": {
+      "build": 11081912,
+      "setup": "DSH enabled FLAG_SECURE via the fixture button after Allow once",
+      "screenshotRefused": true,
+      "imageInToolResult": false,
+      "imageInModelRequest": false,
+      "modelResult": "MH_PHONE_SECURE_VERIFIED"
+    },
+    "release": {
+      "build": 11081916,
+      "sha256": "35251f3f621afb500dcb4e9b379b205c1a7bbcc329be3c5cadd4127421d8a11d",
+      "signing": "Android debug test certificate used for the release build",
+      "upgrade": "Installed over build 11081912 and preserved the accessibility grant",
+      "fixtureLaunchDelayMs": 1400,
+      "modelResult": "MH_PHONE_COLD_READ_VERIFIED",
+      "screenshot": { "tag": "07e8a2a66fdf", "bytes": 39326, "sha256": "1f215f7216788d810072afd0c86a7bad55a990ac1908643d54c6cba90cb09ba7" }
+    },
+    "kotlinPhoneTests": { "suites": 46, "tests": 359, "failures": 0, "errors": 0, "skipped": 0 }
+  },
+  "freshInstallOnboarding": {
+    "device": "New Android 15 ARM64 emulator, build AE3A.240806.043",
+    "model": "Anthropic-compatible fixture on 127.0.0.1:18774, configured through Other providers using a test key",
+    "appPrivateProfileEditedByAdb": false,
+    "setup": ["Welcome", "This phone", "Phone control", "Ask me at key steps", "Notifications", "Accessibility", "Other providers"],
+    "baseline": {
+      "build": 11081916,
+      "activityColdLaunchMs": 4813,
+      "runtime": "Bundled PRoot and Node started under the Android app UID",
+      "discovery": "GET /v1/models returned the fixture model",
+      "firstTask": { "runId": "a0f585b0f032", "clientError": "No DeepSeek API key yet", "modelRequestSent": false },
+      "defaultBeforeManualChange": "deepseek-official / deepseek-flash (unavailable)",
+      "manualRecovery": {
+        "defaultSelectedInSettings": "MH-Loopback-Test / Flash",
+        "runId": "5c92fa51c2d7",
+        "modelResult": "MH_PHONE_REPORT_VERIFIED 5c92fa51c2d7",
+        "independentFixtureStorage": { "sample_on": true },
+        "exportBytes": 69,
+        "exportSha256": "ad010c7e55f36e661a8cb9d47285ab9f045cc00cc38cdca1e8ec687588d5fcc7"
+      }
+    },
+    "fixed": {
+      "build": 11081936,
+      "sha256": "8eb97690c240956e15a070cab7f55de80816895981b344d3604017dd20bcc92f",
+      "signing": "Android debug test certificate used for the release build",
+      "install": "Uninstalled the harness and fixture, then installed the signed APK and the fixture into the same isolated emulator",
+      "accessibilitySetup": "After reinstalling, the service was registered with the package manager and appeared after reopening Android Settings",
+      "firstTask": {
+        "runId": "029ec66b7aab",
+        "modelSelectionAfterSetup": "No model selected manually after saving the provider",
+        "approval": "Allow once",
+        "tools": ["mcp__phone__open", "mcp__phone__screen", "mcp__phone__tap", "mcp__phone__screen", "write", "read"],
+        "modelResult": "MH_PHONE_REPORT_VERIFIED 029ec66b7aab",
+        "independentFixtureStorage": { "sample_on": true },
+        "exportBytes": 69,
+        "exportSha256": "4e875aa861fc0fa1477572718cd9d6fb59b593fc31a9d4cfea491bcac2023571"
+      },
+      "restart": {
+        "localEngineStart": "Manually started after force-stopping and reopening the app",
+        "restoredFirstTaskResult": "MH_PHONE_REPORT_VERIFIED 029ec66b7aab",
+        "newChat": "A new chat without a manual model selection received a response from the same custom endpoint"
+      },
+      "flutterTests": { "suites": ["shell/shell_logic_test.dart", "engine_settings/new_chat_defaults_test.dart"], "passed": 43 }
+    }
+  },
+  "ubuntuSshRelease": {
+    "appBuild": 11081936,
+    "appSha256": "8eb97690c240956e15a070cab7f55de80816895981b344d3604017dd20bcc92f",
+    "host": {
+      "environment": "Isolated Docker Desktop container",
+      "os": "Ubuntu 24.04.5 LTS ARM64",
+      "baseImageDigest": "sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852",
+      "kernel": "Linux 6.10.14-linuxkit",
+      "node": "24.22.1",
+      "dsh": "Published npm package @deepseek-ai/dsh@0.2.2-rc.1",
+      "ssh": "OpenSSH_9.6p1 Ubuntu-3ubuntu13.20",
+      "user": "Non-root SSH fixture account",
+      "model": "Scripted Messages endpoint on the container loopback"
+    },
+    "transport": {
+      "route": "Android 15 emulator virtual network to 10.0.2.2:18776 and Docker published on host loopback",
+      "adbReverseMappingsDuringTest": 0,
+      "localAndroidEngineRunning": false,
+      "firstTrust": "Prompt matched the container host public key and authentication began after confirmation"
+    },
+    "resume": {
+      "runId": "5a36123f0cc0",
+      "serverSession": "session-f429af4a-0c69-4ba5-b6f3-f8e0d92bde82",
+      "sandboxBaseline": "DSH refused workspace-write before the command started because no sandbox backend was usable",
+      "retry": "Same command with a single Allow once approval",
+      "approvalId": "f25c6d44-abae-40d4-8ed1-29907a13e1e8",
+      "outage": "Emulator airplane mode on and Wi-Fi off. Independent TCP probe returned Network is unreachable.",
+      "clientDuringOutage": "Reconnecting",
+      "hostDuringOutage": "The same DSH PID completed the already approved command",
+      "afterRestoration": "New SSH authentication and result displayed in the original conversation",
+      "hostEvents": ["START", "FINISH"],
+      "bashCalls": 2,
+      "executedBashCalls": 1,
+      "modelResult": "MH_SSH_RESUME_VERIFIED 5a36123f0cc0"
+    },
+    "cancel": {
+      "runId": "7016ee1b5d94",
+      "serverSession": "session-6cd0d146-bb38-43bf-8f6e-427ec84f03d8",
+      "approval": "Allow once before execution",
+      "clientAction": "Stop generating after START",
+      "clientStatus": "Stopped",
+      "turnEnd": { "kind": "aborted", "reason": { "kind": "user" } },
+      "commandProcessExited": true,
+      "hostEventsAfterCreatingRelease": ["START"]
+    },
+    "report": {
+      "runId": "cb971241c9d9",
+      "tools": ["write", "read"],
+      "modelResult": "MH_SSH_REPORT_VERIFIED cb971241c9d9",
+      "nativePreview": true,
+      "destination": "Download/DSH-Go/mh-ssh-report-cb971241c9d9.txt",
+      "bytes": 73,
+      "sha256": "8cccc55eef47fcf3f4e9d4790139fcd73dd6790c71ffc01bcdac4021ff224165",
+      "independentByteComparison": "Exact match with the file in the Ubuntu workspace"
+    }
+  },
+  "limitations": [
+    "Physical Android devices and commercial models were outside this run.",
+    "Coordinate swipe evidence covers a straight gesture in a foreground Android app on the emulator.",
+    "Background execution and the readiness fix were exercised with Direct ADB. Other privileged channels remain unverified here.",
+    "Remote execution used an isolated SSH host, including the emulator virtual network without ADB forwarding for SSH. Relay, TURN and wide-area network recovery were outside this run."
+  ]
+}

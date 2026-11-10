@@ -1,0 +1,141 @@
+diff --git a/app/lib/remote/ssh/ssh_link.dart b/app/lib/remote/ssh/ssh_link.dart
+index 668eda7..73efc8d 100644
+--- a/app/lib/remote/ssh/ssh_link.dart
++++ b/app/lib/remote/ssh/ssh_link.dart
+@@ -207,34 +207,41 @@ class SshHostLink implements HostLink {
+     }
+ 
+     at(HostLinkStep.connect, detail: _config.address);
++    var loginConfig = _config;
++    final prompt = promptHostKey;
++    if (loginConfig.hostKeyFingerprint?.isNotEmpty != true && prompt != null) {
++      // Finish the unauthenticated probe before showing the dialog. Human
++      // confirmation can outlast both the client handshake and server login deadlines.
++      final key = await fetchHostKey(loginConfig, transportFactory: _transportFactory);
++      _checkOpen();
++      at(HostLinkStep.verifyHostKey, detail: '${key.shortType} ${key.fingerprint}');
++      final ok = await prompt(HostKeyPrompt(hostName: loginConfig.name, address: loginConfig.address, key: key));
++      _checkOpen();
++      if (!ok) {
++        throw HostLinkError(HostLinkErrorKind.hostKeyRejected, appL10n.remoteHostTrustCancelled);
++      }
++      if (checkHostKey(_config, key) == HostKeyVerdict.mismatch) throw hostKeyMismatchError(_config, key);
++      loginConfig = _config.copyWith(hostKeyType: () => key.type, hostKeyFingerprint: () => key.fingerprint);
++      _config = loginConfig;
++      await pinHostKey?.call(key);
++      _checkOpen();
++    }
+     final secrets = await _loadSecrets();
+     _checkOpen();
+-    final transport = await _transportFactory(SshConnectParams.of(_config, secrets), (key) async {
++    final transport = await _transportFactory(SshConnectParams.of(loginConfig, secrets), (key) {
+       if (_closed) return false;
+       at(HostLinkStep.verifyHostKey, detail: '${key.shortType} ${key.fingerprint}');
+-      switch (checkHostKey(_config, key)) {
++      switch (checkHostKey(loginConfig, key)) {
+         case HostKeyVerdict.trusted:
+           return true;
+         case HostKeyVerdict.mismatch:
+-          throw hostKeyMismatchError(_config, key);
++          throw hostKeyMismatchError(loginConfig, key);
+         case HostKeyVerdict.unknown:
+-          final prompt = promptHostKey;
+-          if (prompt == null) {
+-            throw HostLinkError(
+-              HostLinkErrorKind.hostKeyUnverified,
+-              appL10n.remoteErrFingerprintUnconfirmed,
+-              detail: '${key.shortType} ${key.fingerprint}',
+-            );
+-          }
+-          final ok = await prompt(HostKeyPrompt(hostName: _config.name, address: _config.address, key: key));
+-          if (_closed) return false;
+-          if (!ok) {
+-            throw HostLinkError(HostLinkErrorKind.hostKeyRejected, appL10n.remoteHostTrustCancelled);
+-          }
+-          _config = _config.copyWith(hostKeyType: () => key.type, hostKeyFingerprint: () => key.fingerprint);
+-          await pinHostKey?.call(key);
+-          if (_closed) return false;
+-          return true;
++          throw HostLinkError(
++            HostLinkErrorKind.hostKeyUnverified,
++            appL10n.remoteErrFingerprintUnconfirmed,
++            detail: '${key.shortType} ${key.fingerprint}',
++          );
+       }
+     });
+     if (_closed) {
+diff --git a/app/test/remote/ssh_link_test.dart b/app/test/remote/ssh_link_test.dart
+index 828e40e..4751324 100644
+--- a/app/test/remote/ssh_link_test.dart
++++ b/app/test/remote/ssh_link_test.dart
+@@ -150,24 +150,53 @@ void main() {
+   });
+ 
+   group('host key (TOFU)', () {
+-    test('unknown key: asks, pins, connects', () async {
++    test('unknown key: ends the probe, waits for trust, then opens a pinned login', () async {
+       PresentedHostKey? pinned;
+-      HostKeyPrompt? asked;
++      final shown = Completer<HostKeyPrompt>();
++      final answer = Completer<bool>();
+       final l = link(
+         config: sampleSsh.copyWith(hostKeyType: () => null, hostKeyFingerprint: () => null),
+-        prompt: (p) async {
+-          asked = p;
+-          return true;
++        prompt: (p) {
++          shown.complete(p);
++          return answer.future;
+         },
+         pin: (k) async => pinned = k,
+       );
+-      await l.open();
+-      expect(asked?.hostName, '电脑');
+-      expect(asked?.key.fingerprint, server.hostKey.fingerprint);
++      final opening = l.open();
++      final asked = await shown.future;
++      expect(asked.hostName, '电脑');
++      expect(asked.key.fingerprint, server.hostKey.fingerprint);
++      expect(server.connects.single.secrets.password, isNot('pw'));
++      expect(server.transports, isEmpty);
++      expect(pinned, isNull);
++      answer.complete(true);
++      await opening;
++      expect(server.connects, hasLength(2));
++      expect(server.connects.last.secrets.password, 'pw');
+       expect(pinned?.fingerprint, server.hostKey.fingerprint);
+       expect(l.config.hostKeyFingerprint, server.hostKey.fingerprint);
+     });
+ 
++    test('a key changed after the probe is refused before login', () async {
++      final original = server.hostKey;
++      final l = link(
++        config: sampleSsh.copyWith(hostKeyFingerprint: () => null),
++        prompt: (p) async {
++          expect(p.key, same(original));
++          server.hostKey = const PresentedHostKey('ssh-ed25519', 'SHA256:changed');
++          return true;
++        },
++      );
++      await expectLater(
++        l.open(),
++        throwsA(isA<HostLinkError>().having((e) => e.kind, 'kind', HostLinkErrorKind.hostKeyMismatch)),
++      );
++      expect(l.config.hostKeyFingerprint, original.fingerprint);
++      expect(server.connects, hasLength(2));
++      expect(server.transports, isEmpty);
++      expect(server.remote.launches, 0);
++    });
++
+     test('unknown key without a prompter fails closed', () async {
+       final l = link(config: sampleSsh.copyWith(hostKeyFingerprint: () => null));
+       await expectLater(
+@@ -187,6 +216,8 @@ void main() {
+         l.open(),
+         throwsA(isA<HostLinkError>().having((e) => e.kind, 'kind', HostLinkErrorKind.hostKeyRejected)),
+       );
++      expect(server.connects.single.secrets.password, isNot('pw'));
++      expect(server.transports, isEmpty);
+     });
+ 
+     test('changed key: fails closed with a warning, never prompts, never retries', () async {

@@ -13,3 +13,6 @@
 [submodule "termony"]
 	path = vendor/repos/termony
 	url = https://github.com/TermonyHQ/Termony.git
+[submodule "dsh-go"]
+	path = vendor/repos/dsh-go
+	url = https://github.com/ccch1mneyyy/dsh-Go.git
