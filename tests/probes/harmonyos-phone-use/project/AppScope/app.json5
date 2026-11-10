@@ -1,0 +1,10 @@
+{
+  "app": {
+    "bundleName": "org.mobileharness.phoneuseprobe",
+    "vendor": "Mobile Harness",
+    "versionCode": 1,
+    "versionName": "0.1.0",
+    "icon": "$media:icon",
+    "label": "$string:probe_app_name"
+  }
+}

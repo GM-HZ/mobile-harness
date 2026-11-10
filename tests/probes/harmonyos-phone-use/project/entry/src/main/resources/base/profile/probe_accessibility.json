@@ -1,0 +1,5 @@
+{
+  "accessibilityAbilityTypes": ["generic"],
+  "accessibilityCapabilities": ["retrieve", "gesture"],
+  "description": "Phone Use Probe"
+}

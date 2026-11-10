@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-08",
+  "baselineCommit": "795246635daf59e305de2790f836ff6cd4c5d86f",
+  "device": {
+    "model": "HUAWEI Mate 60",
+    "api": 26,
+    "software": "7.0.0.111(SP10C00E111R5P3)"
+  },
+  "artifact": {
+    "file": "entry-default-signed.hap",
+    "sha256": "e78e82dd1e0fad703b30fff1c6352b57930f43f8c65c59b370b0255ff5fa1f4e",
+    "bundleName": "org.mobileharness.phoneuseprobe",
+    "signingType": "debug",
+    "apl": "normal"
+  },
+  "results": {
+    "installedAndStarted": true,
+    "accessibility": {
+      "registered": true,
+      "enabled": false,
+      "declaredCapabilities": ["retrieve", "gesture"]
+    },
+    "capture": {
+      "scope": "probe in foreground",
+      "api": "screenshot.capture",
+      "pixelBytes": 13074432,
+      "savedImage": false
+    },
+    "openTestPage": {
+      "api": "UIAbilityContext.startAbility",
+      "targetBundle": "com.huawei.hmos.settings",
+      "targetState": "FOREGROUND",
+      "probeState": "BACKGROUND",
+      "probeReturnedToForeground": true
+    },
+    "stop": {
+      "method": "HDC aa force-stop",
+      "probeProcessExited": true
+    },
+    "nativeTouchController": {
+      "artifactSha256": "2cb4b6b654523be5607da79fcdc8196c81f3450c18cf3d305bd596a3bce58e9a",
+      "api": "inputEventClient.createTouchController",
+      "compilerDeviceWarning": "This API is unavailable to phone.",
+      "controlDevicePermissionRequested": false,
+      "errorCode": 801,
+      "tapExecuted": false
+    }
+  },
+  "dshToolErrorReplay": {
+    "dshVersion": "0.2.2-rc.1",
+    "host": "macOS",
+    "model": "scripted local fixture",
+    "mcpTool": "mcp__phone_probe__tap",
+    "fixtureError": "PHONE_TOUCH_UNSUPPORTED: HarmonyOS error 801",
+    "agentReceivedError": true,
+    "livePhoneBridge": false
+  },
+  "remaining": [
+    "denied or revoked capture permission",
+    "background and cross-app capture",
+    "cross-app read and input",
+    "DSH tool registration and native cancellation"
+  ]
+}

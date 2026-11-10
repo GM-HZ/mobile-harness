@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "probe_accessibility_description",
+      "value": "Check whether the system connects a diagnostic accessibility extension."
+    },
+    {
+      "name": "probe_capture_reason",
+      "value": "Check screen capture on the probe screen. Only the byte count is reported."
+    }
+  ]
+}
