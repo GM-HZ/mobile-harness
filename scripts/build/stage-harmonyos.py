@@ -4,6 +4,7 @@ import os
 from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
+from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
@@ -12,6 +13,7 @@ EXPERIMENTAL = os.environ.get("HARMONY_EXPERIMENTAL_HOST_PROCESS") == "1"
 STAGE = ROOT / ".build/stage" / ("harmonyos-process-probe" if EXPERIMENTAL else "harmonyos")
 RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
+SETTINGS_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
 
 
 def copy(source, destination):
@@ -57,8 +59,20 @@ def stage_assets(inputs):
         shutil.copy2(source, destination)
 
 
+def stage_settings_client():
+    # Keep the pinned DSH layer intact. Only overlay its settings client at launch.
+    with ZipFile(RAW / "dsh-layer.zip") as layer:
+        source = layer.read(SETTINGS_CLIENT).decode("utf-8")
+    entry = "\n\t\tfunction apply(ctx) {"
+    if source.count(entry) != 1:
+        raise SystemExit("The pinned DSH General Settings entry point changed")
+    row = (RUNTIME / "web/settings-recovery.js").read_text().rstrip()
+    injection = "\n" + row + "\n" + entry + "\n\t\t\tregisterMobileHarnessRecovery(ctx);"
+    (RAW / "dsh-settings-client.js").write_text(source.replace(entry, injection, 1), encoding="utf-8")
+
+
 def main():
-    inputs = Path(os.environ.get("HARMONY_INPUTS_DIR", ROOT / ".build/inputs/harmonyos")).resolve()
+    inputs = Path(os.environ.get("HARMONY_INPUTS_DIR") or ROOT / ".build/inputs/harmonyos").resolve()
     for source in files_from_index(APP):
         copy(source, STAGE / source.relative_to(APP))
     for directory in (ROOT / "packages/dsh-host", ROOT / "packages/bundles/mobile",
@@ -79,8 +93,12 @@ def main():
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
     stage_assets(inputs)
-    profile = Path(os.environ.get("HARMONY_SIGNING_PROFILE", ROOT / "build-profile.json5"))
+    stage_settings_client()
+    signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
+    profile = Path(signing_profile or ROOT / "build-profile.json5")
     unsigned = os.environ.get("HARMONY_UNSIGNED") == "1"
+    if signing_profile and not unsigned and not EXPERIMENTAL and not profile.is_file():
+        raise SystemExit(f"HarmonyOS signing profile not found: {profile}")
     if EXPERIMENTAL or unsigned or not profile.is_file():
         profile = APP / "build-profile.example.json5"
     signing = STAGE / "build-profile.json5"

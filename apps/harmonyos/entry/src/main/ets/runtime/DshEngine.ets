@@ -205,6 +205,9 @@ class DshEngine {
         hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
           archive, String(extracted), Date.now() - phase);
       }
+      const settingsClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
+      this.copyGuest(context, 'dsh-settings-client.js', settingsClient + '.tmp');
+      fileIo.renameSync(settingsClient + '.tmp', settingsClient);
       for (const name of ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
         'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {
         this.copyGuest(context, name, root + '/' + name);

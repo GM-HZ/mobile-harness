@@ -21,7 +21,28 @@ git submodule update --init --depth=1
 HARMONY_UNSIGNED=1 ./build.sh
 ```
 
-`./build.sh --prepare-only` 只生成 DevEco 暂存工程。编辑源文件用 `apps/harmonyos/`，DevEco 构建和调试打开 `.build/stage/harmonyos/`。HAP 位于暂存工程的 `entry/build/default/outputs/default/`。仓库保留源码、补丁与摘要，签名文件、运行时输入及制品保存在本机。
+`./build.sh --prepare-only` 生成 DevEco 暂存工程。编辑源文件用 `apps/harmonyos/`，在 DevEco 打开 `.build/stage/harmonyos/` 进行构建或调试。仓库保留源码、补丁与摘要。运行时输入和签名配置保存在本机。
+
+## 打包与发布
+
+```sh
+HARMONY_UNSIGNED=1 ./build.sh --package
+HARMONY_SIGNING_PROFILE=/absolute/path/to/build-profile.json5 ./build.sh --package
+```
+
+`--package` 在 `.build/artifacts/harmonyos/` 生成带版本的 ARM64 HAP 及各自的 `.sha256` 文件。未签名包供 Phone 模拟器使用。普通调试签名包适用于签名配置覆盖的真机，可以在同包名、同签名且版本号更高时覆盖安装。
+
+GitHub Actions 的 **Build HarmonyOS HAP** 可在 `main` 上手动触发。注册带 `deveco` 标签的 ARM64 macOS runner，并预装 DevEco Studio SDK 26。将校验清单中的运行时输入存放在 runner 检出目录之外。通过仓库 Actions 变量 `DEVECO_HOME` 和 `HARMONY_INPUTS_DIR` 指定绝对路径。工作流调用同一个打包命令并上传未签名 HAP 和校验文件。
+
+在模拟器通过回归后，从对应的 Git 提交创建 Release。发布包名中的版本号来自 `apps/harmonyos/AppScope/app.json5`，例如以下命令上传 0.4.26 的模拟器包。需要分发真机调试包时，将 `signed.hap` 及其校验文件一同附到该私有仓库的 Release。
+
+```sh
+version=0.4.26
+git push origin main
+gh release create "v$version" --target "$(git rev-parse HEAD)" \
+  --title "DSH-MH $version · HarmonyOS" --notes-file /absolute/path/to/release-notes.md \
+  .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v"$version"-unsigned.hap{,.sha256}
+```
 
 ## Phone 模拟器回归
 

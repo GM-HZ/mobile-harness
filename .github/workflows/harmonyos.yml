@@ -1,0 +1,32 @@
+name: Build HarmonyOS HAP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, macOS, ARM64, deveco]
+    timeout-minutes: 30
+    env:
+      DEVECO_HOME: ${{ vars.DEVECO_HOME }}
+      HARMONY_INPUTS_DIR: ${{ vars.HARMONY_INPUTS_DIR }}
+      HARMONY_UNSIGNED: '1'
+    steps:
+      - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+        with:
+          persist-credentials: false
+          submodules: true
+      - name: Build the ARM64 simulator package
+        run: ./build.sh --package
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dsh-mh-harmonyos-arm64
+          path: |
+            .build/artifacts/harmonyos/*-unsigned.hap
+            .build/artifacts/harmonyos/*-unsigned.hap.sha256
+          if-no-files-found: error
+          compression-level: 0

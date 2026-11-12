@@ -3,6 +3,8 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, dshEngine } from '../runtime/DshEngine';
 
+const RECOVERY_URL = 'http://127.0.0.1:19592/.mobile-harness/recovery';
+
 @Entry
 @Component
 struct Index {
@@ -10,6 +12,7 @@ struct Index {
   @State launchUrl: string = '';
   @State recoveryOpen: boolean = false;
   @State safe: boolean = false;
+  @State webFailed: boolean = false;
   @State restartError: string = '';
   @State restarting: boolean = false;
   private controller: webview.WebviewController = new webview.WebviewController();
@@ -26,6 +29,7 @@ struct Index {
       this.safe = session?.safe === true;
       if (!session) {
         this.launchUrl = '';
+        this.webFailed = false;
         this.closeLogin();
       } else if (!this.launchUrl) {
         try {
@@ -80,7 +84,7 @@ struct Index {
   }
 
   onBackPress(): boolean {
-    if (this.recoveryOpen && this.launchUrl) {
+    if (this.recoveryOpen && this.launchUrl && !this.webFailed) {
       this.recoveryOpen = false;
       return true;
     }
@@ -164,27 +168,23 @@ struct Index {
   private recoveryPage() {
     Column({ space: 12 }) {
       Text('运行时恢复').fontSize(22).fontWeight(FontWeight.Medium)
-      Text(this.status || '恢复操作会重开应用并保留会话与工作区。').fontSize(15)
+      Text(this.webFailed ? '本机 DSH 页面加载失败。' :
+        (this.status || (this.safe ? '当前处于安全模式。' : '恢复操作会重开应用并保留会话与工作区。')))
+        .fontSize(15)
       Button('以安全模式重开').enabled(!this.restarting).onClick(() => { this.restart('safe'); })
       Button('以正常模式重开').enabled(!this.restarting).onClick(() => { this.restart('normal'); })
       if (this.restartError) Text(this.restartError).fontSize(14)
-      if (this.launchUrl) Button('返回会话').onClick(() => { this.recoveryOpen = false; })
+      if (this.launchUrl && !this.webFailed) Button('返回会话').onClick(() => { this.recoveryOpen = false; })
     }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
   }
 
   build() {
     Column() {
       if (this.launchUrl) {
-        if (!this.loginVisible && !this.recoveryOpen) {
-          Row() {
-            Text(this.safe ? '安全模式' : 'Mobile Harness').fontSize(14).layoutWeight(1)
-            Button('恢复选项').onClick(() => { this.recoveryOpen = true; })
-          }.padding({ left: 14, right: 14 }).width('100%')
-        }
         Web({ src: this.launchUrl, controller: this.controller })
           .layoutWeight(1)
           .width('100%')
-          .visibility(this.loginVisible || this.recoveryOpen ? Visibility.None : Visibility.Visible)
+          .visibility(this.loginVisible || this.recoveryOpen || this.webFailed ? Visibility.None : Visibility.Visible)
           .javaScriptAccess(true)
           .domStorageAccess(true)
           .fileAccess(false)
@@ -194,6 +194,10 @@ struct Index {
           .onLoadIntercept((event) => {
             if (!event || !event.data.isMainFrame()) return false;
             const url = event.data.getRequestUrl();
+            if (url === RECOVERY_URL) {
+              this.recoveryOpen = true;
+              return true;
+            }
             return !url.startsWith('http://127.0.0.1:19592/') && url !== 'about:blank';
           })
           .onPageEnd(() => {
@@ -206,17 +210,24 @@ struct Index {
             }, 1500);
           })
           .onErrorReceive((event) => {
-            if (event?.request.isMainFrame()) {
+            if (event?.request.isMainFrame() && event.error.getErrorCode() !== -3 &&
+                event.request.getRequestUrl() !== RECOVERY_URL) {
+              this.webFailed = true;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb main error %{public}d', event.error.getErrorCode());
             }
           })
           .onHttpErrorReceive((event) => {
             if (event?.request.isMainFrame()) {
+              this.webFailed = true;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb HTTP %{public}d', event.response.getResponseCode());
             }
           })
-        if (this.loginVisible) this.loginPage()
-        if (this.recoveryOpen) this.recoveryPage()
+          .onRenderExited(() => { this.webFailed = true; })
+        if (this.webFailed || this.recoveryOpen) {
+          this.recoveryPage()
+        } else if (this.loginVisible) {
+          this.loginPage()
+        }
       } else {
         Text('Mobile Harness').fontSize(26).fontWeight(FontWeight.Medium)
         if (this.recoveryOpen) {
