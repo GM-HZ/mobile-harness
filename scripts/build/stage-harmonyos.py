@@ -97,7 +97,6 @@ def stage_appgallery_layer():
                 if prefix == b"\x7fELF":
                     continue
                 with filtered.open(member, "w") as output:
-                    output.write(prefix)
                     if name == DOCUMENT_PREVIEW_CLIENT:
                         client = (prefix + contents.read()).decode("utf-8")
                         registration = "\t\t\tapply$2(ctx, config.office);\n"
@@ -105,6 +104,7 @@ def stage_appgallery_layer():
                             raise SystemExit("Unexpected pinned Office preview registration")
                         output.write(client.replace(registration, "", 1).encode("utf-8"))
                     else:
+                        output.write(prefix)
                         shutil.copyfileobj(contents, output)
     (RAW / (STORE_LAYER + ".sha256")).write_text(sha256(destination), encoding="utf-8")
     source.unlink()
