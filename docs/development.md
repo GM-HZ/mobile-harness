@@ -48,13 +48,16 @@ gh release create "v$version" --target "$(git rev-parse HEAD)" \
 
 ```sh
 HARMONY_APPGALLERY_BUNDLE='org.mobileharness.dshmh' \
+HARMONY_APPGALLERY_VERSION_NAME=0.4.27 \
+HARMONY_APPGALLERY_VERSION_CODE=34 \
+HARMONY_APPGALLERY_SOURCE_URL='https://your-domain.example/dsh-mh/source' \
 HARMONY_APPGALLERY_PRIVACY_URL='https://your-domain.example/dsh-mh/privacy' \
 ./build.sh --appgallery
 ```
 
-此命令在 `.build/stage/harmonyos-appgallery/` 生成独立的 DevEco 工程，在 `.build/artifacts/harmonyos-appgallery/` 输出 Release 模式的未签名 `.app` 和校验文件。用 DevEco Studio 26 打开该暂存工程，通过「构建 → 上传产品」选择对应的 HarmonyOS 应用并使用开发者中心云管理证书签名。随包 HAP 可在 Phone 模拟器验证。 [华为发布说明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-publish-app/)
+此命令在 `.build/stage/harmonyos-appgallery/` 生成独立的 DevEco 工程，在 `.build/artifacts/harmonyos-appgallery/` 输出 Release 模式的未签名 `.app` 和校验文件。用 DevEco Studio 26 打开该暂存工程，通过「构建 → 上传产品」选择对应的 HarmonyOS 应用并使用开发者中心云管理证书签名。随包 HAP 可在 Phone 模拟器验证。版本名和构建号需成对提供，送审包的构建号需高于之前上传的版本。命令行重新构建保留已有的 DevEco 云签名包。 [华为发布说明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-publish-app/)
 
-应用市场版本在用户同意隐私提示后启动本机 Host。该版本使用独立的 DSH profile，限制外部插件安装、远程接入和通用子进程执行，保留本机工作区、会话及随包搜索能力。提交审核前按实际分发方式核对应用主体、备案及 AI 资质，将正式隐私政策的 HTTPS 地址同时用于 `HARMONY_APPGALLERY_PRIVACY_URL` 和华为后台。包内「个人信息处理说明」会显示该链接。仅供开发的候选包可以省略地址。若原地址上的政策内容发生实质变化，更新 ArkTS 中的 `POLICY_REVISION`，使应用重新提示用户同意。随包工具需要对应源码和许可证。
+应用市场版本在用户同意隐私提示后启动本机 Host。该版本使用独立的 DSH profile，限制外部插件安装、远程接入和通用子进程执行，保留本机工作区、会话及随包搜索能力。提交审核前按实际分发方式核对应用主体、备案及 AI 资质，将正式隐私政策的 HTTPS 地址同时用于 `HARMONY_APPGALLERY_PRIVACY_URL` 和华为后台。包内「个人信息处理说明」会显示该链接。将随包软件的对应源码和构建材料发布到可公开访问的页面，通过 `HARMONY_APPGALLERY_SOURCE_URL` 接入「开源软件声明」。仅供开发的候选包可以省略两个地址。若原地址上的政策内容发生实质变化，更新 ArkTS 中的 `POLICY_REVISION`，使应用重新提示用户同意。随包工具需要对应源码和许可证。
 
 ## Phone 模拟器回归
 

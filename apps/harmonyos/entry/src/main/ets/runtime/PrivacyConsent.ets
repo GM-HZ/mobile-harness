@@ -8,10 +8,10 @@ export function isAppGalleryBuild(context: common.UIAbilityContext): boolean {
   return context.resourceManager.getRawFileListSync('').includes('appgallery.patch.yml');
 }
 
-export function getPrivacyPolicyUrl(context: common.UIAbilityContext): string {
+export function readAppGalleryLink(context: common.UIAbilityContext, asset: string): string {
   const resources = context.resourceManager;
-  if (!resources.getRawFileListSync('').includes('appgallery-privacy-url')) return '';
-  return util.TextDecoder.create('utf-8').decodeToString(resources.getRawFileContentSync('appgallery-privacy-url'));
+  if (!resources.getRawFileListSync('').includes(asset)) return '';
+  return util.TextDecoder.create('utf-8').decodeToString(resources.getRawFileContentSync(asset));
 }
 
 export function hasPrivacyConsent(context: common.UIAbilityContext, policyUrl: string): boolean {

@@ -38,7 +38,7 @@ cd "$stage"
 "$deveco/tools/ohpm/bin/ohpm" install
 hvigor=( "$deveco/tools/node/bin/node" "$deveco/tools/hvigor/bin/hvigorw.js" )
 if [[ $mode == --appgallery ]]; then
-  rm -f build/outputs/default/*.app
+  rm -f build/outputs/default/*-unsigned.app
   "${hvigor[@]}" --mode project -p product=default -p buildMode=release assembleApp --no-daemon
   version=$(python3 -c 'import json; print(json.load(open("AppScope/app.json5"))["app"]["versionName"])')
   artifacts="$project/.build/artifacts/harmonyos-appgallery"

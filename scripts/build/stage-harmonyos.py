@@ -152,7 +152,7 @@ def stage_runtime_revision():
     pinned_names = {PurePosixPath(line.split(maxsplit=1)[1]).name for line in pinned.decode().splitlines()}
     for asset in sorted(RAW.iterdir()):
         if (asset.is_file() and asset.name not in pinned_names
-                and asset.name not in ("runtime-revision", "appgallery-privacy-url")
+                and asset.name not in ("runtime-revision", "appgallery-privacy-url", "appgallery-source-url")
                 and not asset.name.startswith(("LICENSE.", "NOTICE."))
                 and not asset.name.endswith(".zip.sha256")):
             digest.update(f"{asset.name} {sha256(asset)}\n".encode())
@@ -183,9 +183,9 @@ def stage_appgallery_notices():
         copy(notice, RAW / f"NOTICE.alpine.{notice.name}")
 
 
-def stage_appgallery_privacy():
-    path = RAW / "appgallery-privacy-url"
-    url = os.environ.get("HARMONY_APPGALLERY_PRIVACY_URL", "").strip()
+def stage_appgallery_url(variable, filename):
+    path = RAW / filename
+    url = os.environ.get(variable, "").strip()
     if not url:
         path.unlink(missing_ok=True)
         return
@@ -200,8 +200,22 @@ def stage_appgallery_privacy():
     except ValueError:
         valid = False
     if not valid:
-        raise SystemExit("HARMONY_APPGALLERY_PRIVACY_URL must be a public HTTPS URL")
+        raise SystemExit(f"{variable} must be an HTTPS URL without embedded credentials")
     path.write_text(url, encoding="utf-8")
+
+
+def set_appgallery_version(config):
+    name = os.environ.get("HARMONY_APPGALLERY_VERSION_NAME", "")
+    code = os.environ.get("HARMONY_APPGALLERY_VERSION_CODE", "")
+    if not name and not code:
+        return
+    if not re.fullmatch(r"[0-9]{1,9}(?:\.[0-9]{1,9}){2}", name) or not re.fullmatch(r"[0-9]{1,10}", code):
+        raise SystemExit("Set both AppGallery version variables using a three-part version and numeric build number")
+    number = int(code)
+    if not config["versionCode"] < number <= 2_147_483_647:
+        raise SystemExit("AppGallery version code must exceed the repository version code and fit a signed 32-bit integer")
+    config["versionName"] = name
+    config["versionCode"] = number
 
 
 def main():
@@ -229,12 +243,14 @@ def main():
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
     if APPGALLERY:
-        stage_appgallery_privacy()
+        stage_appgallery_url("HARMONY_APPGALLERY_PRIVACY_URL", "appgallery-privacy-url")
+        stage_appgallery_url("HARMONY_APPGALLERY_SOURCE_URL", "appgallery-source-url")
         copy(ROOT / "packages/bundles/mobile/appgallery.patch.yml", RAW / "appgallery.patch.yml")
         app_config = STAGE / "AppScope/app.json5"
         config = json.loads(app_config.read_text())
         config["app"]["bundleName"] = bundle
         config["app"]["vendor"] = "Mobile Harness"
+        set_appgallery_version(config["app"])
         app_config.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
         for directory in (STAGE / "AppScope", STAGE / "entry/src/main"):
             strings = directory / "resources/base/element/string.json"

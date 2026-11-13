@@ -3,7 +3,7 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { util } from '@kit.ArkTS';
 import { BrowserSession, dshEngine } from '../runtime/DshEngine';
-import { getPrivacyPolicyUrl, hasPrivacyConsent, isAppGalleryBuild, savePrivacyConsent } from '../runtime/PrivacyConsent';
+import { hasPrivacyConsent, isAppGalleryBuild, readAppGalleryLink, savePrivacyConsent } from '../runtime/PrivacyConsent';
 
 const RECOVERY_URL = 'http://127.0.0.1:19592/.mobile-harness/recovery';
 const PRIVACY_URL = 'http://127.0.0.1:19592/.mobile-harness/privacy';
@@ -25,6 +25,8 @@ struct Index {
   @State decliningPrivacy: boolean = false;
   @State consentError: string = '';
   @State privacyPolicyUrl: string = '';
+  @State sourceDeliveryUrl: string = '';
+  @State sourceLinkError: boolean = false;
   @State privacyLinkError: boolean = false;
   @State launchUrl: string = '';
   @State recoveryOpen: boolean = false;
@@ -43,7 +45,10 @@ struct Index {
   aboutToAppear(): void {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     this.appGallery = isAppGalleryBuild(context);
-    if (this.appGallery) this.privacyPolicyUrl = getPrivacyPolicyUrl(context);
+    if (this.appGallery) {
+      this.privacyPolicyUrl = readAppGalleryLink(context, 'appgallery-privacy-url');
+      this.sourceDeliveryUrl = readAppGalleryLink(context, 'appgallery-source-url');
+    }
     if (this.appGallery && !hasPrivacyConsent(context, this.privacyPolicyUrl)) {
       this.consentRequired = true;
       return;
@@ -214,6 +219,14 @@ struct Index {
     }.width('100%')
   }
 
+  private openSourceDelivery(): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.sourceLinkError = false;
+    context.openLink(this.sourceDeliveryUrl, { appLinkingOnly: false }).catch(() => {
+      this.sourceLinkError = true;
+    });
+  }
+
   private backFromNotices(): void {
     if (this.noticeTitle) this.noticeTitle = '';
     else if (this.alpineNotices) this.alpineNotices = false;
@@ -255,6 +268,13 @@ struct Index {
             Button(component).onClick(() => this.selectNotice(component, 'NOTICE.alpine.' + component + '.txt'))
           }, (component: string) => component)
         } else {
+          if (this.sourceDeliveryUrl) {
+            Button('获取对应源码').onClick(() => this.openSourceDelivery())
+            if (this.sourceLinkError) {
+              Text('无法打开链接。可在浏览器中访问：' + this.sourceDeliveryUrl)
+                .copyOption(CopyOptions.LocalDevice)
+            }
+          }
           Button('Alpine Linux 3.22').onClick(() => this.showAlpineNotices())
           Button('DeepSeek Harness').onClick(() => this.selectNotice('DeepSeek Harness', 'LICENSE.dsh.txt'))
           Button('dshm').onClick(() => this.selectNotice('dshm', 'LICENSE.dshm.txt'))
@@ -399,6 +419,7 @@ struct Index {
             if (this.appGallery && url === NOTICES_URL) {
               this.noticeTitle = '';
               this.alpineNotices = false;
+              this.sourceLinkError = false;
               this.noticesOpen = true;
               return true;
             }
