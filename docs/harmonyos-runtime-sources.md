@@ -41,6 +41,10 @@
 | `busybox-1.37.0-r20` | GPL-2.0-only | [busybox](https://github.com/alpinelinux/aports/tree/2e97d754a30d558f15524b8e422303c8a96832df/main/busybox) |
 | `musl-1.2.5-r13` | MIT | [musl](https://github.com/alpinelinux/aports/tree/ddaf59b84bc6983a37d6e24d2210c2c4791642bb/main/musl) |
 
-打包目录内的 APKBUILD 列出对应上游源码归档、补丁、校验值及构建步骤。上表记录来源，发布随附的版权声明和对应源码交付仍需核对。
+打包目录内的 APKBUILD 列出对应上游源码归档、补丁、校验值及构建步骤。本机源码交付包已收齐 27 份 APKBUILD 和其中列出的 265 份输入，逐一通过 APKBUILD 的 SHA-512 校验。
 
-PRoot 单独核验 [Termux 固定提交](https://github.com/termux/proot/tree/60485d2646c1e09105099772da4a20deda8d020d)、[Termony 鸿蒙移植](https://github.com/TermonyHQ/Termony/tree/2fe84795201dbe14a586819f7de641db6b6c18b7/build-hnp/proot)、[本仓库补丁](../vendor/patches/proot) 以及 [构建脚本](../runtime/harmonyos/packaging/build-proot-runtime.sh)。需要进一步补齐 talloc 2.4.3 的静态构建输入及发布源码交付。Linux guest Node 和 HarmonyOS 原生 Node 分别核对，见 [Linux Node 验证记录](archive/harmonyos-poc/proot-full-validation.md) 和 [Node 固定源码](https://github.com/nodejs/node/tree/d89bb1b482fa09245c4f2cbb3b5b6a70bea6deaf)。
+## PRoot
+
+在历史构建目录中找到与发布输入相符的源码树。PRoot 0.4.23 树保留的 core 输出与 `libproot_core.so` 一致，使用 DevEco SDK 和仓库中的预加载编译命令从同一树重新编译的 preloader 与 `libproot_preloader.so` 一致。Termux PRoot 早期构建树的 `src/proot` 和 `src/loader/loader` 分别与 `libproot_exec.so` 和 `libproot_loader.so` 一致。上述比较以 [发布输入 SHA-256](build-inputs.sha256) 为准。talloc 2.4.3 官方源码归档也与历史构建输入完全相同。 [Termux 固定提交](https://github.com/termux/proot/tree/60485d2646c1e09105099772da4a20deda8d020d) · [Termony 鸿蒙移植](https://github.com/TermonyHQ/Termony/tree/2fe84795201dbe14a586819f7de641db6b6c18b7/build-hnp) · [talloc 官方源码](https://www.samba.org/ftp/talloc/)
+
+本机交付包 `dsh-mh-0.4.26-alpine-proot-source.tar.gz` 包含两份历史 PRoot 源码树、talloc 官方源码、原始上游源码、移植补丁和构建脚本。已验证完整归档可读取。仍需落实对外提供位置、随包版权声明，以及其他组件的对应源码或许可证。Linux guest Node 和 HarmonyOS 原生 Node 分别核对。 [Linux Node 验证记录](archive/harmonyos-poc/proot-full-validation.md) · [Node 固定源码](https://github.com/nodejs/node/tree/d89bb1b482fa09245c4f2cbb3b5b6a70bea6deaf)
