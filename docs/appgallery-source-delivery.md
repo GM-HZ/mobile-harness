@@ -8,9 +8,8 @@
 | DSH-MH 鸿蒙集成 | 包含 ArkTS、C、Rust、宿主适配、商店配置和构建脚本的 Git 源码归档。 |
 | 鸿蒙 Node.js 24.14.1 | 已核验的上游源码、八份鸿蒙补丁和历史构建脚本。源码准备步骤已验证，完整编译仍需复验。 |
 | 原生工作区搜索 | Rust 锁文件、参与 OHOS ARM64 构建的 crate 源码归档、Rust 编译器版本与提交，以及安装包中对应版权说明。 |
-| LibreOffice Kit WASM 0.1.5 | 与实际分发一致的源码配方、补丁、许可证、引擎清单和 LibreOffice Core 固定提交归档。 |
 
-LibreOffice Kit 的引擎固定使用 LibreOffice Core `bce0998afefdbc355585ca324285661a2170ba77`，配方固定 Emscripten 4.0.10。WASM 包的 49 个文件与 npm 原版一致，其中 47 个文件逐项通过上游发布清单校验。Node 适配器与引擎各自声明 MPL-2.0。引擎源码配方和补丁取自对应的 npm 发行物。Node 适配器的 9 个随包文件与 npm 原版一致。已查询公开上游分支和 npm 元数据，尚未确认 0.1.5 对应的源码提交。应取得该提交或对应源码发行物，再完成这一项交付。 [LibreOffice Core 固定源码](https://github.com/LibreOffice/core/tree/bce0998afefdbc355585ca324285661a2170ba77) · [LibreOffice Kit 源码仓库](https://github.com/deepseek-ai/dsh-libreoffice-kit) · [Mozilla MPL 分发说明](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)
+精简后的送审候选包已移除 LibreOffice Kit 的 Node 适配器及 WASM 引擎。此前候选包的 LibreOffice Core 源码、补丁和配方留存在本机历史归档。当前包的组件清单以 `package-provenance.json` 为准。
 
 Rust 标准库的提交见 `package-provenance.json`。源码随对应的 Rust 工具链版本公开。 [Rust 固定源码](https://github.com/rust-lang/rust/tree/31fca3adb283cc9dfd56b49cdee9a96eb9c96ffd)
 

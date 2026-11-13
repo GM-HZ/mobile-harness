@@ -1,6 +1,6 @@
 # HarmonyOS 候选包的 Alpine 组件来源
 
-当前 0.4.27 商店候选包只携带鸿蒙 Node 和经过过滤的 DSH 层。包清单已确认移除独立 Alpine、PRoot、Linux Node、pnpm、shell 工具层，以及 DSH 归档内的其他平台原生件和 libvips。普通调试构建继续使用原有 Alpine 输入。当前候选包的本地归档及仍待补齐的 LibreOffice Kit 对应源码见[商店版源码交付](appgallery-source-delivery.md)。下文 0.4.26 的源码和许可证记录用于已上传的历史包及调试运行时。
+当前 0.4.27 商店候选包只携带鸿蒙 Node 和经过过滤的 DSH 层。包清单已确认移除独立 Alpine、PRoot、Linux Node、pnpm、shell 工具层，以及 DSH 归档内的其他平台原生件和 libvips。普通调试构建继续使用原有 Alpine 输入。当前候选包移除了不支持鸿蒙宿主的 LibreOffice Kit 转换引擎。本地归档见[商店版源码交付](appgallery-source-delivery.md)。下文 0.4.26 的源码和许可证记录用于已上传的历史包及调试运行时。
 
 以下对应商店候选包 0.4.26 的输入字节。版本、许可证字段和打包提交来自 Alpine 原始包的 `.PKGINFO` 或官方 minirootfs 的已安装包清单。
 

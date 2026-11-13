@@ -16,3 +16,5 @@
   disabled: true
 - id: session-log-download
   disabled: true
+- id: office-to-pdf
+  disabled: true

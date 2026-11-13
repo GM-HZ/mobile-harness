@@ -22,6 +22,7 @@ RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
 SETTINGS_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
 CHAT_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-chat/lib/client.js"
+DOCUMENT_PREVIEW_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-sidebar-documentpreview/lib/client.js"
 STORE_LAYER = "dsh-appgallery-layer.zip"
 STORE_INPUTS = {"libnode.so", "libdshflock.so", "libdshpublish.so", "dsh-layer.zip"}
 STORE_RUNTIME_FILES = {
@@ -81,12 +82,15 @@ def stage_appgallery_layer():
     source = RAW / "dsh-layer.zip"
     destination = RAW / STORE_LAYER
     base = "dsh/node_modules/"
-    foreign_packages = ("@img/sharp-libvips-linuxmusl-arm64/", "@img/sharp-wasm32/", "sherpa-onnx-linux-arm64/")
+    omitted_packages = (
+        "@img/sharp-libvips-linuxmusl-arm64/", "@img/sharp-wasm32/", "sherpa-onnx-linux-arm64/",
+        "@deepseek-ai/libreoffice-kit/", "@deepseek-ai/libreoffice-kit-wasm/",
+    )
     with ZipFile(source) as original, ZipFile(destination, "w") as filtered:
         for member in original.infolist():
             name = member.filename
             if (name == "dsh-probe.cjs" or name.endswith((".node", ".exe", ".dll", ".dylib"))
-                    or any(name.startswith(base + package) for package in foreign_packages)):
+                    or any(name.startswith(base + package) for package in omitted_packages)):
                 continue
             with original.open(member) as contents:
                 prefix = contents.read(4)
@@ -94,7 +98,14 @@ def stage_appgallery_layer():
                     continue
                 with filtered.open(member, "w") as output:
                     output.write(prefix)
-                    shutil.copyfileobj(contents, output)
+                    if name == DOCUMENT_PREVIEW_CLIENT:
+                        client = (prefix + contents.read()).decode("utf-8")
+                        registration = "\t\t\tapply$2(ctx, config.office);\n"
+                        if client.count(registration) != 1:
+                            raise SystemExit("Unexpected pinned Office preview registration")
+                        output.write(client.replace(registration, "", 1).encode("utf-8"))
+                    else:
+                        shutil.copyfileobj(contents, output)
     (RAW / (STORE_LAYER + ".sha256")).write_text(sha256(destination), encoding="utf-8")
     source.unlink()
     (RAW / "dsh-layer.zip.sha256").unlink(missing_ok=True)
