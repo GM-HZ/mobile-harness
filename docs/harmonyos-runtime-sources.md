@@ -53,11 +53,11 @@
 
 - 两个 Node.js 运行时均为 24.14.1。鸿蒙原生 `libnode.so` 和 Alpine 的 `libguest_node.so` 分别匹配历史目录的已签名制品和 Unofficial Builds 归档中的 `bin/node`。原生构建的官方源码归档按历史清单校验，八个本地补丁在独立目录通过源码准备脚本。此轮未重编整套 Node。 [Node.js 官方源码](https://nodejs.org/dist/v24.14.1/) · [Node.js Unofficial Builds](https://unofficial-builds.nodejs.org/download/release/v24.14.1/)
 - 从 npm 注册表按版本重新取得七个随包原生二进制。验证发布者的完整性摘要后，逐项匹配 sharp、libvips、ripgrep、Koffi、DSH System、Landlock 和 require-builtin 的发布输入。用原始 pnpm 11.28.5 发布归档和本仓库脚本重打包，450 个文件与实际分发的 pnpm 层逐字节一致。 [pnpm 打包脚本](../runtime/harmonyos/packaging/package-plugin-runtime.py)
-- libvips 8.18.7 与 sharp-libvips v1.3.4 发布归档的 ARM64 musl 文件完全一致。已归档对应构建源码、libvips 上游源码和第三方声明。另行归档了固定版本 POSIX 构建脚本中的全部 33 个源码或补丁下载项，逐项记录 SHA-256。仍需验证重新链接方案及可交付的说明。 [sharp-libvips v1.3.4](https://github.com/lovell/sharp-libvips/releases/tag/v1.3.4) · [libvips v8.18.7](https://github.com/libvips/libvips/releases/tag/v8.18.7)
+- libvips 8.18.7 与 sharp-libvips v1.3.4 发布归档的 ARM64 musl 文件完全一致。已归档对应构建源码、libvips 上游源码和第三方声明。另行归档了固定版本 POSIX 构建脚本中的全部 33 个源码或补丁下载项，逐项记录 SHA-256。已在独立 0.4.27 Release HAP 中验证，替换暂存工程的 `entry/libs/arm64-v8a/libguest_vips.so` 后，替换 ELF 的 Build ID 保留在打包结果中。原始库和替换库的图片运行验证均被发行包的 PRoot 启动失败阻断，替换库的运行验收仍待完成。 [sharp-libvips v1.3.4](https://github.com/lovell/sharp-libvips/releases/tag/v1.3.4) · [libvips v8.18.7](https://github.com/libvips/libvips/releases/tag/v8.18.7)
 
 本机归档 `dsh-mh-0.4.26-node-npm-provenance.tar.gz` 和相邻的 SHA-256 文件保存在 `.build/artifacts/harmonyos-appgallery/`。归档包含原生 Node 源码及历史构建脚本、Linux musl 原始构建归档、核验过的 npm 发布物、sharp 和 libvips 源码及构建记录。
 
-本机归档 `dsh-mh-0.4.26-libvips-build-inputs.tar.gz` 包含上述 33 个下载项、来源和摘要清单、构建脚本及第三方声明。归档已校验可读取。
+本机归档 `dsh-mh-0.4.26-libvips-build-inputs.tar.gz` 包含上述 33 个下载项、来源和摘要清单、构建脚本及第三方声明。归档已校验可读取。按固定 sharp-libvips 构建仓库的流程执行 `./build.sh linuxmusl-arm64v8`，从输出的 `sharp-libvips-linuxmusl-arm64v8.tar.gz` 中提取 `lib/libvips-cpp.so.8.18.7`。在独立测试包的暂存工程中替换上述输入后运行 Hvigor，随后检查 HAP 里的 ELF 和图片上传。上游完整重编仍待验证。
 
 商店构建在「设置 → 通用 → 开源软件声明」展示 DSH、dshm、Node.js、PRoot、sharp、ripgrep、Koffi、DSH System、require-builtin、pnpm 的许可证，以及固定版本的 libvips 第三方声明。许可证直接从固定源码或发布层提取。libvips 声明来自 sharp-libvips v1.3.4 发布的构建提交。
 

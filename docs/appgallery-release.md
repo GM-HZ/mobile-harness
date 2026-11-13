@@ -18,6 +18,16 @@
 
 0.4.27 的隐私政策和源码下载地址可分别由构建参数注入。使用独立包名在同一模拟器验证「设置 → 通用 → 开源软件声明 → 获取对应源码」打开系统浏览器，加载配置的测试页面。正式发布包使用已确认的公开地址。
 
+### Release 图片附件验收未通过
+
+在同一台 API 26 Phone 模拟器上，已上传的 0.4.26 云签名包和 0.4.27 Release 测试包均把有效 PNG 返回为 `INVALID_IMAGE`。用 0.4.27 在相同包名下对照原始 libvips 和仅修改 ELF Build ID 的同 ABI 副本，结果相同。诊断日志在进入 sharp 之前记录 `ptrace(TRACEME): Permission denied`，PRoot 未能启动 guest Bash。先修复发行形态的图片处理，再用真实图片上传入口重新验收。工作区 grep/glob 同样经过 PRoot，应随修复单独验证。
+
+```sh
+python3 tests/smoke/emulator-appgallery-images.py <loopback-target>
+```
+
+该命令适用于已在模拟器启动并同意隐私提示的候选包。测试生成 3×2 PNG 并验证有效图片成功、损坏图片被拒。准备送审的完整签名包应通过该回归。
+
 ## 隐私政策草稿
 
 已整理 [隐私政策草稿](appgallery-privacy-draft.md) 和 [用户协议草稿](appgallery-terms-draft.md)。生效日期和发布主体以定稿为准。公开链接和应用内说明应同步维护。
