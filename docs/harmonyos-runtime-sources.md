@@ -48,3 +48,11 @@
 在历史构建目录中找到与发布输入相符的源码树。PRoot 0.4.23 树保留的 core 输出与 `libproot_core.so` 一致，使用 DevEco SDK 和仓库中的预加载编译命令从同一树重新编译的 preloader 与 `libproot_preloader.so` 一致。Termux PRoot 早期构建树的 `src/proot` 和 `src/loader/loader` 分别与 `libproot_exec.so` 和 `libproot_loader.so` 一致。上述比较以 [发布输入 SHA-256](build-inputs.sha256) 为准。talloc 2.4.3 官方源码归档也与历史构建输入完全相同。 [Termux 固定提交](https://github.com/termux/proot/tree/60485d2646c1e09105099772da4a20deda8d020d) · [Termony 鸿蒙移植](https://github.com/TermonyHQ/Termony/tree/2fe84795201dbe14a586819f7de641db6b6c18b7/build-hnp) · [talloc 官方源码](https://www.samba.org/ftp/talloc/)
 
 本机交付包 `dsh-mh-0.4.26-alpine-proot-source.tar.gz` 包含两份历史 PRoot 源码树、talloc 官方源码、原始上游源码、移植补丁和构建脚本。已验证完整归档可读取。仍需落实对外提供位置、随包版权声明，以及其他组件的对应源码或许可证。Linux guest Node 和 HarmonyOS 原生 Node 分别核对。 [Linux Node 验证记录](archive/harmonyos-poc/proot-full-validation.md) · [Node 固定源码](https://github.com/nodejs/node/tree/d89bb1b482fa09245c4f2cbb3b5b6a70bea6deaf)
+
+## Node.js、图像库和 npm 组件
+
+- 两个 Node.js 运行时均为 24.14.1。鸿蒙原生 `libnode.so` 和 Alpine 的 `libguest_node.so` 分别匹配历史目录的已签名制品和 Unofficial Builds 归档中的 `bin/node`。原生构建的官方源码归档按历史清单校验，八个本地补丁在独立目录通过源码准备脚本。此轮未重编整套 Node。 [Node.js 官方源码](https://nodejs.org/dist/v24.14.1/) · [Node.js Unofficial Builds](https://unofficial-builds.nodejs.org/download/release/v24.14.1/)
+- 从 npm 注册表按版本重新取得七个随包原生二进制。验证发布者的完整性摘要后，逐项匹配 sharp、libvips、ripgrep、Koffi、DSH System、Landlock 和 require-builtin 的发布输入。用原始 pnpm 11.28.5 发布归档和本仓库脚本重打包，450 个文件与实际分发的 pnpm 层逐字节一致。 [pnpm 打包脚本](../runtime/harmonyos/packaging/package-plugin-runtime.py)
+- libvips 8.18.7 与 sharp-libvips v1.3.4 发布归档的 ARM64 musl 文件完全一致。已归档对应构建源码、libvips 上游源码和第三方声明。其静态链接依赖与构建输入详见固定版本配方，仍需核对完整源码和重新链接所需材料。 [sharp-libvips v1.3.4](https://github.com/lovell/sharp-libvips/releases/tag/v1.3.4) · [libvips v8.18.7](https://github.com/libvips/libvips/releases/tag/v8.18.7)
+
+本机归档 `dsh-mh-0.4.26-node-npm-provenance.tar.gz` 和相邻的 SHA-256 文件保存在 `.build/artifacts/harmonyos-appgallery/`。归档包含原生 Node 源码及历史构建脚本、Linux musl 原始构建归档、核验过的 npm 发布物、sharp 和 libvips 源码及构建记录。

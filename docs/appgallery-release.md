@@ -34,7 +34,7 @@
 | 联网 AI 服务 | 确定首发提供的模型及区域，确认第三方模型的接入授权和适用的上线备案或登记，提供真实审核凭据，并向华为上传应用内显式标识截图及适用资质。回复和整条回复复制带有 AI 标识。需继续核对选中文本、文件、图片和其他导出渠道的适用要求。 [华为 AI 标识 FAQ](https://developer.huawei.com/consumer/cn/doc/app/50111-10) · [国家网信办生成式人工智能服务公告](https://www.cac.gov.cn/2026-09/14/c_1791136833136332.htm) · [人工智能生成合成内容标识办法](https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm) |
 | 隐私 | 正式主体、联系渠道、服务清单、公开 HTTPS 隐私政策及用户协议，并在后台选择与包内实现相符的自定义隐私政策，填写隐私标签。后续构建可通过 `HARMONY_APPGALLERY_PRIVACY_URL` 写入同一个 HTTPS 地址。已用独立模拟器包验证首次启动的说明可打开配置的链接，华为草稿关联的 0.4.26 尚未包含此入口。 [华为隐私政策审核规范](https://developer.huawei.com/consumer/cn/doc/app/50104/) |
 | 分发范围与内容分级 | 按实际运营范围选取分发地区，审核资料包含年龄分级和内容问卷。按开发者已确认的地区和披露填写。 |
-| 第三方许可证与对应源码 | [Alpine 来源清单](harmonyos-runtime-sources.md) 记录 32 个组件包及版本对应的打包源码。候选包携带 DSH、dshm、Node、PRoot 的许可证。已在本机归档 Alpine 源码及与发布输入匹配的 PRoot 源码树、talloc 和构建材料。提交前仍需落实对外提供位置，并核对其他随包组件及随包版权声明。 |
+| 第三方许可证与对应源码 | [Alpine 来源清单](harmonyos-runtime-sources.md) 记录 32 个组件包及版本对应的打包源码。候选包携带 DSH、dshm、Node、PRoot 的许可证。已在本机归档 Alpine 源码及与发布输入匹配的 PRoot 源码树、talloc 和构建材料。两套 Node 运行时及七个 npm 原生二进制已完成来源核验，pnpm 层已逐文件复现。提交前仍需落实对外提供位置，核对 libvips 静态依赖、重新链接材料及随包版权声明。 |
 | 软件包和素材 | 在 DevEco Studio 打开商店暂存工程，经「构建 → 上传产品」用云管理证书签名并上传，核验后台处理通过，关联软件版本并上传符合尺寸的真实截图。 [华为发布说明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-publish-app/) |
 
 后台能保存部分字段的草稿。所有材料与同一发布包核对完成后，再从「版本/升级」提交审核。
