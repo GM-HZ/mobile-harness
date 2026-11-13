@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, dshEngine } from '../runtime/DshEngine';
-import { hasPrivacyConsent, isAppGalleryBuild, savePrivacyConsent } from '../runtime/PrivacyConsent';
+import { getPrivacyPolicyUrl, hasPrivacyConsent, isAppGalleryBuild, savePrivacyConsent } from '../runtime/PrivacyConsent';
 
 const RECOVERY_URL = 'http://127.0.0.1:19592/.mobile-harness/recovery';
 const PRIVACY_URL = 'http://127.0.0.1:19592/.mobile-harness/privacy';
@@ -17,6 +17,8 @@ struct Index {
   @State privacyDetails: boolean = false;
   @State decliningPrivacy: boolean = false;
   @State consentError: string = '';
+  @State privacyPolicyUrl: string = '';
+  @State privacyLinkError: boolean = false;
   @State launchUrl: string = '';
   @State recoveryOpen: boolean = false;
   @State safe: boolean = false;
@@ -34,7 +36,8 @@ struct Index {
   aboutToAppear(): void {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     this.appGallery = isAppGalleryBuild(context);
-    if (this.appGallery && !hasPrivacyConsent(context)) {
+    if (this.appGallery) this.privacyPolicyUrl = getPrivacyPolicyUrl(context);
+    if (this.appGallery && !hasPrivacyConsent(context, this.privacyPolicyUrl)) {
       this.consentRequired = true;
       return;
     }
@@ -146,7 +149,7 @@ struct Index {
   private acceptPrivacy(): void {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     try {
-      savePrivacyConsent(context);
+      savePrivacyConsent(context, this.privacyPolicyUrl);
       this.consentRequired = false;
       this.attachEngine(context);
     } catch (_) {
@@ -163,6 +166,14 @@ struct Index {
     });
   }
 
+  private openPrivacyPolicy(): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.privacyLinkError = false;
+    context.openLink(this.privacyPolicyUrl, { appLinkingOnly: false }).catch(() => {
+      this.privacyLinkError = true;
+    });
+  }
+
   @Builder
   private privacyPage() {
     Scroll() {
@@ -174,6 +185,10 @@ struct Index {
           Text('使用联网模型时，应用会向所选模型服务发送请求。请求可能包含输入的提示词、会话上下文、附件，以及任务使用的工作区内容或工具结果。')
           Text('选择 DeepSeek 账号登录时，应用打开 DeepSeek 登录页面。选择 API Key 时，应用使用你配置的凭据向对应服务发起请求。模型服务按其自身政策处理收到的数据。')
           Text('联网及网络状态权限用于连接模型服务和配置网络连接。应用市场版本关闭外部插件安装及远程接入。')
+          if (this.privacyPolicyUrl) {
+            Button('打开完整隐私政策').onClick(() => this.openPrivacyPolicy())
+            if (this.privacyLinkError) Text('无法打开链接。可在浏览器中访问：' + this.privacyPolicyUrl)
+          }
           Button('返回').onClick(() => { this.privacyDetails = false; })
         } else {
           Text('会话和工作区保存在本机。使用联网模型时，所选模型服务会收到请求所需的提示词、上下文和附件。请阅读个人信息处理说明后再继续。')

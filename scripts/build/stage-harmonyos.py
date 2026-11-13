@@ -6,6 +6,7 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import subprocess
+from urllib.parse import urlsplit
 from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -150,7 +151,7 @@ def stage_runtime_revision():
     digest.update(pinned)
     pinned_names = {PurePosixPath(line.split(maxsplit=1)[1]).name for line in pinned.decode().splitlines()}
     for asset in sorted(RAW.iterdir()):
-        if asset.is_file() and asset.name not in pinned_names and asset.name != "runtime-revision" and not asset.name.endswith(".zip.sha256"):
+        if asset.is_file() and asset.name not in pinned_names and asset.name not in ("runtime-revision", "appgallery-privacy-url") and not asset.name.endswith(".zip.sha256"):
             digest.update(f"{asset.name} {sha256(asset)}\n".encode())
     (RAW / "runtime-revision").write_text(digest.hexdigest(), encoding="utf-8")
     for line in pinned.decode().splitlines():
@@ -158,6 +159,27 @@ def stage_runtime_revision():
         asset = PurePosixPath(filename)
         if asset.parent.name == "rawfile" and asset.suffix == ".zip":
             (RAW / f"{asset.name}.sha256").write_text(checksum, encoding="utf-8")
+
+
+def stage_appgallery_privacy():
+    path = RAW / "appgallery-privacy-url"
+    url = os.environ.get("HARMONY_APPGALLERY_PRIVACY_URL", "").strip()
+    if not url:
+        path.unlink(missing_ok=True)
+        return
+    try:
+        parsed = urlsplit(url)
+        valid = (
+            parsed.scheme == "https" and parsed.hostname
+            and parsed.username is None and parsed.password is None
+            and parsed.port in (None, 443)
+            and not any(char.isspace() or ord(char) < 32 for char in url)
+        )
+    except ValueError:
+        valid = False
+    if not valid:
+        raise SystemExit("HARMONY_APPGALLERY_PRIVACY_URL must be a public HTTPS URL")
+    path.write_text(url, encoding="utf-8")
 
 
 def main():
@@ -185,6 +207,7 @@ def main():
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
     if APPGALLERY:
+        stage_appgallery_privacy()
         copy(ROOT / "packages/bundles/mobile/appgallery.patch.yml", RAW / "appgallery.patch.yml")
         app_config = STAGE / "AppScope/app.json5"
         config = json.loads(app_config.read_text())
