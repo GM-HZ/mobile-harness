@@ -17,9 +17,10 @@ def png_chunk(kind, data):
     return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", binascii.crc32(kind + data))
 
 
-def fixture_png():
-    header = struct.pack(">IIBBBBB", 3, 2, 8, 2, 0, 0, 0)
-    rows = bytes([0, 255, 10, 20, 30, 250, 40, 50, 60, 240]) * 2
+def fixture_png(width=3, height=2, transparent=False):
+    pixel = bytes([255, 10, 20, 127] if transparent else [255, 10, 20])
+    header = struct.pack(">IIBBBBB", width, height, 8, 6 if transparent else 2, 0, 0, 0)
+    rows = (b"\x00" + pixel * width) * height
     return (
         bytes.fromhex("89504e470d0a1a0a")
         + png_chunk(b"IHDR", header)
@@ -55,18 +56,34 @@ def test(emulator, port):
                 with emulator.opener.open(Request(url, data, headers), timeout=35) as response:
                     return json.load(response)
 
-            result = upload(fixture_png())
-            if not result["ok"]:
-                raise RuntimeError(f"Valid PNG was rejected: {result['error']}")
-            receipt = result["value"]
-            image = receipt["image"]
-            if not receipt["receiptId"] or (image["width"], image["height"], image["mediaType"]) != (3, 2, "image/png"):
-                raise RuntimeError(f"Invalid PNG upload receipt: {receipt}")
+            def check_image(data, media_type, expected_dimensions=None):
+                result = upload(data)
+                if not result["ok"]:
+                    raise RuntimeError(f"Valid PNG was rejected: {result['error']}")
+                receipt = result["value"]
+                image = receipt["image"]
+                if not receipt["receiptId"] or image["mediaType"] != media_type:
+                    raise RuntimeError(f"Invalid image upload receipt: {receipt}")
+                dimensions = image["width"], image["height"]
+                if expected_dimensions and dimensions != expected_dimensions:
+                    raise RuntimeError(f"Unexpected image dimensions: {dimensions}")
+                return image
 
-            result = upload(b"not a PNG")
-            if result["ok"] or result["error"]["details"].get("reason") != "INVALID_IMAGE":
-                raise RuntimeError(f"Unexpected malformed PNG upload response: {result}")
-            print("AppGallery image upload passed (valid PNG stored, malformed data rejected).")
+            check_image(fixture_png(), "image/png", (3, 2))
+            print("Valid PNG stored with correct dimensions.", flush=True)
+            for transparent, output in ((False, "image/jpeg"), (True, "image/webp")):
+                image = check_image(fixture_png(9000, 10, transparent=transparent), output)
+                if not (8000 <= image["width"] <= 8192 and image["height"] == 9):
+                    raise RuntimeError(f"Wide image was not proportionally downscaled: {image}")
+                if image["originalDimensions"] != {"width": 9000, "height": 10}:
+                    raise RuntimeError(f"Original dimensions were lost: {image}")
+                print(f"Wide PNG downscaled and stored as {output}.", flush=True)
+
+            for malformed in (b"not a PNG", fixture_png()[:-12]):
+                result = upload(malformed)
+                if result["ok"] or result["error"]["details"].get("reason") != "INVALID_IMAGE":
+                    raise RuntimeError(f"Unexpected malformed PNG upload response: {result}")
+            print("Malformed and truncated PNGs rejected.")
         finally:
             emulator.rpc("workspace/delete", {"request": {"workspaceId": workspace["workspaceId"]}})
     finally:

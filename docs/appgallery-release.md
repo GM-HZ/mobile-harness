@@ -18,15 +18,15 @@
 
 0.4.27 的隐私政策和源码下载地址可分别由构建参数注入。使用独立包名在同一模拟器验证「设置 → 通用 → 开源软件声明 → 获取对应源码」打开系统浏览器，加载配置的测试页面。正式发布包使用已确认的公开地址。
 
-### Release 图片附件验收未通过
+### Release 图片附件验收
 
-在同一台 API 26 Phone 模拟器上，已上传的 0.4.26 云签名包和 0.4.27 Release 测试包均把有效 PNG 返回为 `INVALID_IMAGE`。用 0.4.27 在相同包名下对照原始 libvips 和仅修改 ELF Build ID 的同 ABI 副本，结果相同。诊断日志在进入 sharp 之前记录 `ptrace(TRACEME): Permission denied`，PRoot 未能启动 guest Bash。先修复发行形态的图片处理，再用真实图片上传入口重新验收。工作区 grep/glob 同样经过 PRoot，应随修复单独验证。
+已上传的 0.4.26 云签名包在 API 26 Phone 模拟器上拒绝有效 PNG。诊断日志显示系统拒绝 PRoot 的 `ptrace(TRACEME)`，图片解码进程未能启动。0.4.27 的商店配置改用 HarmonyOS Image Kit。独立 Release 测试包通过真实附件接口验收，普通 PNG 保留原尺寸，超过尺寸限制的无透明度和半透明 PNG 分别缩小并编码为 JPEG 和 WebP，损坏及截断 PNG 返回错误。工作区 grep/glob 仍依赖 PRoot，需另行验收。
 
 ```sh
 python3 tests/smoke/emulator-appgallery-images.py <loopback-target>
 ```
 
-该命令适用于已在模拟器启动并同意隐私提示的候选包。测试生成 3×2 PNG 并验证有效图片成功、损坏图片被拒。准备送审的完整签名包应通过该回归。
+该命令适用于已在模拟器启动并同意隐私提示的候选包。准备送审的完整云签名包还需再跑同一回归。 [HarmonyOS Image Kit C 接口](https://developer.huawei.com/consumer/en/doc/harmonyos-references/capi-image-source-native-h/)
 
 ## 隐私政策草稿
 

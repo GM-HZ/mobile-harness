@@ -208,7 +208,16 @@ async function main() {
   const launchGuest = installProotSpawn(workspace);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
   const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
-  globalThis.__harmonySharp = createSharp(root, launchGuest);
+  if (appGallery) {
+    const { createNativeSharp } = require(path.join(root, 'dsh-native-image.cjs'));
+    let runImage;
+    globalThis.__harmonySharp = createNativeSharp(root, (...args) => {
+      runImage ??= addon('libdshimage.so').runImage;
+      return runImage(...args);
+    });
+  } else {
+    globalThis.__harmonySharp = createSharp(root, launchGuest);
+  }
   globalThis.__harmonyPackageRunner = appGallery ? () => {
     throw new Error('External packages are unavailable in this build');
   } : createPackageRunner(root, home, launchGuest);

@@ -218,6 +218,17 @@ def set_appgallery_version(config):
     config["versionCode"] = number
 
 
+def stage_appgallery_image():
+    sdk = Path(os.environ.get("DEVECO_HOME", "/Applications/DevEco-Studio.app/Contents")) / "sdk/default/openharmony/native"
+    libraries = STAGE / "entry/libs/arm64-v8a"
+    subprocess.run([
+        sdk / "llvm/bin/clang", "--target=aarch64-linux-ohos26.0.0", f"--sysroot={sdk / 'sysroot'}",
+        "-shared", "-fPIC", "-O2", "-DNAPI_VERSION=8", "-I", ROOT / "vendor/repos/node/src",
+        RUNTIME / "native/dsh-image.c", "-L", libraries, "-lnode", "-limage_source", "-limage_packer",
+        "-lpixelmap", "-lm", "-Wl,-z,defs", "-o", libraries / "libdshimage.so",
+    ], check=True)
+
+
 def main():
     bundle = os.environ.get("HARMONY_APPGALLERY_BUNDLE", "")
     if APPGALLERY and not re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+", bundle):
@@ -260,6 +271,8 @@ def main():
                     item["value"] = "DSH-MH"
             strings.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
     stage_assets(inputs)
+    if APPGALLERY:
+        stage_appgallery_image()
     stage_settings_client()
     if APPGALLERY:
         stage_appgallery_presets()

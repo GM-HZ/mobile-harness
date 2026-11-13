@@ -244,7 +244,7 @@ class DshEngine {
       'dsh-harmony-package.cjs', 'dsh-harmony-pnpm-fetch.cjs'];
     const presets = ['cordis', 'minimal', 'ptc', 'standard'];
     const presetDir = root + '/dsh/node_modules/@deepseek-ai/dsh-web-app/presets/';
-    if (appGallery) names.push('appgallery.patch.yml');
+    if (appGallery) names.push('appgallery.patch.yml', 'dsh-native-image.cjs');
     const required = [settingsClient, root + '/bin/busybox', root + '/bin/sh',
       root + '/lib/ld-musl-aarch64.so.1', root + '/etc/alpine-release', ...names.map(name => root + '/' + name)];
     if (appGallery) {
