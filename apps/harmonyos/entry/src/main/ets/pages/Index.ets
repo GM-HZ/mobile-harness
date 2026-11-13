@@ -19,8 +19,6 @@ struct Index {
   @State privacyDetails: boolean = false;
   @State noticesOpen: boolean = false;
   @State noticeTitle: string = '';
-  @State alpineNotices: boolean = false;
-  @State alpineComponents: string[] = [];
   @State noticeText: string = '';
   @State decliningPrivacy: boolean = false;
   @State consentError: string = '';
@@ -229,18 +227,7 @@ struct Index {
 
   private backFromNotices(): void {
     if (this.noticeTitle) this.noticeTitle = '';
-    else if (this.alpineNotices) this.alpineNotices = false;
     else this.noticesOpen = false;
-  }
-
-  private showAlpineNotices(): void {
-    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
-    const prefix = 'NOTICE.alpine.';
-    this.alpineComponents = context.resourceManager.getRawFileListSync('')
-      .filter(name => name.startsWith(prefix) && name.endsWith('.txt') && name !== 'NOTICE.alpine.index.txt')
-      .map(name => name.slice(prefix.length, -4))
-      .sort();
-    this.alpineNotices = true;
   }
 
   private selectNotice(title: string, filename: string): void {
@@ -259,14 +246,9 @@ struct Index {
     Scroll() {
       Column({ space: 12 }) {
         Button('返回').onClick(() => this.backFromNotices())
-        Text(this.noticeTitle || (this.alpineNotices ? 'Alpine Linux 3.22' : '开源软件声明')).fontSize(24).fontWeight(FontWeight.Medium)
+        Text(this.noticeTitle || '开源软件声明').fontSize(24).fontWeight(FontWeight.Medium)
         if (this.noticeTitle) {
           Text(this.noticeText).fontSize(14).copyOption(CopyOptions.LocalDevice)
-        } else if (this.alpineNotices) {
-          Button('组件版本与来源').onClick(() => this.selectNotice('组件版本与来源', 'NOTICE.alpine.index.txt'))
-          ForEach(this.alpineComponents, (component: string) => {
-            Button(component).onClick(() => this.selectNotice(component, 'NOTICE.alpine.' + component + '.txt'))
-          }, (component: string) => component)
         } else {
           if (this.sourceDeliveryUrl) {
             Button('获取对应源码').onClick(() => this.openSourceDelivery())
@@ -275,20 +257,16 @@ struct Index {
                 .copyOption(CopyOptions.LocalDevice)
             }
           }
-          Button('Alpine Linux 3.22').onClick(() => this.showAlpineNotices())
           Button('DeepSeek Harness').onClick(() => this.selectNotice('DeepSeek Harness', 'LICENSE.dsh.txt'))
           Button('dshm').onClick(() => this.selectNotice('dshm', 'LICENSE.dshm.txt'))
           Button('Node.js').onClick(() => this.selectNotice('Node.js', 'LICENSE.node.txt'))
-          Button('PRoot').onClick(() => this.selectNotice('PRoot', 'LICENSE.proot.txt'))
           Button('sharp').onClick(() => this.selectNotice('sharp', 'LICENSE.sharp.txt'))
-          Button('libvips').onClick(() => this.selectNotice('libvips', 'NOTICE.libvips.md'))
           Button('工作区搜索').onClick(() => this.selectNotice('工作区搜索', 'NOTICE.workspace-search.txt'))
           Button('ripgrep').onClick(() => this.selectNotice('ripgrep', 'LICENSE.ripgrep.txt'))
           Button('Koffi').onClick(() => this.selectNotice('Koffi', 'LICENSE.koffi.txt'))
           Button('DSH System').onClick(() => this.selectNotice('DSH System', 'LICENSE.dsh-system.txt'))
           Button('Node.js require-builtin').onClick(() =>
             this.selectNotice('Node.js require-builtin', 'LICENSE.require-builtin.txt'))
-          Button('pnpm').onClick(() => this.selectNotice('pnpm', 'LICENSE.pnpm.txt'))
         }
       }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
     }.width('100%').layoutWeight(1)
@@ -419,7 +397,6 @@ struct Index {
             }
             if (this.appGallery && url === NOTICES_URL) {
               this.noticeTitle = '';
-              this.alpineNotices = false;
               this.sourceLinkError = false;
               this.noticesOpen = true;
               return true;

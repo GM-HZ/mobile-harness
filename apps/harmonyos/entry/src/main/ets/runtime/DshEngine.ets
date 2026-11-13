@@ -192,12 +192,15 @@ class DshEngine {
         return;
       }
       const mode = state.pending ? 'safe' : state.mode;
-      for (const name of ['bin', 'lib', 'etc', 'tmp', 'root']) {
+      const directories = appGallery ? ['tmp'] : ['bin', 'lib', 'etc', 'tmp', 'root'];
+      for (const name of directories) {
         const path = root + '/' + name;
         if (!fileIo.accessSync(path)) fileIo.mkdirSync(path, true);
       }
       let refreshRuntimeFiles = false;
-      for (const archive of ['node-layer.zip', 'dsh-layer.zip', 'shell-tools-layer.zip', 'pnpm-layer-v2.zip']) {
+      const archives = appGallery ? ['dsh-appgallery-layer.zip']
+        : ['node-layer.zip', 'dsh-layer.zip', 'shell-tools-layer.zip', 'pnpm-layer-v2.zip'];
+      for (const archive of archives) {
         const phase = Date.now();
         const extracted = await this.unpack(context, archive, root);
         refreshRuntimeFiles ||= extracted;
@@ -206,7 +209,7 @@ class DshEngine {
       }
       this.prepareRuntimeFiles(context, root, appGallery, refreshRuntimeFiles);
       if (appGallery || mode === 'safe' || !fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
-        await this.prepareResolver(root);
+        if (!appGallery) await this.prepareResolver(root);
         this.runNative(context, root, started, mode);
         nativeStarted = true;
         return;
@@ -239,14 +242,18 @@ class DshEngine {
     const settingsClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
     const chatClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-chat/lib/client.js';
     const modelsClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-models/lib/client.js';
-    const names = ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
-      'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs', 'dsh-native-web.cjs', 'dsh-harmony-sharp.cjs',
-      'dsh-harmony-package.cjs', 'dsh-harmony-pnpm-fetch.cjs'];
+    const names = ['fetch-shim.cjs', 'dsh-client.patch.yml', 'dsh-native-web.cjs'];
+    const guestFiles = ['bin/busybox', 'bin/sh', 'lib/ld-musl-aarch64.so.1', 'etc/alpine-release'];
     const presets = ['cordis', 'minimal', 'ptc', 'standard'];
     const presetDir = root + '/dsh/node_modules/@deepseek-ai/dsh-web-app/presets/';
-    if (appGallery) names.push('appgallery.patch.yml', 'dsh-native-image.cjs', 'dsh-native-search.cjs');
-    const required = [settingsClient, root + '/bin/busybox', root + '/bin/sh',
-      root + '/lib/ld-musl-aarch64.so.1', root + '/etc/alpine-release', ...names.map(name => root + '/' + name)];
+    if (appGallery) {
+      names.push('appgallery.patch.yml', 'dsh-native-image.cjs', 'dsh-native-search.cjs');
+    } else {
+      names.push('fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs', 'dsh-seccomp-probe.cjs',
+        'dsh-harmony-sharp.cjs', 'dsh-harmony-package.cjs', 'dsh-harmony-pnpm-fetch.cjs');
+    }
+    const required = [settingsClient, ...names.map(name => root + '/' + name)];
+    if (!appGallery) required.push(...guestFiles.map(name => root + '/' + name));
     if (appGallery) {
       required.push(chatClient, modelsClient, ...presets.map(name => presetDir + name + '.patch.yml'));
     }
@@ -260,10 +267,12 @@ class DshEngine {
       fileIo.unlinkSync(root + '/appgallery.patch.yml');
     }
     if (fileIo.accessSync(root + '/dsh-startup-sources.gz')) fileIo.unlinkSync(root + '/dsh-startup-sources.gz');
-    this.copyGuest(context, 'alpine-busybox', root + '/bin/busybox');
-    this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
-    this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
-    this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
+    if (!appGallery) {
+      this.copyGuest(context, 'alpine-busybox', root + '/bin/busybox');
+      this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
+      this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
+      this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
+    }
     this.copyGuest(context, 'dsh-settings-client.js', settingsClient + '.tmp');
     fileIo.renameSync(settingsClient + '.tmp', settingsClient);
     for (const name of names) this.copyGuest(context, name, root + '/' + name);

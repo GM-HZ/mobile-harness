@@ -36,7 +36,11 @@ python3 tests/smoke/emulator-appgallery-images.py <loopback-target>
 python3 tests/smoke/emulator-appgallery-search.py <loopback-target>
 ```
 
-原生搜索沿用 ripgrep 的 Rust 匹配组件，采用应用内文件遍历，测试范围覆盖上述工作区行为。运行时仍保留历史 Linux 组件，随包许可和对应源码另见组件来源清单。
+原生搜索沿用 ripgrep 的 Rust 匹配组件，采用应用内文件遍历，测试范围覆盖上述工作区行为。
+
+### 商店运行时精简
+
+0.4.27 商店包使用鸿蒙原生 Node、Image Kit 和工作区搜索，启动只解压一份过滤后的 DSH 归档。包体从约 312 MiB 降到 176 MiB，已检查 HAP 文件清单。应用数据仍使用原路径。在模拟器用相同包名从 0.4.26 覆盖安装后，图片和搜索回归通过。三次强停重开到页面加载完成分别为 5.03、4.18、4.08 秒，均复用本地 DSH 归档。旧会话恢复、回环鉴权和受限 RPC 检查通过。普通调试构建继续提供 Alpine 运行时。
 
 
 ## 隐私政策草稿
@@ -58,7 +62,7 @@ python3 tests/smoke/emulator-appgallery-search.py <loopback-target>
 | 联网 AI 服务 | 确定首发提供的模型及区域，确认第三方模型的接入授权和适用的上线备案或登记，提供真实审核凭据，并向华为上传应用内显式标识截图及适用资质。回复和整条回复复制带有 AI 标识。需继续核对选中文本、文件、图片和其他导出渠道的适用要求。 [华为 AI 标识 FAQ](https://developer.huawei.com/consumer/cn/doc/app/50111-10) · [国家网信办生成式人工智能服务公告](https://www.cac.gov.cn/2026-09/14/c_1791136833136332.htm) · [人工智能生成合成内容标识办法](https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm) |
 | 隐私 | 正式主体、联系渠道、服务清单、公开 HTTPS 隐私政策及用户协议，并在后台选择与包内实现相符的自定义隐私政策，填写隐私标签。后续构建可通过 `HARMONY_APPGALLERY_PRIVACY_URL` 写入同一个 HTTPS 地址。已用独立模拟器包验证首次启动的说明可打开配置的链接，华为草稿关联的 0.4.26 尚未包含此入口。 [华为隐私政策审核规范](https://developer.huawei.com/consumer/cn/doc/app/50104/) |
 | 分发范围与内容分级 | 按实际运营范围选取分发地区，审核资料包含年龄分级和内容问卷。按开发者已确认的地区和披露填写。 |
-| 第三方许可证与对应源码 | [Alpine 来源清单](harmonyos-runtime-sources.md) 记录 32 个组件包及版本对应的打包源码。已上传的 0.4.26 携带 DSH、dshm、Node、PRoot 的许可证。下一版增加「设置 → 通用 → 开源软件声明」，展示 10 份许可证、libvips 第三方声明和 32 个 Alpine 包的来源索引，可按 Alpine 上游项目查看随附许可文本。已在本机归档 Alpine 源码及与发布输入匹配的 PRoot 源码树、talloc 和构建材料。两套 Node 运行时及七个 npm 原生二进制已完成来源核验，pnpm 层已逐文件复现。提供正式源码下载地址后，构建时通过 `HARMONY_APPGALLERY_SOURCE_URL` 接入同一个声明页面。libvips 的构建源码输入已归档，仍需核对 libvips 重新链接材料和其余随包组件的声明。 |
+| 第三方许可证与对应源码 | [组件来源清单](harmonyos-runtime-sources.md) 记录历史 0.4.26 和当前 0.4.27 的差异。0.4.27 商店包已移除 Alpine、PRoot、pnpm 运行时和 Linux 图像库，保留实际分发的 DSH、鸿蒙 Node 和工作区搜索等材料。正式源码下载地址通过 `HARMONY_APPGALLERY_SOURCE_URL` 接入「开源软件声明」。 |
 | 软件包和素材 | 在 DevEco Studio 打开商店暂存工程，经「构建 → 上传产品」用云管理证书签名并上传，核验后台处理通过，关联软件版本并上传符合尺寸的真实截图。 [华为发布说明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-publish-app/) |
 
 后台能保存部分字段的草稿。所有材料与同一发布包核对完成后，再从「版本/升级」提交审核。

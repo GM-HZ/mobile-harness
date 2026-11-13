@@ -1,5 +1,7 @@
 # HarmonyOS 候选包的 Alpine 组件来源
 
+当前 0.4.27 商店候选包只携带鸿蒙 Node 和经过过滤的 DSH 层。包清单已确认移除独立 Alpine、PRoot、Linux Node、pnpm、shell 工具层，以及 DSH 归档内的其他平台原生件和 libvips。普通调试构建继续使用原有 Alpine 输入。下文 0.4.26 的源码和许可证记录用于已上传的历史包及调试运行时。
+
 以下对应商店候选包 0.4.26 的输入字节。版本、许可证字段和打包提交来自 Alpine 原始包的 `.PKGINFO` 或官方 minirootfs 的已安装包清单。
 
 - 从 Alpine v3.22 的 aarch64 镜像下载 [guest-tools-lock.json](guest-tools-lock.json) 的 25 个 APK，逐一匹配锁文件 SHA-256。用现有打包脚本重选内容，110 个签名库输入及 655 个数据条目均与候选包暂存输入一致。
@@ -53,15 +55,13 @@
 
 - 两个 Node.js 运行时均为 24.14.1。鸿蒙原生 `libnode.so` 和 Alpine 的 `libguest_node.so` 分别匹配历史目录的已签名制品和 Unofficial Builds 归档中的 `bin/node`。原生构建的官方源码归档按历史清单校验，八个本地补丁在独立目录通过源码准备脚本。此轮未重编整套 Node。 [Node.js 官方源码](https://nodejs.org/dist/v24.14.1/) · [Node.js Unofficial Builds](https://unofficial-builds.nodejs.org/download/release/v24.14.1/)
 - 从 npm 注册表按版本重新取得七个随包原生二进制。验证发布者的完整性摘要后，逐项匹配 sharp、libvips、ripgrep、Koffi、DSH System、Landlock 和 require-builtin 的发布输入。用原始 pnpm 11.28.5 发布归档和本仓库脚本重打包，450 个文件与实际分发的 pnpm 层逐字节一致。 [pnpm 打包脚本](../runtime/harmonyos/packaging/package-plugin-runtime.py)
-- libvips 8.18.7 与 sharp-libvips v1.3.4 发布归档的 ARM64 musl 文件完全一致。已归档对应构建源码、libvips 上游源码和第三方声明。另行归档了固定版本 POSIX 构建脚本中的全部 33 个源码或补丁下载项，逐项记录 SHA-256。已在独立 0.4.27 Release HAP 中验证，替换暂存工程的 `entry/libs/arm64-v8a/libguest_vips.so` 后，替换 ELF 的 Build ID 保留在打包结果中。原始库和替换库的图片运行验证均被发行包的 PRoot 启动失败阻断，替换库的运行验收仍待完成。之后的 0.4.27 商店配置用系统 Image Kit 处理图片，普通调试包仍走 Alpine。当前商店包依然分发历史 Linux 图像库，需在正式发布前核对分发清单与交付材料。 [sharp-libvips v1.3.4](https://github.com/lovell/sharp-libvips/releases/tag/v1.3.4) · [libvips v8.18.7](https://github.com/libvips/libvips/releases/tag/v8.18.7)
+- libvips 8.18.7 与 sharp-libvips v1.3.4 发布归档的 ARM64 musl 文件完全一致。已归档对应构建源码、libvips 上游源码和第三方声明。另行归档了固定版本 POSIX 构建脚本中的全部 33 个源码或补丁下载项，逐项记录 SHA-256。已在独立 0.4.27 Release HAP 中验证，替换暂存工程的 `entry/libs/arm64-v8a/libguest_vips.so` 后，替换 ELF 的 Build ID 保留在打包结果中。原始库和替换库的图片运行验证均被发行包的 PRoot 启动失败阻断，替换库的运行验收仍待完成。之后的 0.4.27 商店配置用系统 Image Kit 处理图片，普通调试包仍走 Alpine。精简后的 0.4.27 商店包移除了 Linux 和 WASM 图像库。 [sharp-libvips v1.3.4](https://github.com/lovell/sharp-libvips/releases/tag/v1.3.4) · [libvips v8.18.7](https://github.com/libvips/libvips/releases/tag/v8.18.7)
 
 本机归档 `dsh-mh-0.4.26-node-npm-provenance.tar.gz` 和相邻的 SHA-256 文件保存在 `.build/artifacts/harmonyos-appgallery/`。归档包含原生 Node 源码及历史构建脚本、Linux musl 原始构建归档、核验过的 npm 发布物、sharp 和 libvips 源码及构建记录。
 
 本机归档 `dsh-mh-0.4.26-libvips-build-inputs.tar.gz` 包含上述 33 个下载项、来源和摘要清单、构建脚本及第三方声明。归档已校验可读取。按固定 sharp-libvips 构建仓库的流程执行 `./build.sh linuxmusl-arm64v8`，从输出的 `sharp-libvips-linuxmusl-arm64v8.tar.gz` 中提取 `lib/libvips-cpp.so.8.18.7`。在独立测试包的暂存工程中替换上述输入后运行 Hvigor，随后检查 HAP 里的 ELF 和图片上传。上游完整重编仍待验证。
 
-商店构建在「设置 → 通用 → 开源软件声明」展示 DSH、dshm、Node.js、PRoot、sharp、ripgrep、Koffi、DSH System、require-builtin、pnpm 的许可证，以及固定版本的 libvips 第三方声明。许可证直接从固定源码或发布层提取。libvips 声明来自 sharp-libvips v1.3.4 发布的构建提交。
-
-「Alpine Linux 3.22」入口显示 32 个随包版本及对应的固定打包源码，并按 27 个上游项目分别展示归档中的许可或版权文本。SQLite 展示源码声明，CA 证书包展示证书数据及打包脚本附带的许可声明。
+商店构建在「设置 → 通用 → 开源软件声明」展示 DSH、dshm、Node.js、sharp、ripgrep、Koffi、DSH System 和 require-builtin 的许可证。许可证直接从固定源码或原始发布层提取，DSH 内其他模块的许可文件随归档保留。
 
 
 商店版原生工作区搜索的 Rust 依赖版本由 [Cargo.lock](../runtime/harmonyos/search/Cargo.lock) 固定。打包时按 OHOS ARM64 依赖图提取实际使用的 crate 的 MIT 许可证及 Rust 标准库版权说明，在「设置 → 通用 → 开源软件声明 → 工作区搜索」展示。

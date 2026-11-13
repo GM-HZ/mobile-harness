@@ -210,8 +210,6 @@ async function main() {
     const { createWorkspaceSearch } = require(path.join(root, 'dsh-native-search.cjs'));
     globalThis.__harmonyWorkspaceSearch = createWorkspaceSearch(workspace, () => addon('libdshsearch.so'));
   }
-  const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
-  const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
   if (appGallery) {
     const { createNativeSharp } = require(path.join(root, 'dsh-native-image.cjs'));
     let runImage;
@@ -220,11 +218,15 @@ async function main() {
       return runImage(...args);
     });
   } else {
+    const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
     globalThis.__harmonySharp = createSharp(root, launchGuest);
   }
-  globalThis.__harmonyPackageRunner = appGallery ? () => {
-    throw new Error('External packages are unavailable in this build');
-  } : createPackageRunner(root, home, launchGuest);
+  if (appGallery) {
+    globalThis.__harmonyPackageRunner = () => { throw new Error('External packages are unavailable in this build'); };
+  } else {
+    const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
+    globalThis.__harmonyPackageRunner = createPackageRunner(root, home, launchGuest);
+  }
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;

@@ -22,6 +22,11 @@ RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
 SETTINGS_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
 CHAT_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-chat/lib/client.js"
+STORE_LAYER = "dsh-appgallery-layer.zip"
+STORE_INPUTS = {"libnode.so", "libdshflock.so", "libdshpublish.so", "dsh-layer.zip"}
+STORE_RUNTIME_FILES = {
+    "dsh-native-web.cjs", "dsh-native-image.cjs", "dsh-native-search.cjs", "dsh-client.patch.yml",
+}
 MODELS_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-models/lib/client.js"
 
 
@@ -55,17 +60,44 @@ def stage_assets(inputs):
         relative = PurePosixPath(filename)
         if relative.is_absolute() or ".." in relative.parts:
             raise SystemExit(f"Invalid input path: {filename}")
+        destination = STAGE / relative
+        if APPGALLERY and relative.name not in STORE_INPUTS:
+            destination.unlink(missing_ok=True)
+            destination.with_name(destination.name + ".sha256").unlink(missing_ok=True)
+            continue
         source = inputs / relative
         if not source.is_file():
             raise SystemExit(f"Missing pinned HarmonyOS input: {source}")
         if sha256(source) != checksum:
             raise SystemExit(f"HarmonyOS input checksum mismatch: {filename}")
-        destination = STAGE / relative
         # Generated input bytes may change while size and timestamps match.
         if destination.is_file() and sha256(destination) == checksum:
             continue
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
+
+
+def stage_appgallery_layer():
+    source = RAW / "dsh-layer.zip"
+    destination = RAW / STORE_LAYER
+    base = "dsh/node_modules/"
+    foreign_packages = ("@img/sharp-libvips-linuxmusl-arm64/", "@img/sharp-wasm32/", "sherpa-onnx-linux-arm64/")
+    with ZipFile(source) as original, ZipFile(destination, "w") as filtered:
+        for member in original.infolist():
+            name = member.filename
+            if (name == "dsh-probe.cjs" or name.endswith((".node", ".exe", ".dll", ".dylib"))
+                    or any(name.startswith(base + package) for package in foreign_packages)):
+                continue
+            with original.open(member) as contents:
+                prefix = contents.read(4)
+                if prefix == b"\x7fELF":
+                    continue
+                with filtered.open(member, "w") as output:
+                    output.write(prefix)
+                    shutil.copyfileobj(contents, output)
+    (RAW / (STORE_LAYER + ".sha256")).write_text(sha256(destination), encoding="utf-8")
+    source.unlink()
+    (RAW / "dsh-layer.zip.sha256").unlink(missing_ok=True)
 
 
 def stage_settings_client():
@@ -161,7 +193,7 @@ def stage_runtime_revision():
     for line in pinned.decode().splitlines():
         checksum, filename = line.split(maxsplit=1)
         asset = PurePosixPath(filename)
-        if asset.parent.name == "rawfile" and asset.suffix == ".zip":
+        if asset.parent.name == "rawfile" and asset.suffix == ".zip" and (RAW / asset.name).is_file():
             (RAW / f"{asset.name}.sha256").write_text(checksum, encoding="utf-8")
 
 
@@ -177,11 +209,10 @@ def stage_appgallery_notices():
     with ZipFile(RAW / "dsh-layer.zip") as layer:
         for name, member in licenses.items():
             (RAW / f"LICENSE.{name}.txt").write_bytes(layer.read(f"{base}/{member}"))
-    with ZipFile(RAW / "pnpm-layer-v2.zip") as layer:
-        (RAW / "LICENSE.pnpm.txt").write_bytes(layer.read("pnpm-harmony-v2/LICENSE"))
-    copy(RUNTIME / "notices/sharp-libvips-1.3.4.md", RAW / "NOTICE.libvips.md")
-    for notice in sorted((RUNTIME / "notices/alpine-3.22").glob("*.txt")):
-        copy(notice, RAW / f"NOTICE.alpine.{notice.name}")
+    for notice in RAW.glob("NOTICE.alpine.*.txt"):
+        notice.unlink()
+    for name in ("LICENSE.pnpm.txt", "LICENSE.proot.txt", "NOTICE.libvips.md"):
+        (RAW / name).unlink(missing_ok=True)
 
 
 def stage_appgallery_url(variable, filename):
@@ -289,12 +320,22 @@ def main():
                       RUNTIME / "compat", RUNTIME / "diagnostics"):
         for source in sorted(directory.iterdir()):
             if source.is_file() and source.name != "appgallery.patch.yml":
-                copy(source, RAW / source.name)
+                destination = RAW / source.name
+                if APPGALLERY and source.name not in STORE_RUNTIME_FILES:
+                    destination.unlink(missing_ok=True)
+                else:
+                    copy(source, destination)
+    if APPGALLERY:
+        (RAW / "alpine-release").unlink(missing_ok=True)
     dshm = ROOT / "vendor/repos/dshm"
     copy(dshm / "hostcore/app/fetch-shim.js", RAW / "fetch-shim.cjs")
     copy(dshm / "LICENSE", RAW / "LICENSE.dshm.txt")
     for name in ("poc.c", "nativehost.c", "guest-tools.inc"):
         copy(RUNTIME / "native" / name, CPP / name)
+    if APPGALLERY:
+        cmake = CPP / "CMakeLists.txt"
+        with cmake.open("a") as stream:
+            stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_APPGALLERY=1)\n")
     if EXPERIMENTAL:
         app_config = STAGE / "AppScope/app.json5"
         source = (APP / "AppScope/app.json5").read_text()
@@ -329,8 +370,10 @@ def main():
         stage_appgallery_chat()
         stage_appgallery_models()
         stage_appgallery_notices()
-        for project, name in (("dsh", "LICENSE"), ("node", "LICENSE"), ("proot", "COPYING")):
+        for project, name in (("dsh", "LICENSE"), ("node", "LICENSE")):
             copy(ROOT / "vendor/repos" / project / name, RAW / f"LICENSE.{project}.txt")
+    if APPGALLERY:
+        stage_appgallery_layer()
     stage_runtime_revision()
     signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
     profile = Path(signing_profile or ROOT / "build-profile.json5")
