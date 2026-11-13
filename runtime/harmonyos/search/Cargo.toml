@@ -1,0 +1,17 @@
+[package]
+name = "dsh-search"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+ignore = "=0.4.28"
+regex = "=1.13.0"
+serde_json = "=1.0.150"
+
+[profile.release]
+lto = "thin"
+panic = "abort"

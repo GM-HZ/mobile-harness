@@ -282,6 +282,7 @@ struct Index {
           Button('PRoot').onClick(() => this.selectNotice('PRoot', 'LICENSE.proot.txt'))
           Button('sharp').onClick(() => this.selectNotice('sharp', 'LICENSE.sharp.txt'))
           Button('libvips').onClick(() => this.selectNotice('libvips', 'NOTICE.libvips.md'))
+          Button('工作区搜索').onClick(() => this.selectNotice('工作区搜索', 'NOTICE.workspace-search.txt'))
           Button('ripgrep').onClick(() => this.selectNotice('ripgrep', 'LICENSE.ripgrep.txt'))
           Button('Koffi').onClick(() => this.selectNotice('Koffi', 'LICENSE.koffi.txt'))
           Button('DSH System').onClick(() => this.selectNotice('DSH System', 'LICENSE.dsh-system.txt'))

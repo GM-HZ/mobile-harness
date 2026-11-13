@@ -62,3 +62,6 @@
 商店构建在「设置 → 通用 → 开源软件声明」展示 DSH、dshm、Node.js、PRoot、sharp、ripgrep、Koffi、DSH System、require-builtin、pnpm 的许可证，以及固定版本的 libvips 第三方声明。许可证直接从固定源码或发布层提取。libvips 声明来自 sharp-libvips v1.3.4 发布的构建提交。
 
 「Alpine Linux 3.22」入口显示 32 个随包版本及对应的固定打包源码，并按 27 个上游项目分别展示归档中的许可或版权文本。SQLite 展示源码声明，CA 证书包展示证书数据及打包脚本附带的许可声明。
+
+
+商店版原生工作区搜索的 Rust 依赖版本由 [Cargo.lock](../runtime/harmonyos/search/Cargo.lock) 固定。打包时按 OHOS ARM64 依赖图提取实际使用的 crate 的 MIT 许可证及 Rust 标准库版权说明，在「设置 → 通用 → 开源软件声明 → 工作区搜索」展示。

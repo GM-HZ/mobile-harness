@@ -20,13 +20,24 @@
 
 ### Release 图片附件验收
 
-已上传的 0.4.26 云签名包在 API 26 Phone 模拟器上拒绝有效 PNG。诊断日志显示系统拒绝 PRoot 的 `ptrace(TRACEME)`，图片解码进程未能启动。0.4.27 的商店配置改用 HarmonyOS Image Kit。独立 Release 测试包通过真实附件接口验收，普通 PNG 保留原尺寸，超过尺寸限制的无透明度和半透明 PNG 分别缩小并编码为 JPEG 和 WebP，损坏及截断 PNG 返回错误。工作区 grep/glob 仍依赖 PRoot，需另行验收。
+已上传的 0.4.26 云签名包在 API 26 Phone 模拟器上拒绝有效 PNG。诊断日志显示系统拒绝 PRoot 的 `ptrace(TRACEME)`，图片解码进程未能启动。0.4.27 的商店配置改用 HarmonyOS Image Kit。独立 Release 测试包通过真实附件接口验收，普通 PNG 保留原尺寸，超过尺寸限制的无透明度和半透明 PNG 分别缩小并编码为 JPEG 和 WebP，损坏及截断 PNG 返回错误。
 
 ```sh
 python3 tests/smoke/emulator-appgallery-images.py <loopback-target>
 ```
 
 该命令适用于已在模拟器启动并同意隐私提示的候选包。准备送审的完整云签名包还需再跑同一回归。 [HarmonyOS Image Kit C 接口](https://developer.huawei.com/consumer/en/doc/harmonyos-references/capi-image-source-native-h/)
+
+### Release 工作区搜索验收
+
+0.4.26 云签名包的 `glob` 和 `grep` 均复现 ripgrep 进程启动失败。0.4.27 的商店配置在 Host 内运行 Rust 的 `ignore` 和 `regex`，保留 DSH 工具入口和结果格式。通过本机模型夹具在真实 DSH 会话中依次验证文件名匹配、带行号的内容匹配、排除 Git 目录、拒绝无效正则和拒绝工作区外路径。正式云签名包需再次执行相同回归。
+
+```sh
+python3 tests/smoke/emulator-appgallery-search.py <loopback-target>
+```
+
+原生搜索沿用 ripgrep 的 Rust 匹配组件，采用应用内文件遍历，测试范围覆盖上述工作区行为。运行时仍保留历史 Linux 组件，随包许可和对应源码另见组件来源清单。
+
 
 ## 隐私政策草稿
 

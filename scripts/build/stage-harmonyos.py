@@ -6,6 +6,7 @@ from pathlib import Path, PurePosixPath
 import re
 import shutil
 import subprocess
+from html.parser import HTMLParser
 from urllib.parse import urlsplit
 from zipfile import ZipFile
 
@@ -229,6 +230,54 @@ def stage_appgallery_image():
     ], check=True)
 
 
+def stage_appgallery_search():
+    sdk = Path(os.environ.get("DEVECO_HOME", "/Applications/DevEco-Studio.app/Contents")) / "sdk/default/openharmony/native"
+    libraries = STAGE / "entry/libs/arm64-v8a"
+    target = "aarch64-unknown-linux-ohos"
+    artifacts = ROOT / ".build/search-cargo"
+    cargo = shutil.which("cargo") or Path.home() / ".cargo/bin/cargo"
+    subprocess.run([
+        cargo, "build", "--locked", "--release", "--target", target, "--target-dir", artifacts,
+        "--manifest-path", RUNTIME / "search/Cargo.toml",
+    ], check=True)
+    metadata = json.loads(subprocess.check_output([
+        cargo, "metadata", "--offline", "--locked", "--filter-platform", target,
+        "--format-version", "1", "--manifest-path", RUNTIME / "search/Cargo.toml",
+    ]))
+    notices = ["HarmonyOS workspace search dependencies"]
+    for package in sorted(metadata["packages"], key=lambda package: package["name"]):
+        if not package["source"]:
+            continue
+        root = Path(package["manifest_path"]).parent
+        license_file = root / "LICENSE-MIT"
+        if not license_file.is_file():
+            raise SystemExit(f"Missing Rust dependency license: {license_file}")
+        notices.append(f"{package['name']} {package['version']} (MIT)\n{license_file.read_text().rstrip()}")
+    rustc = os.environ.get("RUSTC") or shutil.which("rustc") or Path(cargo).with_name("rustc")
+    sysroot = Path(subprocess.check_output([rustc, "--print", "sysroot"], text=True).strip())
+    copyright_doc = sysroot / "share/doc/rust/COPYRIGHT-library.html"
+
+    class CopyrightText(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.parts = []
+
+        def handle_data(self, data):
+            self.parts.append(data)
+
+    notice = CopyrightText()
+    notice.feed(copyright_doc.read_text())
+    notices.append("".join(notice.parts).strip())
+    (RAW / "NOTICE.workspace-search.txt").write_text("\n\n".join(notices) + "\n", encoding="utf-8")
+    subprocess.run([
+        sdk / "llvm/bin/clang", "--target=aarch64-linux-ohos26.0.0", f"--sysroot={sdk / 'sysroot'}",
+        "-shared", "-fPIC", "-O2", "-DNAPI_VERSION=8", "-I", ROOT / "vendor/repos/node/src",
+        RUNTIME / "native/dsh-search.c", artifacts / target / "release/libdsh_search.a",
+        "-L", libraries, "-lnode", "-Wl,--exclude-libs,ALL", "-Wl,-z,defs",
+        "-o", libraries / "libdshsearch.so",
+    ], check=True)
+
+
 def main():
     bundle = os.environ.get("HARMONY_APPGALLERY_BUNDLE", "")
     if APPGALLERY and not re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+", bundle):
@@ -273,6 +322,7 @@ def main():
     stage_assets(inputs)
     if APPGALLERY:
         stage_appgallery_image()
+        stage_appgallery_search()
     stage_settings_client()
     if APPGALLERY:
         stage_appgallery_presets()

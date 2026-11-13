@@ -59,7 +59,6 @@ function installProotSpawn(workspace) {
   const allowedRoot = fs.realpathSync(workspace);
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
   globalThis.__harmonyProotSpawn = (program, args, options) => {
-    if (appGallery && program !== ripgrep) throw new Error('Only bundled workspace search can start a subprocess');
     if (program !== 'bash' && program !== ripgrep) return spawn(program, args, options);
     if (options.stdio.join(',') !== 'ignore,pipe,pipe') throw new Error('Harmony tools require captured output');
     const cwd = fs.realpathSync(options.cwd);
@@ -205,7 +204,12 @@ async function main() {
   const attachmentUrl = paths('dsh-attachment-local/lib/index.js');
   const searchUrl = paths('dsh-tool-fs-search/lib/index.js');
   const packageUrl = paths('dsh-plugin-manager/lib/index.js');
-  const launchGuest = installProotSpawn(workspace);
+  const launchGuest = appGallery ? undefined : installProotSpawn(workspace);
+  if (appGallery) {
+    globalThis.__harmonyProotSpawn = () => { throw new Error('Subprocesses are unavailable in this build'); };
+    const { createWorkspaceSearch } = require(path.join(root, 'dsh-native-search.cjs'));
+    globalThis.__harmonyWorkspaceSearch = createWorkspaceSearch(workspace, () => addon('libdshsearch.so'));
+  }
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
   const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
   if (appGallery) {
@@ -274,6 +278,11 @@ async function main() {
       }
       if (url === searchUrl) {
         let patched = replacePinned(source, '(await import("@vscode/ripgrep")).rgPath', 'globalThis.__harmonyPackagedRg');
+        if (appGallery) {
+          const workdir = '\tconst workdir = exec.agent === void 0 ? process.cwd() : await ctx.workingDirectory.ensure(exec.agent, exec.signal);';
+          patched = replacePinned(patched, workdir, workdir +
+            '\n\treturn globalThis.__harmonyWorkspaceSearch(workdir, exec.signal, toolName, argv, rawOutputMaxBytes, SearchError);');
+        }
         patched = replacePinned(patched, '\t\t"--sort=modified",\n', '');
         patched = replacePinned(patched, 'paths: all', 'paths: await globalThis.__harmonySortGlobPaths(all, run.workdir, exec.signal)');
         return { ...result, source: patched };
