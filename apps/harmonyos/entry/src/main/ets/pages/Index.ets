@@ -19,6 +19,8 @@ struct Index {
   @State privacyDetails: boolean = false;
   @State noticesOpen: boolean = false;
   @State noticeTitle: string = '';
+  @State alpineNotices: boolean = false;
+  @State alpineComponents: string[] = [];
   @State noticeText: string = '';
   @State decliningPrivacy: boolean = false;
   @State consentError: string = '';
@@ -139,8 +141,7 @@ struct Index {
 
   onBackPress(): boolean {
     if (this.noticesOpen) {
-      if (this.noticeTitle) this.noticeTitle = '';
-      else this.noticesOpen = false;
+      this.backFromNotices();
       return true;
     }
     if (this.privacyDetails) {
@@ -213,6 +214,22 @@ struct Index {
     }.width('100%')
   }
 
+  private backFromNotices(): void {
+    if (this.noticeTitle) this.noticeTitle = '';
+    else if (this.alpineNotices) this.alpineNotices = false;
+    else this.noticesOpen = false;
+  }
+
+  private showAlpineNotices(): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    const prefix = 'NOTICE.alpine.';
+    this.alpineComponents = context.resourceManager.getRawFileListSync('')
+      .filter(name => name.startsWith(prefix) && name.endsWith('.txt') && name !== 'NOTICE.alpine.index.txt')
+      .map(name => name.slice(prefix.length, -4))
+      .sort();
+    this.alpineNotices = true;
+  }
+
   private selectNotice(title: string, filename: string): void {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
     try {
@@ -228,14 +245,17 @@ struct Index {
   private noticesPage() {
     Scroll() {
       Column({ space: 12 }) {
-        Button('返回').onClick(() => {
-          if (this.noticeTitle) this.noticeTitle = '';
-          else this.noticesOpen = false;
-        })
-        Text(this.noticeTitle || '开源软件声明').fontSize(24).fontWeight(FontWeight.Medium)
+        Button('返回').onClick(() => this.backFromNotices())
+        Text(this.noticeTitle || (this.alpineNotices ? 'Alpine Linux 3.22' : '开源软件声明')).fontSize(24).fontWeight(FontWeight.Medium)
         if (this.noticeTitle) {
           Text(this.noticeText).fontSize(14).copyOption(CopyOptions.LocalDevice)
+        } else if (this.alpineNotices) {
+          Button('组件版本与来源').onClick(() => this.selectNotice('组件版本与来源', 'NOTICE.alpine.index.txt'))
+          ForEach(this.alpineComponents, (component: string) => {
+            Button(component).onClick(() => this.selectNotice(component, 'NOTICE.alpine.' + component + '.txt'))
+          }, (component: string) => component)
         } else {
+          Button('Alpine Linux 3.22').onClick(() => this.showAlpineNotices())
           Button('DeepSeek Harness').onClick(() => this.selectNotice('DeepSeek Harness', 'LICENSE.dsh.txt'))
           Button('dshm').onClick(() => this.selectNotice('dshm', 'LICENSE.dshm.txt'))
           Button('Node.js').onClick(() => this.selectNotice('Node.js', 'LICENSE.node.txt'))
@@ -378,6 +398,7 @@ struct Index {
             }
             if (this.appGallery && url === NOTICES_URL) {
               this.noticeTitle = '';
+              this.alpineNotices = false;
               this.noticesOpen = true;
               return true;
             }

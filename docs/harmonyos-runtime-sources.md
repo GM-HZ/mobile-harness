@@ -60,3 +60,5 @@
 本机归档 `dsh-mh-0.4.26-libvips-build-inputs.tar.gz` 包含上述 33 个下载项、来源和摘要清单、构建脚本及第三方声明。归档已校验可读取。
 
 商店构建在「设置 → 通用 → 开源软件声明」展示 DSH、dshm、Node.js、PRoot、sharp、ripgrep、Koffi、DSH System、require-builtin、pnpm 的许可证，以及固定版本的 libvips 第三方声明。许可证直接从固定源码或发布层提取。libvips 声明来自 sharp-libvips v1.3.4 发布的构建提交。
+
+「Alpine Linux 3.22」入口显示 32 个随包版本及对应的固定打包源码，并按 27 个上游项目分别展示归档中的许可或版权文本。SQLite 展示源码声明，CA 证书包展示证书数据及打包脚本附带的许可声明。

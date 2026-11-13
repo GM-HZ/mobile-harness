@@ -1,0 +1,99 @@
+Alpine Linux 3.22 · AArch64
+
+随包组件版本、Alpine 许可证标记及固定打包源码
+
+brotli-libs-1.1.1-r0 · MIT
+https://github.com/alpinelinux/aports/tree/0b8db0af6fbe8b8bc7e50e5f64b2f88bc0d6aa16/main/brotli
+
+c-ares-1.34.9-r0 · MIT
+https://github.com/alpinelinux/aports/tree/2abc7d1defd146f59390a22caf74efe85e5130d9/main/c-ares
+
+ca-certificates-bundle-20261020-r0 · MPL-2.0 AND MIT
+https://github.com/alpinelinux/aports/tree/ce7bff87478cd936f5b7031ce822b02d4fdd313a/main/ca-certificates
+
+gdbm-1.24-r0 · GPL-3.0-or-later
+https://github.com/alpinelinux/aports/tree/cf76e1b436494c60e0c188400007dbf78bbff5f0/main/gdbm
+
+git-2.49.1-r0 · GPL-2.0-only
+https://github.com/alpinelinux/aports/tree/d896b70b77339c50bea678a19895df6331872d82/main/git
+
+git-init-template-2.49.1-r0 · GPL-2.0-only
+https://github.com/alpinelinux/aports/tree/d896b70b77339c50bea678a19895df6331872d82/main/git
+
+libbz2-1.0.8-r6 · bzip2-1.0.6
+https://github.com/alpinelinux/aports/tree/33283848034c9885d984c8e8697c645c57324938/main/bzip2
+
+libcrypto3-3.5.9-r0 · Apache-2.0
+https://github.com/alpinelinux/aports/tree/b6d0d5c5639c0034e9073c39e9ff139e28e71818/main/openssl
+
+libcurl-8.14.1-r4 · curl
+https://github.com/alpinelinux/aports/tree/d1a2a43ff0517fffb947e767cdaeee61e7376cf2/main/curl
+
+libexpat-2.10.0-r0 · MIT
+https://github.com/alpinelinux/aports/tree/e7473064be733caf6876525ecc41181e5137f399/main/expat
+
+libffi-3.4.8-r0 · MIT
+https://github.com/alpinelinux/aports/tree/be5e49159a2ccca93a3290af3d8ab25443523363/main/libffi
+
+libidn2-2.3.7-r0 · GPL-2.0-or-later OR LGPL-3.0-or-later
+https://github.com/alpinelinux/aports/tree/1cdcdd0eccbee1f60078417a7aaf83f92f6e6754/main/libidn2
+
+libpanelw-6.5_p20250503-r0 · X11
+https://github.com/alpinelinux/aports/tree/3fefbe8dda8b3e85458edb190e2f3a69ad16035c/main/ncurses
+
+libpsl-0.21.5-r3 · MIT
+https://github.com/alpinelinux/aports/tree/4cf07ce428e77d8bca8e45258ba1937db8b18661/main/libpsl
+
+libssl3-3.5.9-r0 · Apache-2.0
+https://github.com/alpinelinux/aports/tree/b6d0d5c5639c0034e9073c39e9ff139e28e71818/main/openssl
+
+libunistring-1.3-r0 · GPL-2.0-or-later OR LGPL-3.0-or-later
+https://github.com/alpinelinux/aports/tree/22200a467cea998010743cc288889dbde0496d4a/main/libunistring
+
+mpdecimal-4.0.1-r0 · BSD-2-Clause
+https://github.com/alpinelinux/aports/tree/c0519b85456e9b838e3142e1d233aab0b433b476/main/mpdecimal
+
+ncurses-terminfo-base-6.5_p20250503-r0 · X11
+https://github.com/alpinelinux/aports/tree/3fefbe8dda8b3e85458edb190e2f3a69ad16035c/main/ncurses
+
+nghttp2-libs-1.69.0-r0 · MIT
+https://github.com/alpinelinux/aports/tree/87de39802b2c34c9a7c62a52b3e39e05af1c974e/main/nghttp2
+
+pcre2-10.46-r1 · BSD-3-Clause
+https://github.com/alpinelinux/aports/tree/f5ca111ded52f3c1f4298b09e118af54fba80aa1/main/pcre2
+
+python3-3.12.16-r0 · PSF-2.0
+https://github.com/alpinelinux/aports/tree/712199df117586aee4a5a8138360636deafcae27/main/python3
+
+sqlite-libs-3.49.2-r1 · blessing
+https://github.com/alpinelinux/aports/tree/dac9cea7503a4e9b84d647aab2492d733ac4ac8c/main/sqlite
+
+xz-libs-5.8.4-r0 · GPL-2.0-or-later AND 0BSD AND Public-Domain AND LGPL-2.1-or-later
+https://github.com/alpinelinux/aports/tree/4ad8da6dc8e2b7ed46653b9844835babc3a166ae/main/xz
+
+zlib-1.4-r0 · Zlib
+https://github.com/alpinelinux/aports/tree/a01d2885b6dc5443913a4a40f3689984ab66e7bb/main/zlib
+
+zstd-libs-1.5.7-r0 · BSD-3-Clause OR GPL-2.0-or-later
+https://github.com/alpinelinux/aports/tree/fc7fd35c7bf99156ae31962877c074f679f45b73/main/zstd
+
+libgcc-14.2.0-r6 · GPL-2.0-or-later AND LGPL-2.1-or-later
+https://github.com/alpinelinux/aports/tree/fbf60319be3bbaf6dd32ef55cc6fb7189e05c266/main/gcc
+
+libstdc++-14.2.0-r6 · GPL-2.0-or-later AND LGPL-2.1-or-later
+https://github.com/alpinelinux/aports/tree/fbf60319be3bbaf6dd32ef55cc6fb7189e05c266/main/gcc
+
+bash-5.2.37-r0 · GPL-3.0-or-later
+https://github.com/alpinelinux/aports/tree/dfdce3cefb431614e410ac9bc3665d33ea45020c/main/bash
+
+readline-8.2.13-r1 · GPL-3.0-or-later
+https://github.com/alpinelinux/aports/tree/be0833caee3020f089f02c5d7223e971a9a11ffb/main/readline
+
+libncursesw-6.5_p20250503-r0 · X11
+https://github.com/alpinelinux/aports/tree/3fefbe8dda8b3e85458edb190e2f3a69ad16035c/main/ncurses
+
+busybox-1.37.0-r20 · GPL-2.0-only
+https://github.com/alpinelinux/aports/tree/2e97d754a30d558f15524b8e422303c8a96832df/main/busybox
+
+musl-1.2.5-r13 · MIT
+https://github.com/alpinelinux/aports/tree/ddaf59b84bc6983a37d6e24d2210c2c4791642bb/main/musl

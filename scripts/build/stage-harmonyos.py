@@ -179,6 +179,8 @@ def stage_appgallery_notices():
     with ZipFile(RAW / "pnpm-layer-v2.zip") as layer:
         (RAW / "LICENSE.pnpm.txt").write_bytes(layer.read("pnpm-harmony-v2/LICENSE"))
     copy(RUNTIME / "notices/sharp-libvips-1.3.4.md", RAW / "NOTICE.libvips.md")
+    for notice in sorted((RUNTIME / "notices/alpine-3.22").glob("*.txt")):
+        copy(notice, RAW / f"NOTICE.alpine.{notice.name}")
 
 
 def stage_appgallery_privacy():
