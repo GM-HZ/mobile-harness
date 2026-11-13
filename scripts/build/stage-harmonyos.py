@@ -1,7 +1,9 @@
 import filecmp
 import hashlib
+import json
 import os
 from pathlib import Path, PurePosixPath
+import re
 import shutil
 import subprocess
 from zipfile import ZipFile
@@ -10,10 +12,15 @@ ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
 RUNTIME = ROOT / "runtime/harmonyos"
 EXPERIMENTAL = os.environ.get("HARMONY_EXPERIMENTAL_HOST_PROCESS") == "1"
-STAGE = ROOT / ".build/stage" / ("harmonyos-process-probe" if EXPERIMENTAL else "harmonyos")
+APPGALLERY = os.environ.get("HARMONY_APPGALLERY_BUILD") == "1"
+STAGE = ROOT / ".build/stage" / (
+    "harmonyos-appgallery" if APPGALLERY else "harmonyos-process-probe" if EXPERIMENTAL else "harmonyos"
+)
 RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
 SETTINGS_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
+CHAT_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-chat/lib/client.js"
+MODELS_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-models/lib/client.js"
 
 
 def copy(source, destination):
@@ -67,18 +74,103 @@ def stage_settings_client():
     if source.count(entry) != 1:
         raise SystemExit("The pinned DSH General Settings entry point changed")
     row = (RUNTIME / "web/settings-recovery.js").read_text().rstrip()
-    injection = "\n" + row + "\n" + entry + "\n\t\t\tregisterMobileHarnessRecovery(ctx);"
+    appgallery = "true" if APPGALLERY else "false"
+    injection = f"\n{row}\n{entry}\n\t\t\tregisterMobileHarnessSettings(ctx, {appgallery});"
     (RAW / "dsh-settings-client.js").write_text(source.replace(entry, injection, 1), encoding="utf-8")
 
 
+def stage_appgallery_chat():
+    with ZipFile(RAW / "dsh-layer.zip") as layer:
+        source = layer.read(CHAT_CLIENT).decode("utf-8")
+    position = source.index('function AssistantMarkdown(')
+    entry = "\t\t\tconst rendered = [];"
+    index = source.index(entry, position)
+    label = (
+        '\n\t\t\tif (groupPart !== "reasoning" && blocks.some((block) => block.kind === "text" && block.text.trim())) {'
+        '\n\t\t\t\trendered.push((0, react_jsx_runtime.jsx)("div", {'
+        ' style: { fontSize: "0.75rem", opacity: 0.75, marginBottom: "4px" },'
+        ' children: mobileHarnessAiLabel() }, "mobile-harness-ai-label"));'
+        '\n\t\t\t}'
+    )
+    end = index + len(entry)
+    source = source[:end] + label + source[end:]
+    copy_point = "text: assistantText(closing.blocks),"
+    if source.count(copy_point) != 1:
+        raise SystemExit("Unexpected pinned DSH assistant copy action")
+    source = source.replace(copy_point, "text: mobileHarnessLabelCopy(assistantText(closing.blocks)),")
+    helpers = (
+        'function mobileHarnessAiLabel() { return document.documentElement.lang.startsWith("zh")'
+        ' ? "AI 生成" : "AI-generated"; }\n'
+        'function mobileHarnessLabelCopy(text) { return text ? mobileHarnessAiLabel() + "\\n\\n" + text : text; }\n'
+    )
+    (RAW / "appgallery-chat-client.js").write_text(helpers + source, encoding="utf-8")
+
+
+def stage_appgallery_models():
+    with ZipFile(RAW / "dsh-layer.zip") as layer:
+        source = layer.read(MODELS_CLIENT).decode("utf-8")
+    # The native first-run page supplies the phone-specific disclosure.
+    notice = (
+        '\t\t\tif (!("dshDesktop" in globalThis)) ctx.slots.inject("settings.onboarding", () => ctx.slots.register({\n'
+        '\t\t\t\tname: "settings.onboarding",\n'
+        '\t\t\t\tid: "welcome-notice",\n'
+        '\t\t\t\torder: -100,\n'
+        '\t\t\t\tinject: welcomeInjected\n'
+        '\t\t\t}, WelcomeNotice));\n'
+    )
+    if source.count(notice) != 1:
+        raise SystemExit("Unexpected pinned DSH welcome notice")
+    (RAW / "appgallery-models-client.js").write_text(source.replace(notice, ""), encoding="utf-8")
+
+
+def stage_appgallery_presets():
+    blocked = {
+        "persistent-shell", "tool-bash", "tool-pwsh", "tool-jobs", "tool-plugin-manager",
+        "tool-plugin-market", "tool-executor-ptc", "tool-cordis", "skill-filesystem", "tool-skill",
+    }
+    row = re.compile(r"^ {10}- id: ([\w-]+)\s*$", re.MULTILINE)
+    presets = "dsh/node_modules/@deepseek-ai/dsh-web-app/presets"
+    with ZipFile(RAW / "dsh-layer.zip") as layer:
+        for name in ("cordis", "minimal", "ptc", "standard"):
+            source = layer.read(f"{presets}/{name}.patch.yml").decode("utf-8")
+            rows = list(row.finditer(source))
+            if not rows or not any(match[1] in blocked for match in rows):
+                raise SystemExit(f"Unexpected pinned DSH preset structure: {name}")
+            allowed = [source[:rows[0].start()]]
+            for index, match in enumerate(rows):
+                if match[1] not in blocked:
+                    end = rows[index + 1].start() if index + 1 < len(rows) else len(source)
+                    allowed.append(source[match.start():end])
+            (RAW / f"appgallery-preset-{name}.yml").write_text("".join(allowed), encoding="utf-8")
+
+
+def stage_runtime_revision():
+    digest = hashlib.sha256()
+    pinned = (ROOT / "docs/build-inputs.sha256").read_bytes()
+    digest.update(pinned)
+    pinned_names = {PurePosixPath(line.split(maxsplit=1)[1]).name for line in pinned.decode().splitlines()}
+    for asset in sorted(RAW.iterdir()):
+        if asset.is_file() and asset.name not in pinned_names and asset.name != "runtime-revision" and not asset.name.endswith(".zip.sha256"):
+            digest.update(f"{asset.name} {sha256(asset)}\n".encode())
+    (RAW / "runtime-revision").write_text(digest.hexdigest(), encoding="utf-8")
+    for line in pinned.decode().splitlines():
+        checksum, filename = line.split(maxsplit=1)
+        asset = PurePosixPath(filename)
+        if asset.parent.name == "rawfile" and asset.suffix == ".zip":
+            (RAW / f"{asset.name}.sha256").write_text(checksum, encoding="utf-8")
+
+
 def main():
+    bundle = os.environ.get("HARMONY_APPGALLERY_BUNDLE", "")
+    if APPGALLERY and not re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+", bundle):
+        raise SystemExit("Invalid HARMONY_APPGALLERY_BUNDLE")
     inputs = Path(os.environ.get("HARMONY_INPUTS_DIR") or ROOT / ".build/inputs/harmonyos").resolve()
     for source in files_from_index(APP):
         copy(source, STAGE / source.relative_to(APP))
     for directory in (ROOT / "packages/dsh-host", ROOT / "packages/bundles/mobile",
                       RUNTIME / "compat", RUNTIME / "diagnostics"):
         for source in sorted(directory.iterdir()):
-            if source.is_file():
+            if source.is_file() and source.name != "appgallery.patch.yml":
                 copy(source, RAW / source.name)
     dshm = ROOT / "vendor/repos/dshm"
     copy(dshm / "hostcore/app/fetch-shim.js", RAW / "fetch-shim.cjs")
@@ -92,11 +184,32 @@ def main():
         cmake = CPP / "CMakeLists.txt"
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
+    if APPGALLERY:
+        copy(ROOT / "packages/bundles/mobile/appgallery.patch.yml", RAW / "appgallery.patch.yml")
+        app_config = STAGE / "AppScope/app.json5"
+        config = json.loads(app_config.read_text())
+        config["app"]["bundleName"] = bundle
+        config["app"]["vendor"] = "Mobile Harness"
+        app_config.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
+        for directory in (STAGE / "AppScope", STAGE / "entry/src/main"):
+            strings = directory / "resources/base/element/string.json"
+            config = json.loads(strings.read_text())
+            for item in config["string"]:
+                if item["name"] == "app_name":
+                    item["value"] = "DSH-MH"
+            strings.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
     stage_assets(inputs)
     stage_settings_client()
+    if APPGALLERY:
+        stage_appgallery_presets()
+        stage_appgallery_chat()
+        stage_appgallery_models()
+        for project, name in (("dsh", "LICENSE"), ("node", "LICENSE"), ("proot", "COPYING")):
+            copy(ROOT / "vendor/repos" / project / name, RAW / f"LICENSE.{project}.txt")
+    stage_runtime_revision()
     signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
     profile = Path(signing_profile or ROOT / "build-profile.json5")
-    unsigned = os.environ.get("HARMONY_UNSIGNED") == "1"
+    unsigned = APPGALLERY or os.environ.get("HARMONY_UNSIGNED") == "1"
     if signing_profile and not unsigned and not EXPERIMENTAL and not profile.is_file():
         raise SystemExit(f"HarmonyOS signing profile not found: {profile}")
     if EXPERIMENTAL or unsigned or not profile.is_file():

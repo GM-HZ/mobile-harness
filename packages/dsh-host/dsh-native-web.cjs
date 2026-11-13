@@ -5,13 +5,15 @@ const http = require('node:http');
 const { spawn } = require('node:child_process');
 const { EventEmitter } = require('node:events');
 const { constants } = require('node:os');
-const { Module, registerHooks } = require('node:module');
+const { Module, enableCompileCache, flushCompileCache, registerHooks } = require('node:module');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { performance } = require('node:perf_hooks');
 const started = performance.now();
 const safeMode = process.env.HARMONY_SAFE_MODE === '1';
 const root = process.env.HARMONY_NATIVE_WEB_ROOT;
+const appGalleryPatch = path.join(root, 'appgallery.patch.yml');
+const appGallery = fs.existsSync(appGalleryPatch);
 const dsh = path.join(root, 'dsh/node_modules');
 const cli = path.join(dsh, '@deepseek-ai/dsh/lib/bin.js');
 const home = path.join(root, 'native-benchmark-home');
@@ -37,11 +39,27 @@ function replacePinned(source, point, replacement) {
   if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
   return source.replace(point, replacement);
 }
+const editableStoreSettings = new Set([
+  'ui-settings-general', 'llm-pi-ai', 'llm-deepseek', 'agent-default-model',
+  'agent-preset-registry', 'subagent-model-selection-settings',
+]);
+function isPlainSetting(value) {
+  if (value === null || ['string', 'number', 'boolean'].includes(typeof value)) return true;
+  if (Array.isArray(value)) return value.every(isPlainSetting);
+  return typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype &&
+    Object.entries(value).every(([key, item]) =>
+      !['__jsExpr', '__proto__', 'constructor', 'prototype'].includes(key) && isPlainSetting(item));
+}
+globalThis.__harmonyStoreSettings = patches => patches
+  .filter(patch => editableStoreSettings.has(patch.id) && !patch.insert &&
+    Object.hasOwn(patch, 'config') && isPlainSetting(patch.config))
+  .map(({ id, config }) => ({ id, config }));
 function installProotSpawn(workspace) {
   const bridge = addon('libdshshell.so');
   const allowedRoot = fs.realpathSync(workspace);
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
   globalThis.__harmonyProotSpawn = (program, args, options) => {
+    if (appGallery && program !== ripgrep) throw new Error('Only bundled workspace search can start a subprocess');
     if (program !== 'bash' && program !== ripgrep) return spawn(program, args, options);
     if (options.stdio.join(',') !== 'ignore,pipe,pipe') throw new Error('Harmony tools require captured output');
     const cwd = fs.realpathSync(options.cwd);
@@ -155,12 +173,15 @@ async function publish(url) {
   fs.writeFileSync(launchFile + '.new', JSON.stringify({ url: base, cookie }), { mode: 0o600 });
   fs.renameSync(launchFile + '.new', launchFile);
   mark('loopback-ready', { exchange: 303, page: 200 });
+  setImmediate(() => flushCompileCache());
 }
 async function main() {
   fs.writeFileSync(timeline, '', { mode: 0o600 });
   mark('node-js', { platform: process.platform, node: process.version, safeMode });
   fs.mkdirSync(home, { recursive: true });
   fs.mkdirSync(workspace, { recursive: true });
+  const cache = enableCompileCache(path.join(root, 'tmp', 'node-compile-cache'));
+  mark('compile-cache', { status: cache.status });
   process.chdir(workspace);
   process.env.HOME = home;
   process.env.DSH_HOME = home;
@@ -188,7 +209,9 @@ async function main() {
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
   const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
   globalThis.__harmonySharp = createSharp(root, launchGuest);
-  globalThis.__harmonyPackageRunner = createPackageRunner(root, home, launchGuest);
+  globalThis.__harmonyPackageRunner = appGallery ? () => {
+    throw new Error('External packages are unavailable in this build');
+  } : createPackageRunner(root, home, launchGuest);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;
@@ -222,11 +245,17 @@ async function main() {
         loadCount++;
         loadMs += performance.now() - start;
       }
-      if (safeMode && url === appBootUrl) {
+      if ((safeMode || appGallery) && url === appBootUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
-        return { ...result, source: replacePinned(source,
+        let patched = replacePinned(source,
           '...loadOptionalPatches(binName, join(context.home, "cordis.patch.yml")) ?? [],',
-          '...[],') };
+          '...[],');
+        if (appGallery) {
+          patched = replacePinned(patched,
+            '...initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? [],',
+            '...globalThis.__harmonyStoreSettings(initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? []),');
+        }
+        return { ...result, source: patched };
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
           url !== attachmentUrl && url !== searchUrl && url !== packageUrl) return result;
@@ -281,11 +310,18 @@ async function main() {
   };
   const nativePatch = path.join(root, 'tmp/dsh-native.patch.yml');
   fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n', { mode: 0o600 });
-  const profileArgs = safeMode
-    ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
-    : ['--profile', 'web'];
+  const profile = appGallery
+    ? (safeMode ? 'mobile-appgallery-recovery' : 'mobile-appgallery')
+    : (safeMode ? 'mobile-recovery' : 'web');
+  const profileArgs = ['--profile', profile];
+  const profileManifest = path.join(home, 'profiles', profile, 'package.json');
+  // Explicit template initialization replaces the profile, including its saved settings.
+  if (profile !== 'web' && (!appGallery || !fs.existsSync(profileManifest))) {
+    profileArgs.push('--from-default-profile', 'web');
+  }
+  const distributionArgs = appGallery ? ['--patch', appGalleryPatch] : [];
   process.argv = ['node', cli, '--patch', path.join(root, 'dsh-client.patch.yml'), '--patch', nativePatch,
-    ...profileArgs, '--host', '127.0.0.1', '--port', '19592', '--no-open'];
+    ...distributionArgs, ...profileArgs, '--host', '127.0.0.1', '--port', '19592', '--no-open'];
   const { runCli } = await import(pathToFileURL(cli).href);
   mark('cli-imported');
   await runCli();

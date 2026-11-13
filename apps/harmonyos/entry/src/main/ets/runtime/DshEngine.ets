@@ -3,26 +3,29 @@ import { fileIo } from '@kit.CoreFileKit';
 import zlib from '@ohos.zlib';
 import { connection } from '@kit.NetworkKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { util } from '@kit.ArkTS';
 import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
+import { isAppGalleryBuild } from './PrivacyConsent';
 
 export interface BrowserSession {
   url: string;
   cookie?: string;
   safe?: boolean;
 }
-type EngineListener = (status: string, session?: BrowserSession) => void;
+type EngineListener = (status: string, session?: BrowserSession, failed?: boolean) => void;
 
 class DshEngine {
   private listeners: Set<EngineListener> = new Set<EngineListener>();
   private status: string = '正在准备本机 DSH…';
   private session?: BrowserSession;
+  private failed: boolean = false;
   private running: boolean = false;
   private nativePoll: number = -1;
 
   attach(context: common.UIAbilityContext, listener: EngineListener): () => void {
     this.listeners.add(listener);
-    listener(this.status, this.session);
+    listener(this.status, this.session, this.failed);
     if (!this.running) {
       this.running = true;
       this.start(context);
@@ -32,10 +35,11 @@ class DshEngine {
     return () => { this.listeners.delete(listener); };
   }
 
-  private publish(status: string, session?: BrowserSession): void {
+  private publish(status: string, session?: BrowserSession, failed: boolean = false): void {
     this.status = status;
     this.session = session;
-    this.listeners.forEach(listener => listener(status, session));
+    this.failed = failed;
+    this.listeners.forEach(listener => listener(status, session, failed));
   }
 
   private writeMode(path: string, mode: string): void {
@@ -90,7 +94,7 @@ class DshEngine {
         }
       } catch (e) {
         clearInterval(poll);
-        this.publish('本机 DSH 页面初始化失败。');
+        this.publish('本机 DSH 页面初始化失败。', undefined, true);
         hilog.error(0xD005, 'DSHClient', 'browser session setup failed');
       }
     }, 300);
@@ -111,13 +115,9 @@ class DshEngine {
     const launchFile = root + '/tmp/dsh-client-native-launch';
     if (fileIo.accessSync(launchFile)) fileIo.unlinkSync(launchFile);
     if (fileIo.accessSync(root + '/tmp/dsh-native-timeline.log')) fileIo.unlinkSync(root + '/tmp/dsh-native-timeline.log');
-    this.copyGuest(context, 'dsh-native-web.cjs', root + '/dsh-native-web.cjs');
-    this.copyGuest(context, 'dsh-harmony-sharp.cjs', root + '/dsh-harmony-sharp.cjs');
-    this.copyGuest(context, 'dsh-harmony-package.cjs', root + '/dsh-harmony-package.cjs');
-    this.copyGuest(context, 'dsh-harmony-pnpm-fetch.cjs', root + '/dsh-harmony-pnpm-fetch.cjs');
     const recovery = new BootRecovery(context.filesDir);
     recovery.write(mode, true);
-    this.publish(mode === 'safe' ? '正在启动安全模式…' : '正在启动本机 DeepSeek Harness…');
+    this.publish(mode === 'safe' ? '正在初始化安全模式…' : '正在初始化插件…');
     hilog.info(0xD005, 'DSHClient', 'starting native Web ms=%{public}d', Date.now() - started);
     if (poc.usesHostProcess()) {
       hilog.info(0xD005, 'DSHClient', 'system child-process support native=%{public}s ark=%{public}s',
@@ -130,7 +130,7 @@ class DshEngine {
         const status = poc.nativeStatus();
         if (status < 0 || (!ready && Date.now() - started > 60000)) {
           this.stopPolling();
-          this.publish('本机 DSH 未运行。可在恢复选项中选择安全模式。');
+          this.publish('本机 DSH 未运行。可在恢复选项中选择安全模式。', undefined, true);
           hilog.error(0xD005, 'DSHClient', 'native Host unavailable status=%{public}d', status);
         } else if (!ready && fileIo.accessSync(launchFile)) {
           const session = JSON.parse(fileIo.readTextSync(launchFile)) as BrowserSession;
@@ -146,7 +146,7 @@ class DshEngine {
         }
       } catch (e) {
         this.stopPolling();
-        this.publish('本机 DSH 页面初始化失败。可从恢复选项重试。');
+        this.publish('本机 DSH 页面初始化失败。可从恢复选项重试。', undefined, true);
         hilog.error(0xD005, 'DSHClient', 'native launch descriptor invalid');
       }
     }, 200);
@@ -185,9 +185,10 @@ class DshEngine {
     const modeFile = context.filesDir + '/proot-seccomp-0.4.4';
     let nativeStarted = false;
     try {
+      const appGallery = isAppGalleryBuild(context);
       const state = new BootRecovery(context.filesDir).read();
       if (state.pending && state.mode === 'safe') {
-        this.publish('上次安全启动未完成。请选择恢复选项。');
+        this.publish('上次安全启动未完成。请选择恢复选项。', undefined, true);
         return;
       }
       const mode = state.pending ? 'safe' : state.mode;
@@ -195,30 +196,24 @@ class DshEngine {
         const path = root + '/' + name;
         if (!fileIo.accessSync(path)) fileIo.mkdirSync(path, true);
       }
-      this.copyGuest(context, 'alpine-busybox', root + '/bin/busybox');
-      this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
-      this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
-      this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
+      let refreshRuntimeFiles = false;
       for (const archive of ['node-layer.zip', 'dsh-layer.zip', 'shell-tools-layer.zip', 'pnpm-layer-v2.zip']) {
         const phase = Date.now();
         const extracted = await this.unpack(context, archive, root);
+        refreshRuntimeFiles ||= extracted;
         hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
           archive, String(extracted), Date.now() - phase);
       }
-      const settingsClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
-      this.copyGuest(context, 'dsh-settings-client.js', settingsClient + '.tmp');
-      fileIo.renameSync(settingsClient + '.tmp', settingsClient);
-      for (const name of ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
-        'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {
-        this.copyGuest(context, name, root + '/' + name);
-      }
-      if (mode === 'safe' || !fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
+      this.prepareRuntimeFiles(context, root, appGallery, refreshRuntimeFiles);
+      if (appGallery || mode === 'safe' || !fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
         await this.prepareResolver(root);
         this.runNative(context, root, started, mode);
         nativeStarted = true;
         return;
       }
-      this.copyGuest(context, 'dsh-startup-sources.gz', root + '/dsh-startup-sources.gz');
+      if (!fileIo.accessSync(root + '/dsh-startup-sources.gz')) {
+        this.copyGuest(context, 'dsh-startup-sources.gz', root + '/dsh-startup-sources.gz');
+      }
       await this.prepareResolver(root);
       const fast = await this.acceleration(context, modeFile);
       const ready = await this.run(context, launchFile, fast, started);
@@ -227,13 +222,65 @@ class DshEngine {
         this.writeMode(modeFile, 'compat');
         await this.run(context, launchFile, false, started);
       }
-      this.publish('本机 DSH 服务已退出。重新打开可重试。');
+      this.publish('本机 DSH 服务已退出。重新打开可重试。', undefined, true);
     } catch (e) {
-      this.publish('本机 DSH 准备失败。重新打开可重试。');
+      this.publish('本机 DSH 准备失败。重新打开可重试。', undefined, true);
       hilog.error(0xD005, 'DSHClient', 'setup error %{public}s', String(e));
     } finally {
       if (!nativeStarted) this.running = false;
     }
+  }
+
+  private prepareRuntimeFiles(context: common.UIAbilityContext, root: string,
+    appGallery: boolean, refresh: boolean): void {
+    const revision = util.TextDecoder.create('utf-8').decodeToString(
+      context.resourceManager.getRawFileContentSync('runtime-revision'));
+    const marker = root + '/.runtime-revision';
+    const settingsClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
+    const chatClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-chat/lib/client.js';
+    const modelsClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-models/lib/client.js';
+    const names = ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
+      'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs', 'dsh-native-web.cjs', 'dsh-harmony-sharp.cjs',
+      'dsh-harmony-package.cjs', 'dsh-harmony-pnpm-fetch.cjs'];
+    const presets = ['cordis', 'minimal', 'ptc', 'standard'];
+    const presetDir = root + '/dsh/node_modules/@deepseek-ai/dsh-web-app/presets/';
+    if (appGallery) names.push('appgallery.patch.yml');
+    const required = [settingsClient, root + '/bin/busybox', root + '/bin/sh',
+      root + '/lib/ld-musl-aarch64.so.1', root + '/etc/alpine-release', ...names.map(name => root + '/' + name)];
+    if (appGallery) {
+      required.push(chatClient, modelsClient, ...presets.map(name => presetDir + name + '.patch.yml'));
+    }
+    if (!refresh && fileIo.accessSync(marker) && fileIo.readTextSync(marker) === revision &&
+        required.every(path => fileIo.accessSync(path))) {
+      hilog.info(0xD005, 'DSHClient', 'runtime files reused');
+      return;
+    }
+    if (fileIo.accessSync(marker)) fileIo.unlinkSync(marker);
+    if (!appGallery && fileIo.accessSync(root + '/appgallery.patch.yml')) {
+      fileIo.unlinkSync(root + '/appgallery.patch.yml');
+    }
+    if (fileIo.accessSync(root + '/dsh-startup-sources.gz')) fileIo.unlinkSync(root + '/dsh-startup-sources.gz');
+    this.copyGuest(context, 'alpine-busybox', root + '/bin/busybox');
+    this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
+    this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
+    this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
+    this.copyGuest(context, 'dsh-settings-client.js', settingsClient + '.tmp');
+    fileIo.renameSync(settingsClient + '.tmp', settingsClient);
+    for (const name of names) this.copyGuest(context, name, root + '/' + name);
+    if (appGallery) {
+      this.copyGuest(context, 'appgallery-chat-client.js', chatClient + '.tmp');
+      fileIo.renameSync(chatClient + '.tmp', chatClient);
+      this.copyGuest(context, 'appgallery-models-client.js', modelsClient + '.tmp');
+      fileIo.renameSync(modelsClient + '.tmp', modelsClient);
+      for (const name of presets) {
+        const target = presetDir + name + '.patch.yml';
+        this.copyGuest(context, 'appgallery-preset-' + name + '.yml', target + '.tmp');
+        fileIo.renameSync(target + '.tmp', target);
+      }
+    }
+    this.copyGuest(context, 'runtime-revision', marker + '.tmp');
+    fileIo.renameSync(marker + '.tmp', marker);
+    hilog.info(0xD005, 'DSHClient', 'runtime files refreshed');
   }
 
   private async prepareResolver(root: string): Promise<void> {
@@ -259,8 +306,10 @@ class DshEngine {
 
   private async unpack(context: common.UIAbilityContext, name: string, root: string): Promise<boolean> {
     const archive = context.filesDir + '/' + name;
-    const marker = root + '/.validated-unpack-v2-' + name;
-    if (fileIo.accessSync(marker)) return false;
+    const checksum = util.TextDecoder.create('utf-8').decodeToString(
+      context.resourceManager.getRawFileContentSync(name + '.sha256'));
+    const marker = root + '/.validated-unpack-v3-' + name;
+    if (fileIo.accessSync(marker) && fileIo.readTextSync(marker) === checksum) return false;
     const raw = context.resourceManager.getRawFdSync(name);
     const output = fileIo.openSync(archive,
       fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
@@ -282,7 +331,8 @@ class DshEngine {
     }
     try {
       await zlib.decompressFile(archive, root);
-      fileIo.closeSync(fileIo.openSync(marker, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY).fd);
+      this.copyGuest(context, name + '.sha256', marker + '.tmp');
+      fileIo.renameSync(marker + '.tmp', marker);
       hilog.info(0xD005, 'HarmonyPRoot', 'unpacked %{public}s', name);
       return true;
     } finally { fileIo.unlinkSync(archive); }
@@ -290,7 +340,10 @@ class DshEngine {
   private copyGuest(context: common.UIAbilityContext, asset: string, path: string): void {
     const bytes = context.resourceManager.getRawFileContentSync(asset);
     const file = fileIo.openSync(path, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
-    try { fileIo.writeSync(file.fd, bytes.buffer); }
+    try {
+      const data = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      if (fileIo.writeSync(file.fd, data) !== bytes.byteLength) throw new Error('Incomplete write ' + asset);
+    }
     finally { fileIo.closeSync(file.fd); }
   }
 }

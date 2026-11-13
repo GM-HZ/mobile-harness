@@ -12,6 +12,9 @@
     "buildModeSet": [
       {
         "name": "debug"
+      },
+      {
+        "name": "release"
       }
     ]
   },

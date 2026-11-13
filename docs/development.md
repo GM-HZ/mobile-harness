@@ -44,6 +44,16 @@ gh release create "v$version" --target "$(git rev-parse HEAD)" \
   .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v"$version"-unsigned.hap{,.sha256}
 ```
 
+## AppGallery 候选包
+
+```sh
+HARMONY_APPGALLERY_BUNDLE=<开发者中心登记包名> ./build.sh --appgallery
+```
+
+此命令在 `.build/stage/harmonyos-appgallery/` 生成独立的 DevEco 工程，在 `.build/artifacts/harmonyos-appgallery/` 输出 Release 模式的未签名 `.app` 和校验文件。用 DevEco Studio 26 打开该暂存工程，通过「构建 → 上传产品」选择对应的 HarmonyOS 应用并使用开发者中心云管理证书签名。随包 HAP 可在 Phone 模拟器验证。 [华为发布说明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-publish-app/)
+
+应用市场版本在用户同意隐私提示后启动本机 Host。该版本使用独立的 DSH profile，限制外部插件安装、远程接入和通用子进程执行，保留本机工作区、会话及随包搜索能力。提交审核前按实际分发方式核对应用主体、备案及 AI 资质，使用同一个隐私政策版本生成应用内说明和公开链接，并为随包工具补齐对应源码和许可证。
+
 ## Phone 模拟器回归
 
 显式选定回环 HDC 目标，安装并启动待测 HAP。故障夹具会在独立 Phone 模拟器上安装一个测试 DSH bundle，主动让 Host 进程崩溃并恢复正常 profile。测试使用模拟器测试数据。
