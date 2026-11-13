@@ -151,7 +151,10 @@ def stage_runtime_revision():
     digest.update(pinned)
     pinned_names = {PurePosixPath(line.split(maxsplit=1)[1]).name for line in pinned.decode().splitlines()}
     for asset in sorted(RAW.iterdir()):
-        if asset.is_file() and asset.name not in pinned_names and asset.name not in ("runtime-revision", "appgallery-privacy-url") and not asset.name.endswith(".zip.sha256"):
+        if (asset.is_file() and asset.name not in pinned_names
+                and asset.name not in ("runtime-revision", "appgallery-privacy-url")
+                and not asset.name.startswith(("LICENSE.", "NOTICE."))
+                and not asset.name.endswith(".zip.sha256")):
             digest.update(f"{asset.name} {sha256(asset)}\n".encode())
     (RAW / "runtime-revision").write_text(digest.hexdigest(), encoding="utf-8")
     for line in pinned.decode().splitlines():
@@ -159,6 +162,23 @@ def stage_runtime_revision():
         asset = PurePosixPath(filename)
         if asset.parent.name == "rawfile" and asset.suffix == ".zip":
             (RAW / f"{asset.name}.sha256").write_text(checksum, encoding="utf-8")
+
+
+def stage_appgallery_notices():
+    base = "dsh/node_modules"
+    licenses = {
+        "sharp": "@img/sharp-linuxmusl-arm64/LICENSE",
+        "ripgrep": "@vscode/ripgrep-linux-arm64/LICENSE",
+        "koffi": "koffi/LICENSE.txt",
+        "dsh-system": "@deepseek-ai/node-addon-system-linux-arm64/LICENSE",
+        "require-builtin": "node-addon-require-builtin-linux-arm64-musl/LICENSE",
+    }
+    with ZipFile(RAW / "dsh-layer.zip") as layer:
+        for name, member in licenses.items():
+            (RAW / f"LICENSE.{name}.txt").write_bytes(layer.read(f"{base}/{member}"))
+    with ZipFile(RAW / "pnpm-layer-v2.zip") as layer:
+        (RAW / "LICENSE.pnpm.txt").write_bytes(layer.read("pnpm-harmony-v2/LICENSE"))
+    copy(RUNTIME / "notices/sharp-libvips-1.3.4.md", RAW / "NOTICE.libvips.md")
 
 
 def stage_appgallery_privacy():
@@ -227,6 +247,7 @@ def main():
         stage_appgallery_presets()
         stage_appgallery_chat()
         stage_appgallery_models()
+        stage_appgallery_notices()
         for project, name in (("dsh", "LICENSE"), ("node", "LICENSE"), ("proot", "COPYING")):
             copy(ROOT / "vendor/repos" / project / name, RAW / f"LICENSE.{project}.txt")
     stage_runtime_revision()

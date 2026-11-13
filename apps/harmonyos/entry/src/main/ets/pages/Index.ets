@@ -1,11 +1,13 @@
 import { common } from '@kit.AbilityKit';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { util } from '@kit.ArkTS';
 import { BrowserSession, dshEngine } from '../runtime/DshEngine';
 import { getPrivacyPolicyUrl, hasPrivacyConsent, isAppGalleryBuild, savePrivacyConsent } from '../runtime/PrivacyConsent';
 
 const RECOVERY_URL = 'http://127.0.0.1:19592/.mobile-harness/recovery';
 const PRIVACY_URL = 'http://127.0.0.1:19592/.mobile-harness/privacy';
+const NOTICES_URL = 'http://127.0.0.1:19592/.mobile-harness/notices';
 
 @Entry
 @Component
@@ -15,6 +17,9 @@ struct Index {
   @State consentRequired: boolean = false;
   @State appGallery: boolean = false;
   @State privacyDetails: boolean = false;
+  @State noticesOpen: boolean = false;
+  @State noticeTitle: string = '';
+  @State noticeText: string = '';
   @State decliningPrivacy: boolean = false;
   @State consentError: string = '';
   @State privacyPolicyUrl: string = '';
@@ -133,6 +138,11 @@ struct Index {
   }
 
   onBackPress(): boolean {
+    if (this.noticesOpen) {
+      if (this.noticeTitle) this.noticeTitle = '';
+      else this.noticesOpen = false;
+      return true;
+    }
     if (this.privacyDetails) {
       this.privacyDetails = false;
       return true;
@@ -201,6 +211,46 @@ struct Index {
         }
       }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
     }.width('100%')
+  }
+
+  private selectNotice(title: string, filename: string): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    try {
+      this.noticeText = util.TextDecoder.create('utf-8')
+        .decodeToString(context.resourceManager.getRawFileContentSync(filename));
+    } catch (_) {
+      this.noticeText = '无法读取此声明。';
+    }
+    this.noticeTitle = title;
+  }
+
+  @Builder
+  private noticesPage() {
+    Scroll() {
+      Column({ space: 12 }) {
+        Button('返回').onClick(() => {
+          if (this.noticeTitle) this.noticeTitle = '';
+          else this.noticesOpen = false;
+        })
+        Text(this.noticeTitle || '开源软件声明').fontSize(24).fontWeight(FontWeight.Medium)
+        if (this.noticeTitle) {
+          Text(this.noticeText).fontSize(14).copyOption(CopyOptions.LocalDevice)
+        } else {
+          Button('DeepSeek Harness').onClick(() => this.selectNotice('DeepSeek Harness', 'LICENSE.dsh.txt'))
+          Button('dshm').onClick(() => this.selectNotice('dshm', 'LICENSE.dshm.txt'))
+          Button('Node.js').onClick(() => this.selectNotice('Node.js', 'LICENSE.node.txt'))
+          Button('PRoot').onClick(() => this.selectNotice('PRoot', 'LICENSE.proot.txt'))
+          Button('sharp').onClick(() => this.selectNotice('sharp', 'LICENSE.sharp.txt'))
+          Button('libvips').onClick(() => this.selectNotice('libvips', 'NOTICE.libvips.md'))
+          Button('ripgrep').onClick(() => this.selectNotice('ripgrep', 'LICENSE.ripgrep.txt'))
+          Button('Koffi').onClick(() => this.selectNotice('Koffi', 'LICENSE.koffi.txt'))
+          Button('DSH System').onClick(() => this.selectNotice('DSH System', 'LICENSE.dsh-system.txt'))
+          Button('Node.js require-builtin').onClick(() =>
+            this.selectNotice('Node.js require-builtin', 'LICENSE.require-builtin.txt'))
+          Button('pnpm').onClick(() => this.selectNotice('pnpm', 'LICENSE.pnpm.txt'))
+        }
+      }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
+    }.width('100%').layoutWeight(1)
   }
 
   @Builder
@@ -308,7 +358,7 @@ struct Index {
         Web({ src: this.launchUrl, controller: this.controller })
           .layoutWeight(1)
           .width('100%')
-          .visibility(this.loginVisible || this.recoveryOpen || this.privacyDetails || this.webFailed ? Visibility.None : Visibility.Visible)
+          .visibility(this.loginVisible || this.recoveryOpen || this.privacyDetails || this.noticesOpen || this.webFailed ? Visibility.None : Visibility.Visible)
           .javaScriptAccess(true)
           .domStorageAccess(true)
           .fileAccess(false)
@@ -326,6 +376,11 @@ struct Index {
               this.privacyDetails = true;
               return true;
             }
+            if (this.appGallery && url === NOTICES_URL) {
+              this.noticeTitle = '';
+              this.noticesOpen = true;
+              return true;
+            }
             return !url.startsWith('http://127.0.0.1:19592/') && url !== 'about:blank';
           })
           .onPageEnd(() => {
@@ -340,7 +395,7 @@ struct Index {
           })
           .onErrorReceive((event) => {
             if (event?.request.isMainFrame() && event.error.getErrorCode() !== -3 &&
-                ![RECOVERY_URL, PRIVACY_URL].includes(event.request.getRequestUrl())) {
+                ![RECOVERY_URL, PRIVACY_URL, NOTICES_URL].includes(event.request.getRequestUrl())) {
               this.webFailed = true;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb main error %{public}d', event.error.getErrorCode());
             }
@@ -356,6 +411,8 @@ struct Index {
           this.recoveryPage()
         } else if (this.privacyDetails) {
           this.privacyPage()
+        } else if (this.noticesOpen) {
+          this.noticesPage()
         } else if (this.loginVisible) {
           this.loginPage()
         }

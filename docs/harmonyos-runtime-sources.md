@@ -58,3 +58,5 @@
 本机归档 `dsh-mh-0.4.26-node-npm-provenance.tar.gz` 和相邻的 SHA-256 文件保存在 `.build/artifacts/harmonyos-appgallery/`。归档包含原生 Node 源码及历史构建脚本、Linux musl 原始构建归档、核验过的 npm 发布物、sharp 和 libvips 源码及构建记录。
 
 本机归档 `dsh-mh-0.4.26-libvips-build-inputs.tar.gz` 包含上述 33 个下载项、来源和摘要清单、构建脚本及第三方声明。归档已校验可读取。
+
+商店构建在「设置 → 通用 → 开源软件声明」展示 DSH、dshm、Node.js、PRoot、sharp、ripgrep、Koffi、DSH System、require-builtin、pnpm 的许可证，以及固定版本的 libvips 第三方声明。许可证直接从固定源码或发布层提取。libvips 声明来自 sharp-libvips v1.3.4 发布的构建提交。
