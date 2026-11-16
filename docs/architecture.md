@@ -21,6 +21,10 @@ HAP 内的鸿蒙 Node.js / DSH Host
 
 入口见 [ArkTS 启动与生命周期](../apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets)、[原生 Node／工具桥](../runtime/harmonyos/native/poc.c) 和 [DSH Web 装配](../packages/dsh-host/dsh-native-web.cjs)。[真机与模拟器实测边界](workspace-validation.md)
 
+### 工具和依赖管理
+
+鸿蒙的 Alpine 包、共享库、项目依赖和 DSH 插件分别由其运行环境管理。见[鸿蒙工具与依赖管理](harmonyos-package-management.md)。
+
 ## 跨设备设计方向
 
 | 层 | 规划职责 |
