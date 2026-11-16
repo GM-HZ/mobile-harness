@@ -1,10 +1,12 @@
 import filecmp
 import hashlib
+import json
 import os
 from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
 from zipfile import ZipFile
+from urllib.parse import quote
 
 from harmonyos_dsh import stage_dsh
 from harmonyos_guest_extras import stage_guest_extras
@@ -75,6 +77,17 @@ def stage_settings_client():
     injection = "\n" + row + "\n" + entry + "\n\t\t\tregisterMobileHarnessRecovery(ctx);"
     (RAW / "dsh-settings-client.js").write_text(source.replace(entry, injection, 1), encoding="utf-8")
 
+def stage_workflow_worker():
+    source = ROOT / "vendor/repos/dsh/packages/workflow/workflow-ptc/src/guest-source.ts"
+    declaration = "export const WORKFLOW_GUEST_SOURCE = "
+    _, exported = source.read_text().split(declaration)
+    guest_url = "data:text/javascript," + quote(json.loads(exported), safe="")
+    worker = RAW / "dsh-harmony-workflow-worker.cjs"
+    contents = worker.read_text()
+    if contents.count("PACKAGED_WORKFLOW_GUEST_URL") != 1:
+        raise SystemExit("Unexpected Workflow worker template")
+    worker.write_text(contents.replace("PACKAGED_WORKFLOW_GUEST_URL", json.dumps(guest_url)), encoding="utf-8")
+
 
 def main():
     inputs = Path(os.environ.get("HARMONY_INPUTS_DIR") or ROOT / ".build/inputs/harmonyos").resolve()
@@ -88,7 +101,8 @@ def main():
     dshm = ROOT / "vendor/repos/dshm"
     copy(dshm / "hostcore/app/fetch-shim.js", RAW / "fetch-shim.cjs")
     copy(dshm / "LICENSE", RAW / "LICENSE.dshm.txt")
-    for name in ("poc.c", "nativehost.c", "guest-tools.inc"):
+    stage_workflow_worker()
+    for name in ("poc.c", "nativehost.c", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h"):
         copy(RUNTIME / "native" / name, CPP / name)
     if EXPERIMENTAL:
         app_config = STAGE / "AppScope/app.json5"

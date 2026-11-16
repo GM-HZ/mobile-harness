@@ -38,6 +38,19 @@ function replacePinned(source, point, replacement) {
   if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
   return source.replace(point, replacement);
 }
+function patchWorkflow(source) {
+  const start = '\t\t\tif (this.runtime.sandboxMode === void 0 && this.policy.mode';
+  const end = '\t\t\tthis.terminal = true;';
+  const index = source.indexOf(start);
+  const stop = source.indexOf(end, index);
+  if (index < 0 || stop < 0 || source.indexOf(start, index + 1) !== -1 ||
+      !source.slice(index, stop).includes('const outcome = await this.runtime.run(this.runtime.resolve({')) {
+    throw new Error('Unexpected pinned workflow-ptc execution entry');
+  }
+  return source.slice(0, index) +
+    '\t\t\tconst outcome = await globalThis.__harmonyWorkflowRun(this.bindings(), this.controller.signal);\n' +
+    source.slice(stop);
+}
 function quoteShellArgument(value) {
   if (typeof value !== 'string' || value.includes('\0')) throw new TypeError('Invalid command argument');
   return "'" + value.replaceAll("'", "'\\''") + "'";
@@ -246,12 +259,16 @@ async function main() {
   const ripgrepUrl = paths('dsh-util-ripgrep/lib/index.js');
   const packageUrl = paths('dsh-plugin-manager/lib/index.js');
   const mcpClientUrl = paths('dsh-mcp-client/lib/index.js');
+  const workflowUrl = paths('dsh-workflow-ptc/lib/index.js');
   const mcpStdioUrl = pathToFileURL(path.join(dsh, '@modelcontextprotocol/client/dist/stdio.mjs')).href;
   const launchGuest = installProotSpawn(workspace);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
   const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
   globalThis.__harmonySharp = createSharp(root, launchGuest);
   globalThis.__harmonyPackageRunner = createPackageRunner(root, home, launchGuest);
+  globalThis.__harmonyWorkflowRun = safeMode
+    ? () => { throw new Error('Workflows are disabled while HarmonyOS recovery mode is active'); }
+    : require(path.join(root, 'dsh-harmony-workflow.cjs')).createWorkflowRunner(addon('libdshworkflow.so'), mark);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
   globalThis.__harmonyWebFlock = flock;
@@ -293,8 +310,9 @@ async function main() {
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
           url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl &&
-          url !== mcpClientUrl && url !== mcpStdioUrl) return result;
+          url !== mcpClientUrl && url !== mcpStdioUrl && url !== workflowUrl) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+      if (url === workflowUrl) return { ...result, source: patchWorkflow(source) };
       if (url === mcpClientUrl) {
         return { ...result, source: replacePinned(source, 'env: buildChildEnv(config.env),', 'env: config.env,') };
       }

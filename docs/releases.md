@@ -159,3 +159,9 @@ Phone 模拟器在预约任务到期前强停并重启应用，重开后从原�
 MCP 的本地命令通过现有签名 PRoot 执行桥启动。宿主为 MCP SDK 提供 stdin、stdout、stderr 和退出事件。配置的命令和参数按原值传递，工作目录可以使用 `/workspace-native` 或其子目录。子进程先清空宿主环境，再接收 MCP 项显式配置的变量。安全模式拒绝启动本地 MCP 服务。
 
 Phone 模拟器分别通过 `node` 和 `python3` 启动本地 MCP 测试服务。两套服务均完成初始化、工具发现、真实模型调用和响应回传。含引号的参数、含换行的环境变量和宿主凭据隔离由服务端断言。 [0.4.28 验收记录](evidence/emulator-mcp-stdio-0.4.28.json)
+
+## 0.4.29 鸿蒙 Workflow
+
+正式包启用 RC.3 Workflow。专用 Node worker 安装 seccomp 后接收脚本，由 DSH Host 负责子任务和进度。API 26 Phone 模拟器验证两个真实并行子任务、同步死循环超时、运行中取消、带活跃子任务取消和后台作业结果投递。五次 Workflow 均确认回收 worker。 [验收记录](evidence/emulator-workflow-0.4.29.json) · [实现与边界](research/harmonyos-workflow-sandbox.md)
+
+同一安装包回归了重启后的定时投递、Streamable HTTP MCP，以及 Node 和 Python 本地 stdio MCP。四条链路均获得真实模型结果。 [回归记录](evidence/emulator-workflow-0.4.29.json)

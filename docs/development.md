@@ -63,6 +63,15 @@ python3 tests/smoke/emulator-recovery.py <loopback-target> .build/emulator-recov
 python3 tests/smoke/emulator-mcp-stdio.py <loopback-target> .build/emulator-mcp-stdio.json
 ```
 
+## Workflow 模拟器回归
+
+0.4.29 或更新的正式 HAP 启动后，在独立模拟器用真实模型验证 Workflow。命令读取本机环境中的测试凭据，脚本在完成后移除临时设备配置。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-workflow.py <loopback-target> .build/emulator-workflow.json
+```
+
 ## Host 进程探针
 
 ```sh

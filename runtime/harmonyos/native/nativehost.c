@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "workflow-broker.h"
 #ifdef MOBILE_HARNESS_EXPERIMENTAL_FORK
 #include <errno.h>
 #include <signal.h>
@@ -21,13 +22,25 @@ static bool safe_mode = false;
 typedef int (*NodeStart)(int, char **);
 
 static int RunHost(void) {
+    char workflow_entry[1024];
+    snprintf(workflow_entry, sizeof(workflow_entry), "%s/dsh-harmony-workflow-worker.cjs", directory);
+    if (!safe_mode) {
+        int broker_error = harmony_workflow_broker_start(workflow_entry);
+        if (broker_error) {
+            fprintf(stderr, "Workflow broker unavailable (%d)\n", broker_error);
+        }
+    }
     void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
     NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;
-    if (!start) return -2;
+    if (!start) {
+        harmony_workflow_broker_close();
+        return -2;
+    }
     char *argv[] = {"node", "--jitless", "--expose-internals", entry, NULL};
     setenv("HARMONY_NATIVE_WEB_ROOT", directory, 1);
     setenv("HARMONY_SAFE_MODE", safe_mode ? "1" : "0", 1);
     int code = start(4, argv);
+    harmony_workflow_broker_close();
     return code == 0 ? -3 : -4;
 }
 

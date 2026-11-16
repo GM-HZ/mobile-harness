@@ -116,6 +116,9 @@ class DshEngine {
     this.copyGuest(context, 'dsh-harmony-sharp.cjs', root + '/dsh-harmony-sharp.cjs');
     this.copyGuest(context, 'dsh-harmony-package.cjs', root + '/dsh-harmony-package.cjs');
     this.copyGuest(context, 'dsh-harmony-pnpm-fetch.cjs', root + '/dsh-harmony-pnpm-fetch.cjs');
+    this.copyGuest(context, 'dsh-harmony-workflow.cjs', root + '/dsh-harmony-workflow.cjs');
+    this.copyGuest(context, 'dsh-harmony-workflow-wire.cjs', root + '/dsh-harmony-workflow-wire.cjs');
+    this.copyGuest(context, 'dsh-harmony-workflow-worker.cjs', root + '/dsh-harmony-workflow-worker.cjs');
     const recovery = new BootRecovery(context.filesDir);
     recovery.write(mode, true);
     this.publish(mode === 'safe' ? '正在启动安全模式…' : '正在启动本机 DeepSeek Harness…');

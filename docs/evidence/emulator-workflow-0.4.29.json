@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.29",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "unsignedHapSha256": "de631a1c1bb6b9d06c18a46900d6ce8e98f8130d80218047d92f7b18f9cf6fcf",
+  "unsignedHapBytes": 639352498,
+  "buildExitCode": 0,
+  "installAndStartExitCode": 0,
+  "workflowSmokeExitCode": 0,
+  "startupMs": 9309,
+  "anonymousHttpStatus": 401,
+  "foreground": {
+    "actualSubagentsStarted": 2,
+    "completed": true,
+    "parallel": true,
+    "bothResultsReturned": true
+  },
+  "timeout": {
+    "budgetMs": 5000,
+    "elapsedFromSliceStartToWorkerReapedMs": 5032,
+    "errorReturnedToSession": true
+  },
+  "cancelledDuringSyncSlice": true,
+  "cancelledWithActiveChild": true,
+  "backgroundJob": {
+    "started": true,
+    "completed": true,
+    "resultDelivered": true
+  },
+  "workers": {
+    "started": 5,
+    "reaped": 5
+  },
+  "temporaryModelCredentialRemoved": true,
+  "regression": {
+    "schedulePersistedAcrossHostRestart": true,
+    "scheduleReceivedRealModelReply": true,
+    "restartReadyMs": 6424,
+    "streamableHttpMcpToolResult": true,
+    "nodeStdioMcpToolResult": true,
+    "pythonStdioMcpToolResult": true,
+    "fixturesRemoved": true
+  },
+  "earlierBuilds": [
+    "The first async socket implementation stalled after the DSH Workflow run started.",
+    "With the pre-Node io_uring restriction and startup deadline added, the async implementation still timed out after the initial binding. The final build uses one synchronously polled worker channel and asynchronous host bindings."
+  ],
+  "scope": {
+    "mate60": "HDC offline",
+    "genericPtc": "unchanged",
+    "systemPty": "unchanged"
+  }
+}

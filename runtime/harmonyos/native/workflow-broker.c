@@ -3,6 +3,9 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/filter.h>
+#include <linux/seccomp.h>
+#include <stddef.h>
 #include <poll.h>
 #include <pthread.h>
 #include <signal.h>
@@ -28,6 +31,24 @@ static int follow_parent(pid_t expected)
     return prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) == 0 && getppid() == expected;
 }
 
+// libuv may initialize an io_uring for epoll batching even when SQPOLL is disabled.
+// Force its ordinary epoll path before Node initializes a loop or creates threads.
+static int disable_io_uring(void)
+{
+    struct sock_filter rules[] = {
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, SYS_io_uring_setup, 0, 1),
+        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | ENOSYS),
+        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
+    };
+    const struct sock_fprog filter = {
+        .len = sizeof(rules) / sizeof(rules[0]),
+        .filter = rules,
+    };
+    return prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) ||
+        syscall(SYS_seccomp, SECCOMP_SET_MODE_FILTER, 0, &filter);
+}
+
 static void run_worker(const char *entry, int channel, pid_t parent)
 {
     if (!follow_parent(parent) ||
@@ -35,7 +56,7 @@ static void run_worker(const char *entry, int channel, pid_t parent)
         dup2(channel, STDOUT_FILENO) < 0 ||
         dup2(channel, STDERR_FILENO) < 0 ||
         syscall(SYS_close_range, 3u, ~0u, 0u) < 0 ||
-        clearenv() != 0) _exit(125);
+        clearenv() != 0 || disable_io_uring() != 0) _exit(125);
     void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
     typedef int (*NodeStart)(int, char **);
     NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;

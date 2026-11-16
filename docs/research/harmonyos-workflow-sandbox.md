@@ -13,7 +13,13 @@
 
 上游 Node PTC 会在调度前擦除 TypeScript，即使 Workflow 自带的包装器已经是 JavaScript。Workflow guest 使用 `node:vm` 提供脚本 API，隔离依赖调用侧的进程和系统权限。Node 的 VM 超时依赖额外的 libuv 循环和线程，在该过滤策略下实测无法推进。探针改由父进程负责时限，正常脚本和无限循环分别用独立子进程验证。Mate 60 本轮 HDC 离线。[Node VM 文档](https://nodejs.org/api/vm.html) · [内核 seccomp 文档](https://docs.kernel.org/userspace-api/seccomp_filter.html)
 
-产品接入拟在 DSH Host 初始化 Node 前创建单线程进程管理器。每次从管理器启动空白 Node 实例，让 Host 接收专用控制套接字。需要沿用 RC.3 的 Workflow 回调及子任务所有权，将进度、取消和回收接到实际调度。探针的执行预算覆盖整个固定脚本。产品需区分 VM 的同步执行预算与异步等待子任务的时间，安装限制失败时拒绝执行。通用 PTC 的工作区文件授权需要另行验证，因为按系统调用和文件描述符过滤无法表达工作区路径规则。
+## 0.4.29 正式包接入
+
+DSH Host 在加载 Node 之前启动单线程进程管理器，按次启动 Workflow worker。已锁定的 RC.3 Workflow 模块仍负责验证脚本、分派实际子任务、记录进度和处理取消。鸿蒙适配只替换运行 Workflow guest 的部分。正式包沿用原有的通用 PTC 路径。
+
+Worker 在加载受信任模块后安装 seccomp，随后通过一个 Unix 套接字交换 Workflow 回调。常规 libuv 套接字方案在首个 Host 回调后停滞，最终 worker 采用同步套接字轮询，宿主异步处理子任务，worker 在收到回调后继续推进 Node 的 Promise 队列。此路径依赖已锁定 Node 的 `process._tickCallback`，升级 Node 需要重跑完整 Workflow 验收。
+
+同步 VM 切片的时限由宿主计时，开始等待子任务时解除这个计时器。用户取消或同步超时由进程管理器结束 worker 并确认回收。限制安装失败时不会向 worker 传送脚本或会话数据。安全模式关闭 Workflow worker。通用 PTC 的工作区文件授权仍需独立实现。 [正式包验收记录](../evidence/emulator-workflow-0.4.29.json)
 
 ## 复现
 

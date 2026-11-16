@@ -7,3 +7,6 @@ node_source=${HARMONY_NODE_SOURCE:-"$project/vendor/repos/node"}
 "$sdk/llvm/bin/clang" --target=aarch64-linux-ohos --sysroot="$sdk/sysroot" \
   -shared -fPIC -O2 -DNAPI_VERSION=8 -I "$node_source/src" "$project/runtime/harmonyos/native/dsh-shell.c" \
   -L "$stage/entry/libs/arm64-v8a" -lnode -Wl,-z,defs -o "$stage/entry/libs/arm64-v8a/libdshshell.so"
+"$sdk/llvm/bin/clang" --target=aarch64-linux-ohos --sysroot="$sdk/sysroot" \
+  -shared -fPIC -O2 -DNAPI_VERSION=8 -I "$node_source/src" "$project/runtime/harmonyos/native/dsh-workflow.c" \
+  -L "$stage/entry/libs/arm64-v8a" -lnode -ldl -Wl,-z,defs -o "$stage/entry/libs/arm64-v8a/libdshworkflow.so"
