@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "dshVersion": "0.2.2-rc.3",
+  "appVersion": "0.4.27",
+  "unsignedHapSha256": "7a849efd0731448ff1b93b30c106e76819ab65e94d9158f35dbed0a9c9920e9e",
+  "test": "tests/smoke/emulator-dsh-capabilities.py",
+  "schedule": {
+    "restartReadyMs": 5026,
+    "persistedAcrossHostRestart": true,
+    "receiptPresent": true,
+    "eventsWithMarker": [
+      "agent/inbox/spliced",
+      "user/message",
+      "assistant/message"
+    ],
+    "modelReply": true,
+    "fixtureRemoved": true
+  },
+  "mcpHttp": {
+    "probe": {
+      "ok": true,
+      "serverInfo": {
+        "name": "mh-probe",
+        "version": "1.0"
+      },
+      "toolNames": [
+        "fixture_echo"
+      ],
+      "truncated": false,
+      "durationMs": 42,
+      "closeConfirmed": true
+    },
+    "toolResultReturnedToSession": true,
+    "fixtureRemoved": true,
+    "observedMethods": [
+      "server/discover",
+      "initialize",
+      "notifications/initialized",
+      "tools/list",
+      "server/discover",
+      "initialize",
+      "notifications/initialized",
+      "tools/list",
+      "tools/call"
+    ]
+  },
+  "localStdioLaunchProbe": {
+    "ok": false,
+    "stage": "connect",
+    "message": "mcp-client(mh-regression-stdio): connect: Error: spawn /bin/node ENOENT",
+    "durationMs": 24,
+    "closeConfirmed": true
+  },
+  "scope": {
+    "schedule": "one-shot schedule created before force-stop, delivered after the Host restarted before its due time",
+    "mcp": "loopback Streamable HTTP fixture over temporary HDC reverse mapping; actual model listed and called the fixture tool",
+    "localStdio": "direct /bin/node --version launch from mcpManager/probe; launch failed before protocol initialization"
+  }
+}

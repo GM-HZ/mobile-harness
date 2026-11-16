@@ -147,3 +147,9 @@ PRoot 在 Sharp 的库搜索路径绑定 HAP 内的签名 libvips，解决 Mate 
 鸿蒙工具层增加 curl、sqlite3、tzdata 和常用 BusyBox 命令入口。Node CLI 复用现有 fetch 兼容层，CPython 通过普通 fork 启动子进程，并提供 `python3 -m pip` 的工作区安装方式。普通 Bash 继续执行默认沙箱检查和单次审批。
 
 API 26 Phone 模拟器通过 RC.1 到 RC.3 的覆盖启动、旧会话回读、文件工具、图片附件、子代理、后台作业和插件故障恢复。两个工作区用标准 pip 命令安装并导入不同版本的离线纯 Python wheel。公网 PyPI 安装超时。标准 `venv` 仍因符号链接权限失败。`workflow` 实测在 JITless Host 的 TypeScript 转换步骤失败。系统 PTY、Phone Use 以及这版的 Mate 60 回归待验。 [包管理约定](harmonyos-package-management.md) · [验收记录](evidence/emulator-dsh-rc3-0.4.27.json)
+
+### 0.4.27 调度器与 MCP 补验
+
+Phone 模拟器在预约任务到期前强停并重启应用，重开后从原任务记录按时投递，目标会话收到真实模型回复。Streamable HTTP MCP 通过实际模型调用测试工具，结果回到 DSH 会话。测试用的调度项、MCP 配置和临时凭据均已清理。
+
+同一版本的本地 MCP stdio 探针由宿主直接启动 `/bin/node`，在协议初始化前返回 `ENOENT`。现有 CLI 的 Node 由 PRoot 映射，本地 stdio 仍需接入可双向传输的子进程后端。定时任务跨强停重开后的投递已经验证，应用停止期间的系统唤醒和后台 Bash 作业跨进程续跑需要独立验收。 [调度器及 MCP 证据](evidence/emulator-dsh-capabilities-0.4.27.json)

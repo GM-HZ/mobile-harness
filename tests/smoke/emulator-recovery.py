@@ -65,7 +65,7 @@ class Emulator:
             result = json.load(response)["result"]
         if not result["ok"]:
             raise RuntimeError(f"{method}: {result['error']['code']}")
-        return result["value"]
+        return result.get("value")
 
     def web_status(self, authenticated):
         headers = {"Host": HOST_HEADER}
