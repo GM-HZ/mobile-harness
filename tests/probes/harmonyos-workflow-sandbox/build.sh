@@ -45,7 +45,9 @@ cat > "$stage/entry/src/main/cpp/types/libworkflowprobe/oh-package.json5" <<'PAC
 PACKAGE
 python3 - "$stage" "$probe" "$root" <<'PY'
 import json
+import os
 from pathlib import Path
+import shutil
 import sys
 from urllib.parse import quote
 
@@ -58,7 +60,17 @@ workflow = root / 'vendor/repos/dsh/packages/workflow/workflow-ptc/src'
 guest = (workflow / 'guest-source.ts').read_text().split('export const WORKFLOW_GUEST_SOURCE = ', 1)[1]
 guest_url = 'data:text/javascript,' + quote(json.loads(guest), safe='')
 worker = (probe / 'workflow-worker.cjs').read_text().replace('PACKAGED_WORKFLOW_GUEST_URL', json.dumps(guest_url), 1)
-(stage / 'entry/src/main/resources/rawfile/workflow-worker.cjs').write_text(worker)
+raw = stage / 'entry/src/main/resources/rawfile'
+amaro_dir = os.environ.get('HARMONY_AMARO_PROBE_DIR')
+amaro_files = ['amaro.cjs', 'instantiate.cjs', 'reference.json', 'verify.cjs']
+for name in amaro_files:
+    destination = raw / name
+    destination.unlink(missing_ok=True)
+    if amaro_dir:
+        source = probe.parent / 'harmonyos-ptc' if name == 'verify.cjs' else Path(amaro_dir)
+        shutil.copyfile(source / name, destination)
+(raw / 'amaro-probe-enabled').write_text('1' if amaro_dir else '0')
+(raw / 'workflow-worker.cjs').write_text(worker.replace('PACKAGED_AMARO_PROBE_ENABLED', str(bool(amaro_dir)).lower(), 1))
 PY
 install -m 600 "$stage/build-profile.example.json5" "$stage/build-profile.json5"
 

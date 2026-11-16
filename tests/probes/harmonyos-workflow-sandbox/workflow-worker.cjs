@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const { stripTypeScriptTypes } = require('node:module');
 const { constants } = require('node:os');
+const { performance } = require('node:perf_hooks');
 const vm = require('node:vm');
 const addon = { exports: {} };
 process.dlopen(addon, 'libworkflownode.so');
@@ -13,6 +14,13 @@ async function run() {
   const program = `const { runWorkflowGuest } = await import(${JSON.stringify(guestUrl)}); return await runWorkflowGuest(workflowHost);`;
   assert.throws(() => stripTypeScriptTypes(`async function probe() { ${program} }`),
     { code: 'ERR_WEBASSEMBLY_NOT_SUPPORTED' });
+  const start = performance.now();
+  const amaro = PACKAGED_AMARO_PROBE_ENABLED ? {
+    compile: require('./amaro.cjs').transformSync,
+    baseline: require('./reference.json'),
+    verify: require('./verify.cjs').verify,
+  } : undefined;
+  const compilerLoadMs = Math.round(performance.now() - start);
   const inherited = fs.openSync(__filename, 'r');
   assert.equal(addon.exports.socketErrno(), 0);
   const errno = addon.exports.confine();
@@ -22,6 +30,15 @@ async function run() {
   assert.throws(() => fs.readSync(inherited, Buffer.alloc(1)), { code: 'EPERM' });
   assert.throws(() => fs.writeSync(2, 'denied'), { code: 'EPERM' });
   assert.equal(addon.exports.socketErrno(), constants.errno.EPERM);
+  const typescript = amaro && {
+    ...amaro.verify(amaro.compile, amaro.baseline), loadMs: compilerLoadMs,
+  };
+  if (amaro) {
+    const program = 'async function __dsh_program__() {\nconst value: number = await Promise.resolve(6); return value * 7;\n}';
+    const { code } = amaro.compile(program, { mode: 'strip-only' });
+    typescript.typedResult = await new vm.Script(code + '\n__dsh_program__();').runInNewContext();
+    assert.equal(typescript.typedResult, 42);
+  }
 
   fs.writeSync(1, '+');
   const input = Buffer.alloc(512);
@@ -77,7 +94,7 @@ async function run() {
     node: process.version, platform: process.platform, pid: process.pid,
     nativeSeccomp: true, vmTimeoutDelegated: true, filesystemDenied: true,
     fdReadDenied: true, fdWriteDenied: true, socketDenied: true,
-    result, disposed,
+    result, disposed, typescript,
   }));
   addon.exports.finish();
 }

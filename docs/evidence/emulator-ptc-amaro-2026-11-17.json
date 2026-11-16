@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "bundle": "org.mobileharness.workflowsandbox",
+  "appBaseline": "c8ca6a934f5a644b6ccc4feb418ef7956b963b85",
+  "dshVersion": "0.2.2-rc.3",
+  "nodeVersion": "v24.14.1",
+  "nodeSourceCommit": "d89bb1b482fa09245c4f2cbb3b5b6a70bea6deaf",
+  "amaroVersion": "1.1.7",
+  "binaryenVersion": "132.0.0",
+  "buildExitCode": 0,
+  "installAndStartExitCode": 0,
+  "hilogTimestamp": "11-17 01:15:35.416",
+  "unsignedHapSha256": "c501808c1ba1d4ef2e71b9bdcb6803176dfd7c3f37c55eb9158326bcc5f48fad",
+  "unsignedHapBytes": 131924645,
+  "assetSha256": {
+    "amaro.cjs": "efc9e1155df1dacbf1d0605e78140f09d7016e58dba227006e3d362310d3f839",
+    "instantiate.cjs": "cdcdd45f429279c4d966c2d2a6333c4ee06271065fff4f762a041e153be999a3",
+    "reference.json": "1100cba86dd47a38325a4d6f4bdeeb6e04c2c94eabec6ed866460fe0bfd269ff"
+  },
+  "typescript": {
+    "matchingCases": 80,
+    "stripped": 69,
+    "matchedRejections": 11,
+    "wasmAvailable": false,
+    "macJitlessComparisonMs": 182,
+    "emulatorAssetLoadMs": 302,
+    "emulatorComparisonMs": 219,
+    "typedProgramResultAfterSeccomp": 42
+  },
+  "isolatedWorker": {
+    "fileOpenDenied": true,
+    "extraDescriptorReadDenied": true,
+    "stderrWriteDenied": true,
+    "newSocketDenied": true,
+    "workflowFixtureResult": ["one", "two"],
+    "loopTerminationMs": 1520,
+    "bothWorkersReaped": true
+  },
+  "earlierFailures": {
+    "directWasm2js": "64-bit saturating float-to-int lowering invalidated the translated module",
+    "largeInputBeforeGlueFix": "the JS translation grew memory without detaching the old typed-array views"
+  },
+  "scope": {
+    "productionHap": "unchanged",
+    "genericPtcWorkspacePolicy": "not exercised",
+    "mate60": "HDC offline"
+  }
+}
