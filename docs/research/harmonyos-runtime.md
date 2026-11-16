@@ -11,7 +11,7 @@
 | PRoot 承载完整 Host | 早期版本可运行，但在所测 Mate 60 上启动超过三分钟。seccomp 跟踪加速在该次真机验证回退兼容路径。后续将 Host 改回原生运行，PRoot 按需承载工具 |
 | 原生 Host 与按需 PRoot | 0.4.24 真机覆盖安装后，强停重启到聊天页 10.4 秒。Bash 单次审批、管道、退出码、取消和后台作业已有真机证据 |
 | 系统 PTY | 所测普通 HAP 在真机及 Phone 模拟器分配系统 PTY 返回权限拒绝。HDC 调试会话属于另一执行身份。系统交互 PTY 延期 |
-| Workflow 进程限制 | Phone 模拟器支持在独立子进程启用 seccomp 过滤。RC.3 的 Workflow 包装器在 macOS Node `--jitless` 下可运行固定 JavaScript 试验。[结果与复现](harmonyos-workflow-sandbox.md) |
+| Workflow 进程限制 | Phone 模拟器的独立鸿蒙 Node 子进程在启用 seccomp 后运行 RC.3 Workflow，完成两个模拟子任务。父进程超时可回收死循环，实际 DSH 子任务仍待接入。[结果与复现](harmonyos-workflow-sandbox.md) |
 | Git 和附件 | 真机公网 GitHub 直连超时，经临时代理浅克隆并核验 README。签名库路径修复后真机接受有效 PNG 和 GIF，模型理解图片仍待测 |
 
 0.4.23 模拟器从零数据到 ArkWeb 完成约 15.6 秒，强停重启约 6 秒。0.4.24 的真机 10.4 秒来自保留数据的强停重启。两组数据分别对应设备和启动条件。[模拟器证据](../evidence/emulator-core-0.4.23.json) · [真机证据](../evidence/mate60-core-0.4.23-0.4.24.json) · [回归矩阵](../workspace-validation.md)

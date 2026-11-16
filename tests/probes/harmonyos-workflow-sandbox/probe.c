@@ -109,10 +109,15 @@ static napi_value run(napi_env env, napi_callback_info info)
     return result;
 }
 
+napi_value RunWorkflowNode(napi_env env, napi_callback_info info);
+
 static napi_value init(napi_env env, napi_value exports)
 {
-    napi_property_descriptor property = {"run", NULL, run, NULL, NULL, NULL, napi_default, NULL};
-    napi_define_properties(env, exports, 1, &property);
+    const napi_property_descriptor properties[] = {
+        {"run", NULL, run, NULL, NULL, NULL, napi_default, NULL},
+        {"runNode", NULL, RunWorkflowNode, NULL, NULL, NULL, napi_default, NULL},
+    };
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
     return exports;
 }
 

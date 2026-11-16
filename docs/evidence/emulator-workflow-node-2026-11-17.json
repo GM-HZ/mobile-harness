@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "mobileHarnessBaseline": "c267656298225d229004d7803ed88883bc5f53db",
+  "bundle": "org.mobileharness.workflowsandbox",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "nodeLibrarySha256": "05f5edecd7a94f3aae6a7c1a921c9d333353c0a8c0aa04103b9e395509e5c33e",
+  "unsignedHapSha256": "b67a521cc95bba06b93ce8633647994c8321a29884fcb275487b2f1142731304",
+  "unsignedHapBytes": 114398515,
+  "buildExitCode": 0,
+  "installAndStartExitCode": 0,
+  "hilogTimestamp": "11-17 00:30:47.241",
+  "supervisorPid": 13188,
+  "worker": {
+    "pid": 13293,
+    "platform": "openharmony",
+    "node": "v24.14.1",
+    "nativeSeccomp": true,
+    "vmTimeoutDelegated": true,
+    "filesystemDenied": true,
+    "fdReadDenied": true,
+    "fdWriteDenied": true,
+    "socketDenied": true,
+    "result": {
+      "value": ["one", "two"],
+      "stopReason": "completed",
+      "agentsStarted": 2
+    },
+    "disposed": [1, 2]
+  },
+  "timeoutProbe": {
+    "fixture": "while (true) {}",
+    "budgetMs": 1500,
+    "timedOut": true,
+    "signal": 9,
+    "wallMs": 1513
+  },
+  "scope": {
+    "childBindings": "mocked inside confined worker",
+    "productWorkflow": "unchanged",
+    "genericPtc": "unchanged",
+    "mate60": "HDC offline"
+  }
+}
