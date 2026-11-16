@@ -17,3 +17,4 @@
 *.p12
 *.cer
 *.hap
+__pycache__/

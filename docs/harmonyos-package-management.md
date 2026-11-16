@@ -12,7 +12,7 @@
 | Alpine 辅助程序、数据和配置 | `/usr/libexec`、`/usr/share`、`/etc` | 保留原包的加载位置，包括 Git helpers、模板和 CA 证书。Python 扩展和 Node 原生扩展保留模块各自的加载路径。 |
 | Mobile Harness 管理的额外命令 | `/usr/local/bin` | 使用经打包验证的入口，启用时把该目录加入受管 Shell 的 `PATH`。 |
 | 多文件工具及私有依赖 | `/opt/mobile-harness/tools/<工具>/<版本>/{bin,lib,share}` | 命令入口选定明确版本，私有库由工具自己的加载路径解析。 |
-| Python 与 Node 项目依赖 | 工作区的 `.venv` 和 `node_modules` | Python 使用 `pip`，Node 使用项目声明的管理器和锁文件。环境可从锁文件重建，下载缓存可清理。 |
+| Python 与 Node 项目依赖 | 工作区的 Python 依赖目录和 `node_modules` | Python 使用 `pip`，Node 使用项目声明的管理器和锁文件。环境可从锁文件重建，下载缓存可清理。 |
 | DSH 插件 | DSH 管理的插件目录及 bundle／profile | 通过 DSH 插件管理器安装、启停和恢复，插件依赖按插件版本管理。 |
 
 `/usr/local/bin` 和工具私有目录是新增工具的约定。当前鸿蒙受管 Shell 的 `PATH` 是 `/bin:/usr/bin`。宿主的鸿蒙 NDK 库由 HAP 原生加载器加载。Linux ELF 随 HAP 交付时也可以使用 `libguest_*.so` 包内名，再由 PRoot 映射回 Linux 路径。按文件用途和 ABI 分类。比如 `libguest_bash.so` 实际暴露的是命令 `/bin/bash`，`libguest_musl.so` 暴露的是 Linux 加载器和 libc。见 [随包映射](../runtime/harmonyos/native/poc.c) 和 [生成的工具映射](../runtime/harmonyos/native/guest-tools.inc)。
@@ -27,10 +27,16 @@
 
 ## 项目包管理器
 
-- **Python**。下一步先验证现有 Python 3.12 的离线 `ensurepip` 引导。若需要随包提供全局 `python3 -m pip`，使用 Alpine `py3-pip` 并锁定其传递依赖（包括 `py3-setuptools`）。用 `python3 -m venv .venv` 创建项目环境，用环境内的 Python 执行 `python -m pip`。全局环境由 HAP 管理，接通项目虚拟环境后可使用 `EXTERNALLY-MANAGED` 提示。首期验证纯 Python wheel，依赖复现使用带版本及哈希的 requirements 文件。虚拟环境移到不同路径、解释器 ABI 变化或依赖失配时，从锁定要求重建。
+- **Python**。0.4.27 使用随包的 pip 25.0.1。受管 Bash 中用 `python3 -m pip install --only-binary :all: --target .python-packages -r requirements.txt` 安装项目依赖，再用 `PYTHONPATH="$PWD/.python-packages" python3 script.py` 执行。全局 Python 标记为 `EXTERNALLY-MANAGED`。可用锁定版本和哈希从本地 wheel 重建项目依赖。模拟器已复现标准 `venv` 创建 `lib64` 符号链接时报权限拒绝，`--copies` 也会走到该步骤。
 - **Python 原生扩展**。带原生代码的 wheel 需要验证 CPython ABI、`musllinux` 平台标签、共享库及真机加载。已验收且经常使用的扩展可以纳入签名 HAP。仅有 glibc `manylinux` 制品的依赖交给具备相应环境的执行端。
 - **Node**。现有 pnpm 适配已验证 DSH 插件纯 JS 依赖安装。项目级支持独立验收，沿用项目自己的 `package.json` 和锁文件。优先复用已有 hoisted、copy 和网络适配。纯 JS 安装与含原生 addon 或安装脚本的项目分别验收。
 - **DSH 插件**。复用现有 bundle、profile 和插件管理器。保持现有安装、启动和恢复入口。安装项目依赖时，依赖写入该项目，启用的插件及其依赖通过 DSH 自己管理。
+
+## 0.4.27 工具层
+
+`guest-tools-lock.json` 的 `extras` 扩展基础输入。curl 和 sqlite3 与当前 Alpine 分支、架构及随包库匹配，两个 ELF 随 HAP 交付并映射到 `/usr/bin`。tzdata 以数据文件交付，设备时区能匹配数据库时在启动时更新 `/etc/localtime`。受管 Shell 用应用实际 UID 配置账号记录，并为 BusyBox 增加常用命令入口。
+
+工具层从已锁定的 Python 输入提取原有 pip wheel，将它加入 Python 模块路径。CPython 在 PRoot 下执行子进程时改用常规 fork。模拟器中，pip 的发行版和平台标签探测会走子进程，使用 vfork 时出现崩溃。Node CLI 复用 DSHM 的 fetch 兼容层，仍处于 JITless 模式。应用升级通过独立版本的 ZIP 标记安装工具数据。
 
 ## 验收顺序
 

@@ -21,6 +21,7 @@ fi
 trap 'rmdir "$lock"' EXIT
 export JAVA_HOME="$deveco/jbr/Contents/Home"
 export DEVECO_SDK_HOME="$deveco/sdk"
+export HARMONY_BUILD_NODE="$deveco/tools/node/bin/node"
 export LC_ALL=C
 export PATH="/usr/bin:/bin:/opt/homebrew/bin:$deveco/tools/node/bin"
 scripts/vendor/verify.sh

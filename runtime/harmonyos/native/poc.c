@@ -277,6 +277,20 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         { "libguest_busybox.so", "/bin/tar" },
         { "libguest_busybox.so", "/bin/tr" },
         { "libguest_busybox.so", "/bin/xargs" },
+        { "libguest_busybox.so", "/bin/base64" },
+        { "libguest_busybox.so", "/bin/cmp" },
+        { "libguest_busybox.so", "/bin/du" },
+        { "libguest_busybox.so", "/bin/id" },
+        { "libguest_busybox.so", "/bin/od" },
+        { "libguest_busybox.so", "/bin/readlink" },
+        { "libguest_busybox.so", "/bin/realpath" },
+        { "libguest_busybox.so", "/bin/stat" },
+        { "libguest_busybox.so", "/bin/tee" },
+        { "libguest_busybox.so", "/bin/timeout" },
+        { "libguest_busybox.so", "/bin/unzip" },
+        { "libguest_busybox.so", "/bin/whoami" },
+        { "libguest_tool_curl.so", "/usr/bin/curl" },
+        { "libguest_tool_sqlite3.so", "/usr/bin/sqlite3" },
         { "libguest_rg.so", "/bin/rg" },
         { "libguest_sharp.so", "/dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node" },
         { "libguest_vips.so", "/usr/lib/libvips-cpp.so.8.18.7" },
@@ -285,10 +299,16 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     };
     enum { packaged_count = sizeof(packaged) / sizeof(*packaged) };
     char bind_options[packaged_count][1150];
-    char *bound_guest[packaged_count * 2 + 20];
+    char dsh_binding[1150];
+    char *bound_guest[packaged_count * 2 + sizeof(guest) / sizeof(*guest) + 8];
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
+        if (dsh_test) {
+            snprintf(dsh_binding, sizeof(dsh_binding), "%s/.dsh-0.2.2-rc.3/dsh:/dsh", root);
+            bound_guest[bound_count++] = "-b";
+            bound_guest[bound_count++] = dsh_binding;
+        }
         size_t bindings = dsh_test ? packaged_count : node_test ? 9 : 4;
         for (size_t n = 0; n < bindings; ++n) {
             snprintf(bind_options[n], sizeof(bind_options[n]), "%s/%s:%s", native, packaged[n].name, packaged[n].guest);
@@ -300,6 +320,10 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             bound_guest[bound_count++] = "/dev/null:/dev/null";
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = "/dev/urandom:/dev/urandom";
+            if (access("/dev/zero", R_OK) == 0) {
+                bound_guest[bound_count++] = "-b";
+                bound_guest[bound_count++] = "/dev/zero:/dev/zero";
+            }
         }
         for (int n = 8; n < guest_argc; ++n) bound_guest[bound_count++] = guest[n];
         bound_guest[bound_count] = NULL;
@@ -381,7 +405,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             setenv("LANG", "C.UTF-8", 1);
             setenv("NO_COLOR", "1", 1);
             setenv("PAGER", "cat", 1);
-            setenv("NODE_OPTIONS", "--jitless", 1);
+            setenv("NODE_OPTIONS", "--jitless --require=/fetch-shim-boot.cjs", 1);
             setenv("GIT_EXEC_PATH", "/usr/libexec/git-core", 1);
             setenv("GIT_TEMPLATE_DIR", "/usr/share/git-core/templates", 1);
         } else if (use_pty) {

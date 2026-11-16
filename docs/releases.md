@@ -139,3 +139,11 @@ PRoot 在 Sharp 的库搜索路径绑定 HAP 内的签名 libvips，解决 Mate 
 聊天页直接显示 DSH 原有界面。运行时恢复入口移到「设置 → 通用」，正常启动后可从这里选择安全模式或正常模式。启动异常时，原生恢复入口仍可用。桌面和启动页采用新的鲸鱼图标。
 
 `./build.sh --package` 生成带版本号的 HAP 和 SHA-256 校验文件。 [构建与发布流程](development.md#打包与发布)
+
+## 0.4.27 DSH RC.3 与鸿蒙工具层
+
+升级官方 DSH 到 `0.2.2-rc.3`。npm 的 `next` 指向 RC.3，`latest` 仍指向 RC.1。源码子模块与 npm 发布依赖分别固定。鸿蒙构建从锁文件生成运行时层，保留会话、工作区和 DSH profile 路径。RC.3 使用独立的解包目录。搜索和设置恢复页的适配迁移到 RC.3 的新入口。
+
+鸿蒙工具层增加 curl、sqlite3、tzdata 和常用 BusyBox 命令入口。Node CLI 复用现有 fetch 兼容层，CPython 通过普通 fork 启动子进程，并提供 `python3 -m pip` 的工作区安装方式。普通 Bash 继续执行默认沙箱检查和单次审批。
+
+API 26 Phone 模拟器通过 RC.1 到 RC.3 的覆盖启动、旧会话回读、文件工具、图片附件、子代理、后台作业和插件故障恢复。两个工作区用标准 pip 命令安装并导入不同版本的离线纯 Python wheel。公网 PyPI 安装超时。标准 `venv` 仍因符号链接权限失败。`workflow` 实测在 JITless Host 的 TypeScript 转换步骤失败。系统 PTY、Phone Use 以及这版的 Mate 60 回归待验。 [包管理约定](harmonyos-package-management.md) · [验收记录](evidence/emulator-dsh-rc3-0.4.27.json)

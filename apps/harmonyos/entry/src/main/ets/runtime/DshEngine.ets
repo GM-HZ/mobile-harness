@@ -3,6 +3,7 @@ import { fileIo } from '@kit.CoreFileKit';
 import zlib from '@ohos.zlib';
 import { connection } from '@kit.NetworkKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { i18n } from '@kit.LocalizationKit';
 import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
 
@@ -191,7 +192,7 @@ class DshEngine {
         return;
       }
       const mode = state.pending ? 'safe' : state.mode;
-      for (const name of ['bin', 'lib', 'etc', 'tmp', 'root']) {
+      for (const name of ['bin', 'lib', 'etc', 'tmp', 'root', 'dsh']) {
         const path = root + '/' + name;
         if (!fileIo.accessSync(path)) fileIo.mkdirSync(path, true);
       }
@@ -199,13 +200,21 @@ class DshEngine {
       this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
       this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
       this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
-      for (const archive of ['node-layer.zip', 'dsh-layer.zip', 'shell-tools-layer.zip', 'pnpm-layer-v2.zip']) {
+      for (const archive of ['node-layer.zip', 'shell-tools-layer.zip',
+        'shell-extras-v2.zip', 'pnpm-layer-v2.zip']) {
         const phase = Date.now();
         const extracted = await this.unpack(context, archive, root);
         hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
           archive, String(extracted), Date.now() - phase);
       }
-      const settingsClient = root + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
+      this.prepareTimezone(root);
+      const dshRelease = root + '/.dsh-0.2.2-rc.3';
+      if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
+      const dshUnpackStarted = Date.now();
+      const unpackedDsh = await this.unpack(context, 'dsh-layer.zip', dshRelease);
+      hilog.info(0xD005, 'DSHClient', 'startup archive dsh-layer.zip extracted=%{public}s ms=%{public}s',
+        String(unpackedDsh), Date.now() - dshUnpackStarted);
+      const settingsClient = dshRelease + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
       this.copyGuest(context, 'dsh-settings-client.js', settingsClient + '.tmp');
       fileIo.renameSync(settingsClient + '.tmp', settingsClient);
       for (const name of ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
@@ -233,6 +242,20 @@ class DshEngine {
       hilog.error(0xD005, 'DSHClient', 'setup error %{public}s', String(e));
     } finally {
       if (!nativeStarted) this.running = false;
+    }
+  }
+
+  private prepareTimezone(root: string): void {
+    try {
+      const zone = i18n.getTimeZone().getID();
+      if (!/^[A-Za-z0-9_+-]+(\/[A-Za-z0-9_+-]+)*$/.test(zone)) return;
+      const source = root + '/usr/share/zoneinfo/' + zone;
+      if (!fileIo.accessSync(source)) return;
+      const target = root + '/etc/localtime';
+      fileIo.copyFileSync(source, target + '.tmp');
+      fileIo.renameSync(target + '.tmp', target);
+    } catch (error) {
+      hilog.warn(0xD005, 'DSHClient', 'could not copy device time zone %{public}s', String(error));
     }
   }
 

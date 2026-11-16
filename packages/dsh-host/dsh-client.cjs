@@ -13,7 +13,7 @@ const moduleLoads = { count: 0, ms: 0, packed: 0 };
 function openStartupSources() {
   if (fs.existsSync('/tmp/dsh-startup-no-sources')) return;
   try {
-    const bytes = require('node:zlib').gunzipSync(fs.readFileSync('/dsh-startup-sources.gz'), { maxOutputLength: 96 * 1024 * 1024 });
+    const bytes = require('node:zlib').gunzipSync(fs.readFileSync('/dsh-startup-sources.gz'), { maxOutputLength: 128 * 1024 * 1024 });
     const begin = 4 + bytes.readUInt32LE();
     if (begin > bytes.length) throw new Error('Invalid packed source index');
     const index = JSON.parse(bytes.toString('ascii', 4, begin));

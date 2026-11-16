@@ -1,0 +1,69 @@
+{
+  "date": "2026-11-16",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.27",
+  "dshVersion": "0.2.2-rc.3",
+  "dshNpmDistTag": "next",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "unsignedHapSha256": "7a849efd0731448ff1b93b30c106e76819ab65e94d9158f35dbed0a9c9920e9e",
+  "unsignedHapBytes": 639257533,
+  "overinstallRetainedRc1Session": true,
+  "forcedRestartNodeStartToAuthenticatedLoopbackMs": 4806,
+  "recovery": {
+    "normalReadyMs": 67,
+    "anonymousHttp": 401,
+    "pluginInstalledDisabled": true,
+    "actualPluginCrash": true,
+    "interruptedNormalBoot": {
+      "mode": "normal",
+      "pending": true
+    },
+    "safeReadyMs": 4662,
+    "safeAuthenticatedHttp": 200,
+    "pluginNotLoadedAgain": true,
+    "sameSessionInSafeMode": true,
+    "normalProfileRestored": true
+  },
+  "modelTools": {
+    "files": [
+      "write",
+      "edit",
+      "grep",
+      "glob",
+      "read"
+    ],
+    "subagentReturnedExpectedText": true,
+    "bashRefusedDefaultWhenSandboxBackendMissing": true,
+    "bashSingleApproval": true,
+    "bashBackgroundJobAndOutput": true,
+    "workflowError": "Error: workflow run failed: workflow execution failed (exception): WebAssembly is not supported in this environment, but is required for TypeScript"
+  },
+  "toolkit": {
+    "fixture": "tests/contract/smoke-guest-tools.sh",
+    "coldToolArchiveReuseOnRestart": true,
+    "appUidAndWhoami": true,
+    "tzAsiaShanghai": "+0800",
+    "curlLoopback": 401,
+    "sqliteInMemoryQuery": 42,
+    "jitlessGuestNodeFetchLoopback": 401,
+    "pip": "25.0.1",
+    "offlinePureWheelVersionsInSeparateTargets": [
+      "1.0",
+      "2.0"
+    ],
+    "publicPyPi": "attempt timed out without a recorded package installation",
+    "stockVenv": "both symlinks and --copies failed when creating lib64 symlink on the initial tool layer"
+  },
+  "imageAttachments": {
+    "validPng": true,
+    "validGif": "converted to WebP",
+    "invalidBytesRejected": true,
+    "typeMismatchRejected": true
+  },
+  "scope": {
+    "mate60": "HDC offline during this turn",
+    "phoneUse": "outside this iteration",
+    "systemPty": "no implementation change",
+    "schedulerAndJobContinuationAcrossRestart": "not verified"
+  }
+}

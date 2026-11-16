@@ -1,0 +1,90 @@
+"""Stage the locked additions to the existing HarmonyOS guest tool layer."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import tarfile
+from tempfile import NamedTemporaryFile
+from urllib.request import urlopen
+from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
+
+ZONEINFO = "usr/share/zoneinfo/"
+PYTHON = "usr/lib/python3.12/"
+PIP_WHEEL = "ensurepip/_bundled/pip-25.0.1-py3-none-any.whl"
+EXECUTABLES = {
+    "curl": ("usr/bin/curl", "libguest_tool_curl.so"),
+    "sqlite": ("usr/bin/sqlite3", "libguest_tool_sqlite3.so"),
+}
+
+
+def locked_archive(base, entry, cache):
+    destination = cache / entry["archive"]
+    if destination.is_file():
+        if hashlib.sha256(destination.read_bytes()).hexdigest() != entry["sha256"]:
+            raise ValueError(f"Checksum mismatch: {destination}")
+        return destination
+
+    cache.mkdir(parents=True, exist_ok=True)
+    with NamedTemporaryFile(dir=cache, delete=False) as temporary:
+        pending = Path(temporary.name)
+    try:
+        with urlopen(base + entry["archive"], timeout=30) as response, pending.open("wb") as output:
+            shutil.copyfileobj(response, output)
+        if hashlib.sha256(pending.read_bytes()).hexdigest() != entry["sha256"]:
+            raise ValueError(f"Checksum mismatch: {entry['archive']}")
+        pending.replace(destination)
+    finally:
+        pending.unlink(missing_ok=True)
+    return destination
+
+
+def stage_guest_extras(root, stage, raw):
+    lock = json.loads((root / "docs/guest-tools-lock.json").read_text())
+    cache_override = os.environ.get("HARMONY_GUEST_APKS_DIR")
+    cache = Path(cache_override) if cache_override else root / ".build/runtime-package-inputs"
+    data = {}
+    native = stage / "entry/libs/arm64-v8a"
+    for entry in lock["extras"]:
+        source = locked_archive(lock["base"], entry, cache)
+        with tarfile.open(source, ignore_zeros=True) as package:
+            if entry["name"] == "tzdata":
+                for member in package.getmembers():
+                    if member.name.startswith(ZONEINFO) and (member.isfile() or member.islnk()):
+                        # Materialize Alpine's TZif hardlinks as ordinary zip entries.
+                        data[member.name] = package.extractfile(member).read()
+            else:
+                guest_path, hap_name = EXECUTABLES[entry["name"]]
+                binary = package.extractfile(guest_path).read()
+                if binary[:6] != b"\x7fELF\x02\x01" or int.from_bytes(binary[18:20], "little") != 183:
+                    raise ValueError(f"Expected ARM64 ELF: {guest_path}")
+                (native / hap_name).write_bytes(binary)
+                (native / hap_name).chmod(0o755)
+
+    with ZipFile(raw / "shell-tools-layer.zip") as existing:
+        if PYTHON + PIP_WHEEL not in existing.namelist():
+            raise ValueError("The locked Python layer no longer contains its pip wheel")
+        subprocess_module = existing.read(PYTHON + "subprocess.py")
+    # The embedded PRoot handoff crashes when CPython executes through vfork.
+    vfork = b"_USE_VFORK = True\n"
+    if subprocess_module.count(vfork) != 1:
+        raise ValueError("The Python subprocess vfork setting changed")
+    data[PYTHON + "subprocess.py"] = subprocess_module.replace(vfork, b"_USE_VFORK = False\n")
+    # Python's site module resolves relative .pth entries from site-packages.
+    data[PYTHON + "site-packages/mobile-harness-pip.pth"] = ("../" + PIP_WHEEL + "\n").encode()
+    data[PYTHON + "EXTERNALLY-MANAGED"] = (
+        "[externally-managed]\n"
+        "Error=The base Python is supplied by Mobile Harness. "
+        "Use python3 -m pip install --target <project-directory>.\n"
+    ).encode()
+    if data[ZONEINFO + "Asia/Shanghai"][:4] != b"TZif":
+        raise ValueError("Alpine timezone layer does not contain valid TZif data")
+
+    (raw / "shell-extras-v1.zip").unlink(missing_ok=True)
+    target = raw / "shell-extras-v2.zip"
+    parents = {parent for name in data for parent in Path(name).parents if parent != Path(".")}
+    with ZipFile(target, "w") as archive:
+        for parent in sorted(parents):
+            archive.writestr(ZipInfo(parent.as_posix() + "/"), b"")
+        for name, payload in sorted(data.items()):
+            archive.writestr(ZipInfo(name), payload, compress_type=ZIP_DEFLATED)

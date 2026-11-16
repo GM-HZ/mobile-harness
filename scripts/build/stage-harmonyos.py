@@ -6,6 +6,9 @@ import shutil
 import subprocess
 from zipfile import ZipFile
 
+from harmonyos_dsh import stage_dsh
+from harmonyos_guest_extras import stage_guest_extras
+
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
 RUNTIME = ROOT / "runtime/harmonyos"
@@ -51,6 +54,8 @@ def stage_assets(inputs):
             raise SystemExit(f"Missing pinned HarmonyOS input: {source}")
         if sha256(source) != checksum:
             raise SystemExit(f"HarmonyOS input checksum mismatch: {filename}")
+        if relative.name in {"dsh-layer.zip", "dsh-startup-sources.gz"}:
+            continue
         destination = STAGE / relative
         # Generated input bytes may change while size and timestamps match.
         if destination.is_file() and sha256(destination) == checksum:
@@ -63,7 +68,7 @@ def stage_settings_client():
     # Keep the pinned DSH layer intact. Only overlay its settings client at launch.
     with ZipFile(RAW / "dsh-layer.zip") as layer:
         source = layer.read(SETTINGS_CLIENT).decode("utf-8")
-    entry = "\n\t\tfunction apply(ctx) {"
+    entry = "function apply(ctx){"
     if source.count(entry) != 1:
         raise SystemExit("The pinned DSH General Settings entry point changed")
     row = (RUNTIME / "web/settings-recovery.js").read_text().rstrip()
@@ -93,6 +98,12 @@ def main():
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
     stage_assets(inputs)
+    stage_guest_extras(ROOT, STAGE, RAW)
+    stage_dsh(ROOT, RAW, inputs / "entry/src/main/resources/rawfile/dsh-layer.zip")
+    subprocess.run(
+        ["python3", str(RUNTIME / "packaging/build-startup-sources.py")],
+        env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
+    )
     stage_settings_client()
     signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
     profile = Path(signing_profile or ROOT / "build-profile.json5")

@@ -12,7 +12,7 @@ const { performance } = require('node:perf_hooks');
 const started = performance.now();
 const safeMode = process.env.HARMONY_SAFE_MODE === '1';
 const root = process.env.HARMONY_NATIVE_WEB_ROOT;
-const dsh = path.join(root, 'dsh/node_modules');
+const dsh = path.join(root, '.dsh-0.2.2-rc.3/dsh/node_modules');
 const cli = path.join(dsh, '@deepseek-ai/dsh/lib/bin.js');
 const home = path.join(root, 'native-benchmark-home');
 const workspace = path.join(root, 'workspace-native');
@@ -161,6 +161,10 @@ async function main() {
   mark('node-js', { platform: process.platform, node: process.version, safeMode });
   fs.mkdirSync(home, { recursive: true });
   fs.mkdirSync(workspace, { recursive: true });
+  const passwd = path.join(root, 'etc/passwd');
+  fs.writeFileSync(passwd + '.new', `mobile-harness:x:${process.getuid()}:${process.getgid()}:Mobile Harness:/workspace-native:/bin/bash
+`, { mode: 0o644 });
+  fs.renameSync(passwd + '.new', passwd);
   process.chdir(workspace);
   process.env.HOME = home;
   process.env.DSH_HOME = home;
@@ -183,6 +187,7 @@ async function main() {
   const subprocessUrl = paths('dsh-subprocess-local/lib/index.js');
   const attachmentUrl = paths('dsh-attachment-local/lib/index.js');
   const searchUrl = paths('dsh-tool-fs-search/lib/index.js');
+  const ripgrepUrl = paths('dsh-util-ripgrep/lib/index.js');
   const packageUrl = paths('dsh-plugin-manager/lib/index.js');
   const launchGuest = installProotSpawn(workspace);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
@@ -229,14 +234,17 @@ async function main() {
           '...[],') };
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
-          url !== attachmentUrl && url !== searchUrl && url !== packageUrl) return result;
+          url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
       if (url === subprocessUrl) {
         return { ...result, source: replacePinned(source, 'internals = {};', 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
       }
+      if (url === ripgrepUrl) {
+        return { ...result, source: replacePinned(source,
+          '(await import("@vscode/ripgrep")).rgPath', 'globalThis.__harmonyPackagedRg') };
+      }
       if (url === searchUrl) {
-        let patched = replacePinned(source, '(await import("@vscode/ripgrep")).rgPath', 'globalThis.__harmonyPackagedRg');
-        patched = replacePinned(patched, '\t\t"--sort=modified",\n', '');
+        let patched = replacePinned(source, '\t\t"--sort=modified",\n', '');
         patched = replacePinned(patched, 'paths: all', 'paths: await globalThis.__harmonySortGlobPaths(all, run.workdir, exec.signal)');
         return { ...result, source: patched };
       }
