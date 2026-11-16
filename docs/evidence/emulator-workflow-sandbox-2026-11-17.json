@@ -1,0 +1,46 @@
+{
+  "date": "2026-11-17",
+  "mobileHarnessBaseline": "d0d599fc82102a539a44f373aa6e7a4c4ed9393f",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "nativeProbe": {
+    "target": "DevEco ARM64 Phone emulator, API 26",
+    "bundle": "org.mobileharness.workflowsandbox",
+    "unsignedHapSha256": "b816d949a259b4fbcd6a43720ac6a05e74e9faaa461a585373b9929e164d9f32",
+    "unsignedHapBytes": 1520217,
+    "buildExitCode": 0,
+    "installAndStartExitCode": 0,
+    "hilogTimestamp": "11-17 00:22:08.316",
+    "outcome": {
+      "baselineOpenErrno": 0,
+      "baselineSocketErrno": 0,
+      "landlockAbi": -1,
+      "landlockErrno": 38,
+      "noNewPrivilegesErrno": 0,
+      "seccompTsyncErrno": 0,
+      "filteredOpenErrno": 1,
+      "filteredSocketErrno": 1,
+      "filteredExecErrno": 1,
+      "inheritedPipeWrite": true
+    }
+  },
+  "jitlessProbe": {
+    "target": "macOS, DevEco Node v24.14.1 --jitless",
+    "exitCode": 0,
+    "stripError": "ERR_WEBASSEMBLY_NOT_SUPPORTED",
+    "wrapper": "function-body",
+    "result": {
+      "value": ["one", "two"],
+      "stopReason": "completed",
+      "agentsStarted": 2
+    },
+    "disposedMockChildren": [1, 2]
+  },
+  "scope": {
+    "mate60": "HDC offline",
+    "nativeChildThreads": "single thread after fork",
+    "workflowChildBindings": "mocked on macOS",
+    "productWorkflow": "unchanged",
+    "genericPtc": "unchanged"
+  }
+}
