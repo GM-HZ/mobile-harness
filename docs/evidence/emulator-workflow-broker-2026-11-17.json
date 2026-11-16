@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "mobileHarnessBaseline": "2ed6c16a5af9d49e0a765708733c084e2c9089bc",
+  "bundle": "org.mobileharness.workflowsandbox",
+  "dshVersion": "0.2.2-rc.3",
+  "unsignedHapSha256": "f117a4315b63e5c7a1271e68d4455b65d845e3be2e8b6d8a426116187c7142a3",
+  "unsignedHapBytes": 114404728,
+  "buildExitCode": 0,
+  "installExitCode": 0,
+  "inputTransport": "Unix stream transferred from broker by SCM_RIGHTS",
+  "earlierFailure": "A concurrently prestarted worker read the nonblocking socket before its first byte and got EAGAIN. The final probe waits for readiness first.",
+  "workflowResult": {
+    "value": ["one", "two"],
+    "stopReason": "completed",
+    "agentsStarted": 2,
+    "disposed": [1, 2]
+  },
+  "seccompDenials": ["open a file", "read an extra descriptor", "write stderr", "create a socket"],
+  "runSamples": [
+    {"hilogTimestamp": "11-17 00:38:24.046", "workerPids": [22171, 22180], "killedSignal": 9, "killElapsedMs": 1515, "bothRetired": true},
+    {"hilogTimestamp": "11-17 00:38:39.539", "workerPids": [22541, 22544], "killedSignal": 9, "killElapsedMs": 1514, "bothRetired": true},
+    {"hilogTimestamp": "11-17 00:38:42.880", "workerPids": [22675, 22681], "killedSignal": 9, "killElapsedMs": 1516, "bothRetired": true}
+  ],
+  "scope": {
+    "workerProcesses": "launched concurrently by the native broker before either accepted script input",
+    "childBindings": "mocked inside the confined workflow worker",
+    "normalDshHost": "not integrated with the broker",
+    "mate60": "HDC offline"
+  }
+}

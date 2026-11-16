@@ -9,10 +9,11 @@
 | macOS，DevEco Node 24.14.1 `--jitless` | RC.3 的原始 JavaScript 包装器与上游生成的 guest 模块 | `stripTypeScriptTypes` 返回 `ERR_WEBASSEMBLY_NOT_SUPPORTED`。直接执行同一 JavaScript 时，Workflow 并行取得两个模拟子任务结果，发出进度并清理子任务 |
 | ARM64 Phone 模拟器，API 26 | 鸿蒙 Node 24.14.1 `--jitless` 下执行 RC.3 Workflow | 子进程启用 seccomp 后才接收脚本。完成两个模拟子任务并清理。文件打开、读其他描述符、写 stderr 和创建套接字均返回 `EPERM` |
 | 同一模拟器 | 父进程监督无限循环 fixture | 子进程进入 VM 后无返回。父进程在 1,513 ms 发送 `SIGKILL` 并回收，设定执行预算为 1,500 ms |
+| 同一模拟器 | 原生进程管理器同时启动两个受限 Node worker | Unix 套接字经 `SCM_RIGHTS` 传给调用方。一个 worker 完成试验脚本，另一个无限循环 worker 在 1,514–1,516 ms 被终止。三次均回收两个 worker。[进程管理器试验记录](../evidence/emulator-workflow-broker-2026-11-17.json) |
 
 上游 Node PTC 会在调度前擦除 TypeScript，即使 Workflow 自带的包装器已经是 JavaScript。Workflow guest 使用 `node:vm` 提供脚本 API，隔离依赖调用侧的进程和系统权限。Node 的 VM 超时依赖额外的 libuv 循环和线程，在该过滤策略下实测无法推进。探针改由父进程负责时限，正常脚本和无限循环分别用独立子进程验证。Mate 60 本轮 HDC 离线。[Node VM 文档](https://nodejs.org/api/vm.html) · [内核 seccomp 文档](https://docs.kernel.org/userspace-api/seccomp_filter.html)
 
-产品接入还需要沿用 RC.3 的结构化回调协议，将子任务交给实际 DSH Host 调度，绑定取消、超时、插件卸载和子任务回收。探针的执行预算覆盖整个固定脚本。产品需区分 VM 的同步执行预算与异步等待子任务的时间，安装限制失败时拒绝执行。通用 PTC 的工作区文件授权需要另行验证，因为按系统调用和文件描述符过滤无法表达工作区路径规则。
+产品接入拟在 DSH Host 初始化 Node 前创建单线程进程管理器。每次从管理器启动空白 Node 实例，让 Host 接收专用控制套接字。需要沿用 RC.3 的 Workflow 回调及子任务所有权，将进度、取消和回收接到实际调度。探针的执行预算覆盖整个固定脚本。产品需区分 VM 的同步执行预算与异步等待子任务的时间，安装限制失败时拒绝执行。通用 PTC 的工作区文件授权需要另行验证，因为按系统调用和文件描述符过滤无法表达工作区路径规则。
 
 ## 复现
 

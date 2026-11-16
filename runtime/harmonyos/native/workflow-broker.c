@@ -1,0 +1,260 @@
+#define _GNU_SOURCE
+#include "workflow-broker.h"
+#include <dlfcn.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <pthread.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/prctl.h>
+#include <sys/socket.h>
+#include <sys/syscall.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+enum { START = 1, STOP, STATUS, MAX_WORKERS = 8 };
+struct Request { int action; uint32_t id; };
+struct Reply { int error; uint32_t id; pid_t pid; int finished; int status; };
+struct Worker { uint32_t id; pid_t pid; int finished; int status; };
+
+static pthread_mutex_t client_lock = PTHREAD_MUTEX_INITIALIZER;
+static int client = -1;
+static pid_t broker = -1;
+
+static int follow_parent(pid_t expected)
+{
+    return prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) == 0 && getppid() == expected;
+}
+
+static void run_worker(const char *entry, int channel, pid_t parent)
+{
+    if (!follow_parent(parent) ||
+        dup2(channel, STDIN_FILENO) < 0 ||
+        dup2(channel, STDOUT_FILENO) < 0 ||
+        dup2(channel, STDERR_FILENO) < 0 ||
+        syscall(SYS_close_range, 3u, ~0u, 0u) < 0 ||
+        clearenv() != 0) _exit(125);
+    void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
+    typedef int (*NodeStart)(int, char **);
+    NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;
+    if (!start) _exit(126);
+    char *argv[] = {"node", "--jitless", "--no-warnings", "--max-old-space-size=64", (char *)entry, NULL};
+    _exit(start(5, argv));
+}
+
+static int send_reply(int channel, struct Reply reply, int fd)
+{
+    union { struct cmsghdr align; char buffer[CMSG_SPACE(sizeof(fd))]; } control;
+    struct iovec data = {.iov_base = &reply, .iov_len = sizeof(reply)};
+    struct msghdr message = {.msg_iov = &data, .msg_iovlen = 1};
+    if (fd >= 0) {
+        memset(&control, 0, sizeof(control));
+        message.msg_control = control.buffer;
+        message.msg_controllen = sizeof(control.buffer);
+        struct cmsghdr *header = CMSG_FIRSTHDR(&message);
+        header->cmsg_level = SOL_SOCKET;
+        header->cmsg_type = SCM_RIGHTS;
+        header->cmsg_len = CMSG_LEN(sizeof(fd));
+        memcpy(CMSG_DATA(header), &fd, sizeof(fd));
+    }
+    return sendmsg(channel, &message, MSG_NOSIGNAL) == sizeof(reply);
+}
+
+static struct Worker *worker_slot(struct Worker *workers, uint32_t id)
+{
+    for (int i = 0; i < MAX_WORKERS; ++i) if (workers[i].id == id) return &workers[i];
+    return NULL;
+}
+
+static void reap(struct Worker *worker)
+{
+    if (!worker->id || worker->finished) return;
+    int status;
+    if (waitpid(worker->pid, &status, WNOHANG) == worker->pid) {
+        worker->finished = 1;
+        worker->status = status;
+    }
+}
+
+static void serve(int channel, const char *entry, pid_t parent)
+{
+    const struct sigaction child_signal = {.sa_handler = SIG_DFL};
+    if (!follow_parent(parent) || dup2(channel, STDIN_FILENO) < 0 ||
+        syscall(SYS_close_range, 1u, ~0u, 0u) < 0 ||
+        sigaction(SIGCHLD, &child_signal, NULL) < 0) _exit(125);
+    channel = STDIN_FILENO;
+    const pid_t broker_pid = getpid();
+    struct Worker workers[MAX_WORKERS] = {{0}};
+    uint32_t next_id = 1;
+    struct Request request;
+    for (;;) {
+        ssize_t count = recv(channel, &request, sizeof(request), 0);
+        if (count < 0 && errno == EINTR) continue;
+        if (count != sizeof(request)) break;
+        for (int i = 0; i < MAX_WORKERS; ++i) reap(&workers[i]);
+        struct Reply reply = {0};
+        int worker_fd = -1;
+        if (request.action == START) {
+            struct Worker *worker = worker_slot(workers, 0);
+            int pair[2];
+            if (!worker) reply.error = EBUSY;
+            else if (next_id == 0) reply.error = EOVERFLOW;
+            else if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, pair) < 0) reply.error = errno;
+            else {
+                pid_t pid = fork();
+                if (pid == 0) run_worker(entry, pair[1], broker_pid);
+                if (pid < 0) {
+                    reply.error = errno;
+                    close(pair[0]);
+                } else {
+                    *worker = (struct Worker){.id = next_id++, .pid = pid};
+                    reply.id = worker->id;
+                    reply.pid = pid;
+                    worker_fd = pair[0];
+                }
+                close(pair[1]);
+            }
+        } else {
+            struct Worker *worker = request.id ? worker_slot(workers, request.id) : NULL;
+            if (!worker) reply.error = ESRCH;
+            else if (request.action == STATUS) {
+                reply.finished = worker->finished;
+                reply.status = worker->status;
+                if (worker->finished) worker->id = 0;
+            } else if (request.action == STOP) {
+                if (!worker->finished && kill(worker->pid, SIGKILL) < 0 && errno != ESRCH) reply.error = errno;
+            } else reply.error = EINVAL;
+        }
+        const int sent = send_reply(channel, reply, worker_fd);
+        if (worker_fd >= 0) close(worker_fd);
+        if (!sent) break;
+    }
+    for (int i = 0; i < MAX_WORKERS; ++i) {
+        if (workers[i].id && !workers[i].finished) kill(workers[i].pid, SIGKILL);
+    }
+    _exit(0);
+}
+
+int harmony_workflow_broker_start(const char *entry)
+{
+    pthread_mutex_lock(&client_lock);
+    int error = 0;
+    if (client >= 0 || broker > 0) error = EALREADY;
+    else {
+        int pair[2];
+        if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, pair) < 0) error = errno;
+        else {
+            const pid_t parent = getpid();
+            const pid_t child = fork();
+            if (child == 0) serve(pair[1], entry, parent);
+            if (child < 0) {
+                error = errno;
+                close(pair[0]);
+            } else {
+                broker = child;
+                client = pair[0];
+            }
+            close(pair[1]);
+        }
+    }
+    pthread_mutex_unlock(&client_lock);
+    return error;
+}
+
+static int exchange(struct Request request, struct Reply *reply, int *fd)
+{
+    int error = EIO;
+    int received_fd = -1;
+    pthread_mutex_lock(&client_lock);
+    if (client < 0) error = ENOTCONN;
+    else if (send(client, &request, sizeof(request), MSG_NOSIGNAL | MSG_DONTWAIT) != sizeof(request)) error = errno;
+    else {
+        struct pollfd ready = {.fd = client, .events = POLLIN};
+        const int count = poll(&ready, 1, 500);
+        if (count <= 0) error = count ? errno : ETIMEDOUT;
+        else {
+            union { struct cmsghdr align; char buffer[CMSG_SPACE(sizeof(int))]; } control;
+            struct iovec data = {.iov_base = reply, .iov_len = sizeof(*reply)};
+            struct msghdr message = {
+                .msg_iov = &data, .msg_iovlen = 1, .msg_control = control.buffer,
+                .msg_controllen = sizeof(control.buffer),
+            };
+            const ssize_t bytes = recvmsg(client, &message, MSG_DONTWAIT | MSG_CMSG_CLOEXEC);
+            if (bytes >= 0) {
+                struct cmsghdr *header = CMSG_FIRSTHDR(&message);
+                if (header && header->cmsg_level == SOL_SOCKET && header->cmsg_type == SCM_RIGHTS &&
+                    header->cmsg_len == CMSG_LEN(sizeof(received_fd))) {
+                    memcpy(&received_fd, CMSG_DATA(header), sizeof(received_fd));
+                }
+                if (bytes == sizeof(*reply) && !(message.msg_flags & (MSG_TRUNC | MSG_CTRUNC)) &&
+                    ((received_fd >= 0) == (fd && reply->error == 0))) {
+                    error = reply->error;
+                    if (received_fd >= 0) *fd = received_fd;
+                    received_fd = -1;
+                    pthread_mutex_unlock(&client_lock);
+                    return error;
+                }
+            }
+        }
+    }
+    if (received_fd >= 0) close(received_fd);
+    // A lost response leaves the stream between requests. Close instead of reusing it.
+    if (client >= 0) {
+        close(client);
+        client = -1;
+    }
+    pthread_mutex_unlock(&client_lock);
+    return error;
+}
+
+int harmony_workflow_spawn(struct WorkflowChild *child)
+{
+    struct Reply reply;
+    int error = exchange((struct Request){.action = START}, &reply, &child->fd);
+    if (!error) {
+        child->id = reply.id;
+        child->pid = reply.pid;
+    }
+    return error;
+}
+
+int harmony_workflow_stop(uint32_t id)
+{
+    struct Reply reply;
+    return exchange((struct Request){.action = STOP, .id = id}, &reply, NULL);
+}
+
+int harmony_workflow_status(uint32_t id, int *finished, int *wait_status)
+{
+    struct Reply reply;
+    int error = exchange((struct Request){.action = STATUS, .id = id}, &reply, NULL);
+    if (!error) {
+        *finished = reply.finished;
+        *wait_status = reply.status;
+    }
+    return error;
+}
+
+void harmony_workflow_broker_close(void)
+{
+    pthread_mutex_lock(&client_lock);
+    if (client >= 0) {
+        close(client);
+        client = -1;
+    }
+    if (broker > 0) {
+        pid_t observed;
+        do { observed = waitpid(broker, NULL, WNOHANG); } while (observed < 0 && errno == EINTR);
+        if (observed == 0) {
+            if (kill(broker, SIGKILL) < 0 && errno != ESRCH) {
+                pthread_mutex_unlock(&client_lock);
+                return;
+            }
+            while (waitpid(broker, NULL, 0) < 0 && errno == EINTR) {}
+        }
+        broker = -1;
+    }
+    pthread_mutex_unlock(&client_lock);
+}

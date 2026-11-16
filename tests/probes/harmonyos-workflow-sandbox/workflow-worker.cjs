@@ -27,6 +27,7 @@ async function run() {
   const input = Buffer.alloc(512);
   let used = 0;
   while (used < input.length) {
+    assert.equal(addon.exports.waitInput(), 0, 'waiting for fixture input');
     const count = fs.readSync(0, input, used, input.length - used, null);
     if (count === 0) break;
     used += count;

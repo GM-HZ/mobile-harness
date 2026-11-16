@@ -1,38 +1,15 @@
 #define _GNU_SOURCE
-#include <dlfcn.h>
+#include "workflow-broker.h"
 #include <errno.h>
-#include <fcntl.h>
 #include <napi/native_api.h>
 #include <poll.h>
 #include <signal.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <sys/prctl.h>
 #include <sys/socket.h>
-#include <sys/syscall.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-
-typedef int (*NodeStart)(int, char **);
-
-static void launch_child(const char *entry, int input, int output, pid_t parent)
-{
-    if (prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) < 0 || getppid() != parent) _exit(91);
-    if (dup2(input, STDIN_FILENO) < 0 || dup2(output, STDOUT_FILENO) < 0 ||
-        dup2(output, STDERR_FILENO) < 0) _exit(92);
-    if (syscall(SYS_close_range, 3u, ~0u, 0u) < 0) _exit(93);
-    if (clearenv() != 0) _exit(94);
-    void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
-    NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;
-    if (!start) {
-        dprintf(STDOUT_FILENO, "cannot load embedded Node: %s", dlerror());
-        _exit(95);
-    }
-    char *argv[] = {"node", "--jitless", "--no-warnings", "--max-old-space-size=64", (char *)entry, NULL};
-    _exit(start(5, argv));
-}
 
 static int64_t now_ms(void)
 {
@@ -55,80 +32,64 @@ static ssize_t receive(int fd, void *buffer, size_t size, int64_t deadline)
     return read(fd, buffer, size);
 }
 
-static bool run_node(const char *entry, const char *fixture, bool expect_timeout, char *report, size_t size)
+static int wait_worker(uint32_t id, int *status)
 {
-    int request[2];
-    if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, request) < 0) {
-        snprintf(report, size, "request socket errno=%d", errno);
-        return false;
+    const int64_t deadline = now_ms() + 500;
+    for (;;) {
+        int finished;
+        int error = harmony_workflow_status(id, &finished, status);
+        if (error || finished) return error;
+        if (now_ms() >= deadline) return ETIMEDOUT;
+        usleep(1000);
     }
-    int output[2];
-    if (pipe2(output, O_CLOEXEC) < 0) {
-        snprintf(report, size, "probe output pipe errno=%d", errno);
-        close(request[0]);
-        close(request[1]);
-        return false;
-    }
-    pid_t parent = getpid();
-    pid_t child = request[0] > 2 && request[1] > 2 && output[0] > 2 && output[1] > 2 ? fork() : -1;
-    if (child == 0) launch_child(entry, request[1], output[1], parent);
-    close(request[1]);
-    close(output[1]);
+}
+
+static bool run_node(struct WorkflowChild child, const char *fixture, bool expect_timeout, char *report, size_t size)
+{
     int64_t deadline = now_ms() + 6000;
     int64_t dispatched_at = 0;
     size_t length = 0;
     int transport_ok = 0;
-    if (child > 0) {
-        char marker;
-        ssize_t count = receive(output[0], &marker, 1, deadline);
-        if (count == 1 && marker == '+') {
-            dispatched_at = now_ms();
-            deadline = dispatched_at + 1500;
-            size_t length = strlen(fixture);
-            transport_ok = send(request[0], fixture, length, MSG_NOSIGNAL) == (ssize_t)length;
-        } else if (count == 1) {
-            report[length++] = marker;
-        }
+    char marker;
+    ssize_t count = receive(child.fd, &marker, 1, deadline);
+    if (count == 1 && marker == '+') {
+        dispatched_at = now_ms();
+        deadline = dispatched_at + 1500;
+        size_t fixture_size = strlen(fixture);
+        transport_ok = send(child.fd, fixture, fixture_size, MSG_NOSIGNAL) == (ssize_t)fixture_size;
+    } else if (count == 1) {
+        report[length++] = marker;
     }
-    close(request[0]);
-    ssize_t count = -1;
-    while (child > 0 && length < size - 1) {
-        count = receive(output[0], report + length, size - 1 - length, deadline);
+    shutdown(child.fd, SHUT_WR);
+    while (length < size - 1) {
+        count = receive(child.fd, report + length, size - 1 - length, deadline);
         if (count < 0 && errno == EINTR) continue;
         if (count <= 0) break;
         length += (size_t)count;
     }
     const bool timed_out = count < 0 && errno == ETIMEDOUT;
-    close(output[0]);
+    bool killed = count != 0 && harmony_workflow_stop(child.id) == 0;
+    close(child.fd);
     int status = 0;
-    pid_t observed = child > 0 ? waitpid(child, &status, WNOHANG) : -1;
-    while (observed == 0 && now_ms() < deadline && count == 0) {
-        usleep(1000);
-        observed = waitpid(child, &status, WNOHANG);
-    }
-    bool killed = false;
-    if (observed == 0) {
-        killed = kill(child, SIGKILL) == 0;
-        do { observed = waitpid(child, &status, 0); } while (observed < 0 && errno == EINTR);
-    }
+    int error = wait_worker(child.id, &status);
     report[length] = '\0';
-    if (expect_timeout && transport_ok && timed_out && killed && observed == child && WIFSIGNALED(status) &&
+    if (expect_timeout && transport_ok && timed_out && killed && !error && WIFSIGNALED(status) &&
         WTERMSIG(status) == SIGKILL && strcmp(report, "!") == 0) {
-        snprintf(report, size, "{\"timedOut\":true,\"signal\":%d,\"wallMs\":%lld}",
-                 WTERMSIG(status), (long long)(now_ms() - dispatched_at));
+        snprintf(report, size, "{\"workerId\":%u,\"timedOut\":true,\"signal\":%d,\"wallMs\":%lld}",
+                 child.id, WTERMSIG(status), (long long)(now_ms() - dispatched_at));
         return true;
     }
-    if (!expect_timeout && transport_ok && count == 0 && child > 0 && observed == child &&
+    if (!expect_timeout && transport_ok && count == 0 && !error &&
         WIFEXITED(status) && WEXITSTATUS(status) == 0 && strncmp(report, "!{", 2) == 0) return true;
-    snprintf(report + length, size - length, " [worker probe failed: input=%d read=%zd status=%d]",
-             transport_ok, count, status);
+    snprintf(report + length, size - length, " [worker probe failed: input=%d read=%zd status=%d broker=%d]",
+             transport_ok, count, status, error);
     return false;
 }
 
 napi_value RunWorkflowNode(napi_env env, napi_callback_info info)
 {
     size_t argc = 1, length = 0;
-    char entry[1024], report[1024], timeout[256], result_text[1310];
+    char entry[1024], report[1024], timeout[256], result_text[1430];
     napi_value args[1], result;
     if (napi_get_cb_info(env, info, &argc, args, NULL, NULL) != napi_ok || argc != 1 ||
         napi_get_value_string_utf8(env, args[0], entry, sizeof(entry), &length) != napi_ok ||
@@ -136,14 +97,29 @@ napi_value RunWorkflowNode(napi_env env, napi_callback_info info)
         napi_throw_type_error(env, NULL, "Expected the packaged probe entry path");
         return NULL;
     }
-    bool completed = run_node(entry, "phase('Probe'); return await parallel([() => agent('one'), () => agent('two')]);",
-                              false, report, sizeof(report));
-    if (completed) {
-        run_node(entry, "while (true) {}", true, timeout, sizeof(timeout));
-        snprintf(result_text, sizeof(result_text), "%s\ntimeoutProbe=%s", report + 1, timeout);
+    int error = harmony_workflow_broker_start(entry);
+    struct WorkflowChild regular = {.fd = -1}, spinning = {.fd = -1};
+    if (!error) error = harmony_workflow_spawn(&regular);
+    if (!error) error = harmony_workflow_spawn(&spinning);
+    if (error) {
+        snprintf(result_text, sizeof(result_text), "broker setup errno=%d", error);
+    } else if (run_node(regular, "phase('Probe'); return await parallel([() => agent('one'), () => agent('two')]);",
+                       false, report, sizeof(report))) {
+        regular.fd = -1;
+        run_node(spinning, "while (true) {}", true, timeout, sizeof(timeout));
+        spinning.fd = -1;
+        int finished, status;
+        bool retired = harmony_workflow_status(regular.id, &finished, &status) == ESRCH &&
+            harmony_workflow_status(spinning.id, &finished, &status) == ESRCH;
+        snprintf(result_text, sizeof(result_text), "%s\nbrokerTimeout=%s\nbrokerWorkers=%d,%d retired=%s",
+                 report + 1, timeout, regular.pid, spinning.pid, retired ? "true" : "false");
     } else {
+        regular.fd = -1;
         snprintf(result_text, sizeof(result_text), "%s", report);
     }
+    if (regular.fd >= 0) close(regular.fd);
+    if (spinning.fd >= 0) close(spinning.fd);
+    harmony_workflow_broker_close();
     napi_create_string_utf8(env, result_text, NAPI_AUTO_LENGTH, &result);
     return result;
 }

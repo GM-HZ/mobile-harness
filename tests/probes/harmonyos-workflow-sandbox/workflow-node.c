@@ -4,6 +4,7 @@
 #include <linux/filter.h>
 #include <linux/seccomp.h>
 #include <node_api.h>
+#include <poll.h>
 #include <stddef.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
@@ -15,8 +16,8 @@
 #define ALLOW BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW)
 #define DENY BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | EPERM)
 #define ALLOW_CALL(number) BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, number, 0, 1), ALLOW
-#define ALLOW_FD(number, fd) BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, number, 0, 4), \
-    LOAD_ARG(0), BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, fd, 0, 1), ALLOW, DENY
+#define ALLOW_ARG(number, arg, value) BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, number, 0, 4), \
+    LOAD_ARG(arg), BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, value, 0, 1), ALLOW, DENY
 
 static int restrict_worker(void)
 {
@@ -25,8 +26,9 @@ static int restrict_worker(void)
         BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_AARCH64, 1, 0),
         BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
         BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
-        ALLOW_FD(SYS_read, STDIN_FILENO),
-        ALLOW_FD(SYS_write, STDOUT_FILENO),
+        ALLOW_ARG(SYS_read, 0, STDIN_FILENO),
+        ALLOW_ARG(SYS_write, 0, STDOUT_FILENO),
+        ALLOW_ARG(SYS_ppoll, 1, 1),
         ALLOW_CALL(SYS_futex),
         ALLOW_CALL(SYS_clock_gettime),
         ALLOW_CALL(SYS_getpid),
@@ -84,12 +86,21 @@ static napi_value finish(napi_env env, napi_callback_info info)
     _exit(0);
 }
 
+static napi_value wait_input(napi_env env, napi_callback_info info)
+{
+    (void)info;
+    struct pollfd input = {.fd = STDIN_FILENO, .events = POLLIN};
+    const int ready = poll(&input, 1, 2000);
+    return number(env, ready > 0 ? 0 : ready == 0 ? ETIMEDOUT : errno);
+}
+
 NAPI_MODULE_INIT()
 {
     const napi_property_descriptor properties[] = {
         {"confine", NULL, confine, NULL, NULL, NULL, napi_default, NULL},
         {"socketErrno", NULL, socket_errno, NULL, NULL, NULL, napi_default, NULL},
         {"finish", NULL, finish, NULL, NULL, NULL, napi_default, NULL},
+        {"waitInput", NULL, wait_input, NULL, NULL, NULL, napi_default, NULL},
     };
     napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
     return exports;
