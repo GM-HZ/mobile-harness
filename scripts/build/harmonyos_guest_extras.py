@@ -65,23 +65,37 @@ def stage_guest_extras(root, stage, raw):
         if PYTHON + PIP_WHEEL not in existing.namelist():
             raise ValueError("The locked Python layer no longer contains its pip wheel")
         subprocess_module = existing.read(PYTHON + "subprocess.py")
+        venv_module = existing.read(PYTHON + "venv/__init__.py")
     # The embedded PRoot handoff crashes when CPython executes through vfork.
     vfork = b"_USE_VFORK = True\n"
     if subprocess_module.count(vfork) != 1:
         raise ValueError("The Python subprocess vfork setting changed")
     data[PYTHON + "subprocess.py"] = subprocess_module.replace(vfork, b"_USE_VFORK = False\n")
+    # Alpine uses lib for both Python package schemes. lib64 is a compatibility alias.
+    lib64_link = b"                os.symlink('lib', link_path)\n"
+    if venv_module.count(lib64_link) != 1:
+        raise ValueError("The Python venv lib64 layout changed")
+    data[PYTHON + "venv/__init__.py"] = venv_module.replace(lib64_link, (
+        b"                try:\n"
+        b"                    os.symlink('lib', link_path)\n"
+        b"                except PermissionError:\n"
+        b"                    if sys.platlibdir != 'lib':\n"
+        b"                        raise\n"
+    ))
     # Python's site module resolves relative .pth entries from site-packages.
     data[PYTHON + "site-packages/mobile-harness-pip.pth"] = ("../" + PIP_WHEEL + "\n").encode()
     data[PYTHON + "EXTERNALLY-MANAGED"] = (
         "[externally-managed]\n"
         "Error=The base Python is supplied by Mobile Harness. "
-        "Use python3 -m pip install --target <project-directory>.\n"
+        "Create a virtual environment with python3 -m venv .venv, "
+        "or use python3 -m pip install --target <project-directory>.\n"
     ).encode()
     if data[ZONEINFO + "Asia/Shanghai"][:4] != b"TZif":
         raise ValueError("Alpine timezone layer does not contain valid TZif data")
 
     (raw / "shell-extras-v1.zip").unlink(missing_ok=True)
-    target = raw / "shell-extras-v2.zip"
+    (raw / "shell-extras-v2.zip").unlink(missing_ok=True)
+    target = raw / "shell-extras-v3.zip"
     parents = {parent for name in data for parent in Path(name).parents if parent != Path(".")}
     with ZipFile(target, "w") as archive:
         for parent in sorted(parents):

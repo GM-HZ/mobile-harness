@@ -21,9 +21,10 @@ for version in ("1.0", "2.0"):
     info = f"mh_fixture-{version}.dist-info"
     wheel = directory / f"mh_fixture-{version}-py3-none-any.whl"
     records = {
-        "mh_fixture.py": f"VERSION = {version!r}\n",
+        "mh_fixture.py": f"VERSION = {version!r}\n\ndef main():\n    print(VERSION)\n",
         f"{info}/WHEEL": "Wheel-Version: 1.0\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
         f"{info}/METADATA": f"Metadata-Version: 2.1\nName: mh-fixture\nVersion: {version}\n",
+        f"{info}/entry_points.txt": "[console_scripts]\nmh-fixture = mh_fixture:main\n",
     }
     records[f"{info}/RECORD"] = "".join(f"{path},,\n" for path in [*records, f"{info}/RECORD"])
     with zipfile.ZipFile(wheel, "w") as archive:
@@ -37,3 +38,21 @@ for version in 1.0 2.0; do
     test "$(PYTHONPATH="$target" python3 -c 'import mh_fixture; print(mh_fixture.VERSION)')" = "$version"
 done
 printf 'HARMONY_TOOLKIT_OK\n'
+
+python3 -m venv "$work/project-1.0/.venv"
+python3 -m venv --copies "$work/project-2.0/.venv"
+for version in 1.0 2.0; do
+    venv="$work/project-$version/.venv"
+    (
+        source "$venv/bin/activate"
+        test "$(command -v python)" = "$VIRTUAL_ENV/bin/python"
+        python -c 'import os, sys; assert sys.prefix == os.environ["VIRTUAL_ENV"] and sys.prefix != sys.base_prefix'
+        pip --disable-pip-version-check install --no-index --no-deps "$work/mh_fixture-$version-py3-none-any.whl"
+        test "$(python -c 'import mh_fixture; print(mh_fixture.VERSION)')" = "$version"
+        test "$(mh-fixture)" = "$version"
+    )
+done
+test "$("$work/project-1.0/.venv/bin/mh-fixture")" = 1.0
+test "$("$work/project-2.0/.venv/bin/mh-fixture")" = 2.0
+python3 -c 'import importlib.util; assert importlib.util.find_spec("mh_fixture") is None'
+printf 'HARMONY_PYTHON_VENV_OK\n'

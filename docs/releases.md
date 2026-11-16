@@ -165,3 +165,9 @@ Phone 模拟器分别通过 `node` 和 `python3` 启动本地 MCP 测试服务�
 正式包启用 RC.3 Workflow。专用 Node worker 安装 seccomp 后接收脚本，由 DSH Host 负责子任务和进度。API 26 Phone 模拟器验证两个真实并行子任务、同步死循环超时、运行中取消、带活跃子任务取消和后台作业结果投递。五次 Workflow 均确认回收 worker。 [验收记录](evidence/emulator-workflow-0.4.29.json) · [实现与边界](research/harmonyos-workflow-sandbox.md)
 
 同一安装包回归了重启后的定时投递、Streamable HTTP MCP，以及 Node 和 Python 本地 stdio MCP。四条链路均获得真实模型结果。 [回归记录](evidence/emulator-workflow-0.4.29.json)
+
+## 0.4.30 Python 虚拟环境
+
+鸿蒙受管 Bash 支持 CPython 的默认 `venv` 和 `--copies`。API 26 Phone 模拟器覆盖安装后，在实际 DSH Bash 单次审批中创建两个虚拟环境，用 Pip 25.0.1 分别安装纯 Python wheel 1.0 和 2.0。两套环境的导入与命令入口各自返回对应版本，直接从未激活的 shell 执行命令入口也通过。 [验收记录](evidence/emulator-venv-0.4.30.json)
+
+同一安装包从公网 PyPI 下载并安装 `packaging==24.2`，随后验证了导入版本。Pip 遇到一次读超时，重试后成功。 [联网验收](evidence/emulator-venv-0.4.30.json)

@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "previousVersion": "0.4.29",
+  "dshVersion": "0.2.2-rc.3",
+  "pythonVersion": "3.12.16",
+  "pipVersion": "25.0.1",
+  "unsignedHapSha256": "b599909f4f7cf61705a3a4bfc5474112ca4ca72bb6af60790f7a1febd58d3f16",
+  "unsignedHapBytes": 639359729,
+  "buildExitCode": 0,
+  "installAndStartExitCode": 0,
+  "compatibilityLayerApplied": "shell-extras-v3.zip",
+  "baselineFailure": {
+    "command": "python3 -m venv --copies <workspace-directory>",
+    "errno": 13,
+    "operation": "creating lib64 symlink"
+  },
+  "contract": {
+    "path": "tests/contract/smoke-guest-tools.sh",
+    "via": "DSH Bash with exact command approved once",
+    "exitCode": 0,
+    "resultMarker": "HARMONY_PYTHON_VENV_OK",
+    "defaultVenv": "copied interpreters after symlink refusal and installed offline wheel 1.0",
+    "copiesVenv": "installed offline wheel 2.0",
+    "checked": [
+      "shell activation",
+      "venv sys.prefix distinct from sys.base_prefix",
+      "pip executable",
+      "isolated imports and console-script output",
+      "direct console-script execution without activation",
+      "fixture absent from base Python",
+      "existing pip --target installations"
+    ]
+  },
+  "publicPyPI": {
+    "index": "https://pypi.org/simple",
+    "indexHttpStatus": 200,
+    "package": "packaging==24.2",
+    "installMode": "pip --target in an approved DSH Bash call",
+    "wheelDownloaded": true,
+    "importVersionVerified": true,
+    "readTimeoutRetries": 1,
+    "exitCode": 0
+  },
+  "workflowRegression": {
+    "firstRun": "Foreground parallel execution and timeout passed. The model did not call Workflow on the cancellation fixture.",
+    "secondRunExitCode": 0,
+    "verified": ["foreground parallel execution", "timeout", "cancellation during a VM slice", "cancellation with an active child", "background completion"],
+    "temporaryModelCredentialRemoved": true
+  },
+  "mate60": "HDC offline"
+}
