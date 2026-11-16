@@ -55,6 +55,14 @@ python3 tests/smoke/emulator-recovery.py <loopback-target> .build/emulator-recov
 
 启动计时的 `fresh` 模式会清空目标 App 数据，仅用于独立模拟器。恢复测试要求正常模式已启动，并会记录匿名鉴权、插件崩溃、安全模式和旧会话续接。
 
+## MCP 模拟器回归
+
+普通 HAP 启动后可在隔离的 Phone 模拟器运行 MCP 冒烟测试。测试脚本在退出时清理临时配置。提供 `MH_TEST_DEEPSEEK_API_KEY` 后，脚本会暂存测试凭据，验证模型调用工具并清理凭据。没有配置该变量时，仅验证协议连接、工具列表和探针关闭。
+
+```sh
+python3 tests/smoke/emulator-mcp-stdio.py <loopback-target> .build/emulator-mcp-stdio.json
+```
+
 ## Host 进程探针
 
 ```sh

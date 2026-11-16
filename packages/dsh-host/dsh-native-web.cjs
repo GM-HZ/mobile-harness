@@ -2,6 +2,7 @@
 const fs = require('node:fs');
 const { randomUUID } = require('node:crypto');
 const http = require('node:http');
+const { Socket } = require('node:net');
 const { spawn } = require('node:child_process');
 const { EventEmitter } = require('node:events');
 const { constants } = require('node:os');
@@ -37,10 +38,33 @@ function replacePinned(source, point, replacement) {
   if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
   return source.replace(point, replacement);
 }
+function quoteShellArgument(value) {
+  if (typeof value !== 'string' || value.includes('\0')) throw new TypeError('Invalid command argument');
+  return "'" + value.replaceAll("'", "'\\''") + "'";
+}
 function installProotSpawn(workspace) {
   const bridge = addon('libdshshell.so');
   const allowedRoot = fs.realpathSync(workspace);
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
+  globalThis.__harmonyMcpSpawn = (program, args, options) => {
+    if (safeMode) throw new Error('Local MCP servers are disabled in HarmonyOS recovery mode');
+    if (typeof program !== 'string' || program.length === 0) throw new TypeError('Expected an MCP command');
+    const requested = options.cwd || allowedRoot;
+    const hostCwd = requested === '/workspace-native' || requested.startsWith('/workspace-native/')
+      ? path.join(allowedRoot, path.posix.relative('/workspace-native', requested))
+      : path.resolve(allowedRoot, requested);
+    const guest = path.posix.join('/workspace-native', relativeInWorkspace(allowedRoot, fs.realpathSync(hostCwd)));
+    const environment = Object.entries(options.env ?? {}).map(([key, value]) => {
+      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) ||
+          /^(?:HARMONY_|PROOT_|LD_)/.test(key) ||
+          ['BASH_ENV', 'ENV', 'NODE_OPTIONS', 'PATH', 'HOME', 'TMPDIR'].includes(key) ||
+          typeof value !== 'string' || value.includes('\0')) {
+        throw new TypeError('Invalid or reserved MCP environment variable');
+      }
+      return key + '=' + value;
+    });
+    return launchGuest(guest, 'exec -- ' + [program, ...args].map(quoteShellArgument).join(' '), environment);
+  };
   globalThis.__harmonyProotSpawn = (program, args, options) => {
     if (program !== 'bash' && program !== ripgrep) return spawn(program, args, options);
     if (options.stdio.join(',') !== 'ignore,pipe,pipe') throw new Error('Harmony tools require captured output');
@@ -60,30 +84,57 @@ function installProotSpawn(workspace) {
         relativeInWorkspace(allowedRoot, requested);
         flags.push('--', './' + (path.relative(cwd, requested) || '.'));
       }
-      command = 'exec /bin/rg ' + flags.map(value => "'" + value.replaceAll("'", "'\\''") + "'").join(' ');
+      command = 'exec /bin/rg ' + flags.map(quoteShellArgument).join(' ');
     } else {
       if (args.length !== 2 || args[0] !== '-c') throw new Error('Harmony Bash requires one non-interactive command');
       command = args[1];
     }
     return launchGuest(guest, command);
   };
-  function launchGuest(guest, command) {
-    const launched = bridge.launch(path.dirname(root), guest, command);
+  function launchGuest(guest, command, environment) {
+    const streaming = environment !== undefined;
+    const launched = streaming
+      ? bridge.launchPiped(path.dirname(root), guest, command, environment)
+      : bridge.launch(path.dirname(root), guest, command);
     const child = new EventEmitter();
     child.pid = launched.pid;
     child.exitCode = null;
     child.signalCode = null;
-    child.stdin = null;
-    child.stdout = fs.createReadStream(null, { fd: launched.stdoutFd });
-    child.stderr = fs.createReadStream(null, { fd: launched.stderrFd });
+    child.stdin = streaming ? new Socket({ fd: launched.stdinFd, readable: false, writable: true }) : null;
+    child.stdout = streaming ? new Socket({ fd: launched.stdoutFd, readable: true, writable: false })
+      : fs.createReadStream(null, { fd: launched.stdoutFd });
+    child.stderr = streaming ? new Socket({ fd: launched.stderrFd, readable: true, writable: false })
+      : fs.createReadStream(null, { fd: launched.stderrFd });
     child.stdio = [child.stdin, child.stdout, child.stderr];
-    child.kill = (signal = 'SIGTERM') => process.kill(-child.pid, signal);
+    let exited = false;
+    child.kill = (signal = 'SIGTERM') => {
+      if (exited) return false;
+      try {
+        return process.kill(-child.pid, signal);
+      } catch (error) {
+        if (error?.code === 'ESRCH') return false;
+        throw error;
+      }
+    };
+    if (streaming) {
+      // The MCP SDK expects the ChildProcess lifecycle: exit first, then close after output.
+      const streamsClosed = Promise.all([child.stdout, child.stderr].map(stream =>
+        new Promise(resolve => stream.once('close', resolve))));
+      child.once('exit', () => {
+        child.stdin.destroy();
+        void streamsClosed.then(() => child.emit('close', child.exitCode, child.signalCode));
+      });
+      child.stderr.on('error', () => {});
+      child.stderr.resume();
+      queueMicrotask(() => child.emit('spawn'));
+    }
     const timer = setInterval(() => {
       let result;
       try {
         result = bridge.pollExit(child.pid);
         if (!result) return;
         clearInterval(timer);
+        exited = true;
         child.exitCode = result.exitCode < 0 ? null : result.exitCode;
         child.signalCode = signals.get(result.signal) ?? null;
         if (child.exitCode === 0) {
@@ -97,8 +148,13 @@ function installProotSpawn(workspace) {
         }
       } catch (error) {
         clearInterval(timer);
+        exited = true;
         if (!result) fs.closeSync(launched.statusFd);
         child.emit('error', error);
+        if (streaming) {
+          for (const stream of child.stdio) stream.destroy();
+          child.emit('exit', child.exitCode, child.signalCode);
+        }
         return;
       } finally {
         if (result) fs.closeSync(launched.statusFd);
@@ -189,6 +245,8 @@ async function main() {
   const searchUrl = paths('dsh-tool-fs-search/lib/index.js');
   const ripgrepUrl = paths('dsh-util-ripgrep/lib/index.js');
   const packageUrl = paths('dsh-plugin-manager/lib/index.js');
+  const mcpClientUrl = paths('dsh-mcp-client/lib/index.js');
+  const mcpStdioUrl = pathToFileURL(path.join(dsh, '@modelcontextprotocol/client/dist/stdio.mjs')).href;
   const launchGuest = installProotSpawn(workspace);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
   const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
@@ -234,8 +292,17 @@ async function main() {
           '...[],') };
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
-          url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl) return result;
+          url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl &&
+          url !== mcpClientUrl && url !== mcpStdioUrl) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+      if (url === mcpClientUrl) {
+        return { ...result, source: replacePinned(source, 'env: buildChildEnv(config.env),', 'env: config.env,') };
+      }
+      if (url === mcpStdioUrl) {
+        const isolated = replacePinned(source, '...getDefaultEnvironment(),', '');
+        return { ...result, source: replacePinned(isolated, 'import spawn from "cross-spawn";',
+          'const spawn = globalThis.__harmonyMcpSpawn;') };
+      }
       if (url === subprocessUrl) {
         return { ...result, source: replacePinned(source, 'internals = {};', 'internals = { spawn: globalThis.__harmonyProotSpawn };') };
       }

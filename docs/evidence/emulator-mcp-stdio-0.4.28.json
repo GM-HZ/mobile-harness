@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.28",
+  "dshVersion": "0.2.2-rc.3",
+  "unsignedHapSha256": "84d4450b44f5632f9f530dd6277cf52b45ba73bd84e261fb0f808c73a5fc678e",
+  "unsignedHapBytes": 639263101,
+  "stdio": {
+    "node": {
+      "probe": {
+        "ok": true,
+        "serverInfo": {
+          "name": "node-stdio-fixture",
+          "version": "1"
+        },
+        "toolNames": [
+          "stdio_fixture_echo"
+        ],
+        "truncated": false,
+        "durationMs": 4840,
+        "closeConfirmed": true
+      },
+      "toolResultReturnedToSession": true,
+      "fixtureRemoved": true
+    },
+    "python3": {
+      "probe": {
+        "ok": true,
+        "serverInfo": {
+          "name": "python-stdio-fixture",
+          "version": "1"
+        },
+        "toolNames": [
+          "stdio_fixture_echo"
+        ],
+        "truncated": false,
+        "durationMs": 640,
+        "closeConfirmed": true
+      },
+      "toolResultReturnedToSession": true,
+      "fixtureRemoved": true
+    }
+  },
+  "stdioPolicy": {
+    "outsideWorkspaceCwdRejected": true,
+    "reservedEnvironmentRejected": true,
+    "recoveryStartupRejected": true
+  },
+  "regression": {
+    "streamableHttpMcpActualModelCall": true,
+    "scheduleDeliveryAfterAppRestart": true,
+    "approvedBashToolkit": true,
+    "emulatorRestoredToNormalMode": true,
+    "temporaryModelCredentialRemoved": true
+  },
+  "scope": {
+    "mate60": "HDC offline",
+    "workflow": "unchanged",
+    "systemPty": "unchanged"
+  }
+}

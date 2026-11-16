@@ -6,6 +6,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
+typedef int (*SpawnPiped)(const char *, const char *, const char *, char *const *, int *, int *, int *, int *, char *, size_t);
 typedef int (*SpawnShell)(const char *, const char *, const char *, int *, int *, int *, char *, size_t);
 
 static int string_arg(napi_env env, napi_value value, char *out, size_t capacity) {
@@ -22,27 +23,47 @@ static void set_number(napi_env env, napi_value object, const char *name, int va
     napi_set_named_property(env, object, name, result);
 }
 
-static napi_value launch(napi_env env, napi_callback_info info) {
-    size_t argc = 3;
-    napi_value argv[3];
+static napi_value start_shell(napi_env env, napi_callback_info info, int streaming) {
+    size_t argc = streaming ? 4 : 3;
+    napi_value argv[4];
     char directory[900], cwd[1024], command[32768];
-    if (napi_get_cb_info(env, info, &argc, argv, NULL, NULL) != napi_ok || argc != 3 ||
+    if (napi_get_cb_info(env, info, &argc, argv, NULL, NULL) != napi_ok || argc != (streaming ? 4 : 3) ||
         !string_arg(env, argv[0], directory, sizeof(directory)) || !string_arg(env, argv[1], cwd, sizeof(cwd)) ||
         !string_arg(env, argv[2], command, sizeof(command))) {
         napi_throw_type_error(env, NULL, "Expected bounded filesDir, cwd and Bash command");
         return NULL;
     }
-    void *poc = dlopen("libpoc.so", RTLD_NOW | RTLD_NOLOAD);
-    SpawnShell start = poc ? (SpawnShell)dlsym(poc, "harmony_spawn_shell") : NULL;
-    if (!start) {
-        if (poc) dlclose(poc);
-        napi_throw_error(env, NULL, "PRoot launcher is unavailable");
-        return NULL;
+    char environment_data[32768], *environment[129];
+    if (streaming) {
+        uint32_t count;
+        size_t used = 0;
+        if (napi_get_array_length(env, argv[3], &count) != napi_ok || count >= 129) {
+            napi_throw_type_error(env, NULL, "Expected at most 128 environment entries");
+            return NULL;
+        }
+        for (uint32_t i = 0; i < count; ++i) {
+            napi_value item;
+            if (napi_get_element(env, argv[3], i, &item) != napi_ok ||
+                !string_arg(env, item, environment_data + used, sizeof(environment_data) - used)) {
+                napi_throw_type_error(env, NULL, "Invalid or oversized MCP environment");
+                return NULL;
+            }
+            environment[i] = environment_data + used;
+            used += strlen(environment[i]) + 1;
+        }
+        environment[count] = NULL;
     }
-    int out, err, status;
-    char diagnostic[256] = "PRoot could not start";
-    int pid = start(directory, cwd, command, &out, &err, &status, diagnostic, sizeof(diagnostic));
-    dlclose(poc);
+    void *poc = dlopen("libpoc.so", RTLD_NOW | RTLD_NOLOAD);
+    int input = -1, out, err, status, pid = -1;
+    char diagnostic[256] = "PRoot launcher is unavailable";
+    if (poc && streaming) {
+        SpawnPiped start = (SpawnPiped)dlsym(poc, "harmony_spawn_piped");
+        if (start) pid = start(directory, cwd, command, environment, &input, &out, &err, &status, diagnostic, sizeof(diagnostic));
+    } else if (poc) {
+        SpawnShell start = (SpawnShell)dlsym(poc, "harmony_spawn_shell");
+        if (start) pid = start(directory, cwd, command, &out, &err, &status, diagnostic, sizeof(diagnostic));
+    }
+    if (poc) dlclose(poc);
     if (pid < 0) {
         napi_throw_error(env, NULL, diagnostic);
         return NULL;
@@ -50,10 +71,19 @@ static napi_value launch(napi_env env, napi_callback_info info) {
     napi_value result;
     napi_create_object(env, &result);
     set_number(env, result, "pid", pid);
+    if (streaming) set_number(env, result, "stdinFd", input);
     set_number(env, result, "stdoutFd", out);
     set_number(env, result, "stderrFd", err);
     set_number(env, result, "statusFd", status);
     return result;
+}
+
+static napi_value launch(napi_env env, napi_callback_info info) {
+    return start_shell(env, info, 0);
+}
+
+static napi_value launch_piped(napi_env env, napi_callback_info info) {
+    return start_shell(env, info, 1);
 }
 
 static napi_value poll_exit(napi_env env, napi_callback_info info) {
@@ -84,8 +114,9 @@ static napi_value poll_exit(napi_env env, napi_callback_info info) {
 NAPI_MODULE_INIT() {
     napi_property_descriptor properties[] = {
         {"launch", NULL, launch, NULL, NULL, NULL, napi_default, NULL},
+        {"launchPiped", NULL, launch_piped, NULL, NULL, NULL, napi_default, NULL},
         {"pollExit", NULL, poll_exit, NULL, NULL, NULL, napi_default, NULL},
     };
-    napi_define_properties(env, exports, 2, properties);
+    napi_define_properties(env, exports, sizeof(properties) / sizeof(*properties), properties);
     return exports;
 }

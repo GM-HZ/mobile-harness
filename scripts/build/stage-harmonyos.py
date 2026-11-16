@@ -98,6 +98,10 @@ def main():
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
     stage_assets(inputs)
+    subprocess.run(
+        ["bash", str(RUNTIME / "packaging/build-native-shell.sh")],
+        env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
+    )
     stage_guest_extras(ROOT, STAGE, RAW)
     stage_dsh(ROOT, RAW, inputs / "entry/src/main/resources/rawfile/dsh-layer.zip")
     subprocess.run(

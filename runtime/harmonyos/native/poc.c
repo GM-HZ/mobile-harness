@@ -16,6 +16,7 @@
 #include <poll.h>
 #include <time.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <sys/wait.h>
 #include <sys/uio.h>
 #include <sys/syscall.h>
@@ -104,11 +105,22 @@ static int map_rx(const char *path) {
 struct ShellLaunch {
     const char *cwd;
     const char *command;
+    char *const *environment;
     int pid;
+    int stdin_fd;
     int stdout_fd;
     int stderr_fd;
     int status_fd;
 };
+
+static void close_pair(int pair[2]) {
+    if (pair[0] >= 0) close(pair[0]);
+    if (pair[1] >= 0) close(pair[1]);
+}
+
+static int shell_channel(int pair[2], int streaming) {
+    return streaming ? socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, pair) : pipe2(pair, O_CLOEXEC);
+}
 
 static int close_host_descriptors(int keep) {
     DIR *dir = opendir("/proc/self/fd");
@@ -370,13 +382,16 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             return;
         }
     }
-    int shell_stdout[2] = {-1, -1}, shell_stderr[2] = {-1, -1};
+    int streaming = shell && shell->environment != NULL;
+    int shell_stdin[2] = {-1, -1}, shell_stdout[2] = {-1, -1}, shell_stderr[2] = {-1, -1};
     int shell_status[2];
-    if (shell && (pipe2(shell_stdout, O_CLOEXEC) < 0 || pipe2(shell_stderr, O_CLOEXEC) < 0 ||
+    if (shell && ((streaming && shell_channel(shell_stdin, 1) < 0) ||
+                  shell_channel(shell_stdout, streaming) < 0 || shell_channel(shell_stderr, streaming) < 0 ||
                   pipe2(shell_status, O_CLOEXEC | O_NONBLOCK) < 0)) {
-        snprintf(out, size, "open shell pipes errno=%d", errno);
-        if (shell_stdout[0] >= 0) { close(shell_stdout[0]); close(shell_stdout[1]); }
-        if (shell_stderr[0] >= 0) { close(shell_stderr[0]); close(shell_stderr[1]); }
+        snprintf(out, size, "open shell channels errno=%d", errno);
+        close_pair(shell_stdin);
+        close_pair(shell_stdout);
+        close_pair(shell_stderr);
         close(fd);
         return;
     }
@@ -393,7 +408,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         if (shell) {
             if (prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) < 0 || getppid() != owner) _exit(46);
             const int status_channel = STDERR_FILENO + 1;
-            if (setpgid(0, 0) < 0 || dup2(fd, STDIN_FILENO) < 0 ||
+            if (setpgid(0, 0) < 0 || dup2(streaming ? shell_stdin[1] : fd, STDIN_FILENO) < 0 ||
                 dup2(shell_stdout[1], STDOUT_FILENO) < 0 ||
                 dup2(shell_stderr[1], STDERR_FILENO) < 0 ||
                 dup2(shell_status[1], status_channel) < 0 || fcntl(status_channel, F_SETFD, 0) < 0) _exit(47);
@@ -408,6 +423,11 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             setenv("NODE_OPTIONS", "--jitless --require=/fetch-shim-boot.cjs", 1);
             setenv("GIT_EXEC_PATH", "/usr/libexec/git-core", 1);
             setenv("GIT_TEMPLATE_DIR", "/usr/share/git-core/templates", 1);
+            if (streaming) {
+                for (char *const *item = shell->environment; *item; ++item) {
+                    if (putenv(*item) != 0) _exit(49);
+                }
+            }
         } else if (use_pty) {
             close(master);
             if (setsid() < 0 || ioctl(slave, TIOCSCTTY, 0) < 0) {
@@ -453,10 +473,12 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     }
     if (shell) {
         close(fd);
+        if (streaming) close(shell_stdin[1]);
         close(shell_stdout[1]);
         close(shell_stderr[1]);
         close(shell_status[1]);
         if (child < 0) {
+            if (streaming) close(shell_stdin[0]);
             close(shell_stdout[0]);
             close(shell_stderr[0]);
             close(shell_status[0]);
@@ -464,6 +486,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         } else {
             setpgid(child, child);
             shell->pid = child;
+            shell->stdin_fd = shell_stdin[0];
             shell->stdout_fd = shell_stdout[0];
             shell->stderr_fd = shell_stderr[0];
             shell->status_fd = shell_status[0];
@@ -551,6 +574,20 @@ int harmony_spawn_shell(const char *directory, const char *cwd, const char *comm
     struct ShellLaunch shell = {.cwd = cwd, .command = command, .pid = -1};
     run_proot("proot-embedded-packaged-dsh-shellbench", directory, error, error_size, &shell);
     if (shell.pid > 0) {
+        *stdout_fd = shell.stdout_fd;
+        *stderr_fd = shell.stderr_fd;
+        *status_fd = shell.status_fd;
+    }
+    return shell.pid;
+}
+
+int harmony_spawn_piped(const char *directory, const char *cwd, const char *command,
+                        char *const *environment, int *stdin_fd, int *stdout_fd,
+                        int *stderr_fd, int *status_fd, char *error, size_t error_size) {
+    struct ShellLaunch shell = {.cwd = cwd, .command = command, .environment = environment, .pid = -1};
+    run_proot("proot-embedded-packaged-dsh-shellbench", directory, error, error_size, &shell);
+    if (shell.pid > 0) {
+        *stdin_fd = shell.stdin_fd;
         *stdout_fd = shell.stdout_fd;
         *stderr_fd = shell.stderr_fd;
         *status_fd = shell.status_fd;

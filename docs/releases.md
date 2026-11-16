@@ -153,3 +153,9 @@ API 26 Phone 模拟器通过 RC.1 到 RC.3 的覆盖启动、旧会话回读、�
 Phone 模拟器在预约任务到期前强停并重启应用，重开后从原任务记录按时投递，目标会话收到真实模型回复。Streamable HTTP MCP 通过实际模型调用测试工具，结果回到 DSH 会话。测试用的调度项、MCP 配置和临时凭据均已清理。
 
 同一版本的本地 MCP stdio 探针由宿主直接启动 `/bin/node`，在协议初始化前返回 `ENOENT`。现有 CLI 的 Node 由 PRoot 映射，本地 stdio 仍需接入可双向传输的子进程后端。定时任务跨强停重开后的投递已经验证，应用停止期间的系统唤醒和后台 Bash 作业跨进程续跑需要独立验收。 [调度器及 MCP 证据](evidence/emulator-dsh-capabilities-0.4.27.json)
+
+## 0.4.28 鸿蒙本地 MCP stdio
+
+MCP 的本地命令通过现有签名 PRoot 执行桥启动。宿主为 MCP SDK 提供 stdin、stdout、stderr 和退出事件。配置的命令和参数按原值传递，工作目录可以使用 `/workspace-native` 或其子目录。子进程先清空宿主环境，再接收 MCP 项显式配置的变量。安全模式拒绝启动本地 MCP 服务。
+
+Phone 模拟器分别通过 `node` 和 `python3` 启动本地 MCP 测试服务。两套服务均完成初始化、工具发现、真实模型调用和响应回传。含引号的参数、含换行的环境变量和宿主凭据隔离由服务端断言。 [0.4.28 验收记录](evidence/emulator-mcp-stdio-0.4.28.json)
