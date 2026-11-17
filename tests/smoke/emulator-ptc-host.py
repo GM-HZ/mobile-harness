@@ -156,16 +156,21 @@ def verify_read_only(emulator, evidence):
     name = "mh-ptc-read-only-" + uuid.uuid4().hex[:12]
     original = f"alpine/workspace-native/{name}.txt"
     new = f"alpine/workspace-native/{name}-new.txt"
+    directory = f"alpine/workspace-native/{name}"
     ws = emulator.rpc("workspace/create", {"request": {"path": support["WORKSPACE"]}})["workspace"]["workspaceId"]
     try:
-        emulator.app(f"printf frozen > {original}")
+        emulator.app(f"printf frozen > {original} && mkdir {directory}")
         script = f"""
 const fs = await import('node:fs/promises');
 const denied: string[] = [];
 for (const [name, operation] of [
   ['overwrite', () => fs.writeFile('{name}.txt', 'changed')],
   ['append', () => fs.appendFile('{name}.txt', 'changed')],
-  ['create', () => fs.writeFile('{name}-new.txt', 'changed', {{flag: 'wx'}})]
+  ['create', () => fs.writeFile('{name}-new.txt', 'changed', {{flag: 'wx'}})],
+  ['rename', () => fs.rename('{name}.txt', '{name}-new.txt')],
+  ['unlink', () => fs.unlink('{name}.txt')],
+  ['mkdir', () => fs.mkdir('{name}-new-dir')],
+  ['rmdir', () => fs.rmdir('{name}')]
 ]) {{
   try {{ await operation(); }}
   catch (error) {{ if (error.code === 'EACCES') denied.push(name); else throw error; }}
@@ -173,12 +178,67 @@ for (const [name, operation] of [
 return (await fs.readFile('{name}.txt', 'utf8')) + ':' + denied.join(',');
 """.strip()
         complete_code(emulator, model_session(emulator, ws), "Verify read-only write restrictions",
-                      script, "frozen:overwrite,append,create")
-        assert emulator.app(f"cat {original}; test ! -e {new} && printf ':absent'") == "frozen:absent"
+                      script, "frozen:overwrite,append,create,rename,unlink,mkdir,rmdir")
+        assert emulator.app(f"cat {original}; test ! -e {new} && test -d {directory} "
+                            f"&& test ! -e {directory}-new-dir && printf ':unchanged'") == "frozen:unchanged"
         assert any(row.get("mode") == "read-only" for row in workers(emulator))
-        evidence.update(readOnlyReadsAllowed=True, readOnlyWritesDenied=True, readOnlyDiskUnchanged=True)
+        evidence.update(readOnlyReadsAllowed=True, readOnlyWritesDenied=True, readOnlyDirectoryMutationsDenied=True,
+                        readOnlyDiskUnchanged=True)
     finally:
-        emulator.app(f"rm -f {original} {new}")
+        emulator.app(f"rm -f {original} {new}; rm -rf {directory} {directory}-new-dir")
+
+
+def verify_directory_operations(emulator, workspace, evidence):
+    name = "mh-ptc-directory-" + uuid.uuid4().hex[:12]
+    marker = "HARMONY_MOVED_" + uuid.uuid4().hex.upper()
+    absolute = f"{support['WORKSPACE']}/{name}"
+    root = f"alpine/workspace-native/{name}"
+    outside = f"alpine/{name}"
+    try:
+        emulator.app(f"mkdir {outside}; printf %s {marker} > {outside}/outside.txt; "
+                     f"printf %s {marker} > {root}.txt")
+        script = f"""
+const fs = await import('node:fs/promises');
+await fs.mkdir('{name}');
+await fs.mkdir('{name}/left');
+await fs.mkdir('{name}/right');
+await fs.rename('{name}.txt', '{name}/left/input.txt');
+const moved = await fs.readFile('{name}/left/input.txt', 'utf8');
+await fs.rename('{name}/left/input.txt', '{absolute}/right/moved.txt');
+const denied: string[] = [];
+for (const [name, operation] of [
+  ['move-out', () => fs.rename('{name}/right/moved.txt', '../{name}/target.txt')],
+  ['move-in', () => fs.rename('../{name}/outside.txt', '{name}/right/stolen.txt')],
+  ['unlink-out', () => fs.unlink('../{name}/outside.txt')],
+  ['mkdir-out', () => fs.mkdir('../{name}/directory')],
+  ['remove-root', () => fs.rmdir('.')]
+]) {{
+  try {{ await operation(); }}
+  catch (error) {{
+    if (['EACCES', 'EXDEV', 'EPERM'].includes(error.code)) denied.push(name);
+    else throw error;
+  }}
+}}
+let notEmpty = false;
+try {{ await fs.rmdir('{name}/right'); }}
+catch (error) {{ if (error.code !== 'ENOTEMPTY') throw error; notEmpty = true; }}
+const contents = await fs.readFile('{name}/right/moved.txt', 'utf8');
+await fs.unlink('{name}/right/moved.txt');
+await fs.rmdir('{name}/right');
+await fs.rename('{name}/left', '{name}/renamed');
+await fs.rmdir('{name}/renamed');
+await fs.rmdir('{name}');
+return [moved, contents, denied.join(','), String(notEmpty)].join(':');
+""".strip()
+        complete_code(emulator, model_session(emulator, workspace),
+                      "Verify directory operations under workspace-write", script,
+                      f"{marker}:{marker}:move-out,move-in,unlink-out,mkdir-out,remove-root:true")
+        assert emulator.app(f"test ! -e {root} && test ! -e {root}.txt && cat {outside}/outside.txt") == marker
+        assert emulator.app(f"test ! -e {outside}/target.txt && test ! -e {outside}/directory && printf OK") == "OK"
+        evidence.update(directoryOperationsMatched=True, crossBoundaryDirectoryMutationsDenied=True,
+                        nonemptyDirectoryPreserved=True)
+    finally:
+        emulator.app(f"rm -rf {root} {root}.txt {outside}")
 
 
 def verify(emulator, evidence):
@@ -231,6 +291,7 @@ return {{ text, denied, nestedRead, outsideWriteDenied, duplicateDenied }};
                 evidence.update(typeScriptResultReturned=True, fileContentsMatched=True, outsideReadDenied=True,
                                 nestedHostToolMatched=True, overwriteAndAppendMatched=True,
                                 outsideWriteDenied=True, exclusiveCreatePreservedExisting=True)
+                verify_directory_operations(emulator, ws["workspaceId"], evidence)
                 verify_cancel(emulator, ws["workspaceId"], evidence)
                 return
             if any(event["type"] == "turn/end" for event in events):

@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "919ed5095b8d50320ed98e3d2a5ba3459fae2e305d5307adc928b970467cd400",
+  "unsignedHapBytes": 657075220,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "baseline": {
+    "commit": "71b85d40a12bd299e4e6ee3de47ad5bfffe93e84",
+    "unsignedHapSha256": "837a931f28da02d04fbe3fb46ac54d00bab31a58ab2a65cbe7c36e99cc09abf2",
+    "smokeExitCode": 1,
+    "reproduced": "Node fs.promises.mkdir inside the workspace returned EPERM"
+  },
+  "cases": {
+    "write-access": {
+      "exitCode": 0,
+      "readyMs": 7546,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "read-only": {
+      "exitCode": 0,
+      "readyMs": 5039,
+      "readOnlyReadsAllowed": true,
+      "readOnlyWritesDenied": true,
+      "readOnlyDirectoryMutationsDenied": true,
+      "readOnlyDiskUnchanged": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "pending": [
+      "recursive file APIs",
+      "concurrent host moves of parent directories",
+      "additional roots",
+      "working directories below the workspace root",
+      "cancellation and cleanup with retained state"
+    ]
+  }
+}

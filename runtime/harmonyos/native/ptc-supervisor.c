@@ -25,6 +25,8 @@
 #define SECCOMP_ADDFD_FLAG_SEND (1UL << 1)
 #endif
 
+#define WORKSPACE_RESOLVE (RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_XDEV)
+
 static volatile sig_atomic_t stop_requested;
 static void request_stop(int signal) { (void)signal; stop_requested = 1; }
 
@@ -54,46 +56,53 @@ static void start_node(const char *entry, int control, int setup, int root, pid_
     _exit(start(8, argv));
 }
 
-static int grant_path(int root, pid_t worker, const struct seccomp_notif *request, const struct PtcLaunch *launch)
+static char *workspace_path(pid_t worker, uint64_t address, const struct PtcLaunch *launch, char path[4096])
 {
-    int flags = (int)request->data.args[2] & ~O_LARGEFILE;
+    struct iovec local = {.iov_base = path, .iov_len = 4096};
+    struct iovec remote = {.iov_base = (void *)(uintptr_t)address, .iov_len = 4096};
+    ssize_t size = syscall(SYS_process_vm_readv, worker, &local, 1, &remote, 1, 0);
+    if (size < 0) return NULL;
+    if (!size || !path[0] || !memchr(path, 0, (size_t)size)) {
+        errno = EFAULT;
+        return NULL;
+    }
+    if (path[0] != '/') return path;
+    size_t length = strlen(launch->root);
+    if (strncmp(path, launch->root, length) || (path[length] && path[length] != '/')) {
+        errno = EACCES;
+        return NULL;
+    }
+    char *relative = path + length;
+    while (*relative == '/') ++relative;
+    if (!*relative) {
+        strcpy(path, ".");
+        return path;
+    }
+    return relative;
+}
+
+static int grant_path(int root, pid_t worker, const struct seccomp_data *call, const struct PtcLaunch *launch)
+{
+    int flags = (int)call->args[2] & ~O_LARGEFILE;
     const int directory = O_DIRECTORY | O_CLOEXEC;
     const int create = O_WRONLY | O_CREAT | O_CLOEXEC;
     const int exclusive = (flags & O_EXCL) != 0;
     const int truncate = (flags & O_TRUNC) != 0 && !exclusive;
     const int writes = flags == (create | O_TRUNC) || flags == (create | O_EXCL | O_TRUNC) ||
         flags == (create | O_EXCL) || flags == (create | O_APPEND) || flags == (create | O_APPEND | O_EXCL);
-    if (!request->pid || syscall(SYS_tgkill, worker, request->pid, 0) < 0 ||
-        request->data.nr != SYS_openat || (int)request->data.args[0] != AT_FDCWD ||
+    if ((int)call->args[0] != AT_FDCWD ||
         (flags != O_CLOEXEC && flags != directory && flags != (directory | O_NONBLOCK) &&
          (!writes || !launch->writable))) {
         errno = EACCES;
         return -1;
     }
     char path[4096];
-    struct iovec local = {.iov_base = path, .iov_len = sizeof(path)};
-    struct iovec remote = {.iov_base = (void *)(uintptr_t)request->data.args[1], .iov_len = sizeof(path)};
-    ssize_t size = syscall(SYS_process_vm_readv, worker, &local, 1, &remote, 1, 0);
-    if (size < 0) return -1;
-    if (!size || !path[0] || !memchr(path, 0, (size_t)size)) {
-        errno = EFAULT;
-        return -1;
-    }
-    const char *relative = path;
-    if (path[0] == '/') {
-        size_t root_length = strlen(launch->root);
-        if (strncmp(path, launch->root, root_length) || (path[root_length] && path[root_length] != '/')) {
-            errno = EACCES;
-            return -1;
-        }
-        relative = path + root_length;
-        while (*relative == '/') ++relative;
-        if (!*relative) relative = ".";
-    }
+    const char *relative = workspace_path(worker, call->args[1], launch, path);
+    if (!relative) return -1;
     struct open_how how = {
         // Opening without O_TRUNC lets us validate the exact inode first.
         .flags = (flags & ~O_TRUNC) | O_NONBLOCK, .mode = writes ? 0600 : 0,
-        .resolve = RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_XDEV,
+        .resolve = WORKSPACE_RESOLVE,
     };
     int file = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
     if (file >= 0) {
@@ -115,13 +124,76 @@ static int grant_path(int root, pid_t worker, const struct seccomp_notif *reques
     return file;
 }
 
+static int open_parent(int root, char *path, const char **leaf)
+{
+    char *slash = strrchr(path, '/');
+    *leaf = slash ? slash + 1 : path;
+    if (!**leaf || !strcmp(*leaf, ".") || !strcmp(*leaf, "..")) {
+        errno = EACCES;
+        return -1;
+    }
+    if (slash) *slash = '\0';
+    const struct open_how how = {
+        .flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = WORKSPACE_RESOLVE,
+    };
+    return (int)syscall(SYS_openat2, root, slash ? path : ".", &how, sizeof(how));
+}
+
+static int mutate_path(int root, pid_t worker, const struct seccomp_data *call, const struct PtcLaunch *launch)
+{
+    const int rename = call->nr == SYS_renameat || call->nr == SYS_renameat2;
+    if (!launch->writable || (int)call->args[0] != AT_FDCWD ||
+        (rename && (int)call->args[2] != AT_FDCWD) ||
+        (call->nr == SYS_renameat2 && call->args[4] != 0) ||
+        (call->nr == SYS_unlinkat && call->args[2] != 0 && call->args[2] != AT_REMOVEDIR)) return EACCES;
+    char source[4096], destination[4096];
+    char *path = workspace_path(worker, call->args[1], launch, source);
+    if (!path) return errno;
+    char *target = rename ? workspace_path(worker, call->args[3], launch, destination) : NULL;
+    if (rename && !target) return errno;
+    const char *name, *target_name;
+    int parent = open_parent(root, path, &name);
+    if (parent < 0) return errno;
+    int error;
+    switch (call->nr) {
+    case SYS_mkdirat:
+        error = mkdirat(parent, name, (mode_t)call->args[2] & 0777) == 0 ? 0 : errno;
+        break;
+    case SYS_unlinkat:
+        error = unlinkat(parent, name, (int)call->args[2]) == 0 ? 0 : errno;
+        break;
+    case SYS_renameat:
+    case SYS_renameat2: {
+        int target_parent = open_parent(root, target, &target_name);
+        if (target_parent < 0) error = errno;
+        else {
+            error = renameat(parent, name, target_parent, target_name) == 0 ? 0 : errno;
+            close(target_parent);
+        }
+        break;
+    }
+    default:
+        error = EACCES;
+    }
+    close(parent);
+    return error;
+}
+
 static int mediate(int listener, int root, pid_t worker, const struct PtcLaunch *launch)
 {
     struct seccomp_notif request = {0};
     if (ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &request) < 0 ||
         ioctl(listener, SECCOMP_IOCTL_NOTIF_ID_VALID, &request.id) < 0) return errno;
     struct seccomp_notif_resp response = {.id = request.id};
-    int file = grant_path(root, worker, &request, launch);
+    if (!request.pid || syscall(SYS_tgkill, worker, request.pid, 0) < 0) {
+        response.error = -EACCES;
+        return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
+    }
+    if (request.data.nr != SYS_openat) {
+        response.error = -mutate_path(root, worker, &request.data, launch);
+        return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
+    }
+    int file = grant_path(root, worker, &request.data, launch);
     if (file < 0) {
         response.error = -errno;
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
