@@ -60,6 +60,7 @@ struct PtcRoots {
     int fd[MH_PTC_EXTRA_ROOTS + 1];
     const char *path[MH_PTC_EXTRA_ROOTS + 1];
     int count;
+    unsigned resolve_flags;
 };
 
 static int root_index(const struct PtcRoots *roots, const char *path)
@@ -191,7 +192,7 @@ static int grant_path(const struct PtcRoots *roots, pid_t worker, const struct s
     struct open_how how = {
         // Opening without O_TRUNC lets us validate the exact inode first.
         .flags = (flags & ~O_TRUNC) | O_NONBLOCK, .mode = writes ? 0600 : 0,
-        .resolve = WORKSPACE_RESOLVE,
+        .resolve = roots->resolve_flags,
     };
     int file = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
     if (file >= 0) {
@@ -213,7 +214,7 @@ static int grant_path(const struct PtcRoots *roots, pid_t worker, const struct s
     return file;
 }
 
-static int open_parent(int root, char *path, const char **leaf)
+static int open_parent(const struct PtcRoots *roots, int root, char *path, const char **leaf)
 {
     char *slash = strrchr(path, '/');
     *leaf = slash ? slash + 1 : path;
@@ -223,7 +224,7 @@ static int open_parent(int root, char *path, const char **leaf)
     }
     if (slash) *slash = '\0';
     const struct open_how how = {
-        .flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = WORKSPACE_RESOLVE,
+        .flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = roots->resolve_flags,
     };
     return (int)syscall(SYS_openat2, root, slash ? path : ".", &how, sizeof(how));
 }
@@ -242,7 +243,7 @@ static int mutate_path(const struct PtcRoots *roots, pid_t worker, const struct 
     char *target = rename ? workspace_path(roots, worker, call->args[3], launch, destination, &target_root) : NULL;
     if (rename && !target) return errno;
     const char *name, *target_name;
-    int parent = open_parent(root, path, &name);
+    int parent = open_parent(roots, root, path, &name);
     if (parent < 0) return errno;
     int error;
     switch (call->nr) {
@@ -254,7 +255,7 @@ static int mutate_path(const struct PtcRoots *roots, pid_t worker, const struct 
         break;
     case SYS_renameat:
     case SYS_renameat2: {
-        int target_parent = open_parent(target_root, target, &target_name);
+        int target_parent = open_parent(roots, target_root, target, &target_name);
         if (target_parent < 0) error = errno;
         else {
             error = renameat(parent, name, target_parent, target_name) == 0 ? 0 : errno;
@@ -282,7 +283,7 @@ static int stat_path(int listener, const struct PtcRoots *roots, pid_t worker, c
     const int nofollow = call->args[3] == AT_SYMLINK_NOFOLLOW;
     const struct open_how how = {
         .flags = O_PATH | O_CLOEXEC | (nofollow ? O_NOFOLLOW : 0),
-        .resolve = WORKSPACE_RESOLVE,
+        .resolve = roots->resolve_flags,
     };
     int file = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
     if (file < 0) return errno;
@@ -315,7 +316,7 @@ static int directory_path(const struct PtcRoots *roots, pid_t worker, const stru
         return -1;
     }
     const struct open_how how = {
-        .flags = O_RDONLY | O_DIRECTORY | O_CLOEXEC, .resolve = WORKSPACE_RESOLVE,
+        .flags = O_RDONLY | O_DIRECTORY | O_CLOEXEC, .resolve = roots->resolve_flags,
     };
     int directory = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
     if (directory >= 0) strcpy(absolute, path);
@@ -372,10 +373,12 @@ void harmony_ptc_supervise(const char *entry, int channel, pid_t parent, const s
     struct open_how how = {.flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = RESOLVE_NO_SYMLINKS};
     if (launch->extra_count < 0 || launch->extra_count > MH_PTC_EXTRA_ROOTS ||
         (!launch->writable && launch->extra_count)) _exit(125);
-    struct PtcRoots roots = {.count = launch->extra_count + 1};
+    struct PtcRoots roots = {.count = launch->extra_count + 1, .resolve_flags = WORKSPACE_RESOLVE};
     roots.path[0] = launch->root;
     for (int i = 0; i < launch->extra_count; ++i) roots.path[i + 1] = launch->extra_roots[i];
     for (int i = 0; i < roots.count; ++i) {
+        // An explicit namespace-root grant also covers App data bind mounts.
+        if (!strcmp(roots.path[i], "/")) roots.resolve_flags &= ~RESOLVE_NO_XDEV;
         roots.fd[i] = (int)syscall(SYS_openat2, AT_FDCWD, roots.path[i], &how, sizeof(how));
         if (roots.fd[i] < 0) _exit(125);
     }

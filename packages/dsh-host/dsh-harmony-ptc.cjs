@@ -16,12 +16,13 @@ function bindPtc(native, mark) {
     },
     launch(cwd, policy, config, signal) {
       signal.throwIfAborted();
-      if (policy.mode !== 'read-only' && policy.mode !== 'workspace-write') {
+      if (!['read-only', 'workspace-write', 'danger-full-access'].includes(policy.mode)) {
         throw new Error('HarmonyOS PTC requires a workspace file policy');
       }
+      const root = policy.mode === 'danger-full-access' ? '/' : policy.workspaceRoot;
       const extraRoots = policy.mode === 'workspace-write' ? [...new Set(policy.additionalWritableRoots ?? [])] : [];
       if (extraRoots.length > 16) throw new Error('HarmonyOS PTC supports at most 16 additional writable roots');
-      const roots = [policy.workspaceRoot, ...extraRoots];
+      const roots = [root, ...extraRoots];
       if (fs.realpathSync(cwd) !== cwd || roots.some(root => fs.realpathSync(root) !== root || !fs.statSync(root).isDirectory()) ||
           !roots.some(root => {
             const relative = path.relative(root, cwd);
@@ -29,7 +30,7 @@ function bindPtc(native, mark) {
           })) {
         throw new Error('HarmonyOS PTC requires a canonical working directory inside an authorized root');
       }
-      const { fd, id } = native.launchPtc(policy.workspaceRoot, policy.mode === 'workspace-write',
+      const { fd, id } = native.launchPtc(root, policy.mode !== 'read-only',
         config.maxMessageBytes, config.maxOldGenerationSizeMb, cwd, extraRoots);
       mark('ptc-worker-admitted', { id, mode: policy.mode });
       const control = new Socket({ fd, readable: true, writable: true, allowHalfOpen: true });

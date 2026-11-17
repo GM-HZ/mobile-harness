@@ -97,6 +97,13 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-ptc-lifecycle.py <loopback-target> .build/ptc-lifecycle-script.json --mode vm-script
 ```
 
+审批回归使用实际鉴权的 Remote Event 流接收请求，通过 DSH 的事件结果 RPC 批准或拒绝。脚本复用构建缓存中按锁文件安装的 ws 模块。默认验证工作区写到单次完整文件授权，加 `--read-only` 验证只读到单次工作区写，加 `--retained` 验证保留状态的 REPL。测试只修改自建夹具。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-ptc-approval.py <loopback-target> .build/ptc-approval.json
+```
+
 ## Host 进程探针
 
 ```sh

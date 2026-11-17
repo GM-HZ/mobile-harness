@@ -1,0 +1,139 @@
+{
+  "date": "2026-11-18",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "76e7828b6b3104164f30acf83c1d0477692c764cbfa5d78e88fcd140d8705d3d",
+  "unsignedHapBytes": 657082444,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-approval.py",
+  "testSourceSha256": {
+    "tests/smoke/emulator-ptc-approval.py": "6c578f4f8ad9215179641c9bf28945c9e7e237864a860cf27be653e8b2d8cb66",
+    "tests/smoke/fixtures/approval-events.cjs": "ee90e1f4256b620f05e322fe23c62a289b497f07f2defc62087e241a8cf4673d"
+  },
+  "baseline": {
+    "commit": "5520b36cd7cdb3ee3244b7028a6a396e71a72033",
+    "unsignedHapSha256": "11f31fae500fb7bb96cf1a3266123e8ec674e83f28238271edadcf373ccb0290",
+    "exitCode": 1,
+    "failure": "The old adapter rejected danger-full-access after an actual allowed-once approval."
+  },
+  "earlierAttempt": "The first expanded namespace-root grant hit EXDEV when entering App data. The final scope permits bind-mount traversal when an explicit namespace-root grant exists.",
+  "cases": {
+    "broad": {
+      "exitCode": 0,
+      "readyMs": 71,
+      "defaultPolicyDenied": true,
+      "rejectionPreventedExecution": true,
+      "cancellationPreventedExecution": true,
+      "approvedOnceExecutedAndReaped": true,
+      "standingPolicyPreserved": true,
+      "approvalsBoundToCallAndSession": true,
+      "standingMode": "workspace-write",
+      "approvedMode": "danger-full-access",
+      "temporaryModelCredentialRemoved": true
+    },
+    "workspace": {
+      "exitCode": 0,
+      "readyMs": 5835,
+      "defaultPolicyDenied": true,
+      "rejectionPreventedExecution": true,
+      "cancellationPreventedExecution": true,
+      "approvedOnceExecutedAndReaped": true,
+      "standingPolicyPreserved": true,
+      "approvalsBoundToCallAndSession": true,
+      "standingMode": "read-only",
+      "approvedMode": "workspace-write",
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "retained-broad": {
+      "exitCode": 0,
+      "readyMs": 4404,
+      "defaultPolicyDenied": true,
+      "rejectionPreventedExecution": true,
+      "cancellationPreventedExecution": true,
+      "approvedOnceExecutedAndReaped": true,
+      "standingPolicyPreserved": true,
+      "approvalsBoundToCallAndSession": true,
+      "standingMode": "workspace-write",
+      "approvedMode": "danger-full-access",
+      "retainedStatePreservedAcrossEscalation": true,
+      "escalationUsedFreshProgramState": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "retained-workspace": {
+      "exitCode": 0,
+      "readyMs": 4677,
+      "defaultPolicyDenied": true,
+      "rejectionPreventedExecution": true,
+      "cancellationPreventedExecution": true,
+      "approvedOnceExecutedAndReaped": true,
+      "standingPolicyPreserved": true,
+      "approvalsBoundToCallAndSession": true,
+      "standingMode": "read-only",
+      "approvedMode": "workspace-write",
+      "retainedStatePreservedAcrossEscalation": true,
+      "escalationUsedFreshProgramState": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "regression": {
+    "core": {
+      "exitCode": 0,
+      "readyMs": 92,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "roots": {
+      "exitCode": 0,
+      "readyMs": 5019,
+      "additionalRootsReadWriteMatched": true,
+      "crossRootRenameMatched": true,
+      "nestedGrantMatched": true,
+      "extraRootWorkingDirectoryMatched": true,
+      "unauthorizedSiblingDenied": true,
+      "relativeCrossRootReadWriteMatched": true,
+      "relativeCrossRootMetadataAndRenameMatched": true,
+      "discardedComponentsValidated": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "defaultBuild": {
+    "exitCode": 0,
+    "unsignedHapSha256": "67b973e06f319b9f5e783e208d2fc8535c85a445aa4c955d93e23d2e1618b7f5",
+    "unsignedHapBytes": 639387319,
+    "experimentalEnabledMarker": "0",
+    "installedForTheseTests": false
+  },
+  "scope": {
+    "transport": "Authenticated Gateway Remote Event WebSocket and the ordinary $events/result RPC",
+    "nativeEnforcement": "partial, limited to the file proxy's supported operations",
+    "uiPresentation": "unverified",
+    "defaultEnabled": false,
+    "mate60": "HDC offline"
+  }
+}
