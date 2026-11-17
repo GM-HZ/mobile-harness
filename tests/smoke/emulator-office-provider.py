@@ -67,18 +67,21 @@ def verify(emulator, cases, evidence):
     try:
         for case in cases:
             evidence[case] = record = {}
+            before_workers = {row["id"] for row in office["trace"](emulator) if row["event"] == "office-worker-started"}
             before = {row["request"] for row in office["trace"](emulator) if row["event"] == "office-operation-running"}
             record["created"] = command(emulator, sid, "create", case)
             if case in {"active", "cancel"}:
-                wait_trace(emulator, lambda rows: any(row["event"] == "office-operation-running" and row["request"] not in before for row in rows), 35)
+                assert record["created"]["actedWhilePending"] and record["created"]["status"] == "error", record
+                assert any(row["event"] == "office-operation-running" and row["request"] not in before for row in office["trace"](emulator))
                 record["observedActiveOperation"] = True
             if case == "timeout":
                 assert record["created"]["status"] == "error" and record["created"]["code"] == "timeout", record
             if case in {"idle", "crash"}:
                 assert record["created"]["status"] == "completed" and record["created"]["bytes"] > 100, record
             if case == "cancel":
-                record["cancelled"] = command(emulator, sid, "cancel", case)
-                assert record["cancelled"]["status"] == "error", record
+                record["cancelled"] = record["created"]
+                record["retried"] = command(emulator, sid, "retry", case)
+                assert record["retried"]["status"] == "completed", record
             if case == "crash":
                 record["crashed"] = command(emulator, sid, "crash", case)
                 worker = record["crashed"]["workerId"]
@@ -92,6 +95,11 @@ def verify(emulator, cases, evidence):
             if case == "active": assert disposed["status"] == "error", record
             worker = disposed["workerId"]
             assert worker and any(row["event"] == "office-worker-reaped" and row["id"] == worker for row in office["trace"](emulator)), record
+            final_trace = office["trace"](emulator)
+            owned_workers = {row["id"] for row in final_trace if row["event"] == "office-worker-started"} - before_workers
+            reaped_workers = {row["id"] for row in final_trace if row["event"] == "office-worker-reaped"}
+            assert owned_workers and owned_workers <= reaped_workers, (owned_workers, reaped_workers)
+            record["allOwnedHelpersReaped"] = len(owned_workers)
             print(case, json.dumps(record), flush=True)
     finally:
         emulator.rpc("session/cancel", {"request": {"sessionId": sid}})

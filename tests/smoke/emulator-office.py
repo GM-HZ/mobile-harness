@@ -64,7 +64,7 @@ def file_result(emulator, result, destination):
     return {"path": actual, "bytes": len(content), "sha256": hashlib.sha256(content).hexdigest()}
 
 
-def run(emulator, output, artifacts):
+def run(emulator, output, artifacts, require_native=False):
     artifacts.mkdir(parents=True, exist_ok=True)
     name = "mh-office-" + uuid.uuid4().hex[:12]
     marker = "HARMONY_OFFICE_" + uuid.uuid4().hex.upper()
@@ -146,6 +146,8 @@ def run(emulator, output, artifacts):
             evidence["invalidDocumentRejected"] = text
         evidence["temporaryModelCredentialRemoved"] = True
         evidence["trace"] = trace(emulator)
+        if require_native:
+            assert any(row["event"] == "office-worker-started" and row.get("runtime") == "native" for row in evidence["trace"])
     finally:
         try:
             if sid is not None:
@@ -164,11 +166,12 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--port", type=int, default=19643)
     parser.add_argument("--artifacts", type=Path, default=Path(".build/office-artifacts"))
+    parser.add_argument("--require-native", action="store_true")
     options = parser.parse_args()
     emulator = support["Emulator"](options.target, options.port)
     forward = (f"tcp:{options.port}", "tcp:19592")
     assert "Forwardport result:OK" in emulator.hdc("fport", *forward)
     try:
-        run(emulator, options.output, options.artifacts)
+        run(emulator, options.output, options.artifacts, options.require_native)
     finally:
         emulator.hdc("fport", "rm", *forward)

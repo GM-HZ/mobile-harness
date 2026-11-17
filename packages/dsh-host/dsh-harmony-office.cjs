@@ -5,7 +5,7 @@ const { randomUUID } = require('node:crypto');
 const FRAME = 'MH_OFFICE_RPC ';
 const MAX_FRAME = 128 * 1024;
 
-function createOfficeFactory(root, spawn, mark) {
+function createOfficeFactory(root, spawn, mark, kitModule) {
   const physicalRoot = path.resolve(root);
   function guestPath(value) {
     if (typeof value !== 'string' || !path.isAbsolute(value)) throw new TypeError('Expected an absolute Office path');
@@ -19,8 +19,8 @@ function createOfficeFactory(root, spawn, mark) {
     }
     return '/' + relative.split(path.sep).join('/');
   }
-  function hostImages(result, request) {
-    const output = guestPath(request.outputDir);
+  function hostImages(result, request, native) {
+    const output = native ? request.outputDir : guestPath(request.outputDir);
     return { ...result, inputPath: request.inputPath, images: result.images.map(image => {
       const relative = path.posix.relative(output, image.path);
       if (!relative || relative === '..' || relative.startsWith('../') || path.posix.isAbsolute(relative)) {
@@ -29,21 +29,24 @@ function createOfficeFactory(root, spawn, mark) {
       return { ...image, path: path.join(request.outputDir, relative) };
     }) };
   }
-  return {
-    async createConverter(options = {}) {
+  async function connect(options = {}) {
       const { resolveEnginePackage: _resolver, ...settings } = options;
-      if (settings.fontDirectories !== undefined) settings.fontDirectories = settings.fontDirectories.map(guestPath);
-      else settings.fontDirectories = ['/usr/share/fonts/harmonyos'];
-      if (typeof settings.fontMetadataCacheDirectory === 'string') {
-        settings.fontMetadataCacheDirectory = guestPath(settings.fontMetadataCacheDirectory);
-      }
+      const directories = settings.fontDirectories ?? ['/system/fonts'];
+      directories.forEach(guestPath);
+      if (typeof settings.fontMetadataCacheDirectory === 'string') guestPath(settings.fontMetadataCacheDirectory);
       const workerId = randomUUID();
-      const child = spawn('/bin/node', ['--no-jitless', '--max-old-space-size=512', '/dsh-harmony-office-worker.mjs'], {});
+      const child = await spawn();
+      const native = child.runtime === 'native';
+      const runtimePath = value => native ? path.resolve(value) : guestPath(value);
+      settings.fontDirectories = directories.map(runtimePath);
+      if (typeof settings.fontMetadataCacheDirectory === 'string') {
+        settings.fontMetadataCacheDirectory = runtimePath(settings.fontMetadataCacheDirectory);
+      }
       const pending = new Map();
       let buffer = '', diagnostics = '', terminal = false, closed = false, disposed;
       let settleClose;
       const exited = new Promise(resolve => { settleClose = resolve; });
-      mark('office-worker-started', { id: workerId, pid: child.pid });
+      mark('office-worker-started', { id: workerId, pid: child.pid, runtime: child.runtime });
       function failure(message) {
         return Object.assign(new Error(message + (diagnostics ? ': ' + diagnostics : '')), {
           name: 'ConversionError', code: 'unavailable',
@@ -128,16 +131,19 @@ function createOfficeFactory(root, spawn, mark) {
           signal?.removeEventListener('abort', abort);
         }
       }
-      try { await call('initialize', settings); }
+      try { await call('initialize', { settings, engineModule: native ? kitModule : 'file:///dsh/node_modules/@deepseek-ai/libreoffice-kit/lib/index.js' }); }
       catch (error) { stop(error); await exited; throw error; }
       function operation(method, request, signal) {
-        const translated = { ...request, inputPath: guestPath(request.inputPath) };
-        if (method === 'renderImages') translated.outputDir = guestPath(request.outputDir);
-        else translated.outputPath = guestPath(request.outputPath);
-        return call(method, translated, signal).then(result => method === 'renderImages' ? hostImages(result, request) : result);
+        guestPath(request.inputPath);
+        guestPath(method === 'renderImages' ? request.outputDir : request.outputPath);
+        const translated = { ...request, inputPath: runtimePath(request.inputPath) };
+        if (method === 'renderImages') translated.outputDir = runtimePath(request.outputDir);
+        else translated.outputPath = runtimePath(request.outputPath);
+        return call(method, translated, signal).then(result => method === 'renderImages' ? hostImages(result, request, native) : result);
       }
       return {
         backend: 'wasm',
+        get unavailable() { return terminal; },
         render: (request, signal) => operation('render', request, signal),
         convert: (request, signal) => operation('convert', request, signal),
         recalculate: (request, signal) => operation('recalculate', request, signal),
@@ -153,6 +159,44 @@ function createOfficeFactory(root, spawn, mark) {
               try { await exited; } finally { clearTimeout(deadline); }
             }
           })();
+          return disposed;
+        },
+      };
+  }
+  return {
+    async createConverter(options) {
+      let current = await connect(options);
+      let opening, disposed, closed = false;
+      const unavailable = () => Object.assign(new Error('Office converter is disposed'), { code: 'unavailable' });
+      async function acquire() {
+        if (closed) throw unavailable();
+        if (current.unavailable) {
+          if (!opening) {
+            const previous = current;
+            opening = (async () => {
+              await previous.dispose();
+              current = await connect(options);
+            })();
+          }
+          const attempt = opening;
+          try { await attempt; } finally { if (opening === attempt) opening = undefined; }
+        }
+        if (closed) throw unavailable();
+        return current;
+      }
+      return {
+        backend: 'wasm',
+        render: async (request, signal) => (await acquire()).render(request, signal),
+        convert: async (request, signal) => (await acquire()).convert(request, signal),
+        recalculate: async (request, signal) => (await acquire()).recalculate(request, signal),
+        renderImages: async (request, signal) => (await acquire()).renderImages(request, signal),
+        dispose() {
+          if (!disposed) {
+            closed = true;
+            disposed = (async () => {
+              try { await opening; } finally { await current.dispose(); }
+            })();
+          }
           return disposed;
         },
       };

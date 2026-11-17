@@ -298,7 +298,9 @@ async function main() {
   const launchGuest = installProotSpawn(workspace);
   globalThis.__harmonyOffice = safeMode ? {
     createConverter() { throw Object.assign(new Error('Office workers are disabled in HarmonyOS recovery mode'), { code: 'unavailable' }); },
-  } : require(path.join(root, 'dsh-harmony-office.cjs')).createOfficeFactory(root, globalThis.__harmonyMcpSpawn, mark);
+  } : require(path.join(root, 'dsh-harmony-office.cjs')).createOfficeFactory(root,
+    require(path.join(root, 'dsh-harmony-office-launch.cjs')).createOfficeLauncher(addon('libdshworkflow.so'), globalThis.__harmonyMcpSpawn, mark),
+    mark, pathToFileURL(path.join(dsh, '@deepseek-ai/libreoffice-kit/lib/index.js')).href);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
   const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
   globalThis.__harmonySharp = createSharp(root, launchGuest);

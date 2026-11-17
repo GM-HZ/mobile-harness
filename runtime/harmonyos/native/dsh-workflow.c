@@ -144,6 +144,21 @@ static napi_value launch_ptc(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_value launch_office(napi_env env, napi_callback_info info)
+{
+    (void)info;
+    int (*spawn)(struct WorkflowChild *) = broker_symbol("harmony_office_spawn");
+    struct WorkflowChild child;
+    int error = spawn ? spawn(&child) : ENOSYS;
+    if (error) return error_value(env, "Office launch", error);
+    napi_value result;
+    napi_create_object(env, &result);
+    set_number(env, result, "id", child.id);
+    set_number(env, result, "fd", child.fd);
+    set_number(env, result, "pid", child.pid);
+    return result;
+}
+
 static napi_value change_ptc_directory(napi_env env, napi_callback_info info)
 {
     size_t count = 1, length = 0;
@@ -244,6 +259,7 @@ NAPI_MODULE_INIT()
     const napi_property_descriptor properties[] = {
         {"launch", NULL, launch, NULL, NULL, NULL, napi_default, NULL},
         {"launchPtc", NULL, launch_ptc, NULL, NULL, NULL, napi_default, NULL},
+        {"launchOffice", NULL, launch_office, NULL, NULL, NULL, napi_default, NULL},
         {"terminate", NULL, terminate, NULL, NULL, NULL, napi_default, NULL},
         {"status", NULL, status, NULL, NULL, NULL, napi_default, NULL},
         {"confine", NULL, confine, NULL, NULL, NULL, napi_default, NULL},

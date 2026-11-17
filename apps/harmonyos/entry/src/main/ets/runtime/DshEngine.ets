@@ -119,7 +119,7 @@ class DshEngine {
     this.copyGuest(context, 'dsh-harmony-workflow.cjs', root + '/dsh-harmony-workflow.cjs');
     this.copyGuest(context, 'dsh-harmony-workflow-wire.cjs', root + '/dsh-harmony-workflow-wire.cjs');
     this.copyGuest(context, 'dsh-harmony-workflow-worker.cjs', root + '/dsh-harmony-workflow-worker.cjs');
-    for (const name of ['dsh-harmony-office.cjs', 'dsh-harmony-office-entry.mjs', 'dsh-harmony-office-worker.mjs']) {
+    for (const name of ['dsh-harmony-office.cjs', 'dsh-harmony-office-launch.cjs', 'dsh-harmony-office-entry.mjs', 'dsh-harmony-office-worker.mjs']) {
       this.copyGuest(context, name, root + '/' + name);
     }
     const ptc = context.resourceManager.getRawFileContentSync('dsh-harmony-ptc-enabled');

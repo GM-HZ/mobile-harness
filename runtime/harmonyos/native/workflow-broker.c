@@ -18,7 +18,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-enum { START = 1, STOP, STATUS, START_PTC, MAX_WORKERS = 8 };
+enum { START = 1, STOP, STATUS, START_PTC, START_OFFICE, MAX_WORKERS = 8 };
 struct Request { int action; uint32_t id; struct PtcLaunch launch; };
 struct Reply { int error; uint32_t id; pid_t pid; int finished; int status; };
 struct Worker { uint32_t id; pid_t pid; int finished; int status; int ptc; };
@@ -50,7 +50,7 @@ static int disable_io_uring(void)
         syscall(SYS_seccomp, SECCOMP_SET_MODE_FILTER, 0, &filter);
 }
 
-static void run_worker(const char *entry, int channel, pid_t parent)
+static void run_worker(const char *entry, int channel, pid_t parent, int office)
 {
     if (!follow_parent(parent) ||
         dup2(channel, STDIN_FILENO) < 0 ||
@@ -58,12 +58,21 @@ static void run_worker(const char *entry, int channel, pid_t parent)
         dup2(channel, STDERR_FILENO) < 0 ||
         syscall(SYS_close_range, 3u, ~0u, 0u) < 0 ||
         clearenv() != 0 || disable_io_uring() != 0) _exit(125);
+    if (office) {
+        char directory[1100], home[1100];
+        const char *slash = strrchr(entry, '/');
+        if (!slash || setpgid(0, 0) < 0) _exit(125);
+        snprintf(directory, sizeof(directory), "%.*s/tmp", (int)(slash - entry), entry);
+        snprintf(home, sizeof(home), "%.*s/native-benchmark-home", (int)(slash - entry), entry);
+        if (setenv("TMPDIR", directory, 1) || setenv("HOME", home, 1) || setenv("UV_USE_IO_URING", "0", 1)) _exit(125);
+    }
     void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
     typedef int (*NodeStart)(int, char **);
     NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;
     if (!start) _exit(126);
     char *argv[] = {"node", "--jitless", "--no-warnings", "--max-old-space-size=64", (char *)entry, NULL};
-    _exit(start(5, argv));
+    char *office_argv[] = {"node", "--no-warnings", "--max-old-space-size=512", (char *)entry, NULL};
+    _exit(start(office ? 4 : 5, office ? office_argv : argv));
 }
 
 static int send_reply(int channel, struct Reply reply, int fd)
@@ -117,6 +126,12 @@ static void serve(int channel, const char *entry, pid_t parent)
     const char ptc_name[] = "/dsh-harmony-ptc-worker.mjs";
     int has_ptc = basename && (size_t)(basename - ptc_entry) + sizeof(ptc_name) <= sizeof(ptc_entry);
     if (has_ptc) memcpy(basename, ptc_name, sizeof(ptc_name));
+    char office_entry[1024];
+    snprintf(office_entry, sizeof(office_entry), "%s", entry);
+    basename = strrchr(office_entry, '/');
+    const char office_name[] = "/dsh-harmony-office-worker.mjs";
+    int has_office = basename && (size_t)(basename - office_entry) + sizeof(office_name) <= sizeof(office_entry);
+    if (has_office) memcpy(basename, office_name, sizeof(office_name));
     for (;;) {
         ssize_t count = recv(channel, &request, sizeof(request), 0);
         if (count < 0 && errno == EINTR) continue;
@@ -125,18 +140,20 @@ static void serve(int channel, const char *entry, pid_t parent)
         struct Reply reply = {0};
         int worker_fd = -1;
         const int ptc = request.action == START_PTC;
+        const int office = request.action == START_OFFICE;
         int invalid_roots = request.launch.extra_count < 0 || request.launch.extra_count > MH_PTC_EXTRA_ROOTS;
         for (int i = 0; !invalid_roots && i < request.launch.extra_count; ++i) {
             invalid_roots = request.launch.extra_roots[i][0] != '/' ||
                 !memchr(request.launch.extra_roots[i], 0, sizeof(request.launch.extra_roots[i]));
         }
-        if (request.action == START || ptc) {
+        if (request.action == START || ptc || office) {
             struct Worker *worker = worker_slot(workers, 0);
             int pair[2];
             if (ptc && (invalid_roots || !has_ptc || request.launch.root[0] != '/' ||
                         !memchr(request.launch.root, 0, sizeof(request.launch.root)) ||
                         request.launch.cwd[0] != '/' ||
                         !memchr(request.launch.cwd, 0, sizeof(request.launch.cwd)))) reply.error = EINVAL;
+            else if (office && !has_office) reply.error = EINVAL;
             else if (!worker) reply.error = EBUSY;
             else if (next_id == 0) reply.error = EOVERFLOW;
             else if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, pair) < 0) reply.error = errno;
@@ -145,7 +162,7 @@ static void serve(int channel, const char *entry, pid_t parent)
                 if (pid == 0) {
                     close(pair[0]);
                     if (ptc) harmony_ptc_supervise(ptc_entry, pair[1], broker_pid, &request.launch);
-                    else run_worker(entry, pair[1], broker_pid);
+                    else run_worker(office ? office_entry : entry, pair[1], broker_pid, office);
                 }
                 if (pid < 0) {
                     reply.error = errno;
@@ -267,6 +284,17 @@ int harmony_ptc_spawn(const struct PtcLaunch *launch, struct WorkflowChild *chil
 {
     struct Reply reply;
     int error = exchange((struct Request){.action = START_PTC, .launch = *launch}, &reply, &child->fd);
+    if (!error) {
+        child->id = reply.id;
+        child->pid = reply.pid;
+    }
+    return error;
+}
+
+int harmony_office_spawn(struct WorkflowChild *child)
+{
+    struct Reply reply;
+    int error = exchange((struct Request){.action = START_OFFICE}, &reply, &child->fd);
     if (!error) {
         child->id = reply.id;
         child->pid = reply.pid;

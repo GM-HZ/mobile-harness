@@ -33,6 +33,7 @@ export function apply(ctx) {
       bytes: state.bytes ?? 0, elapsedMs: state.elapsedMs ?? 0,
       workerId: state.worker?.id ?? '', workerPid: state.worker?.pid ?? 0,
       postDisposeRejected: state.postDisposeRejected ?? false,
+      actedWhilePending: state.actedWhilePending ?? false,
       remainingScratch: (await scratch()).filter(name => !state.beforeScratch.has(name)).length,
     };
   }
@@ -52,6 +53,7 @@ export function apply(ctx) {
           elapsedMs: { type: 'number', required: true }, workerId: { type: 'string', required: true },
           workerPid: { type: 'integer', required: true }, postDisposeRejected: { type: 'boolean', required: true },
           remainingScratch: { type: 'integer', required: true },
+          actedWhilePending: { type: 'boolean', required: true },
         },
       },
       render(_args, result) { return [{ type: 'text', text: JSON.stringify(result) }]; },
@@ -80,6 +82,22 @@ export function apply(ctx) {
           state.bytes = result.pdf.length; state.status = 'completed';
         }).catch(error => { state.status = 'error'; state.code = error.code ?? error.name; });
         if (['idle', 'timeout', 'crash'].includes(args.case)) await state.pending;
+        if (['active', 'cancel'].includes(args.case)) {
+          const deadline = Date.now() + 35000;
+          while (!(await trace()).some(row => row.event === 'office-operation-running' && !state.beforeWorkers.has(row.id))) {
+            if (Date.now() >= deadline || state.status !== 'pending') throw new Error('Fixture missed the in-flight operation');
+            await delay(5);
+          }
+          if (state.status !== 'pending') throw new Error('Fixture operation completed before the cancellation action');
+          state.actedWhilePending = true;
+          const started = Date.now();
+          if (args.case === 'active') {
+            await state.owner.fiber.dispose();
+            state.closed = true;
+          } else state.controller.abort(new Error('Fixture cancelled this reader'));
+          await state.pending;
+          state.elapsedMs = Date.now() - started;
+        }
       }
       if (!state) throw new Error('No fixture-owned provider for this case');
       if (args.action === 'cancel') {

@@ -1,4 +1,3 @@
-import { createConverter } from 'file:///dsh/node_modules/@deepseek-ai/libreoffice-kit/lib/index.js';
 import { createInterface } from 'node:readline';
 
 const FRAME = 'MH_OFFICE_RPC ';
@@ -13,9 +12,18 @@ async function execute(frame) {
   const { id, method, request } = frame;
   if (method === 'cancel') { active.get(frame.target)?.abort(new Error('Office operation cancelled')); return; }
   if (typeof id !== 'string') throw new Error('Office request is missing its identity');
+  if (method === 'capabilities') {
+    const bytes = Buffer.from('0061736d010000000105016000017f0302010007070103666f6f00000a06010400412a0b', 'hex');
+    const value = new WebAssembly.Instance(new WebAssembly.Module(bytes)).exports.foo();
+    respond(id, { wasm: true, value, platform: process.platform, node: process.version });
+    return;
+  }
   if (method === 'initialize') {
     if (initialization) throw new Error('Office converter was already initialized');
-    initialization = createConverter(request);
+    const location = new URL(request.engineModule);
+    if (location.protocol !== 'file:' || location.search || location.hash ||
+        !location.pathname.endsWith('/@deepseek-ai/libreoffice-kit/lib/index.js')) throw new Error('Invalid pinned Office engine module');
+    initialization = import(location.href).then(({ createConverter }) => createConverter(request.settings));
     converter = await initialization;
     respond(id, { backend: converter.backend });
     return;
