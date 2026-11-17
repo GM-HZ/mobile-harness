@@ -91,3 +91,10 @@ Mate 60（BRA-AL00，API 26）通过 USB 从 0.4.9 依次覆盖到 0.4.23 和 0.
 | 普通包恢复 | 重新覆盖安装普通包并启动。保留数据强停重启到 ArkWeb 完成 11.717 秒，四个运行时资源包均复用。Bash 单次批准、管道和工具版本检查通过 |
 
 本轮真机隔离以实验制品受控终止 Host 为验收。插件加载即崩溃的故障注入证据来自此前的模拟器。 [真机回归和制品校验](evidence/mate60-restructure-0.4.25.json) · [模拟器故障回归](evidence/emulator-restructure-0.4.25.json)
+
+
+## 0.4.31 模拟器 RC.4 回归
+
+普通包默认启用通用 PTC。16 组现有执行、审批、生命周期、Workflow、MCP、调度和故障恢复回归通过；新增标准工具链回归验证精确 Bash 单次审批、pip／venv 隔离、Git、Node fetch、curl、SQLite、时区和五个文件工具。原生恢复入口实际点击通过，正常模式重新就绪为 5.7 秒。保留升级前真实 venv 会话的 30 条事件及完成标记。
+
+本版为模拟器结果，真机尚未在线验证。[证据、失败尝试和制品](evidence/emulator-dsh-rc4-0.4.31.json) · [能力与限制](dsh-capabilities.md)

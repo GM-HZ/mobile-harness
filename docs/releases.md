@@ -171,3 +171,14 @@ Phone 模拟器分别通过 `node` 和 `python3` 启动本地 MCP 测试服务�
 鸿蒙受管 Bash 支持 CPython 的默认 `venv` 和 `--copies`。API 26 Phone 模拟器覆盖安装后，在实际 DSH Bash 单次审批中创建两个虚拟环境，用 Pip 25.0.1 分别安装纯 Python wheel 1.0 和 2.0。两套环境的导入与命令入口各自返回对应版本，直接从未激活的 shell 执行命令入口也通过。 [验收记录](evidence/emulator-venv-0.4.30.json)
 
 同一安装包从公网 PyPI 下载并安装 `packaging==24.2`，随后验证了导入版本。Pip 遇到一次读超时，重试后成功。 [联网验收](evidence/emulator-venv-0.4.30.json)
+
+
+## 0.4.31 DSH RC.4 与默认通用 PTC
+
+运行时升级到官方 npm `0.2.2-rc.4`，328 个直接 DSH 包均锁定 RC.4。公开源码暂未发布 RC.4 标签，子模块继续固定 RC.3；构建仍检查发布依赖和七个原生绑定的精确字节。PTC、Workflow、MCP 入口经对照保持兼容。
+
+普通构建自动生成并校验 JITless 可用的 Amaro JS，包含通用 PTC worker，不再要求实验构建参数。支持上游 REPL／Script、TypeScript、文件授权、附加目录、工具回调、单次审批、取消和 Agent 生命周期；恢复模式继续跳过该后端。
+
+API 26 Phone 模拟器通过 16 组 PTC／Workflow／MCP／定时任务／故障恢复，以及一组完整 Bash 工具链和五个文件工具回归。实际点击设置恢复入口和原生正常模式按钮也通过。升级前包含 venv 结果的会话历史仍可读取；覆盖升级约 22.7 秒，恢复到正常模式约 5.7 秒。工具链首次采用 90 秒等待，触发原有转后台策略后被模型取消，该次失败保留；180 秒预算下完整夹具通过，未减少功能断言。
+
+真机、首次清空数据后的启动、系统唤醒、每种提供者和可选插件尚未逐一回归。Bash 默认无内核沙箱仍拒绝；PRoot 不作为隔离后端。通用 PTC 的 enforcement 为 partial。系统 PTY 和 Phone Use 继续暂缓。[准确制品与全部回归](evidence/emulator-dsh-rc4-0.4.31.json) · [能力矩阵](dsh-capabilities.md)

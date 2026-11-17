@@ -1,0 +1,731 @@
+{
+  "recordedAt": "2026-11-17T17:39:19.508701+00:00",
+  "target": "DevEco API 26 ARM64 Phone emulator 127.0.0.1:15557",
+  "implementationCommit": "545f3a1b5fb8f1a591efb4cc36ba2d6df4c05caf",
+  "regressionSourcesCommit": "32a1de587754bba67f00fc70b78d5f33f9174036",
+  "artifact": {
+    "appVersion": "0.4.31",
+    "sourceBaseline": "569480c5f7190695a2dc612ee5cb06a02ecb270f",
+    "hap": "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/.build/dsh-rc4/dsh-mh-0.4.31-unsigned.hap",
+    "sha256": "35abee7588048d382d869e1c7cb9736b64e5b8aba53bfaa20e773e2aa0e69589",
+    "bytes": 648437004,
+    "defaultBuild": true,
+    "ptcEnabled": "1",
+    "sourceCommit": "545f3a1b5fb8f1a591efb4cc36ba2d6df4c05caf",
+    "deliveryPath": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.31-unsigned.hap",
+    "descriptor": {
+      "versionName": "0.4.31",
+      "versionCode": 38,
+      "bundleName": "org.sayact.nodepoc"
+    }
+  },
+  "build": {
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=/Users/gongmeng/dev/acode/mobile-harness/.build/inputs/harmonyos ./build.sh",
+    "exitCode": 0,
+    "logSha256": "9b113ed76bace646052af7b9a1129ca254525a33d09ce3c4c878a90a3994153c",
+    "ptcOverrideUsed": false,
+    "portableParserGeneratedByNormalBuild": true,
+    "nativeInputsUnchangedFromPinnedBaseline": true,
+    "nativeInputSha256": {
+      "node-addon-require-builtin-linux-arm64-musl/prebuilt/linux-arm64-musl-napi-v9.node": "f973d48df2892965052b9bc3d6fb3d0a1538724ba51583e6b7d57cfd6df59352",
+      "@deepseek-ai/node-addon-system-linux-arm64/bin/musl/system.node": "5a30225892269c7b9a6cf8db568fe8497e417dd8c4e163375784768c072427f0",
+      "@deepseek-ai/node-addon-system-linux-arm64/bin/landlock-run": "f6ae2ad5893e3123f45329ade5518b33c3ac3b102978001ff1c6a6a8ebe2ad9b",
+      "@vscode/ripgrep-linux-arm64/bin/rg": "e152ea689d6e8420357e592f0d8253b96476c164118ca3e6e13074fa1705ddda",
+      "@koromix/koffi-linux-arm64/musl_arm64/koffi.node": "7344d15a078df5692eafe8d4b35a398389a1b1a792b0e206ccc27e20f3126aa8",
+      "@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node": "df8b81cc62b4a8546b01a52145d8ce3480de0f2e09d9d379e0fc8b79d864cb13",
+      "@img/sharp-libvips-linuxmusl-arm64/lib/libvips-cpp.so.8.18.7": "26e2e3405ac4e9ad4dbad4d5ac60a448a76561388782104492aa15fe3a0c0509"
+    }
+  },
+  "release": {
+    "version": "0.2.2-rc.4",
+    "registryDistTags": {
+      "alpha": "0.2.2-alpha.3",
+      "latest": "0.2.2-rc.1",
+      "next": "0.2.2-rc.4"
+    },
+    "resolved": "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.2.2-rc.4.tgz",
+    "integrity": "sha512-DRJaTWIk4ObkDOHxld+XjFgHdKzX5UApE7PjzE/Espy44m1fT4pY7LRJCMDCFD+ArIJ+Gwl1FL9g1/UlMwNvpw==",
+    "packageLockSha256": "abba45e17c07a89c562ed7dd18217298b349dbfb68915ba328dd94739e4b575f",
+    "dshDirectPackagesAtRc4": 328,
+    "sourceGitlink": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+    "sourceGitlinkRelease": "0.2.2-rc.3",
+    "sourceGitlinkMatchesNpmRelease": false,
+    "publicRc4TagAvailable": false,
+    "publishedFrontendCommit": "70005a5",
+    "resolvePublishedCommit": "GitHub public commits/70005a5 returned HTTP 422: No commit found for SHA",
+    "integrationEntryComparison": {
+      "dsh/lib/bin.js": {
+        "same": true,
+        "sha256": "36f86742e0c3cc1c3b2dbaa6582ee00b0c37bc4f5a190f7531b5303bf3efb6d9"
+      },
+      "dsh-ptc-runtime-node/lib/process.js": {
+        "same": true,
+        "sha256": "c01308c52fc52d5f13edd2b65008f3bbcf67bd753eb17af5e4bc023216eca6b4"
+      },
+      "dsh-ptc-runtime-node/lib/index.js": {
+        "same": true,
+        "sha256": "2eee67bc472e933cc71f9ee25c04ed266f56be0310b809cadeb31d5d5c804349"
+      },
+      "dsh-workflow-ptc/lib/index.js": {
+        "same": true,
+        "sha256": "b1562c97eae68d58d42b23d5d047e6db557c768d6248ab651f152f5e421aa19f"
+      },
+      "dsh-mcp-client/lib/index.js": {
+        "same": true,
+        "sha256": "879b2364e28563626697dd5e3dcf64dcae61dd215dc8f21b283cb7616a672bde"
+      },
+      "dsh-client-ui-settings-general/lib/client.js": {
+        "same": false,
+        "sha256": "438013df8e8f662619a63eda6235063e4212285befce7f4ba0ea2707c97ed395"
+      }
+    },
+    "publishedCodeDelta": {
+      "checkedCurrentSourceFiles": 42525,
+      "changed": [
+        "@deepseek-ai/dsh-client-modules/lib/index.js",
+        "@deepseek-ai/dsh-session-persistence-jsonl/lib/worker.cjs",
+        "@deepseek-ai/dsh-client-ui-settings-general/lib/client.js",
+        "@deepseek-ai/dsh-client-ui-sidebar/lib/client.js",
+        "@deepseek-ai/dsh-llm-deepseek/lib/index.js",
+        "@deepseek-ai/dsh-llm-deepseek/src/translate.ts",
+        "@deepseek-ai/dsh-repeat-tool-reminder/lib/index.js",
+        "@deepseek-ai/dsh-tmux-context/lib/index.js",
+        "@deepseek-ai/dsh-experimental-liveshare/lib/index.js",
+        "@deepseek-ai/dsh-experimental-liveshare/src/host/tunnel-worker.ts",
+        "@deepseek-ai/dsh-client-ui-settings-account/lib/client.js",
+        "@deepseek-ai/dsh-llm/lib/index.js",
+        "@deepseek-ai/dsh-llm/src/error.ts",
+        "@deepseek-ai/dsh-llm/lib/types/error.js"
+      ],
+      "removed": []
+    }
+  },
+  "overinstall": {
+    "startupReadyMs": 22661,
+    "retainedSession": "session-106094ad-2664-4b49-bace-2917f3ce92ce",
+    "retainedSessionCursor": 2,
+    "runtimeVersion": "0.2.2-rc.4",
+    "ptcEnabled": true,
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200
+  },
+  "regressions": [
+    {
+      "case": "ptc-core",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-core.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 26.751,
+      "result": {
+        "readyMs": 59,
+        "runCodeObserved": true,
+        "typeScriptResultReturned": true,
+        "fileContentsMatched": true,
+        "outsideReadDenied": true,
+        "nestedHostToolMatched": true,
+        "overwriteAndAppendMatched": true,
+        "outsideWriteDenied": true,
+        "exclusiveCreatePreservedExisting": true,
+        "directoryOperationsMatched": true,
+        "crossBoundaryDirectoryMutationsDenied": true,
+        "nonemptyDirectoryPreserved": true,
+        "metadataMatched": true,
+        "recursiveDirectoryOperationsMatched": true,
+        "outsideMetadataAndTraversalDenied": true,
+        "processDirectoryChangesMatched": true,
+        "outsideDirectoryChangeDenied": true,
+        "nextTurnStartedInSubdirectory": true,
+        "cancelledViaSession": true,
+        "cancelledWorkerReaped": true,
+        "temporaryModelCredentialRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "27b9b7995594d72dd9f58e0c2fbed5e798fd32afc5d8d6c779e6de3384bd7ced"
+    },
+    {
+      "case": "ptc-readonly",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-readonly.json",
+        "--read-only"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 16.578,
+      "result": {
+        "readyMs": 6086,
+        "readOnlyReadsAllowed": true,
+        "readOnlyWritesDenied": true,
+        "readOnlyDirectoryMutationsDenied": true,
+        "readOnlyDiskUnchanged": true,
+        "readOnlyMetadataAllowed": true,
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "27b9b7995594d72dd9f58e0c2fbed5e798fd32afc5d8d6c779e6de3384bd7ced"
+    },
+    {
+      "case": "ptc-roots",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-roots.json",
+        "--additional-roots"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 24.907,
+      "result": {
+        "readyMs": 4644,
+        "additionalRootsReadWriteMatched": true,
+        "crossRootRenameMatched": true,
+        "nestedGrantMatched": true,
+        "extraRootWorkingDirectoryMatched": true,
+        "unauthorizedSiblingDenied": true,
+        "relativeCrossRootReadWriteMatched": true,
+        "relativeCrossRootMetadataAndRenameMatched": true,
+        "discardedComponentsValidated": true,
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "27b9b7995594d72dd9f58e0c2fbed5e798fd32afc5d8d6c779e6de3384bd7ced"
+    },
+    {
+      "case": "ptc-repl",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-repl.json",
+        "--mode",
+        "persistent-in-memory"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 44.297,
+      "result": {
+        "readyMs": 4635,
+        "executionMode": "persistent-in-memory",
+        "scriptPersistence": false,
+        "topLevelAwait": true,
+        "sameSessionRetained": true,
+        "otherSessionIsolated": true,
+        "admittedWorkers": 2,
+        "archiveAndRestorePreservedState": true,
+        "cooperativeCancellationPreservedState": true,
+        "cooperativeCancellationMs": 103,
+        "blockingCancellationReapedWorker": true,
+        "blockingCancellationMs": 3192,
+        "nextTurnStartedWithFreshState": true,
+        "processDirectoryChangesMatched": true,
+        "outsideDirectoryChangeDenied": true,
+        "nextTurnStartedInSubdirectory": true,
+        "retainedStateSurvivedDirectoryChange": true,
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "27b9b7995594d72dd9f58e0c2fbed5e798fd32afc5d8d6c779e6de3384bd7ced"
+    },
+    {
+      "case": "ptc-script",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-script.json",
+        "--mode",
+        "vm-script"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 17.728,
+      "result": {
+        "readyMs": 4383,
+        "executionMode": "vm-script",
+        "scriptPersistence": false,
+        "topLevelAwait": true,
+        "sameSessionRetained": false,
+        "otherSessionIsolated": true,
+        "admittedWorkers": 3,
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "27b9b7995594d72dd9f58e0c2fbed5e798fd32afc5d8d6c779e6de3384bd7ced"
+    },
+    {
+      "case": "ptc-script-retained",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-script-retained.json",
+        "--mode",
+        "vm-script",
+        "--script-persistence"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 48.25,
+      "result": {
+        "readyMs": 4670,
+        "executionMode": "vm-script",
+        "scriptPersistence": true,
+        "topLevelAwait": true,
+        "sameSessionRetained": true,
+        "otherSessionIsolated": true,
+        "admittedWorkers": 2,
+        "archiveAndRestorePreservedState": true,
+        "cooperativeCancellationPreservedState": true,
+        "cooperativeCancellationMs": 103,
+        "blockingCancellationReapedWorker": true,
+        "blockingCancellationMs": 3108,
+        "nextTurnStartedWithFreshState": true,
+        "processDirectoryChangesMatched": true,
+        "outsideDirectoryChangeDenied": true,
+        "nextTurnStartedInSubdirectory": true,
+        "retainedStateSurvivedDirectoryChange": true,
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "27b9b7995594d72dd9f58e0c2fbed5e798fd32afc5d8d6c779e6de3384bd7ced"
+    },
+    {
+      "case": "ptc-approval",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-approval.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-approval.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 18.05,
+      "result": {
+        "readyMs": 60,
+        "defaultPolicyDenied": true,
+        "rejectionPreventedExecution": true,
+        "cancellationPreventedExecution": true,
+        "approvedOnceExecutedAndReaped": true,
+        "standingPolicyPreserved": true,
+        "approvalsBoundToCallAndSession": true,
+        "standingMode": "workspace-write",
+        "approvedMode": "danger-full-access",
+        "temporaryModelCredentialRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "6c578f4f8ad9215179641c9bf28945c9e7e237864a860cf27be653e8b2d8cb66"
+    },
+    {
+      "case": "ptc-approval-readonly",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-approval.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-approval-readonly.json",
+        "--read-only"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 25.432,
+      "result": {
+        "readyMs": 4761,
+        "defaultPolicyDenied": true,
+        "rejectionPreventedExecution": true,
+        "cancellationPreventedExecution": true,
+        "approvedOnceExecutedAndReaped": true,
+        "standingPolicyPreserved": true,
+        "approvalsBoundToCallAndSession": true,
+        "standingMode": "read-only",
+        "approvedMode": "workspace-write",
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "6c578f4f8ad9215179641c9bf28945c9e7e237864a860cf27be653e8b2d8cb66"
+    },
+    {
+      "case": "ptc-approval-retained",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-approval.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-approval-retained.json",
+        "--retained"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 31.769,
+      "result": {
+        "readyMs": 4370,
+        "defaultPolicyDenied": true,
+        "rejectionPreventedExecution": true,
+        "cancellationPreventedExecution": true,
+        "approvedOnceExecutedAndReaped": true,
+        "standingPolicyPreserved": true,
+        "approvalsBoundToCallAndSession": true,
+        "standingMode": "workspace-write",
+        "approvedMode": "danger-full-access",
+        "retainedStatePreservedAcrossEscalation": true,
+        "escalationUsedFreshProgramState": true,
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "6c578f4f8ad9215179641c9bf28945c9e7e237864a860cf27be653e8b2d8cb66"
+    },
+    {
+      "case": "ptc-approval-retained-readonly",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-approval.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-approval-retained-readonly.json",
+        "--retained",
+        "--read-only"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 31.881,
+      "result": {
+        "readyMs": 4727,
+        "defaultPolicyDenied": true,
+        "rejectionPreventedExecution": true,
+        "cancellationPreventedExecution": true,
+        "approvedOnceExecutedAndReaped": true,
+        "standingPolicyPreserved": true,
+        "approvalsBoundToCallAndSession": true,
+        "standingMode": "read-only",
+        "approvedMode": "workspace-write",
+        "retainedStatePreservedAcrossEscalation": true,
+        "escalationUsedFreshProgramState": true,
+        "temporaryModelCredentialRemoved": true,
+        "temporaryProfilePatchRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "6c578f4f8ad9215179641c9bf28945c9e7e237864a860cf27be653e8b2d8cb66"
+    },
+    {
+      "case": "ptc-lifecycle-repl",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-lifecycle.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-lifecycle-repl.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 52.414,
+      "result": {
+        "readyMs": 4663,
+        "idle": {
+          "ownedHandleDisposed": true,
+          "agentUnregistered": true,
+          "sessionUnregistered": true,
+          "workerReaped": true,
+          "disposeMs": 49,
+          "durableSessionResumedWithFreshWorker": true
+        },
+        "active": {
+          "ownedHandleDisposed": true,
+          "agentUnregistered": true,
+          "sessionUnregistered": true,
+          "workerReaped": true,
+          "disposeMs": 3088,
+          "durableSessionResumedWithFreshWorker": true
+        },
+        "executionMode": "persistent-in-memory",
+        "temporaryModelCredentialRemoved": true,
+        "originalProfileRestored": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "4d98ce337ae63989b2d15c12378dec8fbc0f7125e9c50af43782828d4571da71"
+    },
+    {
+      "case": "ptc-lifecycle-script",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-lifecycle.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/ptc-lifecycle-script.json",
+        "--mode",
+        "vm-script"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 48.066,
+      "result": {
+        "readyMs": 4389,
+        "idle": {
+          "ownedHandleDisposed": true,
+          "agentUnregistered": true,
+          "sessionUnregistered": true,
+          "workerReaped": true,
+          "disposeMs": 37,
+          "durableSessionResumedWithFreshWorker": true
+        },
+        "active": {
+          "ownedHandleDisposed": true,
+          "agentUnregistered": true,
+          "sessionUnregistered": true,
+          "workerReaped": true,
+          "disposeMs": 3039,
+          "durableSessionResumedWithFreshWorker": true
+        },
+        "executionMode": "vm-script",
+        "temporaryModelCredentialRemoved": true,
+        "originalProfileRestored": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "4d98ce337ae63989b2d15c12378dec8fbc0f7125e9c50af43782828d4571da71"
+    },
+    {
+      "case": "workflow",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-workflow.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/workflow.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 14.174,
+      "result": {
+        "startupMs": 62,
+        "foreground": {
+          "actualSubagentsStarted": 2,
+          "completed": true,
+          "bothResultsReturned": true,
+          "parallel": true
+        },
+        "timeout": true,
+        "cancelledDuringSyncSlice": true,
+        "cancelledWithActiveChild": true,
+        "backgroundJob": {
+          "started": true,
+          "completed": true,
+          "resultDelivered": true
+        },
+        "temporaryModelCredentialRemoved": true
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "testSourceSha256": "73670935aa3689ad1d63f7bb8286fea6a3ff9183497b64ecb652d93ccbb617b5"
+    },
+    {
+      "case": "mcp-stdio",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-mcp-stdio.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/mcp-stdio.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 14.524,
+      "result": {
+        "node": {
+          "probe": {
+            "ok": true,
+            "serverInfo": {
+              "name": "node-stdio-fixture",
+              "version": "1"
+            },
+            "toolNames": [
+              "stdio_fixture_echo"
+            ],
+            "truncated": false,
+            "durationMs": 4812,
+            "closeConfirmed": true
+          },
+          "toolResultReturnedToSession": true,
+          "fixtureRemoved": true
+        },
+        "python3": {
+          "probe": {
+            "ok": true,
+            "serverInfo": {
+              "name": "python-stdio-fixture",
+              "version": "1"
+            },
+            "toolNames": [
+              "stdio_fixture_echo"
+            ],
+            "truncated": false,
+            "durationMs": 657,
+            "closeConfirmed": true
+          },
+          "toolResultReturnedToSession": true,
+          "fixtureRemoved": true
+        }
+      },
+      "logSha256": "7fafa72628e60f4b640bfcb10c69aace93b5c3ecebc9c2c48e8e9e884c10fe4f",
+      "testSourceSha256": "2a9a42122f16609d5c43a97040c9ff142ad730215435cb7d79428d07ccf1db3c"
+    },
+    {
+      "case": "scheduler-mcp-http",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-dsh-capabilities.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/scheduler-mcp-http.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 27.652,
+      "result": {
+        "schedule": {
+          "restartReadyMs": 4661,
+          "persistedAcrossHostRestart": true,
+          "receiptPresent": true,
+          "eventsWithMarker": [
+            "agent/inbox/spliced",
+            "user/message",
+            "assistant/message"
+          ],
+          "modelReply": true,
+          "fixtureRemoved": true
+        },
+        "mcpHttp": {
+          "probe": {
+            "ok": true,
+            "serverInfo": {
+              "name": "mh-probe",
+              "version": "1.0"
+            },
+            "toolNames": [
+              "fixture_echo"
+            ],
+            "truncated": false,
+            "durationMs": 48,
+            "closeConfirmed": true
+          },
+          "toolResultReturnedToSession": true,
+          "fixtureRemoved": true,
+          "observedMethods": [
+            "server/discover",
+            "initialize",
+            "notifications/initialized",
+            "tools/list",
+            "server/discover",
+            "initialize",
+            "notifications/initialized",
+            "tools/list",
+            "tools/call"
+          ]
+        }
+      },
+      "logSha256": "d590f0a4927d9005c51ac0bf22ffb340464f66d65d7cc63a6fdc4e7b31f5b5e3",
+      "testSourceSha256": "4de36539aca4e45b0e633d0248aa39a85e344472da9def4cf5ad93288a6096b4"
+    },
+    {
+      "case": "plugin-recovery",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc4/regressions/plugin-recovery.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 20.773,
+      "result": {
+        "normalReadyMs": 59,
+        "anonymousHttp": 401,
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 4969,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true
+      },
+      "logSha256": "c9cfa527ab4eefe5eafb529ad2a4710732a2ad907487ef90d044523c4351fb86",
+      "testSourceSha256": "94aa127d92581c3208f103ca8d4006d9344bc8af6897fc38ebd3ca71407a5d0e"
+    }
+  ],
+  "toolkit": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-toolkit.py",
+      "127.0.0.1:15557",
+      ".build/dsh-rc4/toolkit.json"
+    ],
+    "sourceSha256": "3199009041970d25ae8b6ab80c4522a428eaa2817495642ad6645a91764d4a30",
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "result": {
+      "defaultBashRefusedWithoutBackend": true,
+      "approvedCommandObservedTools": [
+        "bash"
+      ],
+      "approvedToolkit": {
+        "bash": true,
+        "git": true,
+        "pythonPip": true,
+        "twoIsolatedVenvs": true,
+        "nodeFetch": true,
+        "curl": true,
+        "sqlite": true,
+        "timezone": true
+      },
+      "fileTools": [
+        "edit",
+        "glob",
+        "grep",
+        "read",
+        "write"
+      ],
+      "temporaryModelCredentialRemoved": true
+    },
+    "firstAttempt": {
+      "exitCode": 1,
+      "commandTimeoutMs": 90000,
+      "result": "Bash promoted after 90 seconds; the model called job_kill; complete toolkit markers had not returned. Not a passing run.",
+      "logSha256": "defb5e301d443e15a1f1fddeea66f1eb9c9a7c04142d1605c855768f7481d647",
+      "eventsSha256": "aeb15d38211deed4427721d6b4d405347ae3945edde0f2a6bac1d90be085a9e7"
+    },
+    "finalCommandTimeoutMs": 180000,
+    "functionalAssertionsRetained": true
+  },
+  "nativeRecoveryUi": {
+    "settingsRecoveryRowObserved": true,
+    "nativeSafeRecoveryPageObserved": true,
+    "normalModeButtonClicked": true,
+    "normalReadyAfterButtonMs": 5693,
+    "samePreUpgradeSessionRecovered": true,
+    "authenticatedHttp": 200,
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    }
+  },
+  "finalState": {
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "temporaryModelCredentialAbsent": true,
+    "profilePatchAbsent": true,
+    "rc3HistoryRecovered": {
+      "sessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+      "eventCount": 30,
+      "containsOriginalVenvCompletion": true
+    }
+  },
+  "verification": {
+    "vendorCheckExitCode": 0,
+    "pythonCompileExitCode": 0,
+    "gitDiffCheckExitCode": 0,
+    "tamperedPortableParserOverride": "ValueError: Unexpected portable Amaro input: amaro.cjs"
+  },
+  "scope": {
+    "physicalDevice": "Mate 60 not online in HDC; not tested in this release",
+    "freshDataStartup": "not tested; upgrade and recovery restart measured",
+    "phoneUseAndSystemPty": "remain deferred",
+    "bashConfinement": "No usable system sandbox; default refuses; exact command approval required",
+    "ptcEnforcement": "partial, scoped file mediator and restricted native workers; not arbitrary Node/Linux API compatibility",
+    "thirdPartyPlugins": "preserved upstream mechanism, not every plugin/provider individually tested",
+    "background": "schedule restart delivery passed; OS wakeup and live Bash process recovery after app termination not established",
+    "securityStress": "symlink/hardlink and concurrent parent-move stress not fully verified"
+  }
+}
