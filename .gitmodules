@@ -13,3 +13,9 @@
 [submodule "termony"]
 	path = vendor/repos/termony
 	url = https://github.com/TermonyHQ/Termony.git
+[submodule "vendor/repos/typescript-language-server"]
+	path = vendor/repos/typescript-language-server
+	url = https://github.com/typescript-language-server/typescript-language-server.git
+[submodule "vendor/repos/typescript"]
+	path = vendor/repos/typescript
+	url = https://github.com/microsoft/TypeScript.git

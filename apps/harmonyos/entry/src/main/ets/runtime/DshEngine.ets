@@ -113,6 +113,7 @@ class DshEngine {
     if (fileIo.accessSync(launchFile)) fileIo.unlinkSync(launchFile);
     if (fileIo.accessSync(root + '/tmp/dsh-native-timeline.log')) fileIo.unlinkSync(root + '/tmp/dsh-native-timeline.log');
     this.copyGuest(context, 'dsh-native-web.cjs', root + '/dsh-native-web.cjs');
+    this.copyGuest(context, 'dsh-lsp.patch.yml', root + '/dsh-lsp.patch.yml');
     this.copyGuest(context, 'dsh-harmony-subprocess.mjs', root + '/dsh-harmony-subprocess.mjs');
     this.copyGuest(context, 'dsh-harmony-signed-programs.json', root + '/dsh-harmony-signed-programs.json');
     this.copyGuest(context, 'dsh-harmony-http.cjs', root + '/dsh-harmony-http.cjs');
@@ -228,7 +229,12 @@ class DshEngine {
       const dshRelease = root + '/.dsh-0.2.2-rc.4';
       if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
       const dshUnpackStarted = Date.now();
-      const unpackedDsh = await this.unpack(context, 'dsh-layer.zip', dshRelease);
+      let runtimeId = '';
+      for (const byte of context.resourceManager.getRawFileContentSync('dsh-runtime-id.txt')) {
+        runtimeId += String.fromCharCode(byte);
+      }
+      if (!/^[a-f0-9]{64}$/.test(runtimeId)) throw new Error('Invalid packaged DSH runtime identity');
+      const unpackedDsh = await this.unpack(context, 'dsh-layer.zip', dshRelease, runtimeId);
       hilog.info(0xD005, 'DSHClient', 'startup archive dsh-layer.zip extracted=%{public}s ms=%{public}s',
         String(unpackedDsh), Date.now() - dshUnpackStarted);
       const settingsClient = dshRelease + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
@@ -297,9 +303,9 @@ class DshEngine {
     }
   }
 
-  private async unpack(context: common.UIAbilityContext, name: string, root: string): Promise<boolean> {
+  private async unpack(context: common.UIAbilityContext, name: string, root: string, identity: string = ''): Promise<boolean> {
     const archive = context.filesDir + '/' + name;
-    const marker = root + '/.validated-unpack-v2-' + name;
+    const marker = root + '/.validated-unpack-v2-' + name + (identity ? '-' + identity : '');
     if (fileIo.accessSync(marker)) return false;
     const raw = context.resourceManager.getRawFdSync(name);
     const output = fileIo.openSync(archive,

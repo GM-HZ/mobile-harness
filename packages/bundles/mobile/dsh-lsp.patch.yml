@@ -1,0 +1,31 @@
+# Official provider and tool; only the deployment's server selection is ours.
+# Loaded by the native Host in normal mode, never in recovery mode.
+- insert:
+    - id: lsp
+      name: '@deepseek-ai/dsh-lsp'
+    - id: lsp-stdio
+      name: '@deepseek-ai/dsh-lsp-stdio'
+      config:
+        servers:
+          typescript:
+            command: node
+            args: !!js >-
+              ['--max-old-space-size=192', process.env.HARMONY_NATIVE_WEB_ROOT + '/.dsh-0.2.2-rc.4/dsh/node_modules/typescript-language-server/lib/cli.mjs', '--stdio']
+            extensionToLanguage:
+              .ts: typescript
+              .tsx: typescriptreact
+              .mts: typescript
+              .cts: typescript
+              .js: javascript
+              .jsx: javascriptreact
+              .mjs: javascript
+              .cjs: javascript
+            initializationOptions:
+              hostInfo: Mobile Harness
+              disableAutomaticTypingAcquisition: true
+              maxTsServerMemory: 384
+              tsserver:
+                path: !!js process.env.HARMONY_NATIVE_WEB_ROOT + '/.dsh-0.2.2-rc.4/dsh/node_modules/typescript/lib/tsserver.js'
+                useSyntaxServer: never
+    - id: tool-lsp
+      name: '@deepseek-ai/dsh-tool-lsp'

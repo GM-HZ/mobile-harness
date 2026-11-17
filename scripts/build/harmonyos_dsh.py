@@ -23,6 +23,15 @@ def stage_dsh(root, raw, baseline):
     manifest = root / "runtime/harmonyos/dsh"
     lock = manifest / "package-lock.json"
     key = hashlib.sha256(lock.read_bytes()).hexdigest()
+    pinned = json.loads(lock.read_text())["packages"]
+    for package, source in json.loads((manifest / "lsp-sources.json").read_text()).items():
+        recorded = pinned["node_modules/" + package]
+        checkout = root / source["source"]
+        head = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
+        if (head != source["commit"] or recorded["version"] != source["version"] or
+                recorded["integrity"] != source["integrity"] or
+                json.loads((checkout / "package.json").read_text())["version"] != source["version"]):
+            raise ValueError(f"LSP source / npm pin mismatch: {package}")
     cache = root / ".build/dsh-runtime" / key
     archive = cache / ARCHIVE
     if not archive.is_file():
@@ -60,3 +69,6 @@ def stage_dsh(root, raw, baseline):
             pending.unlink(missing_ok=True)
 
     shutil.copy2(archive, raw / ARCHIVE)
+    # A same-DSH-version production dependency change must invalidate unpack.
+    # User profiles/workspaces live outside this immutable release directory.
+    (raw / "dsh-runtime-id.txt").write_text(key)

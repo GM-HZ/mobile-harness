@@ -476,6 +476,7 @@ async function main() {
     ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
     : ['--profile', 'web'];
   process.argv = ['node', cli, '--patch', path.join(root, 'dsh-client.patch.yml'), '--patch', nativePatch,
+    ...(safeMode ? [] : ['--patch', path.join(root, 'dsh-lsp.patch.yml')]),
     ...profileArgs, '--host', '127.0.0.1', '--port', '19592', '--no-open'];
   const { runCli } = await import(pathToFileURL(cli).href);
   mark('cli-imported');
