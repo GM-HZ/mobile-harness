@@ -187,6 +187,16 @@ def verify_mode(emulator, execution_mode, script_persistence, evidence):
                     sameSessionRetained=retained, otherSessionIsolated=True,
                     admittedWorkers=len(admitted() - baseline))
     if retained:
+        archived = emulator.rpc("workspace/archiveSession", {"request": {"sessionId": sid}})
+        assert sid in archived["archivedSessionIds"]
+        try:
+            assert not any(row["event"] == "ptc-worker-reaped" and row["id"] in first for row in workers(emulator))
+        finally:
+            restored = emulator.rpc("workspace/unarchiveSession", {"request": {"sessionId": sid}})
+            assert sid not in restored["archivedSessionIds"]
+        complete_code(emulator, sid, "Read the retained value after restoring the archived session", "fixtureValue", marker)
+        assert len(admitted() - baseline) == expected_workers + 1
+        evidence["archiveAndRestorePreservedState"] = True
         verify_retained_cancellation(emulator, sid, next(iter(first)), marker, evidence)
         verify_working_directory(emulator, ws, evidence, sid, True)
 

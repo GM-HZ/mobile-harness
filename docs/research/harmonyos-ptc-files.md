@@ -38,6 +38,8 @@ Node 的 `stat` 和 `lstat` 通过监督进程读取已授权描述符的元数�
 
 PTC 可以在工作区子目录启动，也可通过 `process.chdir` 切换到同一工作区的其他目录。监督进程校验目标目录并将目录描述符交给 worker，由 worker 执行 `fchdir`。之后的相对文件请求按当前目录解析，工作区根继续来自会话的文件策略。实际会话先调用 DSH 的 `working_directory`，下一轮程序在所选子目录读取了夹具，向工作区外切换目录被拒绝。 [工作目录实测](../evidence/emulator-ptc-cwd-2026-11-17.json)
 
+真实会话通过 `workspace/archiveSession` 归档再恢复后，两种持久模式均继续读取原变量，宿主确认原 worker 保留。这与上游归档语义一致。真正的 Agent 销毁由创建者持有的 `AgentHandle.dispose` 管理，归档 API 保留该 Agent。销毁时的 PTC 释放入口仍待独立设备验证。 [归档恢复实测](../evidence/emulator-ptc-archive-2026-11-18.json)
+
 实验入口接受单一规范化的工作区根，拒绝附加可写根。宿主并发移动父目录和会话销毁时回收空闲持久进程待验证。Mate 60 在本轮离线。
 
 ## 复现

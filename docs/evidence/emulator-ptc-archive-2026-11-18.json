@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-18",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "installedHapCommit": "c8e022f41c9cefbe24dee459fd53c713d493c68f",
+  "unsignedHapSha256": "427c1b6a71fcb94311da5a2ddc6a71fe0bd8bfed7268b1eeb06a7467d3c970aa",
+  "unsignedHapBytes": 657078856,
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "cases": {
+    "repl": {
+      "exitCode": 0,
+      "readyMs": 5338,
+      "executionMode": "persistent-in-memory",
+      "scriptPersistence": false,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "archiveAndRestorePreservedState": true,
+      "cooperativeCancellationPreservedState": true,
+      "cooperativeCancellationMs": 103,
+      "blockingCancellationReapedWorker": true,
+      "blockingCancellationMs": 3153,
+      "nextTurnStartedWithFreshState": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "retainedStateSurvivedDirectoryChange": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "script": {
+      "exitCode": 0,
+      "readyMs": 4375,
+      "executionMode": "vm-script",
+      "scriptPersistence": true,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "archiveAndRestorePreservedState": true,
+      "cooperativeCancellationPreservedState": true,
+      "cooperativeCancellationMs": 104,
+      "blockingCancellationReapedWorker": true,
+      "blockingCancellationMs": 3166,
+      "nextTurnStartedWithFreshState": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "retainedStateSurvivedDirectoryChange": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "scope": {
+    "archive": "workspace/archiveSession retains the idle Agent and its PTC state; unarchive restores use of the same worker",
+    "actualAgentDisposal": "not exercised; upstream AgentHandle.dispose is owned by the creator",
+    "defaultEnabled": false,
+    "mate60": "HDC offline"
+  }
+}
