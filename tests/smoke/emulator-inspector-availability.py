@@ -32,11 +32,19 @@ def run(emulator, output):
         for path in [PROFILE + '/package.json', PROFILE + '/pnpm-lock.yaml', 'mobile-harness-boot.json']:
             originals[path] = agent['read_bytes'](emulator, path)
             if path.endswith('.json'): json.loads(originals[path])
+        manifest = json.loads(originals[PROFILE + '/package.json'])
+        bundles = manifest['dsh']['profile']['bundles']
+        assert NAME not in bundles, 'Do not alter an already user-configured Inspector'
+        # Installed packages are not automatically discoverable as root bundles.
+        # Compose this optional official bundle just like the Ralph regression;
+        # restore the original bytes rather than inventing a management catalog.
+        manifest['dsh']['profile']['bundles'] = bundles + [NAME]
+        emulator.stop()
+        lsp['restore_bytes'](emulator, PROFILE + '/package.json', (json.dumps(manifest) + '\n').encode(), remote + '-mount')
+        emulator.start(); evidence['readyMs'] = emulator.ready('normal')
         row = next(row for row in emulator.rpc('pluginManager/listBundles', {}) if row['name'] == NAME)
-        assert row['availability'] == 'installation' and not row['enabled'], row
-        evidence['enable'] = emulator.rpc('pluginManager/setBundleEnabled', {'name': NAME, 'enabled': True})
-        assert evidence['enable']['application'] != 'failed', evidence['enable']
-        emulator.stop(); emulator.start(); evidence['readyMs'] = emulator.ready('normal')
+        assert row['enabled'] is True, row
+        evidence['temporarilyComposedOfficialBundle'] = True
         evidence['anonymousBootstrapStatus'] = request(emulator, '/api/experimental-inspector/bootstrap', False)[0]
         assert evidence['anonymousBootstrapStatus'] == 401
         status, body = request(emulator, '/api/experimental-inspector/bootstrap', True)
