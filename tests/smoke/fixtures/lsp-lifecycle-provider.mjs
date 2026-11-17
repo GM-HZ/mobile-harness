@@ -48,7 +48,8 @@ async function run(action) {
     else await fiber.dispose();
     const outcome = await pending;
     assert.ok(outcome.error, 'pending query must reject');
-    result.rejected = { name: outcome.error.name, code: outcome.error.code, message: outcome.error.message };
+    result.rejected = { name: outcome.error.name, message: outcome.error.message,
+      ...(outcome.error.code === undefined ? {} : { code: outcome.error.code }) };
     result.settleMs = Date.now() - start;
     assert.ok(result.settleMs < 8000);
     if (action === 'cancel') {
