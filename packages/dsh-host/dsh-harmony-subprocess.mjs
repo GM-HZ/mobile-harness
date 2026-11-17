@@ -41,7 +41,7 @@ export default class HarmonySubprocessRuntime extends LocalSubprocessRuntime {
     try {
       const result = await child.done;
       signal?.throwIfAborted();
-      const resolved = child.stdout.readFrom(0).text;
+      const resolved = child.collected.stdout.readFrom(0).text;
       if (result.exitCode !== 0 || !path.isAbsolute(resolved) || resolved.includes('\n')) {
         throw new SubprocessExecutableNotFoundError('Harmony subprocess: command ' + JSON.stringify(command) + ' was not found as an executable');
       }

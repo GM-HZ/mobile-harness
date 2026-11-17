@@ -175,7 +175,8 @@ def search(emulator, evidence):
         evidence["sourceArchiveStateRestored"] = True
 
 
-def run(emulator, output, case):
+def run(emulator, output, case, verify=None, bundles=None):
+    bundles = BUNDLES if bundles is None else bundles
     name = "mh-optional-" + uuid.uuid4().hex[:10]
     backup = PROFILE + "/" + name + ".package.bak"
     lock_backup = PROFILE + "/" + name + ".lock.bak"
@@ -183,7 +184,7 @@ def run(emulator, output, case):
     remote = "/data/local/tmp/" + name + ".json"
     saved = False
     had_lock = False
-    evidence = {"fixture": name, "enabledBundles": BUNDLES}
+    evidence = {"fixture": name, "enabledBundles": bundles}
     try:
         emulator.ready("normal")
         assert emulator.app("test ! -e alpine/native-benchmark-home/cordis.patch.yml && printf EMPTY") == "EMPTY"
@@ -195,8 +196,8 @@ def run(emulator, output, case):
         evidence["lockBeforeSha256"] = hashlib.sha256(agent["read_bytes"](emulator, PROFILE + "/pnpm-lock.yaml")).hexdigest() if had_lock else None
         manifest = json.loads(emulator.app(f"cat {PROFILE}/package.json"))
         original_bundles = manifest["dsh"]["profile"]["bundles"]
-        assert not any(bundle in original_bundles for bundle in BUNDLES), "Optional bundle already user-enabled; do not alter it"
-        manifest["dsh"]["profile"]["bundles"] = original_bundles + BUNDLES
+        assert not any(bundle in original_bundles for bundle in bundles), "Optional bundle already user-enabled; do not alter it"
+        manifest["dsh"]["profile"]["bundles"] = original_bundles + bundles
         with tempfile.TemporaryDirectory() as temporary:
             local = Path(temporary) / "package.json"; local.write_text(json.dumps(manifest) + "\n")
             assert "FileTransfer finish" in emulator.hdc("file", "send", str(local), remote)
@@ -204,6 +205,8 @@ def run(emulator, output, case):
         evidence["optionalProfileReadyMs"] = emulator.ready("normal")
         emulator.app(f"mkdir -p alpine/workspace-native/{name}")
         with support["model_key"](emulator):
+            if verify is not None:
+                verify(emulator, evidence, name)
             if case in {"all", "ralph"}:
                 evidence["ralph"] = {}; ralph(emulator, evidence["ralph"], name)
             if case in {"all", "search"}:
