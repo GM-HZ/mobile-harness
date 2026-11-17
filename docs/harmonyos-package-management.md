@@ -51,3 +51,7 @@
 本轮用 `HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<基线输入目录> ./build.sh` 构建未签名 HAP，DevEco 构建成功。包内包含上述 110 个 ARM64 ELF，以及 Bash 和 musl。内嵌工具层的 SHA-256 与构建输入清单一致。本轮 HAP SHA-256 为 `0be1fcb9273c812673e7722f5f1974c2a99e045b4e9d27aeed8a44529d79c1bb`。Phone 模拟器及 Mate 60 的 HDC 连接未就绪，设备上的启动和 pip 安装回归尚待执行。
 
 参考 [Alpine apk 手册](https://docs.alpinelinux.org/user-handbook/0.1a/Working/apk.html) · [Alpine ARM64 py3-pip 文件清单](https://pkgs.alpinelinux.org/contents?arch=aarch64&branch=v3.22&name=py3-pip&repo=community) · [Python venv](https://docs.python.org/3.12/library/venv.html) · [Python 平台标签](https://packaging.python.org/en/latest/specifications/platform-compatibility-tags/) · [pip 可复现安装](https://pip.pypa.io/en/stable/topics/repeatable-installs/)
+
+## 0.4.35 LSP 编译器工具链
+
+自带 LSP 的编译器放在 Host 发布目录 `<alpine>/.dsh-0.2.2-rc.4/toolchains/lsp/node_modules/typescript/`，与 DSH 的 node_modules 为兄弟目录。它是版本锁定的只读生产输入，由 HAP 更新，来自同一 npm 锁文件，不是用户项目的包安装目录；原 npm 副本保留。此布局避免 tsserver 为标准库递归监听全部 DSH 依赖，仍保留工作区依赖监听。语言服务器和插件经正式 bundle／profile 管理。见 [实现及复现](research/harmonyos-lsp.md)。

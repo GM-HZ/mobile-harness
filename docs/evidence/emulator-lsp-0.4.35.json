@@ -1,0 +1,1072 @@
+{
+  "recordedAt": "2026-11-17T22:58:04.470822+00:00",
+  "target": "DevEco SDK/API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "baselineCommit": "2285a0b4bbabfc363ffbe1d7132b0a330ad7a27c",
+  "artifact": {
+    "source": "684d101e97a61a8b929e2628d2cd43022dab48d8",
+    "artifact": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.35-unsigned.hap",
+    "bytes": 662455928,
+    "sha256": "555be71d17877797b50e42c1f6150a1a83898a7668ddc52670226320550ba64e",
+    "runtimeDirty": [],
+    "layerSha256": "97c325c448bf82cdffba9f4ad23bc3a5778683d474bd59f60e6241c8e977cd90",
+    "compilerFilesIdenticalToPinnedPackage": 140,
+    "version": "0.4.35",
+    "versionCode": 42,
+    "unsigned": true,
+    "bundleName": "org.sayact.nodepoc"
+  },
+  "upstream": {
+    "checkedAt": "2026-11-17T22:56:19.885906+00:00",
+    "npmNext": {
+      "url": "https://registry.npmjs.org/@deepseek-ai%2fdsh/next",
+      "version": "0.2.2-rc.4"
+    },
+    "githubReleases": {
+      "url": "https://api.github.com/repos/deepseek-ai/deepseek-harness/releases?per_page=5",
+      "rows": [
+        {
+          "tag": "dsh-v0.2.2-rc.4",
+          "prerelease": true,
+          "publishedAt": "2026-11-17T17:53:41Z"
+        },
+        {
+          "tag": "dsh-v0.2.2-rc.3",
+          "prerelease": true,
+          "publishedAt": "2026-11-13T07:56:55Z"
+        },
+        {
+          "tag": "dsh-v0.2.2-rc.2",
+          "prerelease": true,
+          "publishedAt": "2026-11-11T11:33:06Z"
+        },
+        {
+          "tag": "dsh-v0.2.2-rc.1",
+          "prerelease": true,
+          "publishedAt": "2026-11-04T13:07:14Z"
+        },
+        {
+          "tag": "dsh-v0.2.2-alpha.3",
+          "prerelease": true,
+          "publishedAt": "2026-11-03T07:56:48Z"
+        }
+      ]
+    }
+  },
+  "sourcePins": {
+    "typescript-language-server": {
+      "version": "5.0.0",
+      "source": "vendor/repos/typescript-language-server",
+      "commit": "048a362038fdf5656a4917fc7b57b3d70aa60efe",
+      "tag": "v5.0.0",
+      "integrity": "sha512-Glr+4Ss9g6AupBPj3tnk3mrlSH1ROS2Zmr5h0Vmy3DA+MVq+5qq4tv4+SogB8VsEZ13Z9xU01zm54MMyI7Gdzw==",
+      "provenance": "Official source release tag; npm metadata does not declare gitHead. No source-to-bundle reproducibility claim."
+    },
+    "typescript": {
+      "version": "6.0.3",
+      "source": "vendor/repos/typescript",
+      "commit": "050880ce59e30b356b686bd3144efe24f875ebc8",
+      "tag": "v6.0.3",
+      "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
+      "provenance": "Official source tag matches npm gitHead."
+    }
+  },
+  "dshSourceGitlink": "3f321d32bfe382212a8ed8785c1d47a5a300aa23",
+  "dshPackages": 331,
+  "dshPackageVersion": "0.2.2-rc.4",
+  "build": {
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=/Users/gongmeng/dev/acode/mobile-harness/.build/inputs/harmonyos ./build.sh --package",
+    "exitCode": 0,
+    "log": ".build/lsp-poc/build-carrier-final.log",
+    "logSha256": "0f4800b4816564f7ed6ac7b2167e262dc41b9dbb747b533f815fb2e1717bf5dd",
+    "runtimeDiffAfterBuild": [],
+    "note": "Earlier build while staging was dirty was excluded; committed production source was rebuilt. Test-only follow-ups do not relabel older artifacts."
+  },
+  "finalPassingCommands": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp-bundle.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/final/lsp-bundle-restored.json"
+      ],
+      "testSourceCommit": "ddc617adc3ea20d69a3df86eb0a76d3febd2864c",
+      "exitCode": 0,
+      "elapsedSeconds": null
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/final/lsp-validated.json"
+      ],
+      "testSourceCommit": "ddc617adc3ea20d69a3df86eb0a76d3febd2864c",
+      "exitCode": 0,
+      "elapsedSeconds": 60.532
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp-lifecycle.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/final/lsp-lifecycle-json.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": null
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-toolkit.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/toolkit.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 121.704,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-mcp-stdio.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/mcp-stdio.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 16.222,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/ptc-host.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 22.275,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-workflow.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/workflow.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 13.059,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-office.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/office.json",
+        "--require-native",
+        "--artifacts",
+        ".build/lsp-poc/regressions/office-artifacts"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 75.576,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-subprocess.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/subprocess.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 67.458,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-worktree.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/worktree.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 67.985,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/lsp-poc/regressions/recovery.json"
+      ],
+      "testSourceCommit": "cb5cb5c9af4b49fb1113196fa93b2fa50893e316",
+      "exitCode": 0,
+      "elapsedSeconds": 29.881,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8"
+    }
+  ],
+  "results": {
+    "lspBundle": {
+      "before": {
+        "name": "@mobile-harness/lsp",
+        "availability": "installation",
+        "removable": false,
+        "enabled": true,
+        "version": "0.1.0"
+      },
+      "disable": {
+        "stage": "enable",
+        "target": "@mobile-harness/lsp",
+        "enabled": false,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "disabledRestartReadyMs": 4460,
+      "afterDisabledRestart": {
+        "name": "@mobile-harness/lsp",
+        "availability": "installation",
+        "removable": false,
+        "enabled": false,
+        "version": "0.1.0"
+      },
+      "defaultMigrationDidNotReenable": true,
+      "enable": {
+        "stage": "enable",
+        "target": "@mobile-harness/lsp",
+        "enabled": true,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "enabledRestartReadyMs": 4656,
+      "afterEnabledRestart": {
+        "name": "@mobile-harness/lsp",
+        "availability": "installation",
+        "removable": false,
+        "enabled": true,
+        "version": "0.1.0"
+      },
+      "officialProviderActive": true,
+      "restoredReadyMs": 4700,
+      "configurationHashesRestored": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+      }
+    },
+    "lspSemantics": {
+      "fixture": "mh-lsp-2e9214473b",
+      "installedVersions": {
+        "@deepseek-ai/dsh-lsp": "0.2.2-rc.4",
+        "@deepseek-ai/dsh-lsp-stdio": "0.2.2-rc.4",
+        "@deepseek-ai/dsh-tool-lsp": "0.2.2-rc.4",
+        "typescript": "6.0.3",
+        "typescript-language-server": "5.0.0"
+      },
+      "noServerBeforeFirstQuery": true,
+      "sessionId": "session-8c22057f-5be3-4914-935f-0696a330ad54",
+      "definition": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.ts",
+          "line": 2,
+          "character": 24
+        },
+        "text": "shapes.ts:10:17",
+        "elapsedMs": 11881,
+        "isError": false
+      },
+      "pooledServerPid": 2329,
+      "references": {
+        "args": {
+          "operation": "findReferences",
+          "file_path": "shapes.ts",
+          "line": 10,
+          "character": 18
+        },
+        "text": "shapes.ts:10:17\nconsumer.ts:1:18\nconsumer.ts:2:23\nconsumer.ts:4:45",
+        "elapsedMs": 2261,
+        "isError": false
+      },
+      "implementation": {
+        "args": {
+          "operation": "goToImplementation",
+          "file_path": "shapes.ts",
+          "line": 1,
+          "character": 19
+        },
+        "text": "shapes.ts:5:14",
+        "elapsedMs": 2138,
+        "isError": false
+      },
+      "hover": {
+        "args": {
+          "operation": "hover",
+          "file_path": "consumer.ts",
+          "line": 2,
+          "character": 37
+        },
+        "text": "\n```typescript\n(alias) new Circle(r: number): Circle\nimport Circle\n```\n",
+        "elapsedMs": 2147,
+        "isError": false
+      },
+      "utf16AfterAstralCharacter": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.ts",
+          "line": 4,
+          "character": 46
+        },
+        "text": "shapes.ts:10:17",
+        "elapsedMs": 2296,
+        "isError": false
+      },
+      "standardLibrary": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.ts",
+          "line": 3,
+          "character": 31
+        },
+        "text": "/data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.4/toolchains/lsp/node_modules/typescript/lib/lib.es5.d.ts:670:14",
+        "elapsedMs": 2180,
+        "isError": false
+      },
+      "freshSource": {
+        "args": {
+          "operation": "hover",
+          "file_path": "consumer.ts",
+          "line": 5,
+          "character": 15
+        },
+        "text": "\n```typescript\nconst rewritten: boolean\n```\n",
+        "elapsedMs": 1709,
+        "isError": false
+      },
+      "noResult": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "empty.ts",
+          "line": 1,
+          "character": 1
+        },
+        "text": "No results.",
+        "elapsedMs": 2156,
+        "isError": false
+      },
+      "outsideWorkspace": {
+        "args": {
+          "operation": "hover",
+          "file_path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-lsp-2e9214473b-outside.ts",
+          "line": 1,
+          "character": 1
+        },
+        "text": "Error: source \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-lsp-2e9214473b-outside.ts\" resolves outside the workspace",
+        "elapsedMs": 1830,
+        "isError": true
+      },
+      "sameServerReusedAcrossQueries": true,
+      "ownedCrashCommandResult": "KILLED",
+      "afterServerCrash": {
+        "args": {
+          "operation": "hover",
+          "file_path": "consumer.ts",
+          "line": 5,
+          "character": 15
+        },
+        "text": "\n```typescript\nconst rewritten: boolean\n```\n",
+        "elapsedMs": 9558,
+        "isError": false
+      },
+      "crashedServerReplacedAndReaped": true,
+      "temporaryModelCredentialRemoved": true,
+      "finalNormalReadyMs": 6487
+    },
+    "lspLifecycle": {
+      "fixture": "mh-lsp-lifecycle-bb5e742be0",
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "postinstallDidNotRun": true,
+      "enable": {
+        "stage": "enable",
+        "target": "mh-lsp-lifecycle-bb5e742be0",
+        "enabled": true,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "readyMs": 5193,
+      "sessionId": "session-14af04e4-184a-4e91-af33-aef75c3e3987",
+      "cases": {
+        "cancel": {
+          "realSemanticReplyHeld": {
+            "realReply": {
+              "jsonrpc": "2.0",
+              "id": 2,
+              "result": {
+                "contents": {
+                  "kind": "markdown",
+                  "value": "\n```typescript\nfunction twice(value: number): number\n```\n"
+                },
+                "range": {
+                  "start": {
+                    "line": 1,
+                    "character": 22
+                  },
+                  "end": {
+                    "line": 1,
+                    "character": 27
+                  }
+                }
+              }
+            },
+            "childPid": 7067
+          },
+          "rejected": {
+            "name": "Error",
+            "message": "Owned LSP query cancellation"
+          },
+          "settleMs": 431,
+          "retryRealHover": {
+            "kind": "hover",
+            "hover": {
+              "contents": "\n```typescript\nfunction twice(value: number): number\n```\n",
+              "range": {
+                "start": {
+                  "line": 1,
+                  "character": 22
+                },
+                "end": {
+                  "line": 1,
+                  "character": 27
+                }
+              }
+            }
+          }
+        },
+        "dispose": {
+          "realSemanticReplyHeld": {
+            "realReply": {
+              "jsonrpc": "2.0",
+              "id": 2,
+              "result": {
+                "contents": {
+                  "kind": "markdown",
+                  "value": "\n```typescript\nfunction twice(value: number): number\n```\n"
+                },
+                "range": {
+                  "start": {
+                    "line": 1,
+                    "character": 22
+                  },
+                  "end": {
+                    "line": 1,
+                    "character": 27
+                  }
+                }
+              }
+            },
+            "childPid": 7961
+          },
+          "rejected": {
+            "name": "LspError",
+            "message": "lsp-stdio provider is disposed",
+            "code": "LSP_DISPOSED"
+          },
+          "settleMs": 131,
+          "routeUnregistered": true
+        }
+      },
+      "cancelAllHelpersReaped": 6,
+      "disposeAllHelpersReaped": 9,
+      "sessionSettledBeforeRestart": true,
+      "temporaryModelCredentialRemoved": true,
+      "disable": {
+        "stage": "enable",
+        "target": "mh-lsp-lifecycle-bb5e742be0",
+        "enabled": false,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "remove": {
+        "stage": "remove",
+        "target": "mh-lsp-lifecycle-bb5e742be0",
+        "changed": true,
+        "application": "applied",
+        "packageResult": {
+          "exitCode": 0,
+          "output": "✓ Lockfile passes supply-chain policies (verified 1m ago)\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\ndependencies:\n- mh-lsp-lifecycle-bb5e742be0\n\nDone in 5.4s using pnpm v11.28.5\n",
+          "truncated": false,
+          "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-IieABA/pnpm.log"
+        },
+        "warnings": []
+      },
+      "removedThroughActualPluginManager": true,
+      "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+    },
+    "toolkit": {
+      "defaultBashRefusedWithoutBackend": true,
+      "approvedCommandObservedTools": [
+        "bash"
+      ],
+      "approvedToolkit": {
+        "bash": true,
+        "git": true,
+        "pythonPip": true,
+        "twoIsolatedVenvs": true,
+        "nodeFetch": true,
+        "curl": true,
+        "sqlite": true,
+        "timezone": true
+      },
+      "fileTools": [
+        "edit",
+        "glob",
+        "grep",
+        "read",
+        "write"
+      ],
+      "temporaryModelCredentialRemoved": true
+    },
+    "mcp-stdio": {
+      "node": {
+        "probe": {
+          "ok": true,
+          "serverInfo": {
+            "name": "node-stdio-fixture",
+            "version": "1"
+          },
+          "toolNames": [
+            "stdio_fixture_echo"
+          ],
+          "truncated": false,
+          "durationMs": 4489,
+          "closeConfirmed": true
+        },
+        "toolResultReturnedToSession": true,
+        "fixtureRemoved": true
+      },
+      "python3": {
+        "probe": {
+          "ok": true,
+          "serverInfo": {
+            "name": "python-stdio-fixture",
+            "version": "1"
+          },
+          "toolNames": [
+            "stdio_fixture_echo"
+          ],
+          "truncated": false,
+          "durationMs": 668,
+          "closeConfirmed": true
+        },
+        "toolResultReturnedToSession": true,
+        "fixtureRemoved": true
+      }
+    },
+    "ptc-host": {
+      "readyMs": 59,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "workflow": {
+      "startupMs": 63,
+      "foreground": {
+        "actualSubagentsStarted": 2,
+        "completed": true,
+        "bothResultsReturned": true,
+        "parallel": true
+      },
+      "timeout": true,
+      "cancelledDuringSyncSlice": true,
+      "cancelledSyncWorkersReaped": [
+        10
+      ],
+      "cancelledWithActiveChild": true,
+      "backgroundJob": {
+        "started": true,
+        "completed": true,
+        "resultDelivered": true
+      },
+      "sessions": {
+        "mh-workflow-parallel": "session-44978ed1-3af5-41df-8c73-79a177ef4f12",
+        "mh-workflow-timeout": "session-67b0721e-f0a2-476b-b1f7-b0f942734779",
+        "mh-workflow-cancel": "session-c0497e72-f430-45bb-963f-508ab69311b8",
+        "mh-workflow-cancel-child": "session-0effa4c6-f233-4b82-a3f5-8256578e2148",
+        "mh-workflow-background": "session-7fb67d04-820d-4c2a-840d-6e9246054ac8"
+      },
+      "temporaryModelCredentialRemoved": true
+    },
+    "office": {
+      "fixture": "mh-office-df839871aae3",
+      "marker": "HARMONY_OFFICE_9303B66E3CEA4D988A2C4432FDC09860",
+      "readyMs": 106,
+      "fixtureSha256": {
+        "input.docx": "2a37e4a98e51ec4d52d98fbca0a3982556ce9728d748e61424949d2110abd8b8",
+        "input.xlsx": "18a16eef36c69d85eff9590455d2fb1ab8bfd1e712ef2d17eb574eadcb2b316c",
+        "invalid.docx": "61cbf344efdbbc6bc4966e502b29764ae811e0c427a3013ea18dd8ae302265f2",
+        "input.pptx": "a459fb78af5f6446fa5bfcb6623454c984e82bf9f15cfcf27710bb995741702c"
+      },
+      "officeSkillLoaded": true,
+      "documentPdf": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-75674a54a7990be92cc88a3c/ed6a1703-c144-4b55-ba7b-01a5e46e2e55/input.pdf",
+        "bytes": 11653,
+        "sha256": "5d8db8ada97815bc6f40f171ff4f464d4e8691eb437a52064804d1194d7e0d49",
+        "pageCount": 1,
+        "promptElapsedMs": 5658
+      },
+      "repeatUsedHostCache": true,
+      "documentImage": {
+        "attachment": {
+          "attachmentId": "sha256:f8dd2e37972152b23b0134b87260dfc15245fec2057c24ba967b3f953521007b",
+          "mediaType": "image/png",
+          "bytes": 7569,
+          "width": 596,
+          "height": 842
+        },
+        "sha256": "f8dd2e37972152b23b0134b87260dfc15245fec2057c24ba967b3f953521007b",
+        "promptElapsedMs": 15217,
+        "localArtifact": ".build/lsp-poc/regressions/office-artifacts/document.png"
+      },
+      "workbookRecalculated": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-75674a54a7990be92cc88a3c/1901696e-ffbb-4f20-8af1-c9330add2974/input.xlsx",
+        "bytes": 5213,
+        "sha256": "eafe77ba05063c366bbc67a7f7aaf3a47961b9c378427d885928d33620400fa9",
+        "cell": "C1",
+        "formulaRetained": true,
+        "beforeCachedValue": 0,
+        "afterCachedValue": 42,
+        "promptElapsedMs": 15885
+      },
+      "presentationPdf": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-75674a54a7990be92cc88a3c/acbe381f-5bde-45cb-8e16-7eab61b96d52/input.pdf",
+        "bytes": 11036,
+        "sha256": "dd6d5045d6d9b9fd8333bed3f034a2559d0c2f369470bd21f3120c2738ec05b3",
+        "promptElapsedMs": 16799
+      },
+      "invalidDocumentRejected": "Error: cannot convert \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-office-df839871aae3/invalid.docx\": Input is not a supported, bounded OOXML archive.",
+      "temporaryModelCredentialRemoved": true,
+      "trace": [
+        {
+          "event": "office-native-capability",
+          "ms": 203898,
+          "pid": 14831,
+          "available": true,
+          "elapsedMs": 60,
+          "wasm": true,
+          "value": 42,
+          "platform": "openharmony",
+          "node": "v24.14.1"
+        },
+        {
+          "event": "office-worker-started",
+          "ms": 203898,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "pid": 14831,
+          "runtime": "native"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 204007,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "e5c09f64-57a5-4e2e-b6ad-12aa6450eab6",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 206884,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "e5c09f64-57a5-4e2e-b6ad-12aa6450eab6",
+          "method": "convert",
+          "elapsedMs": 2877,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 211725,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "f666ea8b-3003-4211-9835-61e7e1dcfdcf",
+          "method": "renderImages"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 213604,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "f666ea8b-3003-4211-9835-61e7e1dcfdcf",
+          "method": "renderImages",
+          "elapsedMs": 1880,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 234830,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "349d5151-62ac-4598-b145-04df5fb01387",
+          "method": "recalculate"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 237111,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "349d5151-62ac-4598-b145-04df5fb01387",
+          "method": "recalculate",
+          "elapsedMs": 2281,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 250868,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "1b875e6a-96ef-41bf-a96f-bb9285b51300",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 253111,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "1b875e6a-96ef-41bf-a96f-bb9285b51300",
+          "method": "convert",
+          "elapsedMs": 2243,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 267509,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "8b3d2c82-32a4-43e8-bc39-99e4af097d98",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 267699,
+          "id": "b5c5ebdf-1c36-4e9b-a2d9-5996b213c69b",
+          "request": "8b3d2c82-32a4-43e8-bc39-99e4af097d98",
+          "method": "convert",
+          "elapsedMs": 190,
+          "code": "invalid-document"
+        }
+      ],
+      "sourceFixturesRemoved": true
+    },
+    "subprocess": {
+      "fixture": "mh-subprocess-17545ed1ab",
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "postinstallDidNotRun": true,
+      "enable": {
+        "stage": "enable",
+        "target": "mh-subprocess-17545ed1ab",
+        "enabled": true,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "readyMs": 7639,
+      "sessionId": "session-de794248-9a52-4b06-979a-918559c131d2",
+      "contract": {
+        "executionWorldLookup": {
+          "node": "/data/storage/el2/base/haps/entry/files/alpine/bin/node",
+          "git": "/data/storage/el2/base/haps/entry/files/alpine/usr/bin/git",
+          "missingRejected": true,
+          "relativeRejected": true
+        },
+        "literalArgvNativeCwdStreamingAndEof": true,
+        "realNestedNodeProcess": {
+          "execPath": "/data/storage/el2/base/haps/entry/files/alpine/bin/node",
+          "child": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-subprocess-17545ed1ab"
+        },
+        "upstreamAmbientScrubExplicitEnvAndTombstone": true,
+        "nonzeroExitBoundedTailFullSpill": true,
+        "abort": {
+          "actualRunningObserved": true,
+          "managedRangeExited": true,
+          "elapsedMs": 32,
+          "outcome": {
+            "exitCode": 1,
+            "signal": null
+          }
+        },
+        "dispose": {
+          "actualRunningObserved": true,
+          "managedRangeExited": true,
+          "elapsedMs": 32,
+          "outcome": {
+            "exitCode": 1,
+            "signal": null
+          }
+        }
+      },
+      "allHelpersReaped": 12,
+      "sessionSettledBeforeRestart": true,
+      "temporaryModelCredentialRemoved": true,
+      "disable": {
+        "stage": "enable",
+        "target": "mh-subprocess-17545ed1ab",
+        "enabled": false,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "remove": {
+        "stage": "remove",
+        "target": "mh-subprocess-17545ed1ab",
+        "changed": true,
+        "application": "applied",
+        "packageResult": {
+          "exitCode": 0,
+          "output": "✓ Lockfile passes supply-chain policies (verified 45s ago)\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\ndependencies:\n- mh-subprocess-17545ed1ab\n\nDone in 6.6s using pnpm v11.28.5\n",
+          "truncated": false,
+          "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-LKgcOJ/pnpm.log"
+        },
+        "warnings": []
+      },
+      "removedThroughActualPluginManager": true,
+      "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+    },
+    "worktree": {
+      "fixture": "mh-optional-a831d5f081",
+      "enabledBundles": [
+        "@deepseek-ai/dsh-experimental-tool-worktree"
+      ],
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "optionalProfileReadyMs": 4928,
+      "sessionId": "session-c33b7c56-435e-44f9-9023-7066dc7dfaaa",
+      "defaultPolicyRefusedWithoutMutation": true,
+      "explicitOwnedSessionPermission": {
+        "commandId": "cmd-cf102244-1",
+        "result": {
+          "kind": "success",
+          "text": "preset danger-full-access"
+        }
+      },
+      "created": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-a831d5f081/.agents/worktrees/acceptance",
+        "branch": "acceptance",
+        "baseCommit": "5bf9bc18bf89fc38847a5c0fd8c22bcac6315854",
+        "repositoryRoot": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-a831d5f081"
+      },
+      "gitControlFile": "gitdir: /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-a831d5f081/.git/worktrees/acceptance\n",
+      "legacyBashGitIdentity": [
+        "/workspace-native/mh-optional-a831d5f081/.agents/worktrees/acceptance",
+        "acceptance",
+        "5bf9bc18bf89fc38847a5c0fd8c22bcac6315854"
+      ],
+      "nativePathsGitIdentityAndIndependentBytes": true,
+      "helpersReapedBeforeRestart": 26,
+      "restartReadyMs": 4664,
+      "sameSessionCheckoutAcrossRestart": true,
+      "dirtyArchivedCheckoutRetained": true,
+      "cleanSessionId": "session-0e226639-ebf1-4df4-9de0-25cc96b225b4",
+      "cleanArchivedCheckoutReclaimedBranchRetained": true,
+      "helpersReapedAfterRestart": 42,
+      "temporaryModelCredentialRemoved": true,
+      "exactOriginalManifestRestored": true,
+      "exactOriginalLockRestored": true,
+      "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+    },
+    "recovery": {
+      "fixture": "mobile-harness-crash-ef0ad15176",
+      "normalReadyMs": 77,
+      "anonymousHttp": 401,
+      "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "pluginInstalledDisabled": true,
+      "actualPluginCrash": true,
+      "interruptedNormalBoot": {
+        "mode": "normal",
+        "pending": true
+      },
+      "safeReadyMs": 4635,
+      "safeAuthenticatedHttp": 200,
+      "pluginNotLoadedAgain": true,
+      "sameSessionInSafeMode": true,
+      "normalProfileRestored": true,
+      "returnNormalReadyMs": 4684,
+      "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+    }
+  },
+  "faultInjection": {
+    "relay": "tests/smoke/fixtures/lsp-response-relay.cjs",
+    "realServerReplyHeld": true,
+    "shutdownTimeoutMs": 250,
+    "killGraceMs": 250,
+    "notDefaultProductionLatencyGuarantee": true
+  },
+  "finalAudit": {
+    "command": "python3 .build/lsp-poc/final/audit.py",
+    "exitCode": 0,
+    "source": "import runpy, json, hashlib\nfrom pathlib import Path\nx=runpy.run_path('tests/smoke/emulator-agent-continuation.py');s=x['support'];e=s['Emulator']('127.0.0.1:15557',19644);f=('tcp:19644','tcp:19592');e.hdc('fport',*f)\ntry:\n e.ready('normal');r={'boot':e.state(),'anonymousHttp':e.web_status(False),'authenticatedHttp':e.web_status(True),'credential':e.rpc('credentials/describe',{'refs':['DEEPSEEK_API_KEY']})}\n assert r['boot']=={'mode':'normal','pending':False} and r['anonymousHttp']==401 and r['authenticatedHttp']==200\n assert not r['credential']['DEEPSEEK_API_KEY']['configured']\n assert e.app('test ! -e alpine/native-benchmark-home/cordis.patch.yml && printf ABSENT')=='ABSENT';r['temporaryHostPatchAbsent']=True\n r['defaultPermissionPreset']=e.rpc('permissionPresets/catalog',{})['defaultPreset'];assert r['defaultPermissionPreset']=='workspace-write'\n profile='alpine/native-benchmark-home/profiles/web'\n manifest=json.loads(e.app('cat '+profile+'/package.json'));bundles=manifest['dsh']['profile']['bundles']\n assert '@deepseek-ai/dsh-experimental-tool-worktree' not in bundles\n assert not any(b.startswith(('mh-subprocess-', 'mh-lsp-lifecycle-')) for b in bundles)\n r['optionalWorktreeAndFixtureBundlesDisabled']=True\n assert '@mobile-harness/lsp' in bundles\n r['manifestSha256']=hashlib.sha256(x['read_bytes'](e,profile+'/package.json')).hexdigest()\n r['lockSha256']=hashlib.sha256(x['read_bytes'](e,profile+'/pnpm-lock.yaml')).hexdigest()\n assert r['manifestSha256']=='c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8'\n assert r['lockSha256']=='3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e'\n names=set()\n for path in Path('.build/lsp-poc').rglob('*.json'):\n  try:v=json.loads(path.read_text())\n  except ValueError:continue\n  if isinstance(v,dict) and isinstance(v.get('fixture'),str):names.add(v['fixture'])\n for name in names:\n  assert name.replace('-','').isalnum()\n  assert e.app('test ! -e alpine/workspace-native/'+name+' && printf ABSENT')=='ABSENT',name\n r['allOwnReportedFixturesAbsent']=sorted(names)\n r['outsideSourceFixturesAbsent']=[]\n for name in sorted(names):\n  if name.startswith('mh-lsp-') and not name.startswith('mh-lsp-lifecycle-'):\n   path='alpine/workspace-native/'+name+'-outside.ts'\n   assert e.app('test ! -e '+path+' && printf ABSENT')=='ABSENT'\n   r['outsideSourceFixturesAbsent'].append(path)\n sid='session-ecf0df3c-47a9-4df4-b71e-6d4261d13419'\n records=s['events'](e,sid);assert len(records)>=30\n r['retainedRc3Session']={'id':sid,'events':len(records)}\n r['newLayerMarkerPresent']=e.app('test -f alpine/.dsh-0.2.2-rc.4/.validated-unpack-v2-dsh-layer.zip-97c325c448bf82cdffba9f4ad23bc3a5778683d474bd59f60e6241c8e977cd90 && printf PRESENT')=='PRESENT'\n assert r['newLayerMarkerPresent']\n r['compilerVersion']=json.loads(e.app('cat alpine/.dsh-0.2.2-rc.4/toolchains/lsp/node_modules/typescript/package.json'))['version'];assert r['compilerVersion']=='6.0.3'\n Path('.build/lsp-poc/final/audit.json').write_text(json.dumps(r,indent=2)+'\\n');print(json.dumps(r),flush=True)\nfinally:e.hdc('fport','rm',*f)\n",
+    "sourceSha256": "1975e928b834171efcb441ee794509f4b0109384b77b513cbb786e4f672f3ef9",
+    "result": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "credential": {
+        "DEEPSEEK_API_KEY": {
+          "configured": false,
+          "writable": true
+        }
+      },
+      "temporaryHostPatchAbsent": true,
+      "defaultPermissionPreset": "workspace-write",
+      "optionalWorktreeAndFixtureBundlesDisabled": true,
+      "manifestSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "lockSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "allOwnReportedFixturesAbsent": [
+        "mh-lsp-1cf0dffbe2",
+        "mh-lsp-20c20e6522",
+        "mh-lsp-2e9214473b",
+        "mh-lsp-8f06a75843",
+        "mh-lsp-dcd87c9261",
+        "mh-lsp-lifecycle-43b54c884e",
+        "mh-lsp-lifecycle-bb5e742be0",
+        "mh-office-df839871aae3",
+        "mh-optional-a831d5f081",
+        "mh-subprocess-17545ed1ab",
+        "mobile-harness-crash-ef0ad15176"
+      ],
+      "outsideSourceFixturesAbsent": [
+        "alpine/workspace-native/mh-lsp-1cf0dffbe2-outside.ts",
+        "alpine/workspace-native/mh-lsp-20c20e6522-outside.ts",
+        "alpine/workspace-native/mh-lsp-2e9214473b-outside.ts",
+        "alpine/workspace-native/mh-lsp-8f06a75843-outside.ts",
+        "alpine/workspace-native/mh-lsp-dcd87c9261-outside.ts"
+      ],
+      "retainedRc3Session": {
+        "id": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+        "events": 30
+      },
+      "newLayerMarkerPresent": true,
+      "compilerVersion": "6.0.3"
+    }
+  },
+  "diagnostics": {
+    "originalLayout": {
+      "runnerExitCode": 0,
+      "actualBashPayloadExitCode": 1,
+      "deadlineMs": 25000,
+      "realDefinitionReturned": false,
+      "tsserverLastEvent": "DirectoryWatcher on DSH node_modules during updateGraphWorker",
+      "log": ".build/lsp-poc/tsserver.log"
+    },
+    "isolatedCompiler": {
+      "actualChildExitCode": 0,
+      "definitionReplyMs": 6774,
+      "sourceLocation": {
+        "line": 0,
+        "character": 16
+      },
+      "log": ".build/lsp-poc/stdio-isolated.log"
+    },
+    "isolatedWithOriginalWildcardConfig": {
+      "actualChildExitCode": 0,
+      "definitionReplyMs": 8722,
+      "sourceLocation": {
+        "line": 0,
+        "character": 16
+      },
+      "log": ".build/lsp-poc/stdio-isolated-wildcard.log"
+    },
+    "realForkIpc": {
+      "childExitCode": 0,
+      "roundTripValue": 42,
+      "elapsedMs": 1366,
+      "fixture": "tests/smoke/fixtures/node-ipc-probe.cjs"
+    }
+  },
+  "failedRunsAndCorrections": [
+    {
+      "log": ".build/lsp-poc/first.log",
+      "logSha256": "715231ac16768064f1bca7115962ee5df3f2b695368e87f3870043373af74a78",
+      "exitCode": 1,
+      "reason": "CLI installation anchor did not declare LSP; real model called working_directory instead of required lsp. Assertion retained; fixed via public application-owned runProfile installAnchor.",
+      "lastLogLine": "AssertionError: [{'turn': 6, 'step': 1, 'callId': 'call_00_Q4B6qSpqgQInvIY2OhuN8210', 'name': 'working_directory', 'arguments': '{\"cd\": \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-lsp-20c20e6522\"}'}]"
+    },
+    {
+      "log": ".build/lsp-poc/build-carrier.log",
+      "logSha256": "152bbe0ee1f15fe18dddf9f50312b5c536eb7809fca4c98dd0128ce586183fa5",
+      "exitCode": 1,
+      "reason": "Build system Python3.9 lacks hashlib.file_digest; replaced by streamed SHA-256, then rebuilt.",
+      "lastLogLine": "AttributeError: module 'hashlib' has no attribute 'file_digest'"
+    },
+    {
+      "log": ".build/lsp-poc/carrier.log",
+      "logSha256": "bab83646bac502ac4ba2d8fe75290e36963d76fc597b20b120db0a84e7235d04",
+      "exitCode": 1,
+      "reason": "After actual plugin activation, real lsp tool timed out at60000ms; isolated the compiler tree rather than lengthening timeout or faking semantic results.",
+      "lastLogLine": "AssertionError: [{'role': 'tool', 'source': {'kind': 'tool', 'callId': 'call_00_Q7vp86zCmyA2vxPm3u749212'}, 'toolCallId': 'call_00_Q7vp86zCmyA2vxPm3u749212', 'content': [{'type': 'text', 'text': 'Error: tool call timed out after 60000ms'}], 'isError': True, 'id': '9f9ba8fc-d9b5-4510-aac7-396ded8a268d'}]"
+    },
+    {
+      "log": ".build/lsp-poc/final/lsp-bundle.log",
+      "logSha256": "77bdc723047bff4de85531265d9e0878ca2e9a1b2c3cc8362753f2b55197baae",
+      "exitCode": 1,
+      "reason": "Bundle enable/disable passed, but backup restoration produced a694-byte truncated725-byte manifest. Restored exact verified prefix plus known original fields; original bytes now retained outside changing profile and verified before restart. Underlying copy/race cause not claimed established.",
+      "lastLogLine": "RuntimeError: normal Host did not become ready"
+    },
+    {
+      "log": ".build/lsp-poc/final/lsp-bundle-restore.log",
+      "logSha256": "da96b3c6f3b0ef0fc5140218140bdc567516a8769bcd46d3d213a32a62ad664b",
+      "exitCode": 1,
+      "reason": "Follow-up normal readiness failed because startup recovery had switched to safe mode after prior invalid-manifest failures. Explicitly returned to normal after verified restoration; final rerun passed.",
+      "lastLogLine": "RuntimeError: normal Host did not become ready"
+    },
+    {
+      "log": ".build/lsp-poc/bundle.log",
+      "logSha256": "9de13df5c3b7638ded510fdcc0496381ceda86210f9ed229922e474ae8e7d079",
+      "exitCode": 1,
+      "reason": "Four semantics and path/freshness/boundary assertions passed; HDC debug-shell signal injection failed. Replaced with the exact owned process-group kill under an explicitly full-access acceptance session using actual Bash; no semantic assertion removed.",
+      "lastLogLine": "AssertionError"
+    },
+    {
+      "log": ".build/lsp-poc/final/lsp-lifecycle-validated.log",
+      "logSha256": "d9558019cbf10cd28b789ba0a5b11f86e3dddb921e8a1a40219be5f4d855d88d",
+      "exitCode": 1,
+      "reason": "Lifecycle fixture returned undefined error.code, rejected by upstream lossless JSON validation. Omit absent property; same real-server semantics/lifecycle assertions rerun and passed.",
+      "lastLogLine": "AssertionError: [{'role': 'tool', 'source': {'kind': 'tool', 'callId': 'call_00_zTehGxicrRJCoq7jy0Pn7353'}, 'toolCallId': 'call_00_zTehGxicrRJCoq7jy0Pn7353', 'content': [{'type': 'text', 'text': 'Error: tool \"mh_lsp_lifecycle\" returned invalid output: value is not lossless JSON'}], 'isError': True, 'id': 'b53c2225-394d-4668-97ec-963f25aa04ca'}]"
+    }
+  ],
+  "remaining": [
+    "Overall all-applicable-DSH-capabilities goal remains active; compaction, remaining optional bundles, worktree restore and dedicated worktree cancellation still require verification.",
+    "TypeScript semantics on emulator verified; no claim for every language server, project size, native package or Mate60.",
+    "System PTY, Phone Use and kernel isolation remain outside the previously confirmed platform scope.",
+    "PRoot and lifecycle fallback observations do not establish a stronger OS sandbox or escaped-descendant process guarantee."
+  ]
+}

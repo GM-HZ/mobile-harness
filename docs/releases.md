@@ -216,3 +216,11 @@ API 26 Phone 模拟器通过 16 组 PTC／Workflow／MCP／定时任务／故障
 制品源为 `7b66db814dd599cd1d07b5892d92f43ac3dee269`，未签名 HAP 650,936,407字节，SHA-256 `efa9ffd8fb5529d24971b410d32911da9ab0f47a5065107e242627fdb9192c31`。四组测试来自该提交；子进程组在只修复测试收尾后，于 `5d6eeb52158739e19837f718a5194a03167f1257` 重跑通过。没有替换制品或隐去原失败批次。[准确命令、失败与最终审计](evidence/emulator-subprocess-worktree-0.4.34.json) · [设计](research/harmonyos-host-subprocess.md)
 
 DSH 仍锁定官方 RC.4。LSP、压缩、其他可选能力、工作树 restore／专门取消和本版真机继续验收；尚不宣称桌面全部能力等价。
+
+## 0.4.35 官方 LSP 与可控 bundle
+
+DSH 保持最新官方 RC.4，随包331个 DSH 组件版本一致。补充官方 LSP 三插件和真实 TypeScript language server；编译器独立放置，解决递归监听整棵 DSH 依赖引起的60秒超时。生产字节与 TypeScript 6.0.3 精确包匹配，相关源码以标准 submodule 锁定。通过公共 SDK 的安装锚声明自带 bundle，不修改上游核心。工厂配置只迁移一次，用户可以禁用并跨重启保留；恢复 profile 不运行 LSP。DSH 解包标记绑定实际层 SHA-256，避免同一 RC 增加依赖却被旧标记跳过。
+
+同一最终 HAP 共11组检查退出0：三组 LSP 语义／bundle／生命周期，加工具链、MCP、PTC、Workflow、Office、子进程、工作树和崩溃恢复八组。严格核对源位置、引用、实现、悬停、标准库、UTF-16、修改后刷新、边界拒绝、复用及真实崩溃重建；取消／销毁夹具暂扣真实服务器的语义回复，专门检查升级、路由注销、回收及新请求恢复。先前锚点错误、超时、构建 Python 兼容、测试恢复截断和无损 JSON 输出失败均保留。
+
+生产源 `684d101e97a61a8b929e2628d2cd43022dab48d8`，未签名 HAP 662,455,928字节，SHA-256 `555be71d17877797b50e42c1f6150a1a83898a7668ddc52670226320550ba64e`。原配置／锁文件恢复，默认 workspace-write、匿名401／鉴权200，测试凭据与临时 patch 清理，旧 RC.3 会话30事件保留。该版为模拟器结果；压缩、其他适用可选能力、工作树 restore／专门取消和真机仍继续验收。[准确证据](evidence/emulator-lsp-0.4.35.json) · [实现](research/harmonyos-lsp.md)。

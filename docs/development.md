@@ -9,7 +9,7 @@ git submodule update --init --depth=1
 ./scripts/vendor/verify.sh
 ```
 
-父仓库 Git 链接固定每个组件的完整提交。当前直接子模块为 DSH、Node、Termux PRoot、DSHM 和 Termony。构建只读取锁定的子模块，DSHM 的 fetch shim 与许可证直接取自相应子模块。Termony 的嵌套终端组件在当前路径未使用。升级子模块时先提交并推送上游改动，再更新父仓库的 Git 链接。
+父仓库 Git 链接固定每个组件的完整提交。当前直接子模块为 DSH、Node、Termux PRoot、DSHM、Termony、TypeScript language server 和 TypeScript。构建只读取锁定的子模块，DSHM 的 fetch shim 与许可证直接取自相应子模块。Termony 的嵌套终端组件在当前路径未使用。升级子模块时先提交并推送上游改动，再更新父仓库的 Git 链接。
 
 ## 准备输入并打包
 
@@ -189,3 +189,17 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```
 
 后者用标准临时 bundle 验证真正的 provider，包括 stdin/stdout、特殊字符 argv、真实嵌套 Node、环境脱敏／覆盖／删除、非零退出、尾部限额与完整 spill、实际运行中的取消和 Context 销毁。PRoot 取消可能报告退出码1；脚本保留此事实并要求进程范围退出和 helper 回收。两者恢复原 manifest／锁文件并回读摘要，移除本次测试目录和凭据。设计和失败原因见 [Host 子进程](research/harmonyos-host-subprocess.md)。不要在同一模拟器并行运行修改 profile 的回归。
+
+## LSP 模拟器回归
+
+0.4.35 默认通过自带 bundle 装配官方 LSP，按需启动 TypeScript language server。正常语义检查使用真实模型与真实服务器；生命周期检查的透明 relay 只暂扣真实 hover 响应，专门验证取消升级和销毁，不生成语义结果。测试完成恢复原配置、锁文件和普通启动模式。
+
+```sh
+python3 tests/smoke/emulator-lsp-bundle.py <loopback-target> .build/lsp-bundle.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-lsp.py <loopback-target> .build/lsp.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-lsp-lifecycle.py <loopback-target> .build/lsp-lifecycle.json
+```
+
+源码 pins 与 npm 锁一致；构建在 DSH release 内提供独立编译器工具链，并以整个实际层的 SHA-256 判断是否重新解包。不能仅凭包目录存在判断插件启用或测试通过。见 [LSP 设计](research/harmonyos-lsp.md)。
