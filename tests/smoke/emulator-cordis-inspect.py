@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import runpy
 import time
@@ -17,8 +18,27 @@ def invoke(emulator, sid, evidence, key, platform, provider, method, input=None,
     started = time.monotonic()
     result, _ = agent['tool'](emulator, sid, 'cordis_inspect_query', args, expect_error=error)
     text = toolkit['texts']([result])
-    value = text if error else json.loads(text)
+    offload = None
+    if error:
+        value = text
+    else:
+        try: value = json.loads(text)
+        except json.JSONDecodeError:
+            # Large directories use the normal tool-output retention contract.
+            # Verify its complete stored JSON and make the real Agent read its
+            # first page; never mistake clipped inline text for malformed data.
+            match = re.search(r'Full formatted result stored at: (/.+?\.txt)\.', text)
+            if match is None: raise
+            path = match[1]; root = support['WORKSPACE'].rsplit('/', 1)[0]
+            assert path.startswith(root + '/tmp/dsh-spill-') and path.endswith('-cordis_inspect_query.txt'), path
+            body = agent['read_bytes'](emulator, 'alpine/' + path[len(root) + 1:])
+            value = json.loads(body)
+            page, _ = agent['tool'](emulator, sid, 'read', {'file_path': path, 'offset': 1, 'limit': 80})
+            page_text = toolkit['texts']([page]); assert 'platform' in page_text and 'provider' in page_text
+            offload = {'path': path, 'bytes': len(body), 'sha256': hashlib.sha256(body).hexdigest(),
+                       'actualAgentReadFirstPage': page_text}
     evidence[key] = {'args': args, 'result': value, 'elapsedMs': round((time.monotonic() - started) * 1000)}
+    if offload is not None: evidence[key]['offloadedFullResult'] = offload
     print(key, 'rejected' if error else 'returned', flush=True)
     if not error:
         assert value['platform'] == platform and value['provider'] == provider and value['method'] == method
