@@ -84,6 +84,22 @@ function quoteShellArgument(value) {
 function installProotSpawn(workspace) {
   const bridge = addon('libdshshell.so');
   const allowedRoot = fs.realpathSync(workspace);
+  // A sparse root outside Alpine prevents PRoot's rootfs reverse-translation
+  // rule from stripping native prefixes out of Git control files/file URLs.
+  // Data remains in Alpine; only links are created, no second rootfs is copied.
+  const hostRoot = path.join(path.dirname(root), 'dsh-subprocess-root');
+  fs.mkdirSync(hostRoot, { recursive: true, mode: 0o700 });
+  if (fs.lstatSync(hostRoot).isSymbolicLink() || !fs.lstatSync(hostRoot).isDirectory()) {
+    throw new Error('Invalid Harmony subprocess root');
+  }
+  for (const entry of fs.readdirSync(root)) {
+    const destination = path.join(hostRoot, entry);
+    const target = path.join(root, entry);
+    try { fs.symlinkSync(target, destination); }
+    catch (error) {
+      if (error?.code !== 'EEXIST' || !fs.lstatSync(destination).isSymbolicLink() || fs.readlinkSync(destination) !== target) throw error;
+    }
+  }
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
   globalThis.__harmonyHostSpawn = (program, args, options) => {
     if (safeMode) throw new Error('Guest subprocesses are disabled in HarmonyOS recovery mode');
