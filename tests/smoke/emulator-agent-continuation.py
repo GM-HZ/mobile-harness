@@ -1,5 +1,6 @@
 """Actual working-directory and fork/message semantics on the native HarmonyOS Host."""
 import argparse
+import base64
 import json
 import os
 from pathlib import Path
@@ -81,6 +82,11 @@ def assistant_texts(rows):
                      for item in row["data"]["message"]["content"])
 
 
+def read_bytes(emulator, app_path):
+    # HDC's text helper strips whitespace; base64 makes trailing bytes observable.
+    return base64.b64decode(emulator.app("base64 " + app_path), validate=False)
+
+
 def run(emulator, output):
     name = "mh-continuation-" + uuid.uuid4().hex[:10]
     path = support["WORKSPACE"] + "/" + name
@@ -99,7 +105,7 @@ def run(emulator, output):
             result, _ = tool(emulator, sid, "working_directory", {"cd": path + "/parent"})
             assert toolkit["texts"]([result]) == path + "/parent"
             tool(emulator, sid, "write", {"file_path": "parent.txt", "content": "PARENT"})
-            assert emulator.app(f"cat {app}/parent/parent.txt") == "PARENT"
+            assert read_bytes(emulator, f"{app}/parent/parent.txt") == b"PARENT"
             record["relativeFileUsesSessionCwd"] = True
             calls, _, _ = prompt(emulator, sid, "Remember this harmless acceptance token in our conversation: " + token
                                   + ". Reply ACK only; do not call any tools or create a goal.")
@@ -124,7 +130,7 @@ def run(emulator, output):
             result, _ = tool(emulator, sid, "send_message", followup_args, may_wait=True)
             assert "message delivered to agent memory-child" in toolkit["texts"]([result])
             child_rows = child_end(emulator, sid, child, before, lambda rows: token in assistant_texts(rows))
-            assert emulator.app(f"cat {app}/child/followup.txt") == followup
+            assert read_bytes(emulator, f"{app}/child/followup.txt") == followup.encode()
             assert emulator.app(f"test ! -e {app}/followup.txt && printf ABSENT") == "ABSENT"
             assert emulator.app(f"test ! -e {app}/parent/followup.txt && printf ABSENT") == "ABSENT"
             writes = [r["data"] for r in child_rows if r["seq"] > before and r["type"] == "tool/call" and r["data"]["name"] == "write"]
@@ -147,7 +153,7 @@ def run(emulator, output):
                  + json.dumps({"file_path": "restart.txt", "content": resumed})
                  + ". Keep file_path relative. Then reply with the exact FORKMEMORY token remembered from our earlier inherited conversation; use no other tools."}, may_wait=True)
             child_rows = child_end(emulator, sid, child, before_restart, lambda rows: token in assistant_texts(rows))
-            assert emulator.app(f"cat {app}/child/restart.txt") == resumed
+            assert read_bytes(emulator, f"{app}/child/restart.txt") == resumed.encode()
             record["sameChildMemoryAndCwdAfterRestart"] = True
             emulator.rpc("session/cancel", {"request": {"sessionId": sid}})
         record["temporaryModelCredentialRemoved"] = True

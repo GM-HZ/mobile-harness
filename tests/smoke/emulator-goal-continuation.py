@@ -27,11 +27,13 @@ def run(emulator, output):
             fixture = Path(temporary) / "input.txt"; fixture.write_text(marker)
             assert "FileTransfer finish" in emulator.hdc("file", "send", str(fixture), remote)
             emulator.app(f"cp {remote} {app}/input.txt")
+            assert agent["read_bytes"](emulator, f"{app}/input.txt") == marker.encode()
         with support["model_key"](emulator):
             sid = support["session"](emulator, True); evidence["sessionId"] = sid
             try:
                 objective = ("In this isolated acceptance directory, use read to read " + path + "/input.txt, then use write to create "
-                             + path + "/output.txt with exactly the same text. Do not use other execution tools, change directories, "
+                             + path + "/output.txt with exactly the same text. The input deliberately has NO final newline: preserve "
+                             "its exact bytes and do not add one. Do not use other execution tools, change directories, "
                              "or touch other files. After the actual read and write have succeeded, use get_goal and update_goal "
                              "with the current id/revision to mark this goal complete. This is the entire acceptance goal.")
                 args = {"objective": objective, "max_goal_rounds": 2}
@@ -67,7 +69,10 @@ def run(emulator, output):
                 settled = [r["data"]["message"] for r in rows if r["type"] == "tool/result" and r["data"]["message"].get("toolCallId") in ids]
                 assert len(settled) == len(tool_calls) and not any(r["isError"] for r in settled), settled
                 assert marker in agent["toolkit"]["texts"](settled)
-                assert emulator.app(f"cat {app}/output.txt") == marker
+                actual = agent["read_bytes"](emulator, f"{app}/output.txt")
+                evidence["outputBytes"] = len(actual)
+                evidence["inputBytes"] = len(marker.encode())
+                assert actual == marker.encode(), "Goal output changed the hidden fixture bytes (including trailing whitespace)"
                 evidence["automaticRoundDidRealReadAndWrite"] = True
                 evidence["automaticSource"] = [r["data"]["source"] for r in automatic]
                 evidence["actualTools"] = [{"name": r["name"], "arguments": json.loads(r["arguments"])} for r in tool_calls]
