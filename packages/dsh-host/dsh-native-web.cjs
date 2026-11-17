@@ -87,6 +87,8 @@ function installProotSpawn(workspace) {
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
   globalThis.__harmonyHostSpawn = (program, args, options) => {
     if (safeMode) throw new Error('Guest subprocesses are disabled in HarmonyOS recovery mode');
+    // Keep the existing bounded search adapter and its signed /bin/rg mapping.
+    if (program === ripgrep) return globalThis.__harmonyProotSpawn(program, args, options);
     if (!Array.isArray(options.stdio) || options.stdio.length !== 3 ||
         !['ignore', 'pipe'].includes(options.stdio[0]) ||
         options.stdio.slice(1).some(mode => !['pipe', 'inherit'].includes(mode))) {
