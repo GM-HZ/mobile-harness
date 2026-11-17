@@ -42,8 +42,8 @@ def prompt(emulator, sid, instruction, timeout=80, allow_error=False):
     raise AssertionError("The specifically addressed acceptance request did not finish")
 
 
-def tool(emulator, sid, name, args, may_wait=False, expect_error=False):
-    instruction = "Actually call " + name + " exactly once now with precisely " + json.dumps(args) + ". "
+def tool(emulator, sid, name, args, may_wait=False, expect_error=False, literal_unicode=False):
+    instruction = "Actually call " + name + " exactly once now with precisely " + json.dumps(args, ensure_ascii=not literal_unicode) + ". "
     if name == "working_directory" and not args:
         instruction += "This is READ ONLY: {} is an empty object. Omit cd entirely; do not add a default directory or change it. "
     instruction += ("You may use wait_agent if required to collect that child's completion; use no other tools. " if may_wait

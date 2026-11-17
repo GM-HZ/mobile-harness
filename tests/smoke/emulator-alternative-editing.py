@@ -45,7 +45,7 @@ def configured_tools(emulator, evidence):
 
 
 def invoke(emulator, sid, evidence, key, tool, args, error=False):
-    result, rows = agent['tool'](emulator, sid, tool, args, expect_error=error)
+    result, rows = agent['tool'](emulator, sid, tool, args, expect_error=error, literal_unicode=True)
     text = toolkit['texts']([result])
     evidence[key] = {'tool': tool, 'args': args, 'text': text, 'isError': error}
     print(key, 'rejected' if error else 'returned', flush=True)
