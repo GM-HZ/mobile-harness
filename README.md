@@ -6,7 +6,7 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 
 ## 当前基线
 
-鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.4，源码子模块同步锁定官方 RC.4 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。0.4.32 补齐 Office 转换、渲染和公式重算，当前模拟器的独立原生 worker 正常操作约 2–3 秒；18 组旧链路与生命周期回归通过。普通包默认带通用 PTC。真机与其余可选能力仍待验证，范围见[能力矩阵](docs/dsh-capabilities.md)及[0.4.32 证据](docs/evidence/emulator-office-0.4.32.json)。云端执行、远端控制与安卓属于后续阶段。
+鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.4，源码子模块同步锁定官方 RC.4 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。0.4.32 补齐 Office 转换、渲染和公式重算，独立原生 worker 在当前模拟器正常操作约 2–3 秒。0.4.33 补齐 jitless Host 的 HTTP/1 抓取与搜索链路，10 组模拟器检查通过，涵盖目标／团队任务持久化、提问、计划审批及既有执行链路。普通包默认带通用 PTC。真机与其余可选能力仍待验证，范围见[能力矩阵](docs/dsh-capabilities.md)、[Office 证据](docs/evidence/emulator-office-0.4.32.json)和[本轮证据](docs/evidence/emulator-http-standard-0.4.33.json)。云端执行、远端控制与安卓属于后续阶段。
 
 ## 文档
 

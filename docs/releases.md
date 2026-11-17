@@ -190,3 +190,11 @@ API 26 Phone 模拟器通过 16 组 PTC／Workflow／MCP／定时任务／故障
 真实模型完成 DOCX／PPTX PDF、图像附件回读、Excel 公式缓存 0→42、缓存复用、损坏文档拒绝，以及取消后同会话继续执行。独立 OfficeKit 的取消、超时、空闲／在途销毁、故障后新请求恢复和全部 helper 回收均通过。18 组既有链路回归通过。保留 Guest 超时、死连接、模型复述等失败尝试，准确绑定源码和两次包内字节相同的构建，不混用 HAP 摘要。
 
 官方 RC.4 源码标签已补发，Gitlink 固定 `3f321d32bfe382212a8ed8785c1d47a5a300aa23`，npm 仍固定 RC.4。其余能力清点继续，额外网页 HTTP/1 测试失败尚待修复。[证据与命令](evidence/emulator-office-0.4.32.json) · [架构与性能边界](research/harmonyos-native-office.md)
+
+## 0.4.33 标准工具与 HTTP/1
+
+将同一固定 llhttp WASM 在构建时转为 JS，补齐 jitless Host 直接调用 Undici 的 HTTP/1 路径，保留上游网络策略、限额、代理和取消。电脑原生 WASM／jitless 两组 11 项网络对照通过，Phone 模拟器实际网页、中文分块、跳转、拒绝、取消后复用及 DeepSeek 搜索通过。
+
+10 组模拟器检查通过：标准状态工具、网页、Office、Office 取消、Workflow、提问与计划审批、PTC、PTC 审批、本地 MCP、HTTP MCP 与定时。目标和团队任务跨强停重开持久化，单次插件发现审批绑定实际工具。Workflow 取消增强为观察真实同步片段和进程回收；原失败、模型拒绝及测试口径修正全部保留。
+
+最终普通 HAP 已覆盖安装，旧 RC.3 会话与 venv 标记保留，匿名 401／鉴权 200，测试凭据和临时 Host patch 已清理。DSH 仍为 npm／源码同步锁定的 RC.4，本版真机和剩余可选能力未宣称通过。[准确制品与逐项记录](evidence/emulator-http-standard-0.4.33.json) · [实现](research/harmonyos-http.md)

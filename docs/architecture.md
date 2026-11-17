@@ -29,6 +29,8 @@ HAP 内的鸿蒙 Node.js / DSH Host
 
 鸿蒙的 Alpine 包、共享库、项目依赖和 DSH 插件分别由其运行环境管理。见[鸿蒙工具与依赖管理](harmonyos-package-management.md)。
 
+Host 的 jitless HTTP/1 适配仅替换锁定 Undici 的 llhttp 实例化入口，保留原 provider、dispatcher、代理和限额，构建时校验转换输入与输出，手机按需加载。见 [HTTP/1 设计与回归](research/harmonyos-http.md)。
+
 ## 跨设备设计方向
 
 | 层 | 规划职责 |

@@ -12,6 +12,7 @@ Emulator = capabilities["Emulator"]
 model_key = capabilities["model_key"]
 session = capabilities["session"]
 events = capabilities["events"]
+STARTED = {}
 
 
 def start_workflow(emulator, script, name, background=False):
@@ -20,7 +21,14 @@ def start_workflow(emulator, script, name, background=False):
         "meta": {"name": name, "description": "HarmonyOS Workflow acceptance"},
         "script": script, "run_in_background": background,
     })
-    prompt = f"Run the local acceptance fixture by calling workflow once with exactly these arguments: {arguments}. Use no other tool."
+    purpose = ("This tests the managed worker's synchronous timeout, so the deliberate infinite loop must be terminated by its enforced budget. "
+               if name == "mh-workflow-timeout" else
+               "This tests in-flight cancellation; the external acceptance harness will cancel the run as soon as its start is observed. "
+               if "cancel" in name else "")
+    prompt = ("This is an explicitly authorized, isolated local acceptance fixture in a supervised worker. " + purpose
+              + f"Actually call workflow once now with exactly these arguments: {arguments}. "
+              "Do not rewrite the fixture, retry, or call another tool.")
+    STARTED[name] = session_id
     emulator.rpc("session/prompt", {"request": {
         "sessionId": session_id, "requestId": str(uuid.uuid4()), "mode": "queue",
         "content": [{"type": "text", "text": prompt}],
@@ -45,6 +53,10 @@ def of_type(records, event_type):
 
 def run_result(records, outcome):
     return any(event["data"]["stopReason"] == outcome for event in of_type(records, "tool-workflow/run-end"))
+
+
+def worker_trace(emulator):
+    return [json.loads(row) for row in emulator.app("grep workflow-worker- alpine/tmp/dsh-native-timeline.log || true").splitlines()]
 
 
 def verify_workflow(emulator, evidence):
@@ -75,15 +87,26 @@ def verify_workflow(emulator, evidence):
     assert run_result(records, "error") and "Workflow synchronous execution exceeded" in result, result[:1500]
     evidence["timeout"] = True
 
-    sid = start_workflow(emulator, "while (true) {}", "mh-workflow-cancel")
+    previous_workers = {row["id"] for row in worker_trace(emulator)}
+    sid = start_workflow(emulator, "const until = Date.now() + 60000; while (Date.now() < until) {} return 'natural-end';", "mh-workflow-cancel")
     wait_for(emulator, sid, lambda rows: bool(of_type(rows, "tool-workflow/run-start")))
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        trace = worker_trace(emulator)
+        running = [row["id"] for row in trace if row["event"] == "workflow-worker-running" and row["id"] not in previous_workers]
+        if running:
+            assert not any(row["event"] == "workflow-worker-reaped" and row["id"] in running for row in trace)
+            break
+        time.sleep(.02)
+    else: raise AssertionError("The cancellation fixture did not enter an actual synchronous worker slice")
     assert emulator.rpc("session/cancel", {"request": {"sessionId": sid}})["accepted"]
     records = wait_for(emulator, sid, lambda rows: bool(of_type(rows, "tool-workflow/run-end")))
     assert run_result(records, "cancelled"), of_type(records, "tool-workflow/run-end")
+    assert all(any(row["event"] == "workflow-worker-reaped" and row["id"] == worker for row in worker_trace(emulator)) for worker in running)
     evidence["cancelledDuringSyncSlice"] = True
+    evidence["cancelledSyncWorkersReaped"] = running
 
-    sid = start_workflow(emulator, """await agent('Write a long essay, with 600 words, about the history of paper.');
-        await new Promise(() => {});""", "mh-workflow-cancel-child")
+    sid = start_workflow(emulator, "await agent('Write a long essay, with 600 words, about the history of paper.');", "mh-workflow-cancel-child")
     wait_for(emulator, sid, lambda rows: bool(of_type(rows, "tool-workflow/agent-start")))
     assert emulator.rpc("session/cancel", {"request": {"sessionId": sid}})["accepted"]
     records = wait_for(emulator, sid, lambda rows: bool(of_type(rows, "tool-workflow/run-end")))
@@ -118,7 +141,13 @@ def main():
         evidence["startupMs"] = emulator.ready("normal")
         assert emulator.web_status(False) == 401
         with model_key(emulator):
-            verify_workflow(emulator, evidence)
+            try:
+                verify_workflow(emulator, evidence)
+            finally:
+                # Cancel only this fixture's root Sessions before removing their temporary key.
+                for sid in STARTED.values():
+                    emulator.rpc("session/cancel", {"request": {"sessionId": sid}})
+                evidence["sessions"] = dict(STARTED)
         evidence["temporaryModelCredentialRemoved"] = True
     finally:
         options.output.write_text(json.dumps(evidence, indent=2) + "\n")

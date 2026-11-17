@@ -1,0 +1,1054 @@
+{
+  "recordedAt": "2026-11-17T19:42:33.503286+00:00",
+  "target": "DevEco API 26 ARM64 Phone emulator 127.0.0.1:15557",
+  "artifact": {
+    "sourceCommit": "d764559f8e3cb279591777ba55dc7106319f4ad9",
+    "hap": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.33-unsigned.hap",
+    "bytes": 650927151,
+    "sha256": "8d5158a203cb1e9801b4976a6dca8534faa19de56ac25e289bd10ea6cf3a3035",
+    "overinstallReadyMs": 8816,
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200
+  },
+  "release": {
+    "npm": "0.2.2-rc.4",
+    "sourceTag": "dsh-v0.2.2-rc.4",
+    "sourceCommit": "3f321d32bfe382212a8ed8785c1d47a5a300aa23",
+    "registryDistTags": {
+      "alpha": "0.2.2-alpha.3",
+      "latest": "0.2.2-rc.1",
+      "next": "0.2.2-rc.4"
+    },
+    "registryCheckedAt": "2026-11-17T19:42:33.503319+00:00",
+    "packageLockSha256": "abba45e17c07a89c562ed7dd18217298b349dbfb68915ba328dd94739e4b575f"
+  },
+  "build": {
+    "exitCode": 0,
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=/Users/gongmeng/dev/acode/mobile-harness/.build/inputs/harmonyos ./build.sh --package"
+  },
+  "transport": {
+    "undici": "8.11.2",
+    "compiler": "Binaryen 132.0.0 (same verified archive as portable Amaro)",
+    "wasmSourceSha256": "ab4573a06c43574936dc98c3943b10a4ee32798e9797329e9f327e5f64115f54",
+    "clientH1SourceSha256": "e8eb930546e7f7755471c75069878e3584b50f2c9ec8468fc8f2a1d236dab9a4",
+    "generatedJsSha256": "c59f929a2c4edc035fac36b2e3e8c77eeb83428f90e4b2abeac2a9aafc8ea508",
+    "generatedJsBytes": 2463035,
+    "lazyInstantiation": true,
+    "hostStillJitless": true,
+    "dispatcherAndProxyPreserved": true,
+    "sameOriginPolicyAndLimitsPreserved": true
+  },
+  "localContracts": {
+    "commands": [
+      {
+        "case": "native-wasm-control",
+        "command": [
+          "/Applications/DevEco-Studio.app/Contents/tools/node/bin/node",
+          "tests/contract/portable-http.cjs",
+          ".build/dsh-runtime/abba45e17c07a89c562ed7dd18217298b349dbfb68915ba328dd94739e4b575f/node_modules",
+          ".build/llhttp-poc/instantiate.cjs"
+        ],
+        "exitCode": 0
+      },
+      {
+        "case": "portable-jitless",
+        "command": [
+          "/Applications/DevEco-Studio.app/Contents/tools/node/bin/node",
+          "--jitless",
+          "tests/contract/portable-http.cjs",
+          ".build/dsh-runtime/abba45e17c07a89c562ed7dd18217298b349dbfb68915ba328dd94739e4b575f/node_modules",
+          ".build/llhttp-poc/instantiate.cjs"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "nativeWasmControl": {
+      "jitless": false,
+      "patched": false,
+      "checks": [
+        "chunked-trailers-large-body-repeated-keepalive",
+        "gzip",
+        "redirect",
+        "head",
+        "empty",
+        "post",
+        "http-error-body",
+        "cancel-body-and-reuse",
+        "malformed-framing-rejected",
+        "explicit-forward-proxy-dispatcher",
+        "explicit-connect-proxy-dispatcher"
+      ]
+    },
+    "portableJitless": {
+      "jitless": true,
+      "patched": true,
+      "checks": [
+        "chunked-trailers-large-body-repeated-keepalive",
+        "gzip",
+        "redirect",
+        "head",
+        "empty",
+        "post",
+        "http-error-body",
+        "cancel-body-and-reuse",
+        "malformed-framing-rejected",
+        "explicit-forward-proxy-dispatcher",
+        "explicit-connect-proxy-dispatcher"
+      ]
+    }
+  },
+  "emulatorSuites": [
+    {
+      "case": "standard",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-standard-tools.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/emulator/standard.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 38.692
+    },
+    {
+      "case": "web",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-web-tools.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/emulator-final/web.json",
+        "--search"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 33.755
+    },
+    {
+      "case": "office",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-office.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/emulator-final/office.json",
+        "--artifacts",
+        ".build/llhttp-poc/emulator-final/office-artifacts",
+        "--require-native"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 75.432
+    },
+    {
+      "case": "office-cancel",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-office-cancel.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/emulator-final/office-cancel.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 9.05
+    },
+    {
+      "case": "workflow",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-workflow.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/regressions-final/workflow.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 13.693
+    },
+    {
+      "case": "interactions",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-interactions.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/regressions-complete/interactions.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 16.481
+    },
+    {
+      "case": "ptc",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/regressions-complete/ptc.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 25.259
+    },
+    {
+      "case": "ptc-approval",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-approval.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/regressions-complete/ptc-approval.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 18.573
+    },
+    {
+      "case": "mcp-stdio",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-mcp-stdio.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/regressions-complete/mcp-stdio.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 16.451
+    },
+    {
+      "case": "mcp-http-scheduler",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-dsh-capabilities.py",
+        "127.0.0.1:15557",
+        ".build/llhttp-poc/regressions-complete/mcp-http-scheduler.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 28.368
+    }
+  ],
+  "reports": {
+    "standard": {
+      "readyMs": 65,
+      "sessionId": "session-f5b494a1-eea5-4b6f-994f-36ba33192cba",
+      "todoExactSnapshot": true,
+      "bundledSkillLoaded": true,
+      "presentDurableEvent": true,
+      "goalCreatedAndPaused": {
+        "id": "goal-5b06dd02-44a8-4ca3-b501-f559f67d13b4",
+        "revision": 2
+      },
+      "staleGoalUpdateRejected": true,
+      "teamDependencyClaimComplete": true,
+      "restartReadyMs": 5292,
+      "goalPersistedPausedAcrossRestart": true,
+      "teamPersistedAcrossRestart": true,
+      "testGoalClearedTeamDisabled": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "web": {
+      "readyMs": 58,
+      "sessionId": "session-e1646c72-fb63-45c9-92aa-f4b853bf589f",
+      "html": {
+        "status": 200,
+        "actualMarker": "HARMONYWEBEC7EBA1EAD854DFF808FDC9517A611A4"
+      },
+      "chunked": {
+        "status": 200,
+        "actualMarker": "HARMONYWEBEC7EBA1EAD854DFF808FDC9517A611A4"
+      },
+      "redirect": {
+        "status": 200,
+        "actualMarker": "HARMONYWEBEC7EBA1EAD854DFF808FDC9517A611A4"
+      },
+      "error": {
+        "status": 418,
+        "actualMarker": "HARMONYWEBEC7EBA1EAD854DFF808FDC9517A611A4"
+      },
+      "crossRejected": true,
+      "largeRejected": true,
+      "crossOriginDestinationNotContacted": true,
+      "invalidUrlRefusedBeforeNetwork": true,
+      "actualHttpCancelledMs": 72,
+      "sameSessionAfterCancellation": true,
+      "publicHttpsFetch": true,
+      "deepseekSearch": true,
+      "temporaryModelCredentialRemoved": true,
+      "parserTrace": [
+        {
+          "event": "http-parser-portable",
+          "ms": 9417,
+          "runtime": "llhttp-js"
+        }
+      ],
+      "observedPaths": [
+        "/html",
+        "/chunked",
+        "/redirect",
+        "/html",
+        "/error",
+        "/cross",
+        "/large",
+        "/slow",
+        "/html"
+      ]
+    },
+    "office": {
+      "fixture": "mh-office-3771e9793a35",
+      "marker": "HARMONY_OFFICE_0796F1E5643646A482A3A69247215E96",
+      "readyMs": 61,
+      "fixtureSha256": {
+        "input.docx": "ba9735f2dc95b62c4268c68357edb3ff29c644e4b18ce3d039056abdce5f13b1",
+        "input.xlsx": "dc25f063fea605425fcd982162a5c327cb7d0790b5150be07220fadc3c2ff1aa",
+        "invalid.docx": "61cbf344efdbbc6bc4966e502b29764ae811e0c427a3013ea18dd8ae302265f2",
+        "input.pptx": "a459fb78af5f6446fa5bfcb6623454c984e82bf9f15cfcf27710bb995741702c"
+      },
+      "officeSkillLoaded": true,
+      "documentPdf": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-819bfe5b5879b849ce985d56/0ada4908-53fd-46c8-87c8-264fc69c6756/input.pdf",
+        "bytes": 11696,
+        "sha256": "2a82e59363ba4a5f251afd30a4d13f12698bee1a25ce5a0ea14109988ef0dca0",
+        "pageCount": 1,
+        "promptElapsedMs": 5877
+      },
+      "repeatUsedHostCache": true,
+      "documentImage": {
+        "attachment": {
+          "attachmentId": "sha256:b26cc5d0c6eba144ee160b88f4bb8e4c1938ded8839ad0c62aa1e63c5ca6f3f6",
+          "mediaType": "image/png",
+          "bytes": 7549,
+          "width": 596,
+          "height": 842
+        },
+        "sha256": "b26cc5d0c6eba144ee160b88f4bb8e4c1938ded8839ad0c62aa1e63c5ca6f3f6",
+        "promptElapsedMs": 15886,
+        "localArtifact": ".build/llhttp-poc/emulator-final/office-artifacts/document.png"
+      },
+      "workbookRecalculated": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-819bfe5b5879b849ce985d56/1225f747-870e-4c8e-a15c-251157e69a15/input.xlsx",
+        "bytes": 5213,
+        "sha256": "b4a595db00cfb5ee8f630e5690d95c7d57e12dbd6572e1ff8eade75f3f6977f7",
+        "cell": "C1",
+        "formulaRetained": true,
+        "beforeCachedValue": 0,
+        "afterCachedValue": 42,
+        "promptElapsedMs": 14390
+      },
+      "presentationPdf": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-819bfe5b5879b849ce985d56/e8e40b5f-8582-45ff-aaa4-dc829d6e21ba/input.pdf",
+        "bytes": 11036,
+        "sha256": "5d4ccdbcf00ff68d2a9e601deeecc748281a3f1efdb6fee60790baebf6c73b56",
+        "promptElapsedMs": 16984
+      },
+      "invalidDocumentRejected": "Error: cannot convert \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-office-3771e9793a35/invalid.docx\": Input is not a supported, bounded OOXML archive.",
+      "temporaryModelCredentialRemoved": true,
+      "trace": [
+        {
+          "event": "office-native-capability",
+          "ms": 71229,
+          "pid": 7686,
+          "available": true,
+          "elapsedMs": 68,
+          "wasm": true,
+          "value": 42,
+          "platform": "openharmony",
+          "node": "v24.14.1"
+        },
+        {
+          "event": "office-worker-started",
+          "ms": 71229,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "pid": 7686,
+          "runtime": "native"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 71336,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "6cb2422b-47cf-4d79-9b6f-a4bf98fbda24",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 74226,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "6cb2422b-47cf-4d79-9b6f-a4bf98fbda24",
+          "method": "convert",
+          "elapsedMs": 2890,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 80811,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "0505acfb-b021-4be3-9c05-f61d347480d6",
+          "method": "renderImages"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 82879,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "0505acfb-b021-4be3-9c05-f61d347480d6",
+          "method": "renderImages",
+          "elapsedMs": 2069,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 104708,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "b1af23e7-d004-44ea-a33d-dc996def5f86",
+          "method": "recalculate"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 107263,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "b1af23e7-d004-44ea-a33d-dc996def5f86",
+          "method": "recalculate",
+          "elapsedMs": 2556,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 120096,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "4070f6d7-19c8-481b-b11b-9c2d503727f5",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 122327,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "4070f6d7-19c8-481b-b11b-9c2d503727f5",
+          "method": "convert",
+          "elapsedMs": 2231,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 134006,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "2939339c-0f6b-4be3-9059-07bf8e6a1b97",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 134197,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "2939339c-0f6b-4be3-9059-07bf8e6a1b97",
+          "method": "convert",
+          "elapsedMs": 191,
+          "code": "invalid-document"
+        }
+      ],
+      "sourceFixturesRemoved": true
+    },
+    "office-cancel": {
+      "sessionId": "session-530e6f34-63f6-47cd-843e-e49cd3eb28d8",
+      "gatewayCancellation": {
+        "accepted": true,
+        "observedInFlight": true,
+        "turn": "aborted",
+        "engineSettled": true,
+        "scratchRemoved": true,
+        "elapsedMs": 140
+      },
+      "sameSessionAfterCancel": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-9d041eccfd9e5c2d8419c8c5/2ad0711b-a463-4757-bb45-b62ad2fe3a01/input.pdf",
+        "bytes": 11790,
+        "sha256": "8c12f2ec5123544545a7677149343f0f8dec1096e120f05c12a1be6431f8c658",
+        "promptElapsedMs": 4509
+      },
+      "temporaryModelCredentialRemoved": true,
+      "trace": [
+        {
+          "event": "office-native-capability",
+          "ms": 71229,
+          "pid": 7686,
+          "available": true,
+          "elapsedMs": 68,
+          "wasm": true,
+          "value": 42,
+          "platform": "openharmony",
+          "node": "v24.14.1"
+        },
+        {
+          "event": "office-worker-started",
+          "ms": 71229,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "pid": 7686,
+          "runtime": "native"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 71336,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "6cb2422b-47cf-4d79-9b6f-a4bf98fbda24",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 74226,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "6cb2422b-47cf-4d79-9b6f-a4bf98fbda24",
+          "method": "convert",
+          "elapsedMs": 2890,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 80811,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "0505acfb-b021-4be3-9c05-f61d347480d6",
+          "method": "renderImages"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 82879,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "0505acfb-b021-4be3-9c05-f61d347480d6",
+          "method": "renderImages",
+          "elapsedMs": 2069,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 104708,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "b1af23e7-d004-44ea-a33d-dc996def5f86",
+          "method": "recalculate"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 107263,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "b1af23e7-d004-44ea-a33d-dc996def5f86",
+          "method": "recalculate",
+          "elapsedMs": 2556,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 120096,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "4070f6d7-19c8-481b-b11b-9c2d503727f5",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 122327,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "4070f6d7-19c8-481b-b11b-9c2d503727f5",
+          "method": "convert",
+          "elapsedMs": 2231,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 134006,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "2939339c-0f6b-4be3-9059-07bf8e6a1b97",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 134197,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "2939339c-0f6b-4be3-9059-07bf8e6a1b97",
+          "method": "convert",
+          "elapsedMs": 191,
+          "code": "invalid-document"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 146138,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "e2635234-301c-4bbc-97b8-bd2416cbfd00",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 146240,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "e2635234-301c-4bbc-97b8-bd2416cbfd00",
+          "method": "convert",
+          "elapsedMs": 102,
+          "code": "failed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 147485,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "f47eec04-65c1-4b9b-80fe-6655baff080b",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 149726,
+          "id": "45396a74-fac3-4779-9578-3b9f1a0e59df",
+          "request": "f47eec04-65c1-4b9b-80fe-6655baff080b",
+          "method": "convert",
+          "elapsedMs": 2241,
+          "code": "completed"
+        }
+      ]
+    },
+    "workflow": {
+      "startupMs": 60,
+      "foreground": {
+        "actualSubagentsStarted": 2,
+        "completed": true,
+        "bothResultsReturned": true,
+        "parallel": true
+      },
+      "timeout": true,
+      "cancelledDuringSyncSlice": true,
+      "cancelledSyncWorkersReaped": [
+        8
+      ],
+      "cancelledWithActiveChild": true,
+      "backgroundJob": {
+        "started": true,
+        "completed": true,
+        "resultDelivered": true
+      },
+      "sessions": {
+        "mh-workflow-parallel": "session-a4f23d94-839e-4836-9177-545a8ca92e76",
+        "mh-workflow-timeout": "session-d3e1533f-11ca-4861-87dd-34f8da95f670",
+        "mh-workflow-cancel": "session-b1cbbfda-7ada-4781-957f-edc90443e8be",
+        "mh-workflow-cancel-child": "session-d050d6a7-a64e-468e-ac5d-1c9012fe6189",
+        "mh-workflow-background": "session-7ead617a-a293-4b02-93a3-da6c3b9d0a25"
+      },
+      "temporaryModelCredentialRemoved": true
+    },
+    "interactions": {
+      "readyMs": 69,
+      "sessionId": "session-32b84528-0f9d-46a8-9b6d-fdb681616c0c",
+      "answered": {
+        "questionOrApprovalObserved": true,
+        "decision": "A",
+        "callId": "call_00_xUm0o8cjxt0qCOAbw6RH4193",
+        "turn": "completed"
+      },
+      "cancelled": {
+        "questionOrApprovalObserved": true,
+        "decision": "cancel",
+        "callId": "call_00_HxIBTX9GQmlgNXJntX3e0027",
+        "turn": "aborted"
+      },
+      "sameSessionAfterCancel": {
+        "questionOrApprovalObserved": true,
+        "decision": "B",
+        "callId": "call_00_j5h6TDxYsxFBQC8bZ5bi7262",
+        "turn": "completed"
+      },
+      "planCommand": {
+        "commandId": "cmd-cecf6a58-4",
+        "result": {
+          "kind": "success",
+          "text": "Plan mode on. Use /plan off to leave."
+        }
+      },
+      "planRejected": {
+        "questionOrApprovalObserved": true,
+        "decision": "Keep planning",
+        "callId": "call_00_Oy95zZ5j5IoUM9cUMINJ1959",
+        "turn": "completed",
+        "active": true
+      },
+      "planApproved": {
+        "questionOrApprovalObserved": true,
+        "decision": "Approve",
+        "callId": "call_00_c3NiFX13sx2LpFYWB9Nn0434",
+        "turn": "completed",
+        "active": false
+      },
+      "pluginDiscovery": {
+        "questionOrApprovalObserved": true,
+        "decision": "allowed-once",
+        "callId": "call_00_xveEyQS6vCjtMj5V25Vf3607",
+        "turn": "completed",
+        "totalBundles": 29
+      },
+      "temporaryModelCredentialRemoved": true
+    },
+    "ptc": {
+      "readyMs": 58,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "ptc-approval": {
+      "readyMs": 59,
+      "defaultPolicyDenied": true,
+      "rejectionPreventedExecution": true,
+      "cancellationPreventedExecution": true,
+      "approvedOnceExecutedAndReaped": true,
+      "standingPolicyPreserved": true,
+      "approvalsBoundToCallAndSession": true,
+      "standingMode": "workspace-write",
+      "approvedMode": "danger-full-access",
+      "temporaryModelCredentialRemoved": true
+    },
+    "mcp-stdio": {
+      "node": {
+        "probe": {
+          "ok": true,
+          "serverInfo": {
+            "name": "node-stdio-fixture",
+            "version": "1"
+          },
+          "toolNames": [
+            "stdio_fixture_echo"
+          ],
+          "truncated": false,
+          "durationMs": 5257,
+          "closeConfirmed": true
+        },
+        "toolResultReturnedToSession": true,
+        "fixtureRemoved": true
+      },
+      "python3": {
+        "probe": {
+          "ok": true,
+          "serverInfo": {
+            "name": "python-stdio-fixture",
+            "version": "1"
+          },
+          "toolNames": [
+            "stdio_fixture_echo"
+          ],
+          "truncated": false,
+          "durationMs": 688,
+          "closeConfirmed": true
+        },
+        "toolResultReturnedToSession": true,
+        "fixtureRemoved": true
+      }
+    },
+    "mcp-http-scheduler": {
+      "schedule": {
+        "restartReadyMs": 7897,
+        "persistedAcrossHostRestart": true,
+        "receiptPresent": true,
+        "eventsWithMarker": [
+          "agent/inbox/spliced",
+          "user/message",
+          "assistant/message"
+        ],
+        "modelReply": true,
+        "fixtureRemoved": true
+      },
+      "mcpHttp": {
+        "probe": {
+          "ok": true,
+          "serverInfo": {
+            "name": "mh-probe",
+            "version": "1.0"
+          },
+          "toolNames": [
+            "fixture_echo"
+          ],
+          "truncated": false,
+          "durationMs": 35,
+          "closeConfirmed": true
+        },
+        "toolResultReturnedToSession": true,
+        "fixtureRemoved": true,
+        "observedMethods": [
+          "server/discover",
+          "initialize",
+          "notifications/initialized",
+          "tools/list",
+          "server/discover",
+          "initialize",
+          "notifications/initialized",
+          "tools/list",
+          "tools/call"
+        ]
+      }
+    }
+  },
+  "finalState": {
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "credentialConfigured": false,
+    "temporaryHostProfilePatch": "ABSENT",
+    "persistentWebProfileRetained": true,
+    "legacyRc3Session": {
+      "id": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+      "events": 30,
+      "venvMarkerRetained": true
+    },
+    "ownedGuestProbeDirectoryRemoved": true,
+    "ownedProbeUninstall": "[Info]App uninstall path: msg:uninstall bundle successfully. \nAppMod finish",
+    "finalNormalReadyMs": 358
+  },
+  "failuresAndTestChanges": [
+    {
+      "record": "baseline/status.json",
+      "exitCode": 1,
+      "reason": "0.4.32 controlled HTTP/1 web_fetch failed before successful content retrieval; standard-first in 0.4.32 evidence separately records HTTPS success"
+    },
+    {
+      "record": "emulator/status.json",
+      "exitCode": 1,
+      "reason": "0.4.33 HTTP/1 already returned actual200/marker, but HTML-to-Markdown escaped underscore in fixture marker; use alphanumeric marker to assert full content without confusing markup escapes"
+    },
+    {
+      "records": [
+        "emulator-final/workflow.json",
+        "regressions-rest/workflow.json"
+      ],
+      "exitCode": 1,
+      "reason": "Parallel children and sync timeout passed. Model refused infinite-loop cancellation fixture. Preserve failures. Cancellation fixture now self-ends after60sec, still requires cancelled outcome, and newly requires actual worker synchronous slice plus process reap. Timeout fixture retains infinite loop. Child cancellation waits actual child start and asserts child cancelled, without unrelated never-resolving tail"
+    },
+    {
+      "records": [
+        "regressions-final/interactions.json",
+        "regressions-tail/interactions.json"
+      ],
+      "exitCode": 1,
+      "reason": "/plan on submitted on as a separate human task and started an unrelated turn. Use documented bare /plan for mode-only selection; retain exact tool, question and plan arguments"
+    },
+    {
+      "record": "regressions-verified/interactions.json",
+      "exitCode": 1,
+      "reason": "Upstream Keep planning intentionally returns an error tool envelope. Test now requires that specific exact error plus active plan state; approval still requires success and inactive state"
+    },
+    {
+      "reason": "Local HTTP contract initially expected a different malformed-framing code and lacked forward-proxy handler. Same-version native-WASM control established UND_ERR_RES_CONTENT_LENGTH_MISMATCH and default forward proxy; test validates that exact error and both forward/CONNECT modes"
+    },
+    {
+      "reason": "Final cleanup audit first inspected the persistent web-profile config instead of the temporary Host patch. No existing configuration deleted. Correct Host patch is absent, credential slot is unconfigured; final-state report verified"
+    }
+  ],
+  "rawAttemptStatuses": {
+    "emulator/status.json": [
+      {
+        "case": "standard",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-standard-tools.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/emulator/standard.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 38.692
+      },
+      {
+        "case": "web",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-web-tools.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/emulator/web.json",
+          "--search"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 3.439
+      }
+    ],
+    "emulator-final/status.json": [
+      {
+        "case": "web",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-web-tools.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/emulator-final/web.json",
+          "--search"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 33.755
+      },
+      {
+        "case": "office",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-office.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/emulator-final/office.json",
+          "--artifacts",
+          ".build/llhttp-poc/emulator-final/office-artifacts",
+          "--require-native"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 75.432
+      },
+      {
+        "case": "office-cancel",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-office-cancel.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/emulator-final/office-cancel.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 9.05
+      },
+      {
+        "case": "workflow",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-workflow.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/emulator-final/workflow.json"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 64.717
+      }
+    ],
+    "regressions-rest/status.json": [
+      {
+        "case": "workflow",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-workflow.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-rest/workflow.json"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 65.108
+      }
+    ],
+    "regressions-final/status.json": [
+      {
+        "case": "workflow",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-workflow.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-final/workflow.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 13.693
+      },
+      {
+        "case": "interactions",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-interactions.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-final/interactions.json"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 13.809
+      }
+    ],
+    "regressions-tail/status.json": [
+      {
+        "case": "interactions",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-interactions.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-tail/interactions.json"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 8.192
+      }
+    ],
+    "regressions-verified/status.json": [
+      {
+        "case": "interactions",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-interactions.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-verified/interactions.json"
+        ],
+        "exitCode": 1,
+        "elapsedSeconds": 7.99
+      }
+    ],
+    "regressions-complete/status.json": [
+      {
+        "case": "interactions",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-interactions.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-complete/interactions.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 16.481
+      },
+      {
+        "case": "ptc",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-host.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-complete/ptc.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 25.259
+      },
+      {
+        "case": "ptc-approval",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-approval.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-complete/ptc-approval.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 18.573
+      },
+      {
+        "case": "mcp-stdio",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-mcp-stdio.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-complete/mcp-stdio.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 16.451
+      },
+      {
+        "case": "mcp-http-scheduler",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-dsh-capabilities.py",
+          "127.0.0.1:15557",
+          ".build/llhttp-poc/regressions-complete/mcp-http-scheduler.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 28.368
+      }
+    ]
+  },
+  "localEvidenceSha256": {
+    ".build/llhttp-poc/build-0.4.33.log": "1c21493d59e7a9c3b42c3c91da7c280357d983cac5ae7be49014c3b2a29367d9",
+    ".build/llhttp-poc/emulator/install.log": "1b8a2c0190fff99b60545cab5a2b371c99265872e8adbd9e46ac59644cd2c361",
+    ".build/llhttp-poc/baseline/run.log": "a8fdeecd40124d480d8d97a866b3f2217fac80304360dc61f6d72af4b10b1671",
+    ".build/llhttp-poc/baseline/status.json": "dcc5ca10e5a468a0d238626c0ca29d0d2b0cb2f74198e3c1ecc89a56db2016a9",
+    ".build/llhttp-poc/emulator/status.json": "fe002a7c1f3cf2a2903269f5599edf800c8416c6eac67047378b07ce35563a3c",
+    ".build/llhttp-poc/emulator-final/status.json": "c12568ce6fcade1e57bacb693acc09c0760834797334ccb4035a7bef1c2e64f8",
+    ".build/llhttp-poc/regressions-rest/status.json": "b6507d715c606fde11a9bed13c88bb2ad1edb64148460bcad46ff2f77e3bfb8a",
+    ".build/llhttp-poc/regressions-final/status.json": "4852242fa05c8844ecec73f5882f00d1f72c93429b2229519dac87e4cd53e143",
+    ".build/llhttp-poc/regressions-tail/status.json": "f9c751e17ac009f180a097b3b7d0a6fa1ac6c40b49c2ea60bff91ccd3a6f06a6",
+    ".build/llhttp-poc/regressions-verified/status.json": "2d0e3a85c0929f1489f8136ae65bd97f4f4302b0479315de0e8f399eaa614828",
+    ".build/llhttp-poc/regressions-complete/status.json": "ed3cc77ad2474665ac90d96ab0acde0cbb39d0c582a5cb3f3f121ae23dd62075",
+    ".build/llhttp-poc/final-state.json": "959cf776afbd1a5184e3856bc52b28b7da427e8d8637cd6006de2f7e750ac915"
+  },
+  "limitations": [
+    "Current tests are emulator-only; Mate60 offline",
+    "No claim of all desktop or optional plugins working",
+    "LSP, worktree Host processes, optional Ralph/session search and fork/control tools require separate audit",
+    "Goal paused persistence tested; autonomous goal-loop completion not yet end-to-end tested",
+    "No system PTY, Phone Use, kernel namespaces, full Bash sandbox or app-off system wakeup",
+    "Question/plan decisions exercised real authenticated Remote Events; full ArkWeb visual layout is not certified by these tests",
+    "No fresh-data cold startup or arbitrary Node/WASM/addon compatibility claim"
+  ]
+}

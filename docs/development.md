@@ -137,3 +137,20 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```
 
 Provider 测试通过标准 bundle 临时注册夹具，为每种场景创建真正的独立 OfficeKit。验证在途动作、超时、销毁、所有新建进程回收和失败后继续执行；退出时恢复原 profile、锁文件与启动模式。应用内输出按上游保留策略管理。完整说明见 [原生 Office](research/harmonyos-native-office.md)。
+
+## 标准工具、交互与 HTTP/1 回归
+
+0.4.33 的构建将固定 Undici llhttp 转为 JS，按源与输出摘要验证；复用固定的 Binaryen 132.0.0。主 Host 保持 jitless。构建后的电脑网络契约在同一份 Node modules 上分别用原生 WASM 和 jitless 运行，验证代理、流式正文、取消、错误和连接复用。测试参数必须使用锁文件对应的构建目录与准确生成物。
+
+```sh
+node --jitless tests/contract/portable-http.cjs /absolute/path/to/locked/node_modules /absolute/path/to/dsh-harmony-llhttp.cjs
+node tests/contract/portable-http.cjs /absolute/path/to/locked/node_modules /absolute/path/to/dsh-harmony-llhttp.cjs
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-standard-tools.py <loopback-target> .build/standard-tools.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-web-tools.py <loopback-target> .build/web-tools.json --search
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-interactions.py <loopback-target> .build/interactions.json
+```
+
+标准工具测试创建自己的目标与团队任务，验证强停重开后状态，最后清除目标、关闭团队模式并删去自己的文件。交互测试通过鉴权 Remote Events 模拟回答和计划决定，不需要真人点击；插件发现只批准本次列表读取。网页夹具临时反向映射电脑上的受控 HTTP/1 服务，实际客户端和 DSH 工具运行于模拟器，退出时清除端口与测试凭据。`--search` 额外调用真实 DeepSeek 搜索 API。

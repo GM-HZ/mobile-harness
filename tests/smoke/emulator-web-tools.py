@@ -60,7 +60,8 @@ def run(emulator, output, search=False):
     sid = None
     server = ThreadingHTTPServer(("127.0.0.1", 0), Fixture)
     server.daemon_threads = True
-    server.marker = "HARMONY_WEB_" + uuid.uuid4().hex.upper()
+    # Keep the token free of Markdown punctuation: HTML headings are escaped by Turndown.
+    server.marker = "HARMONYWEB" + uuid.uuid4().hex.upper()
     server.paths = []; server.pending = threading.Event(); server.release = threading.Event()
     server.device_port = 19739
     reverse = (f"tcp:{server.device_port}", f"tcp:{server.server_port}")
@@ -87,7 +88,7 @@ def run(emulator, output, search=False):
             assert "/must-not-be-fetched" not in server.paths, server.paths
             evidence["crossOriginDestinationNotContacted"] = True
             before = len(server.paths)
-            for url, fragment in [("http://user:password@127.0.0.1:" + str(server.device_port) + "/credential", "credentials"), ("file:///etc/passwd", "scheme")]:
+            for url, fragment in [("http://user:password@127.0.0.1:" + str(server.device_port) + "/credential", "credentials"), ("file:///mh-nonexistent-fixture.txt", "scheme")]:
                 result, _ = office["invoke"](emulator, sid, "web_fetch", {"url": url}, expect_error=True)
                 assert fragment in toolkit["texts"]([result]).lower(), result
             assert len(server.paths) == before

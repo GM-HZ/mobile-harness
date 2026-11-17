@@ -102,3 +102,7 @@ Mate 60（BRA-AL00，API 26）通过 USB 从 0.4.9 依次覆盖到 0.4.23 和 0.
 ## 0.4.32 模拟器 Office 回归
 
 Word、Excel、PPT、实际页面附件、缓存、无效文档、会话取消及取消后新请求通过。独立 Office provider 的五种生命周期场景均通过并核对所有 helper 回收。18 组旧工具链／PTC／审批／Workflow／MCP／定时与恢复回归通过；最终包已安装，原生恢复页切回正常模式约 6.7 秒。当前模拟器原生 Office 各正常操作约 2–3 秒，真机未验。额外标准工具验收的状态与网页失败单列，不算全套通过。见 [准确制品与失败记录](evidence/emulator-office-0.4.32.json)。
+
+## 0.4.33 模拟器标准工具与网络
+
+实际模型通过目标、待办、团队依赖、交付、内置 Skill、提问、计划拒绝／批准和单次插件发现审批；目标／团队数据重启后保留。HTTP/1、HTML／分块、URL／跳转／限额、取消复用、HTTPS 与 DeepSeek 搜索通过。回归 Office、Workflow、PTC／审批、本地与 HTTP MCP、定时，共 10 组检查逐条退出 0。两个电脑原生／jitless 网络对照也退出 0。保留所有失败尝试及变化原因，不据此声明全部可选插件或最新真机通过。[本轮证据](evidence/emulator-http-standard-0.4.33.json)
