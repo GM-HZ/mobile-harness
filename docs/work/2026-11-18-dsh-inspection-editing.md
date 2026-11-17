@@ -9,3 +9,11 @@
 验收：实际模型调用对应工具并核对结果、字节与边界；分页目录后按返回的准确entry id查询schema，静态 API目录与实时工具／Config分开证明。替代编辑和补丁先保持上游开关，只在测试预设按配置启用，保留完整standard组成；不能用改写默认Host或放宽权限使测试通过。必要时验证失败后恢复和正常恢复入口。保留实际制品、测试源码、退出码、失败和未验项，提交推送。
 
 状态：已阅读官方组成与接口，开始普通包 Cordis 发现测试。尚未声明 Inspector 客户端或编辑功能通过。整体目标仍为全部适用DSH能力。
+
+## 已复现的原子创建错误与适配
+
+0.4.35 中实际 str_replace_editor create 返回 FS_PERMISSION_DENIED：fs-local 的 createIfAbsent 使用 hard-link 原子发布，鸿蒙拒绝 link。没有放宽已存在目标拒绝或改为覆盖写。检查现有已锁定 libdshpublish.so（SHA-256 `4df1a50e227048a21a1c6f68f2a12b98ba3f0c9626519e34096def7a0a340077`），反汇编 RenameNoReplace 明确为AArch64 syscall276、flags1（renameat2/RENAME_NOREPLACE），既有附件／持久化已经使用该能力。
+
+0.4.36 通过可替换 HarmonyFileSystem 继承官方 SandboxedFileSystem，仅注入公开 FsIoInternals.linkFile 发布边界；复用已有原子no-replace原生桥，保留原暂存、sync、版本检查、锁和每次调用权限。恢复模式继续原provider，不因适配器故障丢失恢复入口。不改上游核心或新增底层编译。需验证已存在文件／确定性并发创建拒绝、完整编辑测试和受影响回归后才声明通过。
+
+另：第一轮 Cordis 检查把超过inline上限的工具目录当完整JSON解析而失败。实际完整结果已按正式retention机制保存。测试修正为核对完整保存结果及摘要，并让真实Agent用read读取首分页；保留所有语义断言，不提高输出上限或删去完整工具目录检查。Host及真实ArkWeb五类查询和重启的修正批次已退出0，尚未等同于可选诊断Inspector Worker验收。

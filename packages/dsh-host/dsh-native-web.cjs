@@ -358,10 +358,11 @@ async function main() {
   globalThis.__harmonyWebFlock = flock;
   globalThis.__harmonyPackagedRg = ripgrep;
   globalThis.__harmonySortGlobPaths = sortGlobPaths;
-  globalThis.__harmonyWebRename = (source, target) => {
+  globalThis.__harmonyPublishNoReplace = (source, target) => {
     const errno = rename(source, target);
     if (errno) throw Object.assign(new Error('exclusive publish failed'), { errno, code: errno === 17 ? 'EEXIST' : 'EIO' });
   };
+  globalThis.__harmonyWebRename = globalThis.__harmonyPublishNoReplace;
   globalThis.__harmonyAttachmentBoundary = (directory, filesystemRoot) =>
     directory === home ? root : filesystemRoot;
   globalThis.__harmonyAttachmentAlias = async (source, target) => {
@@ -470,8 +471,9 @@ async function main() {
   };
   const nativePatch = path.join(root, 'tmp/dsh-native.patch.yml');
   fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n' +
-    (safeMode ? '' : '- id: subprocess\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
-      JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n'), { mode: 0o600 });
+    (safeMode ? '' : '- id: subprocess\n  disabled: true\n- id: fs-sandbox\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
+      JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n    - id: harmony-fs\n      name: ' +
+      JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n'), { mode: 0o600 });
   const profileArgs = safeMode
     ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
     : ['--profile', 'web'];
