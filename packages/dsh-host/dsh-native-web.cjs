@@ -478,9 +478,21 @@ async function main() {
   process.argv = ['node', cli, '--patch', path.join(root, 'dsh-client.patch.yml'), '--patch', nativePatch,
     ...(safeMode ? [] : ['--patch', path.join(root, 'dsh-lsp.patch.yml')]),
     ...profileArgs, '--host', '127.0.0.1', '--port', '19592', '--no-open'];
-  const { runCli } = await import(pathToFileURL(cli).href);
+  // The CLI's own installation anchor declares only its published dependency
+  // closure. Our carrier declares additional official plugins and must supply
+  // that manifest through the public application-owned profile API.
+  const { prepareProfile, runProfile } = await import(pathToFileURL(path.join(dsh, '@deepseek-ai/dsh/lib/profile-boot.js')).href);
+  const { loadLayeredEnv } = await import(appBootUrl);
   mark('cli-imported');
-  await runCli();
+  const profileName = safeMode ? 'mobile-recovery' : 'web';
+  const profile = prepareProfile(profileName, true, safeMode ? 'web' : undefined);
+  await runProfile({
+    environment: loadLayeredEnv('dsh'), profile: profileName,
+    resolvedProfile: { profile, installAnchor: path.join(root, '.dsh-0.2.2-rc.4/dsh/package.json') },
+    patchFiles: [path.join(root, 'dsh-client.patch.yml'), nativePatch,
+      ...(safeMode ? [] : [path.join(root, 'dsh-lsp.patch.yml')])],
+    args: ['--host', '127.0.0.1', '--port', '19592', '--no-open'],
+  });
   mark('profile-mounted');
 }
 main().catch(fail);

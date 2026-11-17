@@ -22,7 +22,9 @@ ARCHIVE = "dsh-layer.zip"
 def stage_dsh(root, raw, baseline):
     manifest = root / "runtime/harmonyos/dsh"
     lock = manifest / "package-lock.json"
-    key = hashlib.sha256(lock.read_bytes()).hexdigest()
+    # This layer also carries our application manifest. Cache the complete
+    # recipe, not only npm's dependency graph.
+    key = hashlib.sha256(lock.read_bytes() + (manifest / "package.json").read_bytes() + Path(__file__).read_bytes()).hexdigest()
     pinned = json.loads(lock.read_text())["packages"]
     for package, source in json.loads((manifest / "lsp-sources.json").read_text()).items():
         recorded = pinned["node_modules/" + package]
@@ -58,6 +60,7 @@ def stage_dsh(root, raw, baseline):
         pending = archive.with_suffix(".tmp")
         try:
             with ZipFile(pending, "w") as output:
+                output.writestr(ZipInfo("dsh/package.json"), (manifest / "package.json").read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
                 for path in sorted(modules.rglob("*")):
                     if path.is_symlink():
                         raise ValueError(f"Unexpected npm symlink: {path}")
@@ -71,4 +74,6 @@ def stage_dsh(root, raw, baseline):
     shutil.copy2(archive, raw / ARCHIVE)
     # A same-DSH-version production dependency change must invalidate unpack.
     # User profiles/workspaces live outside this immutable release directory.
-    (raw / "dsh-runtime-id.txt").write_text(key)
+    with archive.open("rb") as packed:
+        identity = hashlib.file_digest(packed, "sha256").hexdigest()
+    (raw / "dsh-runtime-id.txt").write_text(identity)
