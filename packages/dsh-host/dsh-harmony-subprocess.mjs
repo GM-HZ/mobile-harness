@@ -19,6 +19,9 @@ export default class HarmonySubprocessRuntime extends LocalSubprocessRuntime {
       PATH: ['home/dsh/.local/bin', 'opt/tools/bin', 'usr/local/bin', 'usr/bin', 'bin'].map(p => path.join(root, p)).join(':'),
       HOME: path.join(root, 'home/dsh'), TMPDIR: path.join(root, 'tmp'),
       NODE_OPTIONS: '--jitless --require=/fetch-shim-boot.cjs',
+      // These describe the native launcher, not the child execution world.
+      // Explicit reserved overrides still reach the launcher's refusal.
+      ...Object.fromEntries(Object.keys(process.env).filter(key => /^(?:HARMONY_|PROOT_|LD_)/.test(key)).map(key => [key, undefined])),
       ...spec.env,
     } });
   }
