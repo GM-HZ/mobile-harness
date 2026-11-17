@@ -11,6 +11,7 @@ import uuid
 
 agent = runpy.run_path(str(Path(__file__).with_name('emulator-agent-continuation.py')))
 support = agent['support']; toolkit = agent['toolkit']
+worktree = runpy.run_path(str(Path(__file__).with_name('emulator-worktree.py')))
 
 SHAPES = '\n'.join([
     'export interface Shape {', '  area(): number', '}', '',
@@ -112,7 +113,15 @@ def run(emulator, output):
             assert live_helpers(emulator) == pooled, (pooled, live_helpers(emulator))
             evidence['sameServerReusedAcrossQueries'] = True
             pid = next(iter(pooled))
-            assert emulator.app(f'kill -9 {pid} && printf KILLED') == 'KILLED'
+            # HDC's debug shell cannot signal the application's child. Execute
+            # the exact owned helper-group fault under the application's UID.
+            worktree['full_permission'](emulator, sid)
+            killed, _ = agent['tool'](emulator, sid, 'bash', {
+                'command': f'kill -KILL -- -{pid} && printf KILLED',
+                'description': 'Crash only this acceptance test language-server process group',
+            })
+            evidence['ownedCrashCommandResult'] = toolkit['texts']([killed])
+            assert evidence['ownedCrashCommandResult'] == 'KILLED', evidence['ownedCrashCommandResult']
             text = query(emulator, sid, at('hover', 'consumer.ts', fresh, len(fresh.splitlines()), 'rewritten'), evidence, 'afterServerCrash')
             assert 'rewritten' in text and 'boolean' in text, text
             replaced = live_helpers(emulator); assert len(replaced) == 1 and pid not in replaced, replaced

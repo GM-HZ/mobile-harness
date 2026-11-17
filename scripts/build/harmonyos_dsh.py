@@ -30,6 +30,10 @@ def stage_dsh(root, raw, baseline):
     for package, version in json.loads(bundle_files[0].read_text())["dependencies"].items():
         if application["dependencies"].get(package) != version:
             raise ValueError(f"Mobile LSP bundle dependency mismatch: {package}")
+    # Our bundle is built from this repository, not fetched from npm. Declare
+    # it in the final carrier so PluginManager recognizes shipped ownership.
+    bundle_manifest = json.loads(bundle_files[0].read_text())
+    application["dependencies"][bundle_manifest["name"]] = bundle_manifest["version"]
     key = hashlib.sha256(lock.read_bytes() + (manifest / "package.json").read_bytes() + Path(__file__).read_bytes() + b''.join(file.read_bytes() for file in bundle_files)).hexdigest()
     pinned = json.loads(lock.read_text())["packages"]
     for package, source in json.loads((manifest / "lsp-sources.json").read_text()).items():
@@ -66,7 +70,7 @@ def stage_dsh(root, raw, baseline):
         pending = archive.with_suffix(".tmp")
         try:
             with ZipFile(pending, "w") as output:
-                output.writestr(ZipInfo("dsh/package.json"), (manifest / "package.json").read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
+                output.writestr(ZipInfo("dsh/package.json"), (json.dumps(application, indent=2) + '\n').encode(), compress_type=ZIP_DEFLATED, compresslevel=3)
                 for file in bundle_files:
                     output.writestr(ZipInfo("dsh/node_modules/@mobile-harness/lsp/" + file.name), file.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
                 for path in sorted(modules.rglob("*")):
