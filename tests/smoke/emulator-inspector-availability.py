@@ -45,6 +45,8 @@ def run(emulator, output):
         row = next(row for row in emulator.rpc('pluginManager/listBundles', {}) if row['name'] == NAME)
         assert row['enabled'] is True, row
         evidence['temporarilyComposedOfficialBundle'] = True
+        evidence['liveEntries'] = [row for row in emulator.rpc('pluginManager/listPlugins', {})
+                                  if row.get('moduleName') in ['@deepseek-ai/dsh-experimental-inspector', '@deepseek-ai/dsh-experimental-session-inspector', '@deepseek-ai/dsh-experimental-client-ui-stats']]
         evidence['anonymousBootstrapStatus'] = request(emulator, '/api/experimental-inspector/bootstrap', False)[0]
         assert evidence['anonymousBootstrapStatus'] == 401
         status, body = request(emulator, '/api/experimental-inspector/bootstrap', True)
@@ -59,9 +61,6 @@ def run(emulator, output):
         elif status == 503:
             evidence['workerAvailable'] = False
         else: raise AssertionError(f'Unexpected Inspector bootstrap status {status}')
-        evidence['liveEntries'] = [{key: row.get(key) for key in ['moduleName', 'enabled', 'fiberPhase', 'error']}
-                                  for row in emulator.rpc('pluginManager/listPlugins', {})
-                                  if row.get('moduleName') in ['@deepseek-ai/dsh-experimental-inspector', '@deepseek-ai/dsh-experimental-session-inspector', '@deepseek-ai/dsh-experimental-client-ui-stats']]
         evidence['disable'] = emulator.rpc('pluginManager/setBundleEnabled', {'name': NAME, 'enabled': False})
         assert evidence['disable']['application'] != 'failed'
     finally:
