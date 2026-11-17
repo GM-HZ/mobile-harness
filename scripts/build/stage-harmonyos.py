@@ -2,6 +2,7 @@ import filecmp
 import hashlib
 import json
 import os
+import re
 from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
@@ -141,6 +142,15 @@ def main():
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
     )
     stage_guest_extras(ROOT, STAGE, RAW)
+    # Exact native launcher overlay paths, rather than a second manually kept
+    # executable list. Harmony's signed loader can execute these while POSIX
+    # X_OK returns false for the app UID on owner-executable package libraries.
+    bindings = (CPP / "poc.c").read_text() + (CPP / "guest-tools.inc").read_text()
+    programs = sorted({guest for guest in re.findall(r'\{\s*"libguest_[^"]+",\s*"([^"]+)"\s*\}', bindings)
+                       if re.match(r'^/(?:usr/)?s?bin/', guest) and not guest.endswith(('.node', '.so'))})
+    if not {'/bin/node', '/bin/bash', '/usr/bin/git'} <= set(programs):
+        raise SystemExit("Missing signed subprocess executable overlays")
+    (RAW / "dsh-harmony-signed-programs.json").write_text(json.dumps(programs) + "\n")
     stage_dsh(ROOT, RAW, inputs / "entry/src/main/resources/rawfile/dsh-layer.zip")
     stage_ptc_worker()
     stage_http(ROOT, RAW)

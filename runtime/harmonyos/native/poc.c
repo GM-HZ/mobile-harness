@@ -480,11 +480,13 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             setenv("PROOT_LOADER", loader, 1);
             if (loader_entry) setenv("HARMONY_PROOT_LOADER_ENTRY", address, 1);
             setenv("PROOT_TMP_DIR", directory, 1);
-            setenv("PATH", "/bin:/usr/bin", 1);
+            if (!host_paths) setenv("PATH", "/bin:/usr/bin", 1);
             setenv("TERM", shell ? "dumb" : "xterm", 1);
             setenv("UV_USE_IO_URING", "0", 1);
-            setenv("TMPDIR", "/tmp", 1);
-            setenv("DSH_HOME", "/tmp/dsh-poc-home", 1);
+            if (!host_paths) {
+                setenv("TMPDIR", "/tmp", 1);
+                setenv("DSH_HOME", "/tmp/dsh-poc-home", 1);
+            }
             if (accelerated || strstr(stage, "default")) unsetenv("PROOT_NO_SECCOMP");
             else setenv("PROOT_NO_SECCOMP", "1", 1);
             _exit(entry(only_version ? (int)(sizeof(version) / sizeof(*version) - 1) : execution_argc, only_version ? version : execution_argv));

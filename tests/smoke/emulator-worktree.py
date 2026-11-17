@@ -57,7 +57,7 @@ def verify(emulator, evidence, name):
         checkout_app = app + '/.agents/worktrees/acceptance'
         assert created['path'] == checkout and created['branch'] == 'acceptance' and created['repositoryRoot'] == repo, created
         assert re.fullmatch('[a-f0-9]{40}', created['baseCommit']), created
-        assert any(r['type'] == 'plugin/record' and r['data'].get('type') == 'plugin:worktree/created' for r in rows), rows[-5:]
+        assert any(r['type'] == 'plugin:worktree/created' and r.get('ignorable') is True and r['data'] == created for r in rows), rows[-5:]
         assert agent['read_bytes'](emulator, checkout_app + '/tracked.txt') == marker.encode()
         assert repo.encode() + b'/.git/worktrees/' in agent['read_bytes'](emulator, checkout_app + '/.git')
         agent['tool'](emulator, sid, 'write', {'file_path': 'tracked.txt', 'content': modified})
