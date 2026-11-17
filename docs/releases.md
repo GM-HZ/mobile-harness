@@ -198,3 +198,7 @@ API 26 Phone 模拟器通过 16 组 PTC／Workflow／MCP／定时任务／故障
 10 组模拟器检查通过：标准状态工具、网页、Office、Office 取消、Workflow、提问与计划审批、PTC、PTC 审批、本地 MCP、HTTP MCP 与定时。目标和团队任务跨强停重开持久化，单次插件发现审批绑定实际工具。Workflow 取消增强为观察真实同步片段和进程回收；原失败、模型拒绝及测试口径修正全部保留。
 
 最终普通 HAP 已覆盖安装，旧 RC.3 会话与 venv 标记保留，匿名 401／鉴权 200，测试凭据和临时 Host patch 已清理。DSH 仍为 npm／源码同步锁定的 RC.4，本版真机和剩余可选能力未宣称通过。[准确制品与逐项记录](evidence/emulator-http-standard-0.4.33.json) · [实现](research/harmonyos-http.md)
+
+### 0.4.33 Agent 续接补验
+
+同一准确 HAP 通过工作目录、fork 上下文、独立 cwd、消息控制与应用重启后继续同一子会话。自动目标轮实际执行文件工具并完成；隐藏夹具精确43字节回读通过。仅新增验证和证据，没有把旧包改名成新版本，未额外宣称长期任务／后台唤醒。[续接与失败记录](evidence/emulator-agent-continuation-0.4.33.json)

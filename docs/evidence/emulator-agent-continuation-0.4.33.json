@@ -1,0 +1,264 @@
+{
+  "recordedAt": "2026-11-17T19:57:27.658118+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "testSourcesCommit": "d86487fbeaf38e17256c649eb197dff1b4793994",
+  "artifact": {
+    "sourceCommit": "d764559f8e3cb279591777ba55dc7106319f4ad9",
+    "hap": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.33-unsigned.hap",
+    "bytes": 650927151,
+    "sha256": "8d5158a203cb1e9801b4976a6dca8534faa19de56ac25e289bd10ea6cf3a3035",
+    "overinstallReadyMs": 8816,
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200
+  },
+  "runtimeChanged": false,
+  "newHapBuildRequired": false,
+  "commands": [
+    {
+      "case": "agent",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-agent-continuation.py",
+        "127.0.0.1:15557",
+        ".build/agent-continuation/bytes-verified/agent.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 32.055
+    },
+    {
+      "case": "goal",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-goal-continuation.py",
+        "127.0.0.1:15557",
+        ".build/agent-continuation/bytes-verified/goal.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 7.127
+    }
+  ],
+  "directoryForkContinuation": {
+    "fixture": "mh-continuation-8d464e2e44",
+    "readyMs": 68,
+    "sessionId": "session-0db03ea7-eb53-436d-a819-078a32d96877",
+    "relativeFileUsesSessionCwd": true,
+    "childSessionId": "6a354e79-bc65-4711-ae9e-8a0b37497520",
+    "forkInheritedConversation": true,
+    "childDiscoveredByListTool": true,
+    "messageContinuedSameChild": true,
+    "childCwdIndependentOfParent": true,
+    "childMemoryAfterContinuation": true,
+    "restartReadyMs": 5313,
+    "childCatalogSurvivedRestart": true,
+    "childDiscoveredAfterRestart": true,
+    "sameChildMemoryAndCwdAfterRestart": true,
+    "temporaryModelCredentialRemoved": true
+  },
+  "automaticGoal": {
+    "fixture": "mh-goal-loop-fa760c3d3b",
+    "readyMs": 64,
+    "sessionId": "session-ea6d8f08-165f-4fc4-afa9-b8c2a69191c2",
+    "createdGoal": {
+      "id": "goal-917773c3-4a9d-42a8-a981-9cb0e588f3c7",
+      "revision": 1
+    },
+    "outputBytes": 43,
+    "inputBytes": 43,
+    "automaticRoundDidRealReadAndWrite": true,
+    "automaticSource": [
+      {
+        "kind": "goal",
+        "goalId": "goal-917773c3-4a9d-42a8-a981-9cb0e588f3c7",
+        "revision": 1,
+        "round": 1
+      }
+    ],
+    "actualTools": [
+      {
+        "name": "read",
+        "arguments": {
+          "file_path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-goal-loop-fa760c3d3b/input.txt"
+        }
+      },
+      {
+        "name": "write",
+        "arguments": {
+          "file_path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-goal-loop-fa760c3d3b/output.txt",
+          "content": "GOALCONTENT43230B9FA5F8484CBB2B4432261BBA94"
+        }
+      },
+      {
+        "name": "read",
+        "arguments": {
+          "file_path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-goal-loop-fa760c3d3b/output.txt"
+        }
+      },
+      {
+        "name": "get_goal",
+        "arguments": {}
+      },
+      {
+        "name": "update_goal",
+        "arguments": {
+          "goal_id": "goal-917773c3-4a9d-42a8-a981-9cb0e588f3c7",
+          "revision": 1,
+          "action": "complete"
+        }
+      }
+    ],
+    "completedGoal": {
+      "id": "goal-917773c3-4a9d-42a8-a981-9cb0e588f3c7",
+      "revision": 2,
+      "objective": "In this isolated acceptance directory, use read to read /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-goal-loop-fa760c3d3b/input.txt, then use write to create /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-goal-loop-fa760c3d3b/output.txt with exactly the same text. The input deliberately has NO final newline: preserve its exact bytes and do not add one. Do not use other execution tools, change directories, or touch other files. After the actual read and write have succeeded, use get_goal and update_goal with the current id/revision to mark this goal complete. This is the entire acceptance goal.",
+      "phase": "complete",
+      "maxGoalRounds": 2,
+      "roundsStarted": 1,
+      "createdAt": 1794945319294,
+      "updatedAt": 1794945323678,
+      "activation": "disarmed"
+    },
+    "outputEqualsHiddenFixtureContent": true,
+    "testGoalCleared": true,
+    "temporaryModelCredentialRemoved": true
+  },
+  "cleanupAndParentToolCalls": {
+    "parentToolCalls": [
+      {
+        "turn": 1,
+        "step": 1,
+        "callId": "call_00_0yiPXn7irOS0sGxH1KJA1349",
+        "name": "working_directory",
+        "arguments": "{}"
+      },
+      {
+        "turn": 2,
+        "step": 1,
+        "callId": "call_00_nBrMLs6l6fI5c1G0ieA28917",
+        "name": "working_directory",
+        "arguments": "{\"cd\": \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-continuation-8d464e2e44/parent\"}"
+      },
+      {
+        "turn": 3,
+        "step": 1,
+        "callId": "call_00_Q4P77CjM8si2wLtJtmhC0674",
+        "name": "write",
+        "arguments": "{\"file_path\": \"parent.txt\", \"content\": \"PARENT\"}"
+      },
+      {
+        "turn": 5,
+        "step": 1,
+        "callId": "call_00_4q8pqh8RjzsE31wDT77h0543",
+        "name": "subagent_fork",
+        "arguments": "{\"description\": \"Verify inherited conversation token\", \"name\": \"memory-child\", \"cwd\": \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-continuation-8d464e2e44/child\", \"prompt\": \"Our earlier human conversation contains a token beginning FORKMEMORY. Reply with exactly that entire token. Use no tools and take no other action.\"}"
+      },
+      {
+        "turn": 5,
+        "step": 2,
+        "callId": "call_00_YAoomNEBHzXtkFhmkyiB7546",
+        "name": "wait_agent",
+        "arguments": "{\"timeout_ms\": 120000}"
+      },
+      {
+        "turn": 6,
+        "step": 1,
+        "callId": "call_00_fPahghFUWNXywWKA216Y0429",
+        "name": "list_agents",
+        "arguments": "{}"
+      },
+      {
+        "turn": 7,
+        "step": 1,
+        "callId": "call_00_RdWX60JZY9rHm2qoyOOL3712",
+        "name": "working_directory",
+        "arguments": "{\"cd\": \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-continuation-8d464e2e44\"}"
+      },
+      {
+        "turn": 8,
+        "step": 1,
+        "callId": "call_00_cg3Fm02MyTS7R4b0ddke7562",
+        "name": "send_message",
+        "arguments": "{\"agent\": \"memory-child\", \"message\": \"This is a new, explicitly requested continuation. Use write exactly once with precisely {\\\"file_path\\\": \\\"followup.txt\\\", \\\"content\\\": \\\"FORKFOLLOWUPB0D6A86CF8E245B9B4CA52E6BD992D28\\\"}. Keep the file_path relative and do not change directories. Then reply with the exact FORKMEMORY token from our inherited earlier conversation, without other tools.\"}"
+      },
+      {
+        "turn": 8,
+        "step": 2,
+        "callId": "call_00_sra8W71vrUgS597SgEqX7248",
+        "name": "wait_agent",
+        "arguments": "{\"timeout_ms\": 120000}"
+      },
+      {
+        "turn": 9,
+        "step": 1,
+        "callId": "call_00_keZ9fLCmFg3Sa9tPffDy4892",
+        "name": "working_directory",
+        "arguments": "{\"cd\": \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native\"}"
+      },
+      {
+        "turn": 10,
+        "step": 1,
+        "callId": "call_00_mKZiDSzugOaGwsBBl1Ur9801",
+        "name": "list_agents",
+        "arguments": "{}"
+      },
+      {
+        "turn": 11,
+        "step": 1,
+        "callId": "call_00_A02TOfzO4DGfuMmDBYIo4864",
+        "name": "send_message",
+        "arguments": "{\"agent\": \"memory-child\", \"message\": \"Continue after the application restart. Without changing directories, use write exactly once with precisely {\\\"file_path\\\": \\\"restart.txt\\\", \\\"content\\\": \\\"FORKRESTART013D6A81D90C4DB5847C58055EBD3D2A\\\"}. Keep file_path relative. Then reply with the exact FORKMEMORY token remembered from our earlier inherited conversation; use no other tools.\"}"
+      },
+      {
+        "turn": 11,
+        "step": 2,
+        "callId": "call_00_mQ4GGWpZSEPEb4KneEAH7695",
+        "name": "wait_agent",
+        "arguments": "{\"timeout_ms\": 120000}"
+      }
+    ],
+    "childAddressKind": "subagent",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "credentialConfigured": false,
+    "temporaryHostPatchAbsent": true,
+    "ownedFixtureDirectoriesRemoved": true
+  },
+  "preservedAttempts": [
+    {
+      "record": ".build/agent-continuation/first/status.json",
+      "exitCode": 1,
+      "reason": "Fork child actually completed with inherited token, but generic session address repeatedly returned agent-busy. Correct public subagent address reads through its owning parent. Original failure retained."
+    },
+    {
+      "record": ".build/agent-continuation/verified/status.json",
+      "exitCode": 1,
+      "reason": "Model supplied cd while asked to read cwd with {}. Exact argument assertion retained; read-only intent and omission clarified."
+    },
+    {
+      "record": ".build/agent-continuation/complete/status.json",
+      "reportedExitCodes": [
+        0,
+        0
+      ],
+      "acceptedAsFinalEvidence": false,
+      "reason": "HDC helper strips trailing whitespace, so earlier goal equality failed to detect an added newline. Explicitly preserve no-final-newline fixture and require base64 byte readback of input/output; strengthened tests rerun. Final input/output43 bytes exactly. All inherited parent events excluded when judging new child turns."
+    }
+  ],
+  "rawEvidenceSha256": {
+    ".build/agent-continuation/bytes-verified/status.json": "e0c4083717a6aaa7dc9776a8d0fdb253d7cbbdc186e9541e34014fa82b094256",
+    ".build/agent-continuation/bytes-verified/agent.json": "14c78a30b64174e943dd2e4da4443eb93d52d64c872764b3e0a2160a5d297981",
+    ".build/agent-continuation/bytes-verified/goal.json": "e7c686e3b9f27b086ff94865d027df91fd57521db4e1340429766fdf8ccb2304",
+    ".build/agent-continuation/bytes-verified/audit.json": "c77b5e5b5c0738194b2e2a37c380f584b64a4a41d9c65ef9274470538ea11365",
+    ".build/agent-continuation/first/status.json": "1d712979d8ac83d742b46628ee26f50b299ccb466e37b85659cf9d085910356a",
+    ".build/agent-continuation/verified/status.json": "75b423c7d7422b3564a095cc32bb0c59db5d3d2439793f3abf2b7b99f1c76ace",
+    ".build/agent-continuation/complete/status.json": "1ae9975371a2dd5bad322deb7056405d12333c97e29434d08ebd714d0d4c2e2f"
+  },
+  "limits": [
+    "Same unmodified 0.4.33 HAP; not a new product version",
+    "Fork and its same child tested after force-stop/restart, not phone background wakeup",
+    "Goal round completion tested with2-round cap and actual one automatic round; long goals and blocked/resume stress remain separate",
+    "Ralph, optional session search, LSP and worktree native process integration remain in audit",
+    "No physical-device or full desktop equivalence claim"
+  ]
+}

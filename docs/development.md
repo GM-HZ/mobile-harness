@@ -154,3 +154,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```
 
 标准工具测试创建自己的目标与团队任务，验证强停重开后状态，最后清除目标、关闭团队模式并删去自己的文件。交互测试通过鉴权 Remote Events 模拟回答和计划决定，不需要真人点击；插件发现只批准本次列表读取。网页夹具临时反向映射电脑上的受控 HTTP/1 服务，实际客户端和 DSH 工具运行于模拟器，退出时清除端口与测试凭据。`--search` 额外调用真实 DeepSeek 搜索 API。
+
+## Agent 与目标续跑补验
+
+以下测试使用普通包，不改 profile。fork 子会话用正式 subagent 地址读取，结果只取其新事件；文件通过 base64 精确回读，以免 HDC 文本接口去掉空白。目标夹具初始轮只创建，随后必须由自动 continuation 实际执行并完成。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-agent-continuation.py <loopback-target> .build/agent-continuation.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-goal-continuation.py <loopback-target> .build/goal-continuation.json
+```

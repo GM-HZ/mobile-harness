@@ -19,25 +19,25 @@
 | fs | 是 | read／write／edit 既有完整工具链回归；apply_patch 仍遵循上游默认开关 |
 | fs-search | 是 | glob／grep 及范围检查既有回归 |
 | terminal | 是 | 可选系统 PTY 终端；按先前要求暂缓 |
-| goal | 是 | 创建、暂停、旧 revision 拒绝及重启后恢复已验；自动续跑完成仍待验 |
+| goal | 是 | 创建、暂停、旧 revision 拒绝及重启后恢复已验；自动一轮真实读写与完成通过，长期压力仍待验 |
 | schedule | 是 | 持久任务强停重开后投递和实际模型回复已验；非系统唤醒 |
 | lsp | 否 | 默认 npm DSH 未安装此工具及 provider；语言服务器路径待单独装配与验证 |
 | ralph | 是 | 随包的可选 bundle 默认关闭；实际多轮 fresh-child 验收待完成 |
 | skill | 是 | 内置 dsh-doc／Office 已验；自定义 Skill 有历史证据 |
 | session-query | 是 | 随包可选 session-search；实际索引与查询待验 |
-| subagent | 是 | Workflow spawn 的真实并行子任务已验；独立 fork、继承与后续控制待进一步验收 |
-| subagent-control | 是 | 运行中取消／子任务取消有证据；list／send／wait 工具组合待补验 |
+| subagent | 是 | Workflow spawn 的真实并行子任务已验；fork 继承、消息续接、独立 cwd 与同一子会话跨重启继续通过 |
+| subagent-control | 是 | 运行中取消／子任务取消有证据；list／send／wait 与消息续接已实际调用并通过 |
 | jobs | 是 | Workflow 后台投递本轮通过；Bash job 输出与取消有历史证据 |
 | agent-team | 是 | 依赖、认领、完成、ready 更新及重启持久化已验 |
 | todo | 是 | 精确全量 todo/write 快照已验 |
-| working-directory | 是 | 标准能力已装配；切目录与子任务 cwd 独立性待补验 |
+| working-directory | 是 | 切目录、相对文件、子任务 cwd 独立性与重启后继续均通过 |
 | workflow | 是 | 真实并行、同步超时、实际同步片段取消、子任务取消与后台投递已验 |
 | workspace-dependencies | 是 | 上游仅在 desktop＋DSH_PRIMARY_RUNTIME 时启用；当前 web profile 不启用 |
 | web | 是 | 实际 HTTP/1、HTTPS、搜索、跳转、限额与取消通过；代理有电脑双运行时对照 |
 
 官方还提供 16 个默认关闭的可选 bundle，以及 Claude Code／Codex 两个按需安装入口。Phone／Computer Use、系统 PTY 的既有暂缓要求保持；任意外部 CLI、其他供应商账号、语音提供者或桌面插件不能凭组件存在宣称鸿蒙兼容。
 
-优先继续：工作目录和 fork／控制、自动目标续跑及压缩、Ralph 和会话搜索，随后验证工作树与 LSP 对 Host 子进程、路径和工具链的真实要求。每一项先复现、优先使用上游插件／provider seam，验证实际结果、取消与生命周期；不通过关闭能力或移除断言假称补齐。
+已补验 [工作目录、fork 与自动目标](../evidence/emulator-agent-continuation-0.4.33.json)。优先继续：压缩、Ralph 和会话搜索，随后验证工作树与 LSP 对 Host 子进程、路径和工具链的真实要求。每一项先复现、优先使用上游插件／provider seam，验证实际结果、取消与生命周期；不通过关闭能力或移除断言假称补齐。
 
 [当前能力矩阵](../dsh-capabilities.md) · [0.4.33 证据](../evidence/emulator-http-standard-0.4.33.json) · [官方 RC.4 源码](https://github.com/deepseek-ai/deepseek-harness/tree/3f321d32bfe382212a8ed8785c1d47a5a300aa23)
 
