@@ -317,6 +317,8 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     int host_paths = shell && strncmp(shell->cwd, root, strlen(root)) == 0 &&
         (shell->cwd[strlen(root)] == '/' || shell->cwd[strlen(root)] == '\0');
     char root_binding[1850];
+    enum { max_top_bindings = 128 };
+    char top_bindings[max_top_bindings][2200];
     char host_root[1024];
     if (host_paths) {
         snprintf(host_root, sizeof(host_root), "%s/dsh-subprocess-root", directory);
@@ -325,7 +327,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     char bind_options[packaged_count][1150];
     char host_bind_options[packaged_count][4096];
     char dsh_binding[1150];
-    char *bound_guest[packaged_count * 4 + sizeof(guest) / sizeof(*guest) + 14];
+    char *bound_guest[packaged_count * 4 + max_top_bindings * 2 + sizeof(guest) / sizeof(*guest) + 14];
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
@@ -333,6 +335,33 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             snprintf(root_binding, sizeof(root_binding), "%s:%s", root, root);
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = root_binding;
+            /* Native symlink creation is forbidden by the app sandbox. Fill
+             * the sparse root with PRoot bindings instead. Workspace has ONLY
+             * its native alias here, otherwise Git's canonical paths revert
+             * to /workspace-native. Legacy Bash/MCP use the old launch mode. */
+            DIR *contents = opendir(root);
+            if (!contents) {
+                snprintf(out, size, "cannot inspect subprocess root errno=%d", errno);
+                close(fd);
+                return;
+            }
+            struct dirent *item;
+            size_t count = 0;
+            while ((item = readdir(contents))) {
+                const char *name = item->d_name;
+                if (!strcmp(name, ".") || !strcmp(name, "..") || !strcmp(name, "workspace-native") ||
+                    !strcmp(name, "data") || strchr(name, ':') || strchr(name, '\n')) continue;
+                if (count == max_top_bindings) {
+                    closedir(contents);
+                    snprintf(out, size, "too many subprocess root entries");
+                    close(fd);
+                    return;
+                }
+                snprintf(top_bindings[count], sizeof(top_bindings[count]), "%s/%s:/%s", root, name, name);
+                bound_guest[bound_count++] = "-b";
+                bound_guest[bound_count++] = top_bindings[count++];
+            }
+            closedir(contents);
         }
         if (dsh_test) {
             snprintf(dsh_binding, sizeof(dsh_binding), "%s/.dsh-0.2.2-rc.4/dsh:/dsh", root);

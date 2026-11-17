@@ -86,30 +86,19 @@ function installProotSpawn(workspace) {
   const allowedRoot = fs.realpathSync(workspace);
   // A sparse root outside Alpine prevents PRoot's rootfs reverse-translation
   // rule from stripping native prefixes out of Git control files/file URLs.
-  // Data remains in Alpine; only links are created, no second rootfs is copied.
+  // Data remains in Alpine; native launcher bindings fill this empty anchor.
   const hostRoot = path.join(path.dirname(root), 'dsh-subprocess-root');
   if (!safeMode) {
     fs.mkdirSync(hostRoot, { recursive: true, mode: 0o700 });
     if (fs.lstatSync(hostRoot).isSymbolicLink() || !fs.lstatSync(hostRoot).isDirectory()) {
       throw new Error('Invalid Harmony subprocess root');
     }
-    for (const entry of fs.readdirSync(root)) {
-      // Reserve the native absolute-prefix tree for the self-binding. An old
-      // Alpine/data glue directory must not become a recursive /data symlink.
-      if (entry === root.split(path.sep)[1]) continue;
-      const destination = path.join(hostRoot, entry);
-      const target = path.join(root, entry);
-      try { fs.symlinkSync(target, destination); }
-      catch (error) {
-        if (error?.code !== 'EEXIST' || !fs.lstatSync(destination).isSymbolicLink() || fs.readlinkSync(destination) !== target) throw error;
-      }
-    }
   }
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
   globalThis.__harmonyHostSpawn = (program, args, options) => {
     if (safeMode) throw new Error('Guest subprocesses are disabled in HarmonyOS recovery mode');
     // Keep the existing bounded search adapter and its signed /bin/rg mapping.
-    if (program === ripgrep) return globalThis.__harmonyProotSpawn(program, args, options);
+    if (program === 'bash' || program === ripgrep) return globalThis.__harmonyProotSpawn(program, args, options);
     if (!Array.isArray(options.stdio) || options.stdio.length !== 3 ||
         !['ignore', 'pipe'].includes(options.stdio[0]) ||
         options.stdio.slice(1).some(mode => !['pipe', 'inherit'].includes(mode))) {
