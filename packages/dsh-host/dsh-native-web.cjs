@@ -263,6 +263,7 @@ async function main() {
   process.chdir(workspace);
   process.env.HOME = home;
   process.env.DSH_HOME = home;
+  process.env.TMPDIR = path.join(root, 'tmp');
   process.env.DSH_TELEMETRY_DISABLED = '1';
   process.env.DSH_PERMISSION_MODE = 'workspace-write';
   process.env.NO_COLOR = '1';
@@ -287,12 +288,17 @@ async function main() {
   const mcpClientUrl = paths('dsh-mcp-client/lib/index.js');
   const workflowUrl = paths('dsh-workflow-ptc/lib/index.js');
   const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
+  const officeUrl = paths('dsh-office-kit/lib/index.js');
+  const officeAdapter = pathToFileURL(path.join(root, 'dsh-harmony-office-entry.mjs')).href;
   const ptcEnabled = !safeMode && fs.readFileSync(path.join(root, 'dsh-harmony-ptc-enabled'), 'utf8') === '1';
   if (ptcEnabled) {
     globalThis.__harmonyPtc = require(path.join(root, 'dsh-harmony-ptc.cjs')).bindPtc(addon('libdshworkflow.so'), mark);
   }
   const mcpStdioUrl = pathToFileURL(path.join(dsh, '@modelcontextprotocol/client/dist/stdio.mjs')).href;
   const launchGuest = installProotSpawn(workspace);
+  globalThis.__harmonyOffice = safeMode ? {
+    createConverter() { throw Object.assign(new Error('Office workers are disabled in HarmonyOS recovery mode'), { code: 'unavailable' }); },
+  } : require(path.join(root, 'dsh-harmony-office.cjs')).createOfficeFactory(root, globalThis.__harmonyMcpSpawn, mark);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
   const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
   globalThis.__harmonySharp = createSharp(root, launchGuest);
@@ -326,6 +332,12 @@ async function main() {
   let loadMs = 0;
   let booting = true;
   registerHooks({
+    resolve(specifier, context, nextResolve) {
+      if (context.parentURL === officeUrl && specifier === '@deepseek-ai/libreoffice-kit') {
+        return { url: officeAdapter, shortCircuit: true };
+      }
+      return nextResolve(specifier, context);
+    },
     load(url, context, nextLoad) {
       const start = performance.now();
       const result = nextLoad(url, context);

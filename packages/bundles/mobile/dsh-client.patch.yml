@@ -10,3 +10,8 @@
   disabled: true
 - id: desktop-product-telemetry
   disabled: true
+- id: office-kit
+  config:
+    fontDirectories:
+      - /system/fonts
+    timeoutMs: 180000

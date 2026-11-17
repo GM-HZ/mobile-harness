@@ -312,7 +312,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     enum { packaged_count = sizeof(packaged) / sizeof(*packaged) };
     char bind_options[packaged_count][1150];
     char dsh_binding[1150];
-    char *bound_guest[packaged_count * 2 + sizeof(guest) / sizeof(*guest) + 8];
+    char *bound_guest[packaged_count * 2 + sizeof(guest) / sizeof(*guest) + 12];
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
@@ -328,6 +328,10 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             bound_guest[bound_count++] = bind_options[n];
         }
         if (dsh_test) {
+            if (access("/system/fonts", R_OK | X_OK) == 0) {
+                bound_guest[bound_count++] = "-b";
+                bound_guest[bound_count++] = "/system/fonts:/usr/share/fonts/harmonyos";
+            }
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = "/dev/null:/dev/null";
             bound_guest[bound_count++] = "-b";
