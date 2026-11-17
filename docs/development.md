@@ -13,7 +13,7 @@ git submodule update --init --depth=1
 
 ## 准备输入并打包
 
-1. 备齐 [输入清单](build-inputs.sha256) 指定的 0.4.24 原始打包输入，保留清单中的相对路径。已有开发机的输入存放在 `.build/inputs/harmonyos/`，也可通过 `HARMONY_INPUTS_DIR` 指向一份外部输入目录。当前配方使用已校验的 Node 和 PRoot 输入。DSH 源码子模块固定到公开 RC.3 发布标签；当前 RC.4 的公开源码标签尚未发布。运行时不从该源码构建，而是用 [npm 锁文件](../runtime/harmonyos/dsh/package-lock.json) 装配上游发布包，并核对随包原生绑定对应的上游字节。首次准备需要访问 npm 和 Alpine 稳定仓库。新增 Alpine 包可预填至 `.build/runtime-package-inputs/` 或通过 `HARMONY_GUEST_APKS_DIR` 提供已经校验的归档。
+1. 备齐 [输入清单](build-inputs.sha256) 指定的 0.4.24 原始打包输入，保留清单中的相对路径。已有开发机的输入存放在 `.build/inputs/harmonyos/`，也可通过 `HARMONY_INPUTS_DIR` 指向一份外部输入目录。当前配方使用已校验的 Node 和 PRoot 输入。DSH 源码子模块固定到官方 RC.4 发布标签，运行时用 [npm 锁文件](../runtime/harmonyos/dsh/package-lock.json) 装配上游发布包，并核对随包原生绑定对应的上游字节。首次准备需要访问 npm 和 Alpine 稳定仓库。新增 Alpine 包可预填至 `.build/runtime-package-inputs/` 或通过 `HARMONY_GUEST_APKS_DIR` 提供已经校验的归档。
 2. 参考 [DevEco 配置示例](../apps/harmonyos/build-profile.example.json5) 设置本机签名。签名配置从仓库根目录的 `build-profile.json5` 或 `HARMONY_SIGNING_PROFILE` 读取。模拟器用 `HARMONY_UNSIGNED=1`。
 3. 在仓库根目录运行：
 
@@ -120,3 +120,20 @@ HARMONY_EXPERIMENTAL_HOST_PROCESS=1 ./build.sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-toolkit.py <loopback-target> .build/emulator-toolkit.json
 ```
+
+
+## Office 模拟器回归
+
+0.4.32 通过上游 Office skill 与三个文档工具执行转换、页面渲染和公式重算。测试要求独立模拟器及测试凭据，输出的 PDF、工作簿与实际附件图像保存在 `--artifacts` 指定目录。`--require-native` 用于要求当前模拟器确实选择原生 worker。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-office.py <loopback-target> .build/office.json \
+  --artifacts .build/office-artifacts --require-native
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-office-cancel.py <loopback-target> .build/office-cancel.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-office-provider.py <loopback-target> .build/office-provider.json
+```
+
+Provider 测试通过标准 bundle 临时注册夹具，为每种场景创建真正的独立 OfficeKit。验证在途动作、超时、销毁、所有新建进程回收和失败后继续执行；退出时恢复原 profile、锁文件与启动模式。应用内输出按上游保留策略管理。完整说明见 [原生 Office](research/harmonyos-native-office.md)。

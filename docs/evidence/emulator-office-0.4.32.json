@@ -1,0 +1,910 @@
+{
+  "recordedAt": "2026-11-17T19:18:15.425622+00:00",
+  "target": "DevEco API 26 ARM64 Phone emulator 127.0.0.1:15557",
+  "implementationCommit": "0ebf2570fd885af647ffa8cc28585b784c9e443e",
+  "artifact": {
+    "version": "0.4.32",
+    "versionCode": 39,
+    "bundleName": "org.sayact.nodepoc",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.32-unsigned.hap",
+    "sha256": "8b18d5116ae9f05c987381770dcf525525171928b5286ea7f875bf8e55fc97f3",
+    "bytes": 648459395,
+    "defaultBuild": true
+  },
+  "release": {
+    "npm": "0.2.2-rc.4",
+    "sourceTag": "dsh-v0.2.2-rc.4",
+    "sourceCommit": "3f321d32bfe382212a8ed8785c1d47a5a300aa23",
+    "packageLockSha256": "abba45e17c07a89c562ed7dd18217298b349dbfb68915ba328dd94739e4b575f",
+    "registry": {
+      "distTags": {
+        "alpha": "0.2.2-alpha.3",
+        "latest": "0.2.2-rc.1",
+        "next": "0.2.2-rc.4"
+      },
+      "checkedAt": "2026-11-17T19:11:56.860168+00:00"
+    }
+  },
+  "build": {
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=/Users/gongmeng/dev/acode/mobile-harness/.build/inputs/harmonyos ./build.sh",
+    "exitCode": 0,
+    "installTextChecked": true
+  },
+  "nativeProbe": {
+    "result": {
+      "pid": 16112,
+      "exitCode": 0,
+      "signal": 0,
+      "timedOut": false,
+      "elapsedMs": 364
+    },
+    "checks": [
+      "WASM function returns 42",
+      "built-in TypeScript strip/eval returns 42",
+      "native fetch from worker-owned local HTTP server returns 200/body42"
+    ],
+    "mainHostStillJitless": true,
+    "physicalDeviceNotTested": true
+  },
+  "officeCoreOnFinalArtifact": {
+    "fixture": "mh-office-bcbb5070c556",
+    "marker": "HARMONY_OFFICE_8F961E5889B64F4BA21FE8576F0B5537",
+    "readyMs": 65,
+    "fixtureSha256": {
+      "input.docx": "e668fec52398c2eb9181467ce89ff148dbb101a68893d1e81ed778f444508f04",
+      "input.xlsx": "8063db8ebed7db3ec3c7a1ccb3388769c038713aea645386927b79b86695b3b1",
+      "invalid.docx": "61cbf344efdbbc6bc4966e502b29764ae811e0c427a3013ea18dd8ae302265f2",
+      "input.pptx": "a459fb78af5f6446fa5bfcb6623454c984e82bf9f15cfcf27710bb995741702c"
+    },
+    "officeSkillLoaded": true,
+    "documentPdf": {
+      "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-20102c4e3fd0040a0a4045fd/ab78c573-e7e9-4b78-9abb-c190b28c5816/input.pdf",
+      "bytes": 11890,
+      "sha256": "4197fb0b8777334e9323ba87da8340b0e7bc152c9ac247ca1f641c1b1b491309",
+      "pageCount": 1,
+      "promptElapsedMs": 6059
+    },
+    "repeatUsedHostCache": true,
+    "documentImage": {
+      "attachment": {
+        "attachmentId": "sha256:f7ec6ecb238ada41ba4c2d3c0af4094337b4181b2f41a9a536b51b5c25e63548",
+        "mediaType": "image/png",
+        "bytes": 7451,
+        "width": 596,
+        "height": 842
+      },
+      "sha256": "f7ec6ecb238ada41ba4c2d3c0af4094337b4181b2f41a9a536b51b5c25e63548",
+      "promptElapsedMs": 12066,
+      "localArtifact": ".build/office-poc/verified-final/document.png"
+    },
+    "workbookRecalculated": {
+      "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-20102c4e3fd0040a0a4045fd/a9986a9f-76fc-4ef6-8b11-cc808a588a32/input.xlsx",
+      "bytes": 5213,
+      "sha256": "1be46dcd01dc5052f0e15239336e76452efee1a7a341a58b2589c7d411d8241e",
+      "cell": "C1",
+      "formulaRetained": true,
+      "beforeCachedValue": 0,
+      "afterCachedValue": 42,
+      "promptElapsedMs": 15348
+    },
+    "presentationPdf": {
+      "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-20102c4e3fd0040a0a4045fd/2063f212-dcc9-40c1-9420-15ebae7dec7b/input.pdf",
+      "bytes": 11036,
+      "sha256": "0e9f81f4afb97faab81b54a664e4907823a68f9cdb27848367127ef2b3df3a5d",
+      "promptElapsedMs": 12074
+    },
+    "invalidDocumentRejected": "Error: cannot convert \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-office-bcbb5070c556/invalid.docx\": Input is not a supported, bounded OOXML archive.",
+    "temporaryModelCredentialRemoved": true,
+    "trace": [
+      {
+        "event": "office-native-capability",
+        "ms": 11286,
+        "pid": 10745,
+        "available": true,
+        "elapsedMs": 60,
+        "wasm": true,
+        "value": 42,
+        "platform": "openharmony",
+        "node": "v24.14.1"
+      },
+      {
+        "event": "office-worker-started",
+        "ms": 11286,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "pid": 10745,
+        "runtime": "native"
+      },
+      {
+        "event": "office-operation-running",
+        "ms": 11369,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "3be0c331-4ec6-4ac0-808e-9fcaef150f47",
+        "method": "convert"
+      },
+      {
+        "event": "office-operation-ended",
+        "ms": 14020,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "3be0c331-4ec6-4ac0-808e-9fcaef150f47",
+        "method": "convert",
+        "elapsedMs": 2652,
+        "code": "completed"
+      },
+      {
+        "event": "office-operation-running",
+        "ms": 20174,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "11f5c506-ec38-40ec-90be-5af52e22a9e4",
+        "method": "renderImages"
+      },
+      {
+        "event": "office-operation-ended",
+        "ms": 22094,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "11f5c506-ec38-40ec-90be-5af52e22a9e4",
+        "method": "renderImages",
+        "elapsedMs": 1920,
+        "code": "completed"
+      },
+      {
+        "event": "office-operation-running",
+        "ms": 39599,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "17656c13-5a22-4ecd-b940-dd05b310ee70",
+        "method": "recalculate"
+      },
+      {
+        "event": "office-operation-ended",
+        "ms": 41823,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "17656c13-5a22-4ecd-b940-dd05b310ee70",
+        "method": "recalculate",
+        "elapsedMs": 2224,
+        "code": "completed"
+      },
+      {
+        "event": "office-operation-running",
+        "ms": 54686,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "a6cceff3-b460-4e85-ba28-240c06b99c29",
+        "method": "convert"
+      },
+      {
+        "event": "office-operation-ended",
+        "ms": 56865,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "a6cceff3-b460-4e85-ba28-240c06b99c29",
+        "method": "convert",
+        "elapsedMs": 2179,
+        "code": "completed"
+      },
+      {
+        "event": "office-operation-running",
+        "ms": 68726,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "3b7d29d1-484c-49df-9dee-d4a9c58c4c2f",
+        "method": "convert"
+      },
+      {
+        "event": "office-operation-ended",
+        "ms": 68883,
+        "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+        "request": "3b7d29d1-484c-49df-9dee-d4a9c58c4c2f",
+        "method": "convert",
+        "elapsedMs": 158,
+        "code": "invalid-document"
+      }
+    ],
+    "sourceFixturesRemoved": true
+  },
+  "cancellationOnFinalArtifact": {
+    "status": {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-office-cancel.py",
+        "127.0.0.1:15557",
+        ".build/office-poc/cancel-final-retry/result.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 10.104
+    },
+    "evidence": {
+      "sessionId": "session-9ccca77d-ef10-4458-920c-286fb2c25ffe",
+      "gatewayCancellation": {
+        "accepted": true,
+        "observedInFlight": true,
+        "turn": "aborted",
+        "engineSettled": true,
+        "scratchRemoved": true,
+        "elapsedMs": 134
+      },
+      "sameSessionAfterCancel": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/office-kit/outputs/session-511e7d25808a4201502fbac3/735b5fef-5f0a-4c9e-8ea9-0357ce7e5d1d/input.pdf",
+        "bytes": 11932,
+        "sha256": "4dae5e18d31d3b59fb671555ff5ecf7428136e158f0c5e45bd8f54504a5b75e1",
+        "promptElapsedMs": 4670
+      },
+      "temporaryModelCredentialRemoved": true,
+      "trace": [
+        {
+          "event": "office-native-capability",
+          "ms": 11286,
+          "pid": 10745,
+          "available": true,
+          "elapsedMs": 60,
+          "wasm": true,
+          "value": 42,
+          "platform": "openharmony",
+          "node": "v24.14.1"
+        },
+        {
+          "event": "office-worker-started",
+          "ms": 11286,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "pid": 10745,
+          "runtime": "native"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 11369,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "3be0c331-4ec6-4ac0-808e-9fcaef150f47",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 14020,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "3be0c331-4ec6-4ac0-808e-9fcaef150f47",
+          "method": "convert",
+          "elapsedMs": 2652,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 20174,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "11f5c506-ec38-40ec-90be-5af52e22a9e4",
+          "method": "renderImages"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 22094,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "11f5c506-ec38-40ec-90be-5af52e22a9e4",
+          "method": "renderImages",
+          "elapsedMs": 1920,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 39599,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "17656c13-5a22-4ecd-b940-dd05b310ee70",
+          "method": "recalculate"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 41823,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "17656c13-5a22-4ecd-b940-dd05b310ee70",
+          "method": "recalculate",
+          "elapsedMs": 2224,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 54686,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "a6cceff3-b460-4e85-ba28-240c06b99c29",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 56865,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "a6cceff3-b460-4e85-ba28-240c06b99c29",
+          "method": "convert",
+          "elapsedMs": 2179,
+          "code": "completed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 68726,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "3b7d29d1-484c-49df-9dee-d4a9c58c4c2f",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 68883,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "3b7d29d1-484c-49df-9dee-d4a9c58c4c2f",
+          "method": "convert",
+          "elapsedMs": 158,
+          "code": "invalid-document"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 82157,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "8c0238c4-ef94-49f9-b6f0-a4aedb13a5ad",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 82282,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "8c0238c4-ef94-49f9-b6f0-a4aedb13a5ad",
+          "method": "convert",
+          "elapsedMs": 126,
+          "code": "failed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 413084,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "427074af-8b6a-4289-95c9-51c6100c5bcd",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 413171,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "427074af-8b6a-4289-95c9-51c6100c5bcd",
+          "method": "convert",
+          "elapsedMs": 89,
+          "code": "failed"
+        },
+        {
+          "event": "office-operation-running",
+          "ms": 414130,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "ea8f352e-a92a-4a23-b627-1c34f70c7cff",
+          "method": "convert"
+        },
+        {
+          "event": "office-operation-ended",
+          "ms": 416541,
+          "id": "ac793c25-957d-4327-a2e6-47111f08ea48",
+          "request": "ea8f352e-a92a-4a23-b627-1c34f70c7cff",
+          "method": "convert",
+          "elapsedMs": 2411,
+          "code": "completed"
+        }
+      ]
+    }
+  },
+  "workflowOnFinalArtifact": {
+    "startupMs": 60,
+    "foreground": {
+      "actualSubagentsStarted": 2,
+      "completed": true,
+      "bothResultsReturned": true,
+      "parallel": true
+    },
+    "timeout": true,
+    "cancelledDuringSyncSlice": true,
+    "cancelledWithActiveChild": true,
+    "backgroundJob": {
+      "started": true,
+      "completed": true,
+      "resultDelivered": true
+    },
+    "temporaryModelCredentialRemoved": true
+  },
+  "regressions": {
+    "testedArtifactSha256": "e457aca72507138d4c172881232e705ec65d8f19dfe64b08ffe67b3839764780",
+    "finalArtifactPayloadComparison": {
+      "sourceCommit": "0ebf2570fd885af647ffa8cc28585b784c9e443e",
+      "dshSourceCommit": "3f321d32bfe382212a8ed8785c1d47a5a300aa23",
+      "oldSha256": "e457aca72507138d4c172881232e705ec65d8f19dfe64b08ffe67b3839764780",
+      "newSha256": "8b18d5116ae9f05c987381770dcf525525171928b5286ea7f875bf8e55fc97f3",
+      "payloadFilesChanged": [],
+      "bytes": 648459395
+    },
+    "suites": [
+      {
+        "case": "office-provider",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-office-provider.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/office-provider.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 74.231
+      },
+      {
+        "case": "toolkit",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-toolkit.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/toolkit.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 116.467
+      },
+      {
+        "case": "ptc-core",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-host.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-core.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 24.121
+      },
+      {
+        "case": "ptc-readonly",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-host.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-readonly.json",
+          "--read-only"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 16.907
+      },
+      {
+        "case": "ptc-roots",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-host.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-roots.json",
+          "--additional-roots"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 24.995
+      },
+      {
+        "case": "ptc-repl",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-host.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-repl.json",
+          "--mode",
+          "persistent-in-memory"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 44.167
+      },
+      {
+        "case": "ptc-script",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-host.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-script.json",
+          "--mode",
+          "vm-script"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 20.001
+      },
+      {
+        "case": "ptc-script-retained",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-host.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-script-retained.json",
+          "--mode",
+          "vm-script",
+          "--script-persistence"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 47.242
+      },
+      {
+        "case": "ptc-approval",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-approval.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-approval.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 14.136
+      },
+      {
+        "case": "ptc-approval-readonly",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-approval.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-approval-readonly.json",
+          "--read-only"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 25.807
+      },
+      {
+        "case": "ptc-approval-retained",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-approval.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-approval-retained.json",
+          "--retained"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 33.807
+      },
+      {
+        "case": "ptc-approval-retained-readonly",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-approval.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-approval-retained-readonly.json",
+          "--retained",
+          "--read-only"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 31.751
+      },
+      {
+        "case": "ptc-lifecycle-repl",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-lifecycle.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-lifecycle-repl.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 52.464
+      },
+      {
+        "case": "ptc-lifecycle-script",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-ptc-lifecycle.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/ptc-lifecycle-script.json",
+          "--mode",
+          "vm-script"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 50.057
+      },
+      {
+        "case": "workflow",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-workflow.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/workflow.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 14.158
+      },
+      {
+        "case": "mcp-stdio",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-mcp-stdio.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/mcp-stdio.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 17.586
+      },
+      {
+        "case": "scheduler-mcp-http",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-dsh-capabilities.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/scheduler-mcp-http.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 28.514
+      },
+      {
+        "case": "plugin-recovery",
+        "command": [
+          "python3",
+          "tests/smoke/emulator-recovery.py",
+          "127.0.0.1:15557",
+          ".build/office-poc/regressions/plugin-recovery.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 22.494
+      }
+    ],
+    "officeProvider": {
+      "readyMs": 7323,
+      "idle": {
+        "created": {
+          "status": "completed",
+          "closed": false,
+          "code": "",
+          "bytes": 11604,
+          "elapsedMs": 0,
+          "workerId": "b011b7ae-84d8-40cf-9184-8de6920b4217",
+          "workerPid": 13011,
+          "postDisposeRejected": false,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "disposed": {
+          "status": "completed",
+          "closed": true,
+          "code": "",
+          "bytes": 11604,
+          "elapsedMs": 72,
+          "workerId": "b011b7ae-84d8-40cf-9184-8de6920b4217",
+          "workerPid": 13011,
+          "postDisposeRejected": true,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "allOwnedHelpersReaped": 1
+      },
+      "active": {
+        "created": {
+          "status": "error",
+          "closed": true,
+          "code": "unavailable",
+          "bytes": 0,
+          "elapsedMs": 31,
+          "workerId": "deee72b0-d6e4-460e-b719-4139d2d808da",
+          "workerPid": 13311,
+          "postDisposeRejected": false,
+          "actedWhilePending": true,
+          "remainingScratch": 0
+        },
+        "observedActiveOperation": true,
+        "disposed": {
+          "status": "error",
+          "closed": true,
+          "code": "unavailable",
+          "bytes": 0,
+          "elapsedMs": 0,
+          "workerId": "deee72b0-d6e4-460e-b719-4139d2d808da",
+          "workerPid": 13311,
+          "postDisposeRejected": true,
+          "actedWhilePending": true,
+          "remainingScratch": 0
+        },
+        "allOwnedHelpersReaped": 1
+      },
+      "cancel": {
+        "created": {
+          "status": "error",
+          "closed": false,
+          "code": "Error",
+          "bytes": 0,
+          "elapsedMs": 0,
+          "workerId": "1b822836-bbab-4407-ace6-579e2ab50741",
+          "workerPid": 13491,
+          "postDisposeRejected": false,
+          "actedWhilePending": true,
+          "remainingScratch": 1
+        },
+        "observedActiveOperation": true,
+        "cancelled": {
+          "status": "error",
+          "closed": false,
+          "code": "Error",
+          "bytes": 0,
+          "elapsedMs": 0,
+          "workerId": "1b822836-bbab-4407-ace6-579e2ab50741",
+          "workerPid": 13491,
+          "postDisposeRejected": false,
+          "actedWhilePending": true,
+          "remainingScratch": 1
+        },
+        "retried": {
+          "status": "completed",
+          "closed": false,
+          "code": "",
+          "bytes": 60,
+          "elapsedMs": 0,
+          "workerId": "1b822836-bbab-4407-ace6-579e2ab50741",
+          "workerPid": 13491,
+          "postDisposeRejected": false,
+          "actedWhilePending": true,
+          "remainingScratch": 0
+        },
+        "disposed": {
+          "status": "completed",
+          "closed": true,
+          "code": "",
+          "bytes": 60,
+          "elapsedMs": 68,
+          "workerId": "1b822836-bbab-4407-ace6-579e2ab50741",
+          "workerPid": 13491,
+          "postDisposeRejected": true,
+          "actedWhilePending": true,
+          "remainingScratch": 0
+        },
+        "allOwnedHelpersReaped": 1
+      },
+      "timeout": {
+        "created": {
+          "status": "error",
+          "closed": false,
+          "code": "timeout",
+          "bytes": 0,
+          "elapsedMs": 0,
+          "workerId": "95ae6b97-b968-4e1e-a013-dd07af45fba4",
+          "workerPid": 13814,
+          "postDisposeRejected": false,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "disposed": {
+          "status": "error",
+          "closed": true,
+          "code": "timeout",
+          "bytes": 0,
+          "elapsedMs": 22,
+          "workerId": "95ae6b97-b968-4e1e-a013-dd07af45fba4",
+          "workerPid": 13814,
+          "postDisposeRejected": true,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "allOwnedHelpersReaped": 1
+      },
+      "crash": {
+        "created": {
+          "status": "completed",
+          "closed": false,
+          "code": "",
+          "bytes": 11604,
+          "elapsedMs": 0,
+          "workerId": "3eb86864-163f-402f-90d6-801a1c77d510",
+          "workerPid": 13984,
+          "postDisposeRejected": false,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "crashed": {
+          "status": "completed",
+          "closed": false,
+          "code": "",
+          "bytes": 11604,
+          "elapsedMs": 0,
+          "workerId": "3eb86864-163f-402f-90d6-801a1c77d510",
+          "workerPid": 13984,
+          "postDisposeRejected": false,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "retried": {
+          "status": "completed",
+          "closed": false,
+          "code": "",
+          "bytes": 60,
+          "elapsedMs": 0,
+          "workerId": "3eb86864-163f-402f-90d6-801a1c77d510",
+          "workerPid": 13984,
+          "postDisposeRejected": false,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "disposed": {
+          "status": "completed",
+          "closed": true,
+          "code": "",
+          "bytes": 60,
+          "elapsedMs": 61,
+          "workerId": "3eb86864-163f-402f-90d6-801a1c77d510",
+          "workerPid": 13984,
+          "postDisposeRejected": true,
+          "actedWhilePending": false,
+          "remainingScratch": 0
+        },
+        "allOwnedHelpersReaped": 2
+      },
+      "temporaryModelCredentialRemoved": true,
+      "originalProfileRestored": true
+    }
+  },
+  "recoveryOnFinalArtifact": {
+    "nativeRecoveryButtonObserved": true,
+    "clickedNormalMode": true,
+    "normalReadyMs": 6697,
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200
+  },
+  "preservedAttempts": [
+    {
+      "record": "baseline-first.json",
+      "outcome": "0.4.31 real office_convert rejected: no usable fonts"
+    },
+    {
+      "record": "guest-result.json",
+      "outcome": "same WASM in packaged Linux Node converted DOCX, about 96.5 seconds"
+    },
+    {
+      "record": "office-core-first.json",
+      "outcome": "model called skill twice; strict single-call assertion failed; no assertion removed"
+    },
+    {
+      "record": "office-core-ppt-failure.json",
+      "outcome": "Guest Word/render/recalc passed, official PPTX timed out after 195 seconds"
+    },
+    {
+      "record": "provider-crash-first.json",
+      "outcome": "new operation retained dead converter; fixed stable facade reconnect without replay"
+    },
+    {
+      "record": "provider-native-first.json",
+      "outcome": "second model request arrived after native operation ended; fixture now cancels/disposes inside same pending tool, retains in-flight and cleanup assertions"
+    },
+    {
+      "record": "cancel-final.json",
+      "outcome": "actual cancellation passed144ms; model summarized previous cancellation instead of issuing new call. Failed follow-up retained. New-request wording clarified; same single-call and PDF assertions retained; retry exit0"
+    },
+    {
+      "record": "standard-first/result.json",
+      "outcome": "todo, bundled skill, present, goal revision/persistence, team dependency/persistence and public HTTPS passed; suite exit1 due test incorrectly assuming RC.4 forbids local network. RC.4 permits it. Local HTTP/1 request separately failed generic fetch; investigation remains active"
+    }
+  ],
+  "additionalStandardToolsFirstAttempt": {
+    "status": {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-standard-tools.py",
+        "127.0.0.1:15557",
+        ".build/office-poc/standard-first/result.json"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 43.981
+    },
+    "partialResults": {
+      "readyMs": 65,
+      "sessionId": "session-e6789a36-be59-4b03-a9be-aea885a4daf1",
+      "todoExactSnapshot": true,
+      "bundledSkillLoaded": true,
+      "presentDurableEvent": true,
+      "goalCreatedAndPaused": {
+        "id": "goal-7c6d94d4-21fd-4c7d-a54d-21fe1f5b5a82",
+        "revision": 2
+      },
+      "staleGoalUpdateRejected": true,
+      "teamDependencyClaimComplete": true,
+      "restartReadyMs": 7908,
+      "goalPersistedPausedAcrossRestart": true,
+      "teamPersistedAcrossRestart": true,
+      "testGoalClearedTeamDisabled": true,
+      "webSessionId": "session-1226a868-b0f3-4311-a794-53972dfd0c9e",
+      "publicHttpsFetch": true
+    }
+  },
+  "localEvidenceHashes": {
+    ".build/office-poc/build-final-source.log": "c91df3db87bb051bf847d37b6f0c4271d41867f52c5b32104e15a6025ef7b2eb",
+    ".build/office-poc/install-final-source.log": "143d3754434f9f83cecf5c4662e676bba06d5a5bf72653730ac8f2462fe12a89",
+    ".build/office-poc/office-native.log": "3234dd61ba7ae46877d749eff7855eeb3811f6ff26978753f9b2792c24105009",
+    ".build/office-poc/gateway-cancel.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".build/office-poc/office-final.log": "9680046b7c2a6044fd741dc504d6758eccf7ee245e4abfa41a1e6884a8c63aa5",
+    ".build/office-poc/cancel-final.log": "ec76ab3987a4e09bf216f692ae3024ac34615cdf73d8059f3adad6e82cf6d8f4",
+    ".build/office-poc/cancel-final-retry/run.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    ".build/office-poc/regressions/status.json": "58bbe10b16c39438fc898115918d6024b3dfaa16917eeec794dc346c4a3996c1",
+    ".build/office-poc/native-wasm-runtime.log": "ca6761ef52b26cd9f1b6b3085b2512be6a0d249447c93234121f8d8a82c11bcb",
+    ".build/office-poc/native-wasm-result.json": "c17afdd388935eb2208dcfe2357f8c94176c06c7489154a0b988fb7283b7a2ce",
+    ".build/office-poc/standard-first/run.log": "fa8ec0331f7601b6426e38fb0fe8a5ab92a1a577203d7dd5e79225d126324f12"
+  },
+  "limitations": [
+    "Mate60 offline; no current physical-device regression",
+    "Standalone native JIT/WASM proof is emulator-specific",
+    "Guest fallback capability failure path not force-tested after final native launcher change",
+    "Main Host remains jitless; raw Node WASM/TS and optional plugin transports not universally supported",
+    "No system PTY, Phone Use, Chromium, kernel namespace or full Bash sandbox",
+    "No fresh-data cold-start performance or long concurrency guarantee",
+    "Full standard and optional DSH capability audit is still active; Office milestone is not desktop feature equivalence"
+  ]
+}

@@ -33,6 +33,7 @@ def run(emulator, output):
             emulator.app(f"cp {remote} {app}/input.docx")
         with support["model_key"](emulator):
             sid = support["session"](emulator, True)
+            evidence["sessionId"] = sid
             office["invoke"](emulator, sid, "skill", {"name": "office"})
             old = support["events"](emulator, sid)
             previous_turns = sum(row["type"] == "turn/end" for row in old)
@@ -71,7 +72,10 @@ def run(emulator, output):
             evidence["gatewayCancellation"] = {"accepted": True, "observedInFlight": True, "turn": "aborted",
                                                "engineSettled": True, "scratchRemoved": True,
                                                "elapsedMs": round((time.monotonic() - started) * 1000)}
-            result, elapsed = office["invoke"](emulator, sid, "office_convert", args)
+            result, elapsed = office["invoke"](emulator, sid, "office_convert", args, preamble=(
+                "The previous conversion was deliberately cancelled and that request is finished. "
+                "This is a NEW request to actually execute a new conversion now in this same session. "
+                "Do not summarize the previous call or report its cancelled result. "))
             destination = output.with_suffix(".pdf")
             record = office["file_result"](emulator, result, destination)
             assert destination.read_bytes().startswith(b"%PDF-")

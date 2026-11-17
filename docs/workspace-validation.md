@@ -98,3 +98,7 @@ Mate 60（BRA-AL00，API 26）通过 USB 从 0.4.9 依次覆盖到 0.4.23 和 0.
 普通包默认启用通用 PTC。16 组现有执行、审批、生命周期、Workflow、MCP、调度和故障恢复回归通过；新增标准工具链回归验证精确 Bash 单次审批、pip／venv 隔离、Git、Node fetch、curl、SQLite、时区和五个文件工具。原生恢复入口实际点击通过，正常模式重新就绪为 5.7 秒。保留升级前真实 venv 会话的 30 条事件及完成标记。
 
 本版为模拟器结果，真机尚未在线验证。[证据、失败尝试和制品](evidence/emulator-dsh-rc4-0.4.31.json) · [能力与限制](dsh-capabilities.md)
+
+## 0.4.32 模拟器 Office 回归
+
+Word、Excel、PPT、实际页面附件、缓存、无效文档、会话取消及取消后新请求通过。独立 Office provider 的五种生命周期场景均通过并核对所有 helper 回收。18 组旧工具链／PTC／审批／Workflow／MCP／定时与恢复回归通过；最终包已安装，原生恢复页切回正常模式约 6.7 秒。当前模拟器原生 Office 各正常操作约 2–3 秒，真机未验。额外标准工具验收的状态与网页失败单列，不算全套通过。见 [准确制品与失败记录](evidence/emulator-office-0.4.32.json)。

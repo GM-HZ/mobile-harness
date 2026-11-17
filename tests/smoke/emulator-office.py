@@ -42,10 +42,10 @@ def trace(emulator):
     return [json.loads(row) for row in rows.splitlines()]
 
 
-def invoke(emulator, sid, name, args, expect_error=False):
+def invoke(emulator, sid, name, args, expect_error=False, preamble=""):
     start = time.monotonic()
     calls, results = toolkit["prompt"](emulator, sid,
-        f"This is a local regression fixture. Call {name} exactly once with precisely {json.dumps(args)}. "
+        preamble + f"This is a local regression fixture. Call {name} exactly once with precisely {json.dumps(args)}. "
         "Report the tool result and stop. Do not use another tool, copy or modify files, retry, or substitute another engine.", timeout=225)
     assert len(calls) == len(results) == 1 and calls[0]["name"] == name, calls
     assert json.loads(calls[0]["arguments"]) == args, calls

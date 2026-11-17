@@ -182,3 +182,11 @@ Phone 模拟器分别通过 `node` 和 `python3` 启动本地 MCP 测试服务�
 API 26 Phone 模拟器通过 16 组 PTC／Workflow／MCP／定时任务／故障恢复，以及一组完整 Bash 工具链和五个文件工具回归。实际点击设置恢复入口和原生正常模式按钮也通过。升级前包含 venv 结果的会话历史仍可读取；覆盖升级约 22.7 秒，恢复到正常模式约 5.7 秒。工具链首次采用 90 秒等待，触发原有转后台策略后被模型取消，该次失败保留；180 秒预算下完整夹具通过，未减少功能断言。
 
 真机、首次清空数据后的启动、系统唤醒、每种提供者和可选插件尚未逐一回归。Bash 默认无内核沙箱仍拒绝；PRoot 不作为隔离后端。通用 PTC 的 enforcement 为 partial。系统 PTY 和 Phone Use 继续暂缓。[准确制品与全部回归](evidence/emulator-dsh-rc4-0.4.31.json) · [能力矩阵](dsh-capabilities.md)
+
+## 0.4.32 原生 Office 与 RC.4 源码锁定
+
+标准 Office skill 保留上游服务，转换、页面附件和公式重算交给受管理的独立原生 Node，使用同一官方 LibreOffice Kit WASM 与手机系统字体。当前 Phone 模拟器正常操作约 2–3 秒；主 Host 与通用 PTC 保持 jitless。失败能力探测可选用 Guest 兼容路径，但本版真机及强制回退尚未验收。
+
+真实模型完成 DOCX／PPTX PDF、图像附件回读、Excel 公式缓存 0→42、缓存复用、损坏文档拒绝，以及取消后同会话继续执行。独立 OfficeKit 的取消、超时、空闲／在途销毁、故障后新请求恢复和全部 helper 回收均通过。18 组既有链路回归通过。保留 Guest 超时、死连接、模型复述等失败尝试，准确绑定源码和两次包内字节相同的构建，不混用 HAP 摘要。
+
+官方 RC.4 源码标签已补发，Gitlink 固定 `3f321d32bfe382212a8ed8785c1d47a5a300aa23`，npm 仍固定 RC.4。其余能力清点继续，额外网页 HTTP/1 测试失败尚待修复。[证据与命令](evidence/emulator-office-0.4.32.json) · [架构与性能边界](research/harmonyos-native-office.md)
