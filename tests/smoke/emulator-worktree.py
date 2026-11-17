@@ -69,7 +69,12 @@ def verify(emulator, evidence, name):
             'command': 'git rev-parse --show-toplevel && git branch --show-current && git rev-parse HEAD',
             'description': 'Verify owned linked checkout identity'})
         text = toolkit['texts']([result])
-        assert checkout in text and 'acceptance' in text and created['baseCommit'] in text, text
+        # Bash deliberately retains the original /workspace-native namespace.
+        # Require its exact known equivalent, branch and commit, while the
+        # control file above must keep the Host-native path without rewriting.
+        legacy_checkout = checkout.replace(support['WORKSPACE'], '/workspace-native', 1)
+        assert text.strip().splitlines() == [legacy_checkout, 'acceptance', created['baseCommit']], text
+        evidence['legacyBashGitIdentity'] = text.strip().splitlines()
         evidence['nativePathsGitIdentityAndIndependentBytes'] = True
         evidence['helpersReapedBeforeRestart'] = helpers_reaped(emulator)
         emulator.stop(); emulator.start(); evidence['restartReadyMs'] = emulator.ready('normal')
