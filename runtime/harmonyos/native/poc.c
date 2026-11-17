@@ -331,10 +331,12 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
-        if (host_paths) {
+        if (shell) {
             snprintf(root_binding, sizeof(root_binding), "%s:%s", root, root);
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = root_binding;
+        }
+        if (host_paths) {
             /* Native symlink creation is forbidden by the app sandbox. Fill
              * the sparse root with PRoot bindings instead. Workspace has ONLY
              * its native alias here, otherwise Git's canonical paths revert
@@ -373,7 +375,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             snprintf(bind_options[n], sizeof(bind_options[n]), "%s/%s:%s", native, packaged[n].name, packaged[n].guest);
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = bind_options[n];
-            if (host_paths) {
+            if (shell) {
                 snprintf(host_bind_options[n], sizeof(host_bind_options[n]), "%s/%s:%s%s",
                          native, packaged[n].name, root, packaged[n].guest);
                 bound_guest[bound_count++] = "-b";
