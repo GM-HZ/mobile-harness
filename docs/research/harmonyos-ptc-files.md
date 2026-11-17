@@ -26,7 +26,11 @@ API 26 ARM64 Phone 模拟器支持 seccomp 用户态通知和 `openat2`。Landlo
 
 构建时设置 `HARMONY_PTC_AMARO_DIR` 可在普通应用的 DSH Host 中启用上游 `ProgramWorker`。鸿蒙适配器提供 TypeScript 擦除与进程启动。独立监督进程持有工作区目录描述符，并为 worker 处理文件请求。默认构建与恢复模式禁用该入口。
 
-API 26 Phone 模拟器通过真实模型触发会话内的 `run_code`。实测 TypeScript、工作区读取、独占文件创建、越界拒绝和嵌套 DSH 文件工具。取消会话后宿主确认回收对应 worker。实验入口接受单一规范化的工作区根，拒绝附加可写根，以及工作目录与根不一致的请求。覆盖、删除、重命名、创建目录和持久 worker 模式尚未提供或验证。Mate 60 在本轮离线。 [正式 Host 实测](../evidence/emulator-ptc-host-2026-11-17.json) · [构建与回归](../development.md#通用-ptc-实验回归)
+API 26 Phone 模拟器通过真实模型触发会话内的 `run_code`。实测 TypeScript、工作区读取、独占创建、覆盖、追加和嵌套 DSH 文件工具。工作区外读写均被拒绝，只读会话可读取夹具，其创建、覆盖、追加请求均被拒绝。宿主回读核对了文件内容。取消默认模式的会话后，宿主确认回收对应 worker。覆盖先打开目标并验证描述符对应单链接普通文件，再截断文件。模拟器的 HDC 应用上下文拒绝创建符号链接和硬链接，本轮未验证通过这两类链接发起的文件操作。 [正式 Host 实测](../evidence/emulator-ptc-host-2026-11-17.json) · [扩展工作区操作实测](../evidence/emulator-ptc-access-2026-11-17.json)
+
+RC.3 的 REPL 和启用持久化的 Script 均在同一会话跨轮保留变量，另一会话的独立进程无法读取这些变量。未启用持久化的 Script 第二轮用新进程，变量随首轮结束释放。三种配置都通过官方 `ptc-runtime` profile 节点选择。 [构建与回归](../development.md#通用-ptc-实验回归)
+
+实验入口接受单一规范化的工作区根，拒绝附加可写根，以及工作目录与根不一致的请求。删除、重命名、创建目录以及持久模式的取消和资源回收待验证。Mate 60 在本轮离线。
 
 ## 复现
 

@@ -58,10 +58,11 @@ static int grant_path(int root, pid_t worker, const struct seccomp_notif *reques
 {
     int flags = (int)request->data.args[2] & ~O_LARGEFILE;
     const int directory = O_DIRECTORY | O_CLOEXEC;
-    const int create = O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC;
-    // Node's wx includes O_TRUNC. An exclusive create can never truncate an existing file.
-    if (flags == (create | O_TRUNC)) flags = create;
-    const int writes = flags == create;
+    const int create = O_WRONLY | O_CREAT | O_CLOEXEC;
+    const int exclusive = (flags & O_EXCL) != 0;
+    const int truncate = (flags & O_TRUNC) != 0 && !exclusive;
+    const int writes = flags == (create | O_TRUNC) || flags == (create | O_EXCL | O_TRUNC) ||
+        flags == (create | O_EXCL) || flags == (create | O_APPEND) || flags == (create | O_APPEND | O_EXCL);
     if (!request->pid || syscall(SYS_tgkill, worker, request->pid, 0) < 0 ||
         request->data.nr != SYS_openat || (int)request->data.args[0] != AT_FDCWD ||
         (flags != O_CLOEXEC && flags != directory && flags != (directory | O_NONBLOCK) &&
@@ -90,15 +91,24 @@ static int grant_path(int root, pid_t worker, const struct seccomp_notif *reques
         if (!*relative) relative = ".";
     }
     struct open_how how = {
-        .flags = flags | O_NONBLOCK, .mode = writes ? 0600 : 0,
+        // Opening without O_TRUNC lets us validate the exact inode first.
+        .flags = (flags & ~O_TRUNC) | O_NONBLOCK, .mode = writes ? 0600 : 0,
         .resolve = RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_XDEV,
     };
     int file = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
     if (file >= 0) {
         struct stat stat;
-        if (fstat(file, &stat) < 0 || (!S_ISDIR(stat.st_mode) && !S_ISREG(stat.st_mode))) {
+        if (fstat(file, &stat) < 0 ||
+            (writes ? !S_ISREG(stat.st_mode) || stat.st_nlink != 1
+                    : !S_ISDIR(stat.st_mode) && !S_ISREG(stat.st_mode))) {
             close(file);
             errno = EACCES;
+            return -1;
+        }
+        if (truncate && ftruncate(file, 0) < 0) {
+            int error = errno;
+            close(file);
+            errno = error;
             return -1;
         }
     }

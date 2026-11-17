@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "837a931f28da02d04fbe3fb46ac54d00bab31a58ab2a65cbe7c36e99cc09abf2",
+  "unsignedHapBytes": 657072676,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "cases": {
+    "write-access": {
+      "exitCode": 0,
+      "readyMs": 5619,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "read-only": {
+      "exitCode": 0,
+      "readyMs": 4652,
+      "readOnlyReadsAllowed": true,
+      "readOnlyWritesDenied": true,
+      "readOnlyDiskUnchanged": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "repl": {
+      "exitCode": 0,
+      "readyMs": 4341,
+      "executionMode": "persistent-in-memory",
+      "scriptPersistence": false,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "retained-script": {
+      "exitCode": 0,
+      "readyMs": 4372,
+      "executionMode": "vm-script",
+      "scriptPersistence": true,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "fresh-script": {
+      "exitCode": 0,
+      "readyMs": 4319,
+      "executionMode": "vm-script",
+      "scriptPersistence": false,
+      "topLevelAwait": true,
+      "sameSessionRetained": false,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 3,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "deviceLinkFixtures": "HDC app context returned EPERM for both hardlink and symlink creation",
+    "pending": [
+      "remove",
+      "rename",
+      "create directory",
+      "additional roots",
+      "non-root working directories",
+      "cancellation and cleanup with retained state",
+      "physical device validation"
+    ]
+  }
+}

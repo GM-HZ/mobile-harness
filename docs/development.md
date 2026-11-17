@@ -84,6 +84,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-ptc-host.py <loopback-target> .build/emulator-ptc-host.json
 ```
 
+可选参数 `--read-only` 验证只读会话。用 `--mode persistent-in-memory` 验证 REPL，用 `--mode vm-script` 验证 Script，给后者加 `--script-persistence` 验证 Script 跨轮保留变量。这些回归会临时写入官方 Host profile patch 并重启应用，要求独立模拟器的用户 patch 槽为空。测试结束会移除临时 patch，恢复正常模式。
+
 ## Host 进程探针
 
 ```sh
