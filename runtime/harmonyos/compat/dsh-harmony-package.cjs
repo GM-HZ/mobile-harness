@@ -43,7 +43,7 @@ function createPackageRunner(root, home, launch) {
     const packageAction = args.find(arg => !arg.startsWith('-'));
     if (command === 'pnpm' && ['add', 'install', 'remove', 'update'].includes(packageAction)) {
       remapped.push('--config.node-linker=hoisted', '--config.package-import-method=copy',
-        '--store-dir=' + profileHome + '/package-store', '--ignore-scripts');
+        '--store-dir=' + profileHome + '/package-store', '--config.ignore-scripts=true');
     }
     const child = launch(guestPath(cwd),
       'export HOME=' + quote(profileHome) + ' GIT_TERMINAL_PROMPT=0; exec ' +

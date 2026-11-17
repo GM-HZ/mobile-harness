@@ -176,3 +176,16 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```
 
 可用 `--case ralph`、`search`、`cancel` 或 `scope` 单独复现。scope 的工具错误是明确要求的拒绝结果，仍精确检查错误内容和无数据泄露，其他调用继续要求成功。该测试不认证任意长循环，也不把工具级工作区授权说成操作系统沙箱。
+
+## Host 子进程与可选工作树回归
+
+0.4.34 替换公共 subprocess provider，复用上游的输出管理和生命周期。工作树测试临时启用随包官方 bundle，使用真实 Git 创建、进入、重启续接并归档。默认策略必须拒绝；只有夹具自身的会话通过正式 `/permission` 命令明确选择完整权限。Bash 仍显示原 `/workspace-native` 视图，工作树控制文件保留 Host 的原生路径，测试分别精确验证。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-worktree.py <loopback-target> .build/worktree.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-subprocess.py <loopback-target> .build/subprocess.json
+```
+
+后者用标准临时 bundle 验证真正的 provider，包括 stdin/stdout、特殊字符 argv、真实嵌套 Node、环境脱敏／覆盖／删除、非零退出、尾部限额与完整 spill、实际运行中的取消和 Context 销毁。PRoot 取消可能报告退出码1；脚本保留此事实并要求进程范围退出和 helper 回收。两者恢复原 manifest／锁文件并回读摘要，移除本次测试目录和凭据。设计和失败原因见 [Host 子进程](research/harmonyos-host-subprocess.md)。不要在同一模拟器并行运行修改 profile 的回归。

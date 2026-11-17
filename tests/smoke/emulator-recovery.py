@@ -1,5 +1,7 @@
 """Inject a crash-only DSH bundle on an isolated loopback Phone emulator."""
 import argparse
+import base64
+import hashlib
 import io
 import json
 import os
@@ -116,9 +118,14 @@ def test(emulator, output):
     marker = name + ".log"
     remote = f"/data/local/tmp/{name}"
     backup = f"{PROFILE}/{name}.bak"
-    result = {}
+    lock_backup = backup + '.lock'
+    boot_backup = 'mobile-harness-boot.json.' + name
+    result = {"fixture": name}
     modified = False
     forwarded = False
+    had_lock = False
+    def digest(file):
+        return hashlib.sha256(base64.b64decode(emulator.app('base64 ' + file))).hexdigest()
     try:
         forward = emulator.hdc("fport", f"tcp:{emulator.url.rsplit(':', 1)[1]}", "tcp:19592")
         assert "Forwardport result:OK" in forward, forward
@@ -126,6 +133,12 @@ def test(emulator, output):
         result["normalReadyMs"] = emulator.ready("normal")
         result["anonymousHttp"] = emulator.web_status(False)
         assert result["anonymousHttp"] == 401
+        assert emulator.app(f'cp {PROFILE}/package.json {backup} && cp mobile-harness-boot.json {boot_backup} && printf SAVED') == 'SAVED'
+        modified = True
+        result['manifestBeforeSha256'] = digest(PROFILE + '/package.json')
+        had_lock = emulator.app(f'test -e {PROFILE}/pnpm-lock.yaml && printf PRESENT') == 'PRESENT'
+        if had_lock: emulator.app(f'cp {PROFILE}/pnpm-lock.yaml {lock_backup}')
+        result['lockBeforeSha256'] = digest(PROFILE + '/pnpm-lock.yaml') if had_lock else None
         workspace = emulator.rpc("workspace/create", {"request": {"path": WORKSPACE}})["workspace"]
         session = emulator.rpc("session/create", {"request": {"workspaceId": workspace["workspaceId"]}})["sessionId"]
         with tempfile.TemporaryDirectory() as temporary:
@@ -146,8 +159,6 @@ def test(emulator, output):
             modified_profile = Path(temporary) / "package.json"
             modified_profile.write_text(json.dumps(profile) + "\n")
             assert "FileTransfer finish" in emulator.hdc("file", "send", str(modified_profile), remote + ".json")
-            assert emulator.app(f"cp {PROFILE}/package.json {backup} && echo SAVED") == "SAVED"
-            modified = True
             assert emulator.app(f"cp {remote}.json {PROFILE}/package.json && echo ACTIVATED") == "ACTIVATED"
         emulator.start()
         deadline = time.monotonic() + 65
@@ -171,11 +182,21 @@ def test(emulator, output):
     finally:
         try:
             if modified:
+                emulator.stop()
                 result["normalProfileRestored"] = emulator.app(
-                    f"cp {backup} {PROFILE}/package.json && cmp -s {backup} {PROFILE}/package.json && echo RESTORED"
+                    f"cp {backup} {PROFILE}/package.json && cmp -s {backup} {PROFILE}/package.json && cp {boot_backup} mobile-harness-boot.json && echo RESTORED"
                 ) == "RESTORED"
                 assert result["normalProfileRestored"]
+                if had_lock: emulator.app(f'cp {lock_backup} {PROFILE}/pnpm-lock.yaml')
+                else: emulator.app(f'rm -f {PROFILE}/pnpm-lock.yaml')
+                emulator.app(f'rm -rf alpine/workspace-native/{name} {PROFILE}/node_modules/{name}; rm -f alpine/workspace-native/{marker} {backup} {lock_backup} {boot_backup}')
+                emulator.start(); result['returnNormalReadyMs'] = emulator.ready('normal')
+                result['manifestAfterSha256'] = digest(PROFILE + '/package.json')
+                result['lockAfterSha256'] = digest(PROFILE + '/pnpm-lock.yaml') if had_lock else None
+                assert result['manifestBeforeSha256'] == result['manifestAfterSha256']
+                assert result['lockBeforeSha256'] == result['lockAfterSha256']
         finally:
+            emulator.hdc('shell', 'rm', '-f', remote + '.tgz', remote + '.json')
             if forwarded:
                 emulator.hdc("fport", "rm", f"tcp:{emulator.url.rsplit(':', 1)[1]}", "tcp:19592")
             output.write_text(json.dumps(result, indent=2) + "\n")
