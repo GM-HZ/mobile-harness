@@ -114,6 +114,7 @@ class DshEngine {
     if (fileIo.accessSync(root + '/tmp/dsh-native-timeline.log')) fileIo.unlinkSync(root + '/tmp/dsh-native-timeline.log');
     this.copyGuest(context, 'dsh-native-web.cjs', root + '/dsh-native-web.cjs');
     this.copyGuest(context, 'dsh-harmony-subprocess.mjs', root + '/dsh-harmony-subprocess.mjs');
+    this.copyGuest(context, 'dsh-harmony-fs.mjs', root + '/dsh-harmony-fs.mjs');
     this.copyGuest(context, 'dsh-harmony-signed-programs.json', root + '/dsh-harmony-signed-programs.json');
     this.copyGuest(context, 'dsh-harmony-http.cjs', root + '/dsh-harmony-http.cjs');
     this.copyGuest(context, 'dsh-harmony-llhttp.cjs', root + '/dsh-harmony-llhttp.cjs');
