@@ -1,0 +1,14 @@
+{
+  "name": "@mobile-harness/lsp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "On-demand mobile JavaScript and TypeScript navigation using official DSH LSP plugins",
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
+  "dependencies": {
+    "@deepseek-ai/dsh-lsp": "0.2.2-rc.4",
+    "@deepseek-ai/dsh-lsp-stdio": "0.2.2-rc.4",
+    "@deepseek-ai/dsh-tool-lsp": "0.2.2-rc.4",
+    "typescript": "6.0.3",
+    "typescript-language-server": "5.0.0"
+  }
+}

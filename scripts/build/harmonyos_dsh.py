@@ -24,7 +24,13 @@ def stage_dsh(root, raw, baseline):
     lock = manifest / "package-lock.json"
     # This layer also carries our application manifest. Cache the complete
     # recipe, not only npm's dependency graph.
-    key = hashlib.sha256(lock.read_bytes() + (manifest / "package.json").read_bytes() + Path(__file__).read_bytes()).hexdigest()
+    bundle = root / "packages/bundles/mobile-lsp"
+    bundle_files = [bundle / "package.json", bundle / "cordis.patch.yml"]
+    application = json.loads((manifest / "package.json").read_text())
+    for package, version in json.loads(bundle_files[0].read_text())["dependencies"].items():
+        if application["dependencies"].get(package) != version:
+            raise ValueError(f"Mobile LSP bundle dependency mismatch: {package}")
+    key = hashlib.sha256(lock.read_bytes() + (manifest / "package.json").read_bytes() + Path(__file__).read_bytes() + b''.join(file.read_bytes() for file in bundle_files)).hexdigest()
     pinned = json.loads(lock.read_text())["packages"]
     for package, source in json.loads((manifest / "lsp-sources.json").read_text()).items():
         recorded = pinned["node_modules/" + package]
@@ -61,17 +67,28 @@ def stage_dsh(root, raw, baseline):
         try:
             with ZipFile(pending, "w") as output:
                 output.writestr(ZipInfo("dsh/package.json"), (manifest / "package.json").read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
+                for file in bundle_files:
+                    output.writestr(ZipInfo("dsh/node_modules/@mobile-harness/lsp/" + file.name), file.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
                 for path in sorted(modules.rglob("*")):
                     if path.is_symlink():
                         raise ValueError(f"Unexpected npm symlink: {path}")
                     if path.is_file():
                         name = "dsh/" + path.relative_to(cache).as_posix()
                         output.writestr(ZipInfo(name), path.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
+                # tsserver watches its nearest node_modules recursively. Keep
+                # its immutable compiler library away from DSH's large tree;
+                # workspace dependencies remain visible and fully watched.
+                compiler = modules / "typescript"
+                for path in sorted(compiler.rglob("*")):
+                    if path.is_file():
+                        name = "toolchains/lsp/node_modules/typescript/" + path.relative_to(compiler).as_posix()
+                        output.writestr(ZipInfo(name), path.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
             pending.replace(archive)
         finally:
             pending.unlink(missing_ok=True)
 
     shutil.copy2(archive, raw / ARCHIVE)
+    (raw / "dsh-lsp.patch.yml").unlink(missing_ok=True)
     # A same-DSH-version production dependency change must invalidate unpack.
     # User profiles/workspaces live outside this immutable release directory.
     digest = hashlib.sha256()

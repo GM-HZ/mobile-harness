@@ -25,7 +25,7 @@
               disableAutomaticTypingAcquisition: true
               maxTsServerMemory: 384
               tsserver:
-                path: !!js process.env.HARMONY_NATIVE_WEB_ROOT + '/.dsh-0.2.2-rc.4/dsh/node_modules/typescript/lib/tsserver.js'
+                path: !!js process.env.HARMONY_NATIVE_WEB_ROOT + '/.dsh-0.2.2-rc.4/toolchains/lsp/node_modules/typescript/lib/tsserver.js'
                 useSyntaxServer: never
     - id: tool-lsp
       name: '@deepseek-ai/dsh-tool-lsp'

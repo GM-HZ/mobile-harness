@@ -476,21 +476,36 @@ async function main() {
     ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
     : ['--profile', 'web'];
   process.argv = ['node', cli, '--patch', path.join(root, 'dsh-client.patch.yml'), '--patch', nativePatch,
-    ...(safeMode ? [] : ['--patch', path.join(root, 'dsh-lsp.patch.yml')]),
     ...profileArgs, '--host', '127.0.0.1', '--port', '19592', '--no-open'];
   // The CLI's own installation anchor declares only its published dependency
   // closure. Our carrier declares additional official plugins and must supply
   // that manifest through the public application-owned profile API.
   const { prepareProfile, runProfile } = await import(pathToFileURL(path.join(dsh, '@deepseek-ai/dsh/lib/profile-boot.js')).href);
-  const { loadLayeredEnv } = await import(appBootUrl);
+  const { loadLayeredEnv, loadProfile, readProfileManifest, writeProfileManifest } = await import(appBootUrl);
   mark('cli-imported');
   const profileName = safeMode ? 'mobile-recovery' : 'web';
-  const profile = prepareProfile(profileName, true, safeMode ? 'web' : undefined);
+  const installAnchor = path.join(root, '.dsh-0.2.2-rc.4/dsh/package.json');
+  let profile;
+  if (safeMode) {
+    profile = prepareProfile(profileName, true, 'web');
+  } else {
+    profile = loadProfile('dsh', profileName, installAnchor, home);
+    const migration = path.join(profile.dir, '.mobile-harness-default-lsp-v1');
+    if (!fs.existsSync(migration)) {
+      const manifest = readProfileManifest('dsh', profile.dir);
+      const bundles = manifest.dsh.profile.bundles;
+      if (!bundles.includes('@mobile-harness/lsp')) {
+        bundles.push('@mobile-harness/lsp');
+        writeProfileManifest(profile.dir, manifest);
+      }
+      fs.writeFileSync(migration, '1\n', { mode: 0o600 });
+      profile = loadProfile('dsh', profileName, installAnchor, home);
+    }
+  }
   await runProfile({
     environment: loadLayeredEnv('dsh'), profile: profileName,
-    resolvedProfile: { profile, installAnchor: path.join(root, '.dsh-0.2.2-rc.4/dsh/package.json') },
-    patchFiles: [path.join(root, 'dsh-client.patch.yml'), nativePatch,
-      ...(safeMode ? [] : [path.join(root, 'dsh-lsp.patch.yml')])],
+    resolvedProfile: { profile, installAnchor },
+    patchFiles: [path.join(root, 'dsh-client.patch.yml'), nativePatch],
     args: ['--host', '127.0.0.1', '--port', '19592', '--no-open'],
   });
   mark('profile-mounted');

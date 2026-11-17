@@ -95,7 +95,7 @@ def run(emulator, output):
             text = query(emulator, sid, at('goToDefinition', 'consumer.ts', CONSUMER, 4, 'describe'), evidence, 'utf16AfterAstralCharacter')
             assert text == 'shapes.ts:10:17', text
             text = query(emulator, sid, at('goToDefinition', 'consumer.ts', CONSUMER, 3, 'PI'), evidence, 'standardLibrary')
-            assert root + '/.dsh-0.2.2-rc.4/dsh/node_modules/typescript/lib/lib.es5.d.ts:' in text, text
+            assert root + '/.dsh-0.2.2-rc.4/toolchains/lsp/node_modules/typescript/lib/lib.es5.d.ts:' in text, text
             for line in text.splitlines():
                 file, number, column = line.rsplit(':', 2)
                 assert file.startswith(root + '/'), line
