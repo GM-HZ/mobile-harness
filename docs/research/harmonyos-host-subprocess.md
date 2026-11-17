@@ -28,7 +28,9 @@
 
 ## 验收与限制
 
-测试通过标准临时 bundle 调用真正 provider、真实 Node/Git；使用真实模型调用官方工作树工具。测试记录 stdout 管道、字面特殊字符、stdin EOF、真实嵌套 Node、环境删除与显式覆盖、非零退出、输出尾部与完整 spill、运行中取消和 Context 销毁。正式结果与准确制品将在验收后写入证据。
+测试通过标准临时 bundle 调用真正 provider、真实 Node/Git；使用真实模型调用官方工作树工具。stdout 管道、字面特殊字符、stdin EOF、真实嵌套 Node、环境删除与显式覆盖、非零退出、输出尾部与完整 spill、运行中取消和 Context 销毁均通过。工作树实际创建、目录与文件独立性、同会话重启续接、脏树保留及干净树归档清理通过。最终取消／销毁分别约31／34ms，11个 helper 回收；这是固定夹具的一次结果，不是任意任务的性能保证。
+
+收尾实际卸载暴露了本地 adapter 为 pnpm remove 添加 `--ignore-scripts` 的错误；改为同版 pnpm 11.28.5 接受的 `--config.ignore-scripts=true`，保持原跳过安装脚本策略。真实安装、启用、禁用、卸载 API 全部通过，postinstall 没有执行。恢复夹具安装前备份原 manifest／lock／boot，最终普通模式摘要相同。错误与测试收尾修复均保留，不拿曾经 exit1 的运行冒充通过。见[准确来源、制品与五组记录](../evidence/emulator-subprocess-worktree-0.4.34.json)。
 
 PRoot 收到进程组 TERM 后可能回收 tracee 并返回退出码1，不能伪称直接命令收到某个 POSIX signal。验收要求真实运行标记、非成功退出事实、`waitForExit`、所有新 helper 回收与耗时，同时保留实际 outcome。最初要求固定 signal 的测试失败保留，修正原因与差异记录在证据。
 

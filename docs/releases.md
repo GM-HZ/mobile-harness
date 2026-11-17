@@ -206,3 +206,13 @@ API 26 Phone 模拟器通过 16 组 PTC／Workflow／MCP／定时任务／故障
 ### 0.4.33 官方可选能力补验
 
 同一准确 HAP 临时启用官方 Ralph／session-search bundle，四项固定来源组合验收退出0：两轮不同 fresh 子代理与文件字节结果、执行中取消并回收 helper、归档会话跨重启索引与五个查询工具、工作区边界。原 profile／锁文件恢复摘要一致，可选项仍遵循默认开关。仅新增验证，不生成或重命名应用包。[完整证据](evidence/emulator-optional-iteration-0.4.33.json)
+
+## 0.4.34 公共子进程与工作树
+
+替换公共 subprocess provider，复用上游 Local 输出收集与生命周期，连接随包 Git／Node。空目录根与 PRoot 绑定让官方工作树控制文件保持 Host 原生路径，Bash／MCP 保留旧视图并可读取该原生别名；没有第二份 rootfs。修复 pnpm remove 的参数兼容，保留跳过安装脚本策略。
+
+同一最终普通 HAP 的五组通过记录：工作树、子进程／插件管理、工具链、MCP stdio、崩溃恢复。工作树默认仍拒绝无沙箱执行；明确选择完整权限的自建会话完成创建、独立读写、重启续接与归档清理。插件实际安装、启用、禁用、卸载通过，postinstall 未运行。恢复测试返回普通模式、配置／锁文件摘要一致，匿名401、鉴权200，测试凭据清除，旧会话保留。重启恢复约4.7–7.9秒，不代表清空数据首次启动。
+
+制品源为 `7b66db814dd599cd1d07b5892d92f43ac3dee269`，未签名 HAP 650,936,407字节，SHA-256 `efa9ffd8fb5529d24971b410d32911da9ab0f47a5065107e242627fdb9192c31`。四组测试来自该提交；子进程组在只修复测试收尾后，于 `5d6eeb52158739e19837f718a5194a03167f1257` 重跑通过。没有替换制品或隐去原失败批次。[准确命令、失败与最终审计](evidence/emulator-subprocess-worktree-0.4.34.json) · [设计](research/harmonyos-host-subprocess.md)
+
+DSH 仍锁定官方 RC.4。LSP、压缩、其他可选能力、工作树 restore／专门取消和本版真机继续验收；尚不宣称桌面全部能力等价。

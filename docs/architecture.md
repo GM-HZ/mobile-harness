@@ -18,6 +18,7 @@ HAP 内的鸿蒙 Node.js / DSH Host
 | 宿主 | ArkTS 管理启动和界面，N-API 桥在 HAP 中加载鸿蒙 Node.js 24.14.1，运行固定版本 DSH 0.2.2-rc.4 |
 | Web | DSH Web 仅绑定本机回环。应用完成令牌交换后把会话 Cookie 配置到 ArkWeb。真机匿名请求 401，鉴权请求 200 |
 | 执行 | 本机文件工具与工作区规则复用 DSH。部分 Linux 用户态工具由 PRoot 按需运行，普通 Bash 在没有可用系统沙箱时按默认权限拒绝，可对具体命令单次批准 |
+| Host 子进程 | 0.4.34 通过公共 provider 连接随包 Git／Node，保留上游输出与生命周期；使用空根加目录绑定保持 Host 原生工作区路径，Bash／MCP 保留旧视图并能读取原生别名。没有第二套 rootfs，见[设计与验收](research/harmonyos-host-subprocess.md) |
 | PTC | 0.4.31 普通包包含 TypeScript 擦除、REPL／Script、工具回调与独立 worker；文件代理通过 seccomp 按目录授权。上游报告 partial enforcement，不等同完整 Linux 沙箱或任意 Node 系统 API。恢复模式不启用此后端 |
 | Office | 0.4.32 沿用上游 OfficeKit 的授权、队列、缓存和输出管理；仅替换 Converter 执行端。独立原生 Node 探测 WASM 后运行官方 Kit，主 Host 与受限 PTC 配置不变。见[执行与实测](research/harmonyos-native-office.md) |
 | 数据 | 会话、工具依赖、配置及默认工作区位于应用私有数据。覆盖安装保留数据；强停重启时复用已展开资源 |

@@ -1,0 +1,597 @@
+{
+  "recordedAt": "2026-11-17T21:36:12.366733+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "baselineCommit": "9cef2f102882102e6e60433a990f77540b93c609",
+  "artifact": {
+    "version": "0.4.34",
+    "versionCode": 41,
+    "bundleName": "org.sayact.nodepoc",
+    "sourceCommit": "7b66db814dd599cd1d07b5892d92f43ac3dee269",
+    "hap": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.34-unsigned.hap",
+    "sha256": "efa9ffd8fb5529d24971b410d32911da9ab0f47a5065107e242627fdb9192c31",
+    "bytes": 650936407,
+    "unsigned": true,
+    "sourceEntriesVerified": {
+      "packages/dsh-host/dsh-native-web.cjs": {
+        "entry": "resources/rawfile/dsh-native-web.cjs",
+        "sha256": "b50a05587f3655d6ba10b3520eaca22656c1cd08b63dfcda690f07367532c66f"
+      },
+      "packages/dsh-host/dsh-harmony-subprocess.mjs": {
+        "entry": "resources/rawfile/dsh-harmony-subprocess.mjs",
+        "sha256": "01af4bfc57252975b62e85f224647307e315c90b6045a9e79e54a6d5f6c0fccc"
+      },
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": {
+        "entry": "resources/rawfile/dsh-harmony-package.cjs",
+        "sha256": "a8e7a33b9e22fdca0b68073da89e0c939c4dbc59b3938f3286175d462e530ab7"
+      }
+    }
+  },
+  "upstream": {
+    "npmDsh": "0.2.2-rc.4",
+    "sourceGitlink": "3f321d32bfe382212a8ed8785c1d47a5a300aa23",
+    "distTags": {
+      "alpha": "0.2.2-alpha.3",
+      "latest": "0.2.2-rc.1",
+      "next": "0.2.2-rc.4"
+    },
+    "distTagsCommand": "npm view @deepseek-ai/dsh dist-tags --json",
+    "officialReleases": "https://github.com/deepseek-ai/deepseek-harness/releases"
+  },
+  "build": {
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=/Users/gongmeng/dev/acode/mobile-harness/.build/inputs/harmonyos ./build.sh --package",
+    "exitCode": 0,
+    "log": ".build/host-subprocess/build-package-remove.log"
+  },
+  "finalPassingCommands": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-worktree.py",
+        "127.0.0.1:15557",
+        ".build/host-subprocess/final-remove/worktree.json"
+      ],
+      "testSourceCommit": "7b66db814dd599cd1d07b5892d92f43ac3dee269",
+      "exitCode": 0,
+      "elapsedSeconds": 80.444
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-subprocess.py",
+        "127.0.0.1:15557",
+        ".build/host-subprocess/subprocess-final/result.json"
+      ],
+      "testSourceCommit": "5d6eeb52158739e19837f718a5194a03167f1257",
+      "exitCode": 0,
+      "elapsedSeconds": null
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-toolkit.py",
+        "127.0.0.1:15557",
+        ".build/host-subprocess/final-remove/toolkit.json"
+      ],
+      "testSourceCommit": "7b66db814dd599cd1d07b5892d92f43ac3dee269",
+      "exitCode": 0,
+      "elapsedSeconds": 114.931
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-mcp-stdio.py",
+        "127.0.0.1:15557",
+        ".build/host-subprocess/final-remove/mcp-stdio.json"
+      ],
+      "testSourceCommit": "7b66db814dd599cd1d07b5892d92f43ac3dee269",
+      "exitCode": 0,
+      "elapsedSeconds": 15.726
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/host-subprocess/final-remove/recovery.json"
+      ],
+      "testSourceCommit": "7b66db814dd599cd1d07b5892d92f43ac3dee269",
+      "exitCode": 0,
+      "elapsedSeconds": 28.632
+    }
+  ],
+  "verified": {
+    "worktree": {
+      "fixture": "mh-optional-9efafc0d3c",
+      "enabledBundles": [
+        "@deepseek-ai/dsh-experimental-tool-worktree"
+      ],
+      "manifestBeforeSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+      "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "optionalProfileReadyMs": 4960,
+      "sessionId": "session-24d48421-0b46-43c8-80ed-a6f05ee77f22",
+      "defaultPolicyRefusedWithoutMutation": true,
+      "explicitOwnedSessionPermission": {
+        "commandId": "cmd-43420b88-1",
+        "result": {
+          "kind": "success",
+          "text": "preset danger-full-access"
+        }
+      },
+      "created": {
+        "path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-9efafc0d3c/.agents/worktrees/acceptance",
+        "branch": "acceptance",
+        "baseCommit": "370d7448e2fdfa82a6f095091f3457674634b317",
+        "repositoryRoot": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-9efafc0d3c"
+      },
+      "gitControlFile": "gitdir: /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-9efafc0d3c/.git/worktrees/acceptance\n",
+      "legacyBashGitIdentity": [
+        "/workspace-native/mh-optional-9efafc0d3c/.agents/worktrees/acceptance",
+        "acceptance",
+        "370d7448e2fdfa82a6f095091f3457674634b317"
+      ],
+      "nativePathsGitIdentityAndIndependentBytes": true,
+      "helpersReapedBeforeRestart": 25,
+      "restartReadyMs": 7938,
+      "sameSessionCheckoutAcrossRestart": true,
+      "dirtyArchivedCheckoutRetained": true,
+      "cleanSessionId": "session-9a7af564-0a7c-4469-9523-f1e4188cb4cf",
+      "cleanArchivedCheckoutReclaimedBranchRetained": true,
+      "helpersReapedAfterRestart": 41,
+      "temporaryModelCredentialRemoved": true,
+      "exactOriginalManifestRestored": true,
+      "exactOriginalLockRestored": true,
+      "manifestAfterSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+      "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+    },
+    "subprocess": {
+      "fixture": "mh-subprocess-8dd9d63e2b",
+      "manifestBeforeSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+      "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "postinstallDidNotRun": true,
+      "enable": {
+        "stage": "enable",
+        "target": "mh-subprocess-8dd9d63e2b",
+        "enabled": true,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "readyMs": 4974,
+      "sessionId": "session-3cb96aba-15c1-4aa7-89c7-751e70861b07",
+      "contract": {
+        "executionWorldLookup": {
+          "node": "/data/storage/el2/base/haps/entry/files/alpine/bin/node",
+          "git": "/data/storage/el2/base/haps/entry/files/alpine/usr/bin/git",
+          "missingRejected": true,
+          "relativeRejected": true
+        },
+        "literalArgvNativeCwdStreamingAndEof": true,
+        "realNestedNodeProcess": {
+          "execPath": "/data/storage/el2/base/haps/entry/files/alpine/bin/node",
+          "child": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-subprocess-8dd9d63e2b"
+        },
+        "upstreamAmbientScrubExplicitEnvAndTombstone": true,
+        "nonzeroExitBoundedTailFullSpill": true,
+        "abort": {
+          "actualRunningObserved": true,
+          "managedRangeExited": true,
+          "elapsedMs": 31,
+          "outcome": {
+            "exitCode": 1,
+            "signal": null
+          }
+        },
+        "dispose": {
+          "actualRunningObserved": true,
+          "managedRangeExited": true,
+          "elapsedMs": 34,
+          "outcome": {
+            "exitCode": 1,
+            "signal": null
+          }
+        }
+      },
+      "allHelpersReaped": 11,
+      "sessionSettledBeforeRestart": true,
+      "temporaryModelCredentialRemoved": true,
+      "disable": {
+        "stage": "enable",
+        "target": "mh-subprocess-8dd9d63e2b",
+        "enabled": false,
+        "changed": true,
+        "application": "applied",
+        "warnings": []
+      },
+      "remove": {
+        "stage": "remove",
+        "target": "mh-subprocess-8dd9d63e2b",
+        "changed": true,
+        "application": "applied",
+        "packageResult": {
+          "exitCode": 0,
+          "output": "✓ Lockfile passes supply-chain policies (verified 37s ago)\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\ndependencies:\n- mh-subprocess-8dd9d63e2b\n\nDone in 2.1s using pnpm v11.28.5\n",
+          "truncated": false,
+          "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-mBMBJk/pnpm.log"
+        },
+        "warnings": []
+      },
+      "removedThroughActualPluginManager": true,
+      "manifestAfterSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+      "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+    },
+    "toolkit": {
+      "defaultBashRefusedWithoutBackend": true,
+      "approvedCommandObservedTools": [
+        "bash"
+      ],
+      "approvedToolkit": {
+        "bash": true,
+        "git": true,
+        "pythonPip": true,
+        "twoIsolatedVenvs": true,
+        "nodeFetch": true,
+        "curl": true,
+        "sqlite": true,
+        "timezone": true
+      },
+      "fileTools": [
+        "edit",
+        "glob",
+        "grep",
+        "read",
+        "write"
+      ],
+      "temporaryModelCredentialRemoved": true
+    },
+    "mcp-stdio": {
+      "node": {
+        "probe": {
+          "ok": true,
+          "serverInfo": {
+            "name": "node-stdio-fixture",
+            "version": "1"
+          },
+          "toolNames": [
+            "stdio_fixture_echo"
+          ],
+          "truncated": false,
+          "durationMs": 5153,
+          "closeConfirmed": true
+        },
+        "toolResultReturnedToSession": true,
+        "fixtureRemoved": true
+      },
+      "python3": {
+        "probe": {
+          "ok": true,
+          "serverInfo": {
+            "name": "python-stdio-fixture",
+            "version": "1"
+          },
+          "toolNames": [
+            "stdio_fixture_echo"
+          ],
+          "truncated": false,
+          "durationMs": 616,
+          "closeConfirmed": true
+        },
+        "toolResultReturnedToSession": true,
+        "fixtureRemoved": true
+      }
+    },
+    "recovery": {
+      "fixture": "mobile-harness-crash-892abf8e8e",
+      "normalReadyMs": 69,
+      "anonymousHttp": 401,
+      "manifestBeforeSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+      "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "pluginInstalledDisabled": true,
+      "actualPluginCrash": true,
+      "interruptedNormalBoot": {
+        "mode": "normal",
+        "pending": true
+      },
+      "safeReadyMs": 4946,
+      "safeAuthenticatedHttp": 200,
+      "pluginNotLoadedAgain": true,
+      "sameSessionInSafeMode": true,
+      "normalProfileRestored": true,
+      "returnNormalReadyMs": 4695,
+      "manifestAfterSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+      "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+    }
+  },
+  "finalAudit": {
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "credential": {
+      "DEEPSEEK_API_KEY": {
+        "configured": false,
+        "writable": true
+      }
+    },
+    "temporaryHostPatchAbsent": true,
+    "defaultPermissionPreset": "workspace-write",
+    "optionalWorktreeAndFixtureBundlesDisabled": true,
+    "manifestSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+    "lockSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+    "allOwnReportedFixturesAbsent": [
+      "mh-optional-18abff8b78",
+      "mh-optional-23ff9e0908",
+      "mh-optional-5937d9a97b",
+      "mh-optional-62a0864a65",
+      "mh-optional-7efa5d8de2",
+      "mh-optional-857cba3630",
+      "mh-optional-9efafc0d3c",
+      "mh-optional-b724d82038",
+      "mh-optional-c3f052b305",
+      "mh-optional-d257d47644",
+      "mh-optional-dd8d7aa645",
+      "mh-subprocess-584758c36b",
+      "mh-subprocess-5b727e3128",
+      "mh-subprocess-73538c1d05",
+      "mh-subprocess-821b8858cd",
+      "mh-subprocess-8b087dc9ba",
+      "mh-subprocess-8dd9d63e2b",
+      "mh-subprocess-9e20b725ca",
+      "mh-subprocess-a1145458d0",
+      "mobile-harness-crash-892abf8e8e"
+    ],
+    "retainedRc3Session": {
+      "id": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+      "events": 30
+    }
+  },
+  "verificationScope": "Five selected passing suites on the same final HAP. The subprocess suite is the committed cleanup-fix rerun; this is not a claim that one batch exited entirely green or that earlier 18/10-suite baselines were rerun.",
+  "testChanges": [
+    "Use handle.collected.stdout, not the raw-pipe stdout field, for collected output.",
+    "Require actual active-process observation, non-success exit, managed-range exit, all helpers reaped and bounded cancellation time. PRoot handles TERM and may report exitCode=1, signal=null; do not invent a direct-command signal.",
+    "Require exact native Git control path and exact legacy Bash namespace equivalent, branch and commit separately. Do not rewrite real tool output.",
+    "Reuse temporary-bundle backup/restore helper for worktree; original Ralph/search cases retain their default behavior.",
+    "Add actual plugin enable/disable/remove API checks and postinstall-not-run assertion. Recovery now backs up before installation, restores exact manifest/lock/boot and returns normal.",
+    "The first successful remove was followed by a test-only session/not-found cancellation after App restart. The rerun settles the completed session before restart and always restores profile in finally; all operational assertions remain."
+  ],
+  "notVerified": [
+    "Physical Mate 60 on this HAP",
+    "LSP packages/server end-to-end",
+    "Compaction and remaining optional bundles",
+    "Dedicated worktree restore/cancel scenarios",
+    "Arbitrary plugin upgrade/native build scripts",
+    "Extra subprocess control fd",
+    "Escaped descendant containment, full kernel sandbox, system PTY, Phone Use"
+  ],
+  "earlierAttempts": [
+    {
+      "directory": ".build/host-subprocess/signed",
+      "status": {
+        "head": "6ead88a50a6ab009f3b85a55a0905b5eef427600",
+        "hapSha256": "4ed05163fc20d183b19eb7ab2c7e1fa69b4dc5da0a86fa6f01d8dbde8bc5cb46",
+        "tests": {
+          "worktree": {
+            "exitCode": 1,
+            "elapsedSeconds": 37.848
+          },
+          "subprocess": {
+            "exitCode": 1,
+            "elapsedSeconds": 37.353
+          }
+        }
+      },
+      "failureDiagnostics": {
+        "worktree": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 111, in <module>\n    try: optional['run'](emulator, options.output, 'custom', verify, ['@deepseek-ai/dsh-experimental-tool-worktree'])\n         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-optional-iteration.py\", line 209, in run\n    verify(emulator, evidence, name)\n    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 62, in verify\n    assert repo.encode() + b'/.git/worktrees/' in agent['read_bytes'](emulator, checkout_app + '/.git')\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+        "subprocess": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-subprocess.py\", line 93, in <module>\n    try: run(emulator, options.output)\n         ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-subprocess.py\", line 64, in run\n    result, _ = agent['tool'](emulator, sid, 'mh_subprocess_contract', {})\n                ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-agent-continuation.py\", line 51, in tool\n    calls, results, rows = prompt(emulator, sid, instruction + \"Report the result and stop.\", allow_error=expect_error)\n                           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-agent-continuation.py\", line 39, in prompt\n    assert allow_error or not any(r[\"isError\"] for r in results), results\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: [{'role': 'tool', 'source': {'kind': 'tool', 'callId': 'call_00_uuDoUy8a6ayJzVWkbpC94603'}, 'toolCallId': 'call_00_uuDoUy8a6ayJzVWkbpC94603', 'content': [{'type': 'text', 'text': 'Error: {\"exitCode\":1,\"signal\":null}'}], 'isError': True, 'id': 'df47f608-9a8e-47b2-b313-992466c43c17'}]\n"
+      }
+    },
+    {
+      "directory": ".build/host-subprocess/workspace",
+      "status": {
+        "head": "555285b6ea44306eeea763e29c834d276447b943",
+        "hapSha256": "c9f1de4e33da27d7f74b36d64a72f253096b9b2f68820c363767722ab24d41ab",
+        "tests": {
+          "worktree": {
+            "exitCode": 1,
+            "elapsedSeconds": 39.512
+          },
+          "subprocess": {
+            "exitCode": 0,
+            "elapsedSeconds": 51.765
+          }
+        }
+      },
+      "failureDiagnostics": {
+        "worktree": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 112, in <module>\n    try: optional['run'](emulator, options.output, 'custom', verify, ['@deepseek-ai/dsh-experimental-tool-worktree'])\n         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-optional-iteration.py\", line 209, in run\n    verify(emulator, evidence, name)\n    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 63, in verify\n    assert repo + '/.git/worktrees/' in evidence['gitControlFile'], evidence['gitControlFile']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: gitdir: /workspace-native/mh-optional-62a0864a65/.git/worktrees/acceptance\n\n"
+      }
+    },
+    {
+      "directory": ".build/host-subprocess/sparse",
+      "status": {
+        "head": "a42c8a8c2f5e78e05578062394be47eb9ffa0785",
+        "hapSha256": "c4d0d87e54ee1a1642962c61e998a0c107da2a0b0193f4bac2fb26780f96c3ed",
+        "tests": {
+          "worktree": {
+            "exitCode": 1,
+            "elapsedSeconds": 65.399
+          },
+          "subprocess": {
+            "exitCode": 1,
+            "elapsedSeconds": 65.262
+          }
+        }
+      },
+      "failureDiagnostics": {
+        "worktree": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 112, in <module>\n    try: optional['run'](emulator, options.output, 'custom', verify, ['@deepseek-ai/dsh-experimental-tool-worktree'])\n         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-optional-iteration.py\", line 189, in run\n    emulator.ready(\"normal\")\n    ~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-recovery.py\", line 90, in ready\n    raise RuntimeError(f\"{mode} Host did not become ready\")\nRuntimeError: normal Host did not become ready\n",
+        "subprocess": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-subprocess.py\", line 93, in <module>\n    try: run(emulator, options.output)\n         ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-subprocess.py\", line 42, in run\n    emulator.ready('normal')\n    ~~~~~~~~~~~~~~^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-recovery.py\", line 90, in ready\n    raise RuntimeError(f\"{mode} Host did not become ready\")\nRuntimeError: normal Host did not become ready\n"
+      }
+    },
+    {
+      "directory": ".build/host-subprocess/bindings",
+      "status": {
+        "head": "e80ae475df0ae9a7d3f6fe732962f5a6f15a8762",
+        "hapSha256": "7e130b5fbeb647bc4829a51c1c98849327bd0f8b45b6e64861222b23eab036c6",
+        "tests": {
+          "worktree": {
+            "exitCode": 1,
+            "elapsedSeconds": 44.116
+          },
+          "subprocess": {
+            "exitCode": 0,
+            "elapsedSeconds": 42.864
+          }
+        }
+      },
+      "failureDiagnostics": {
+        "worktree": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 112, in <module>\n    try: optional['run'](emulator, options.output, 'custom', verify, ['@deepseek-ai/dsh-experimental-tool-worktree'])\n         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-optional-iteration.py\", line 209, in run\n    verify(emulator, evidence, name)\n    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 72, in verify\n    assert checkout in text and 'acceptance' in text and created['baseCommit'] in text, text\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: [stderr]\nfatal: not a git repository: /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-7efa5d8de2/.git/worktrees/acceptance\n[exit code: 128]\n"
+      }
+    },
+    {
+      "directory": ".build/host-subprocess/legacy-alias",
+      "status": {
+        "head": "d3fdf64a50c3327b9852c9f8177cda9ec17a7dd0",
+        "hapSha256": "485976fc0de77c817d15676a521ab0565a3f6ccd6c9e9a525ec64d7dca8905a6",
+        "tests": {
+          "worktree": {
+            "exitCode": 1,
+            "elapsedSeconds": 45.606
+          },
+          "subprocess": {
+            "exitCode": 0,
+            "elapsedSeconds": 49.47
+          }
+        }
+      },
+      "failureDiagnostics": {
+        "worktree": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 112, in <module>\n    try: optional['run'](emulator, options.output, 'custom', verify, ['@deepseek-ai/dsh-experimental-tool-worktree'])\n         ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-optional-iteration.py\", line 209, in run\n    verify(emulator, evidence, name)\n    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-worktree.py\", line 72, in verify\n    assert checkout in text and 'acceptance' in text and created['baseCommit'] in text, text\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: /workspace-native/mh-optional-c3f052b305/.agents/worktrees/acceptance\nacceptance\n536d6e9e1f75b3669de14a2e8f269cc38366abdc\n\n"
+      }
+    },
+    {
+      "directory": ".build/host-subprocess/final",
+      "status": {
+        "head": "9a53df509e117c41772ad4720ba7cc232c929274",
+        "runtimeSource": "d3fdf64a50c3327b9852c9f8177cda9ec17a7dd0",
+        "hapSha256": "485976fc0de77c817d15676a521ab0565a3f6ccd6c9e9a525ec64d7dca8905a6",
+        "tests": {
+          "worktree": {
+            "exitCode": 0,
+            "elapsedSeconds": 70.372
+          },
+          "subprocess": {
+            "exitCode": 0,
+            "elapsedSeconds": 46.029
+          },
+          "toolkit": {
+            "exitCode": 0,
+            "elapsedSeconds": 117.293
+          },
+          "mcp-stdio": {
+            "exitCode": 0,
+            "elapsedSeconds": 17.019
+          },
+          "recovery": {
+            "exitCode": 0,
+            "elapsedSeconds": 27.119
+          }
+        }
+      },
+      "failureDiagnostics": {}
+    },
+    {
+      "directory": ".build/host-subprocess/final-remove",
+      "status": {
+        "head": "7b66db814dd599cd1d07b5892d92f43ac3dee269",
+        "hapSha256": "efa9ffd8fb5529d24971b410d32911da9ab0f47a5065107e242627fdb9192c31",
+        "tests": {
+          "worktree": {
+            "exitCode": 0,
+            "elapsedSeconds": 80.444
+          },
+          "subprocess": {
+            "exitCode": 1,
+            "elapsedSeconds": 56.481
+          },
+          "toolkit": {
+            "exitCode": 0,
+            "elapsedSeconds": 114.931
+          },
+          "mcp-stdio": {
+            "exitCode": 0,
+            "elapsedSeconds": 15.726
+          },
+          "recovery": {
+            "exitCode": 0,
+            "elapsedSeconds": 28.632
+          }
+        }
+      },
+      "failureDiagnostics": {
+        "subprocess": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-subprocess.py\", line 104, in <module>\n    try: run(emulator, options.output)\n         ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-subprocess.py\", line 82, in run\n    if sid: emulator.rpc('session/cancel', {'request': {'sessionId': sid}})\n            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/tests/smoke/emulator-recovery.py\", line 69, in rpc\n    raise RuntimeError(f\"{method}: {result['error']['code']}\")\nRuntimeError: session/cancel: session/not-found\n"
+      }
+    }
+  ],
+  "priorNativeUiSupplement": {
+    "artifactSourceCommit": "d3fdf64a50c3327b9852c9f8177cda9ec17a7dd0",
+    "artifactSha256": "485976fc0de77c817d15676a521ab0565a3f6ccd6c9e9a525ec64d7dca8905a6",
+    "observedSettingsRecoveryButton": true,
+    "observedNativeNormalModeButton": true,
+    "clickedNormalMode": true,
+    "returnNormalMs": 7106,
+    "note": "Prior candidate only. Later package-runner fix did not change UI/native source; do not relabel this as a final-HAP UI run."
+  },
+  "actualRemovalFailureBeforeFix": {
+    "stage": "remove",
+    "target": "mobile-harness-crash-13bd8f5e5c",
+    "changed": false,
+    "application": "failed",
+    "packageResult": {
+      "exitCode": 1,
+      "output": "[ERROR] Unknown option: 'ignore-scripts'\nDid you mean 'ignore-workspace'? Use \"--config.unknown=value\" to force an unknown option.\nFor help, run: pnpm help remove\n",
+      "truncated": false,
+      "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-BmPdIM/pnpm.log",
+      "kind": "unknown"
+    },
+    "error": {
+      "code": "operation-error",
+      "diagnostic": "[ERROR] Unknown option: 'ignore-scripts'\nDid you mean 'ignore-workspace'? Use \"--config.unknown=value\" to force an unknown option.\nFor help, run: pnpm help remove\n"
+    }
+  },
+  "initialReproduction": {
+    "fixture": "mh-optional-5937d9a97b",
+    "enabledBundles": [
+      "@deepseek-ai/dsh-experimental-tool-worktree"
+    ],
+    "manifestBeforeSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+    "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+    "optionalProfileReadyMs": 6167,
+    "search": {
+      "result": {
+        "role": "tool",
+        "source": {
+          "kind": "tool",
+          "callId": "call_00_9VynTrLGYFptvMjkhlVj1533"
+        },
+        "toolCallId": "call_00_9VynTrLGYFptvMjkhlVj1533",
+        "content": [
+          {
+            "type": "text",
+            "text": "Error: subprocess-local: command \"git\" was not found on PATH"
+          }
+        ],
+        "isError": true,
+        "id": "74019a52-2df1-4a11-823a-7766aea83354"
+      }
+    },
+    "temporaryModelCredentialRemoved": true,
+    "exactOriginalManifestRestored": true,
+    "exactOriginalLockRestored": true,
+    "manifestAfterSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+    "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+  },
+  "baselineRestorationAfterOldRecovery": {
+    "manifestSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+    "lockSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+    "method": "Remove only the newly installed crash-fixture entries from captured files, require exact known pre-test SHA-256 matches, then transfer/read back those exact bytes; preserve all preexisting entries."
+  }
+}
