@@ -16,6 +16,16 @@ worktree = runpy.run_path(str(Path(__file__).with_name('emulator-worktree.py')))
 PROFILE = 'alpine/native-benchmark-home/profiles/web'
 
 
+def restore_bytes(emulator, path, body, remote):
+    with tempfile.TemporaryDirectory() as folder:
+        local = Path(folder) / 'original'; local.write_bytes(body)
+        try:
+            assert 'FileTransfer finish' in emulator.hdc('file', 'send', str(local), remote)
+            emulator.app('cp ' + remote + ' ' + path)
+            assert agent['read_bytes'](emulator, path) == body, path
+        finally: emulator.hdc('shell', 'rm', '-f', remote)
+
+
 def archive_fixture(destination, name):
     root = support['WORKSPACE'].rsplit('/', 1)[0]
     source = Path(__file__).with_name('fixtures').joinpath('lsp-lifecycle-provider.mjs').read_text()
@@ -39,15 +49,19 @@ def run(emulator, output):
     remote = '/data/local/tmp/' + name
     backup = f'{PROFILE}/package.json.{name}'; lock_backup = f'{PROFILE}/pnpm-lock.yaml.{name}'
     boot_backup = 'mobile-harness-boot.json.' + name
-    evidence = {'fixture': name}; saved = False; had_lock = False; sid = None
+    evidence = {'fixture': name}; saved = False; had_lock = False; sid = None; originals = {}
     try:
         emulator.ready('normal')
         assert emulator.app('test ! -e alpine/native-benchmark-home/cordis.patch.yml && printf EMPTY') == 'EMPTY'
         assert emulator.app(f'cp {PROFILE}/package.json {backup} && cp mobile-harness-boot.json {boot_backup} && printf SAVED') == 'SAVED'
         saved = True
+        for path in [PROFILE + '/package.json', 'mobile-harness-boot.json']:
+            originals[path] = agent['read_bytes'](emulator, path); json.loads(originals[path])
         evidence['manifestBeforeSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/package.json')).hexdigest()
         had_lock = emulator.app(f'test -e {PROFILE}/pnpm-lock.yaml && printf PRESENT') == 'PRESENT'
-        if had_lock: emulator.app(f'cp {PROFILE}/pnpm-lock.yaml {lock_backup}')
+        if had_lock:
+            emulator.app(f'cp {PROFILE}/pnpm-lock.yaml {lock_backup}')
+            originals[PROFILE + '/pnpm-lock.yaml'] = agent['read_bytes'](emulator, PROFILE + '/pnpm-lock.yaml')
         evidence['lockBeforeSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/pnpm-lock.yaml')).hexdigest() if had_lock else None
         with tempfile.TemporaryDirectory() as temporary:
             folder = Path(temporary); archive = folder / 'fixture.tgz'; archive_fixture(archive, name)
@@ -94,9 +108,10 @@ def run(emulator, output):
                 if sid: emulator.rpc('session/cancel', {'request': {'sessionId': sid}})
             finally:
                 if saved:
-                    emulator.stop(); emulator.app(f'cp {backup} {PROFILE}/package.json && cp {boot_backup} mobile-harness-boot.json')
-                    if had_lock: emulator.app(f'cp {lock_backup} {PROFILE}/pnpm-lock.yaml')
-                    else: emulator.app(f'rm -f {PROFILE}/pnpm-lock.yaml')
+                    emulator.stop()
+                    for index, (path, body) in enumerate(originals.items()):
+                        restore_bytes(emulator, path, body, remote + '-restore-' + str(index))
+                    if not had_lock: emulator.app(f'rm -f {PROFILE}/pnpm-lock.yaml')
                     emulator.app(f'rm -f {backup} {lock_backup} {boot_backup}; rm -rf alpine/workspace-native/{name} {PROFILE}/node_modules/{name}')
                     emulator.start(); emulator.ready('normal')
                     evidence['manifestAfterSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/package.json')).hexdigest()

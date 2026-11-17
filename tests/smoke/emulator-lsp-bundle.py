@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import runpy
+import tempfile
 import uuid
 
 agent = runpy.run_path(str(Path(__file__).with_name('emulator-agent-continuation.py')))
@@ -22,15 +23,15 @@ def bundle(emulator):
 
 def run(emulator, output):
     evidence = {}; suffix = '.mh-lsp-toggle-' + uuid.uuid4().hex[:8]
-    saved = []; before = {}
+    saved = {}; before = {}
     try:
         emulator.ready('normal')
         for path in [PROFILE + '/package.json', PROFILE + '/pnpm-lock.yaml', 'mobile-harness-boot.json']:
             exists = emulator.app('test -e ' + path + ' && printf PRESENT') == 'PRESENT'
             if exists:
-                before[path] = hashlib.sha256(agent['read_bytes'](emulator, path)).hexdigest()
-                assert emulator.app('cp ' + path + ' ' + path + suffix + ' && printf SAVED') == 'SAVED'
-                saved.append(path)
+                saved[path] = agent['read_bytes'](emulator, path)
+                if path.endswith('.json'): json.loads(saved[path])
+                before[path] = hashlib.sha256(saved[path]).hexdigest()
         evidence['before'] = bundle(emulator); assert evidence['before']['enabled']
         evidence['disable'] = emulator.rpc('pluginManager/setBundleEnabled', {'name': NAME, 'enabled': False})
         assert evidence['disable']['application'] in ['applied', 'restart-required'], evidence['disable']
@@ -53,7 +54,18 @@ def run(emulator, output):
         try:
             if saved:
                 emulator.stop()
-                for path in saved: emulator.app('cp ' + path + suffix + ' ' + path + ' && rm -f ' + path + suffix)
+                # Keep the verified original bytes outside the changing profile.
+                # Verify restoration before starting Host, preserving the first
+                # test failure rather than replacing it with a readiness error.
+                with tempfile.TemporaryDirectory() as temporary:
+                    for index, (path, body) in enumerate(saved.items()):
+                        local = Path(temporary) / str(index); local.write_bytes(body)
+                        remote = '/data/local/tmp/' + suffix + '-' + str(index)
+                        try:
+                            assert 'FileTransfer finish' in emulator.hdc('file', 'send', str(local), remote)
+                            emulator.app('cp ' + remote + ' ' + path)
+                            assert agent['read_bytes'](emulator, path) == body, path
+                        finally: emulator.hdc('shell', 'rm', '-f', remote)
                 emulator.start(); evidence['restoredReadyMs'] = emulator.ready('normal')
                 after = {path: hashlib.sha256(agent['read_bytes'](emulator, path)).hexdigest() for path in saved}
                 assert before == after, (before, after)
