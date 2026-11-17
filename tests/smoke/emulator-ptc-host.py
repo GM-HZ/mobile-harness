@@ -421,6 +421,7 @@ def verify_additional_roots(emulator, paths, read_only, evidence):
     sid = model_session(emulator, workspace)
     first, second, nested = paths
     blocked = first + "-neighbor"
+    relative_first = "../" + first.rsplit("/", 1)[1]
     marker = "MH_EXTRA_" + uuid.uuid4().hex.upper()
     if read_only:
         script = f"""
@@ -447,6 +448,20 @@ await fs.writeFile('{nested}/left/right/item.txt', '{marker}');
 const metadata = (await fs.stat('{second}/moved.txt')).size;
 process.chdir('{second}');
 const text = await fs.readFile('moved.txt', 'utf8');
+const relativeText = await fs.readFile('{relative_first}/nested/left/right/item.txt', 'utf8');
+await fs.writeFile('{relative_first}/relative.txt', relativeText);
+await fs.rename('{relative_first}/relative.txt', 'relative-moved.txt');
+const relativeSize = (await fs.stat('{relative_first}/nested/left/right/item.txt')).size;
+await fs.unlink('relative-moved.txt');
+const pathErrors = [];
+for (const [name, path] of [
+  ['missing', 'missing/../moved.txt'],
+  ['file-parent', 'moved.txt/../moved.txt'],
+  ['file-dot', 'moved.txt/.']
+]) {{
+  try {{ await fs.stat(path); }}
+  catch (error) {{ pathErrors.push(name + '=' + error.code); }}
+}}
 process.chdir('{support['WORKSPACE']}');
 const denied = [];
 for (const [name, operation] of [
@@ -462,10 +477,11 @@ for (const [name, operation] of [
   }}
 }}
 await fs.rm('{nested}/left', {{ recursive: true }});
-return [text, metadata, denied.join(',')].join(':');
+return [text, metadata, denied.join(','), relativeText, relativeSize, pathErrors.join(',')].join(':');
 """.strip()
     complete_code(emulator, sid, "Verify explicitly authorized extra roots and their boundaries", script,
-                  f"{marker}:{len(marker)}:write,stat,move-out,cwd")
+                  f"{marker}:{len(marker)}:write,stat,move-out,cwd:{marker}:{len(marker)}:"
+                  "missing=ENOENT,file-parent=ENOTDIR,file-dot=ENOTDIR")
     complete_code(emulator, sid, "Set the next program directory to an extra authorized root",
                   f"await tools.working_directory({{ cd: '{second}' }}); return 'MH_EXTRA_SELECTED';", "MH_EXTRA_SELECTED")
     complete_code(emulator, sid, "Read from an extra root as the next program working directory",
@@ -476,7 +492,9 @@ return [text, metadata, denied.join(',')].join(':');
                         f"test ! -e {app_path(blocked + '/denied.txt')} && test ! -e {app_path(blocked + '/moved.txt')} "
                         "&& printf OK") == "OK"
     evidence.update(additionalRootsReadWriteMatched=True, crossRootRenameMatched=True, nestedGrantMatched=True,
-                    extraRootWorkingDirectoryMatched=True, unauthorizedSiblingDenied=True)
+                    extraRootWorkingDirectoryMatched=True, unauthorizedSiblingDenied=True,
+                    relativeCrossRootReadWriteMatched=True, relativeCrossRootMetadataAndRenameMatched=True,
+                    discardedComponentsValidated=True)
 
 
 def verify(emulator, evidence):

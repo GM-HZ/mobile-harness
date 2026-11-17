@@ -69,12 +69,60 @@ static int root_index(const struct PtcRoots *roots, const char *path)
     for (int i = 0; i < roots->count; ++i) {
         size_t length = strlen(roots->path[i]);
         if (length >= longest && !strncmp(path, roots->path[i], length) &&
-            (!path[length] || path[length] == '/')) {
+            (length == 1 || !path[length] || path[length] == '/')) {
             selected = i;
             longest = length;
         }
     }
     return selected;
+}
+
+static int normalize_path(const char *source, char path[4096])
+{
+    size_t used = 1;
+    path[0] = '/';
+    path[1] = 0;
+    const char *part = source;
+    while (*part) {
+        while (*part == '/') ++part;
+        const char *end = part;
+        while (*end && *end != '/') ++end;
+        size_t length = (size_t)(end - part);
+        if (!length) break;
+        if (length == 2 && !memcmp(part, "..", 2)) {
+            while (used > 1 && path[used - 1] != '/') --used;
+            if (used > 1) --used;
+        } else if (length != 1 || part[0] != '.') {
+            size_t separator = used > 1 ? 1 : 0;
+            if (used + separator + length >= 4096) return ENAMETOOLONG;
+            if (used > 1) path[used++] = '/';
+            memcpy(path + used, part, length);
+            used += length;
+        }
+        path[used] = 0;
+        part = end;
+    }
+    if (used > 1 && source[strlen(source) - 1] == '/') {
+        if (used + 1 >= 4096) return ENAMETOOLONG;
+        path[used++] = '/';
+    }
+    path[used] = 0;
+    return 0;
+}
+
+static int validate_parent(char *path)
+{
+    char *leaf = strrchr(path, '/');
+    if (!leaf) return EACCES;
+    *leaf = 0;
+    const struct open_how how = {
+        .flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = RESOLVE_NO_SYMLINKS,
+    };
+    // The original parent must resolve, including components removed by ".." or ".".
+    int directory = (int)syscall(SYS_openat2, AT_FDCWD, *path ? path : "/", &how, sizeof(how));
+    if (directory < 0) return errno;
+    close(directory);
+    return 0;
 }
 
 static char *workspace_path(const struct PtcRoots *roots, pid_t worker, uint64_t address,
@@ -98,9 +146,21 @@ static char *workspace_path(const struct PtcRoots *roots, pid_t worker, uint64_t
         memcpy(path, launch->cwd, prefix);
         path[prefix] = '/';
     }
+    char original[4096];
+    strcpy(original, path);
+    int error = normalize_path(original, path);
+    if (error) {
+        errno = error;
+        return NULL;
+    }
     int selected = root_index(roots, path);
     if (selected < 0) {
         errno = EACCES;
+        return NULL;
+    }
+    error = validate_parent(original);
+    if (error) {
+        errno = error;
         return NULL;
     }
     *root = roots->fd[selected];

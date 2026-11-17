@@ -1,0 +1,82 @@
+{
+  "date": "2026-11-18",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "11f31fae500fb7bb96cf1a3266123e8ec674e83f28238271edadcf373ccb0290",
+  "unsignedHapBytes": 657082335,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "baseline": {
+    "commit": "a6902a788b0c53b78998468c9e55b2f0bad2d63b",
+    "unsignedHapSha256": "eff38d5af5f035d9c975dd0b907f2bed05f97fb8940f54fcfae623b27eccbe86",
+    "exitCode": 1,
+    "failure": "relative file path from one authorized root to another returned EXDEV"
+  },
+  "cases": {
+    "extra-roots": {
+      "exitCode": 0,
+      "readyMs": 5514,
+      "additionalRootsReadWriteMatched": true,
+      "crossRootRenameMatched": true,
+      "nestedGrantMatched": true,
+      "extraRootWorkingDirectoryMatched": true,
+      "unauthorizedSiblingDenied": true,
+      "relativeCrossRootReadWriteMatched": true,
+      "relativeCrossRootMetadataAndRenameMatched": true,
+      "discardedComponentsValidated": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "core": {
+      "exitCode": 0,
+      "readyMs": 69,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "read-only-extra": {
+      "exitCode": 0,
+      "readyMs": 6244,
+      "readOnlyIgnoredAdditionalGrants": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "defaultBuild": {
+    "exitCode": 0,
+    "unsignedHapSha256": "d80206a7c983ba7efd10bae88e7c16b7f78c47ae0ec0833b3ad6ee552be9bfa7",
+    "unsignedHapBytes": 639387210,
+    "experimentalEnabledMarker": "0",
+    "installedForTheseTests": false
+  },
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "symbolicLinkFixture": "Unavailable in the app-data view",
+    "pending": [
+      "concurrent host moves of parent directories",
+      "actual Agent disposal"
+    ]
+  }
+}
