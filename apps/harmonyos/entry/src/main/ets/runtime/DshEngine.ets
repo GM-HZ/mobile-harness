@@ -218,7 +218,7 @@ class DshEngine {
           archive, String(extracted), Date.now() - phase);
       }
       this.prepareTimezone(root);
-      const dshRelease = root + '/.dsh-0.2.2-rc.3';
+      const dshRelease = root + '/.dsh-0.2.2-rc.4';
       if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
       const dshUnpackStarted = Date.now();
       const unpackedDsh = await this.unpack(context, 'dsh-layer.zip', dshRelease);

@@ -17,7 +17,9 @@ PATCH = ptc["PTC_PROFILE_PATCH"]
 
 
 def fixture_archive(destination, name):
-    packages = support["WORKSPACE"].rsplit("/", 1)[0] + "/.dsh-0.2.2-rc.3/dsh/node_modules/@deepseek-ai/"
+    manifest = Path(__file__).resolve().parents[2] / "runtime/harmonyos/dsh/package.json"
+    version = json.loads(manifest.read_text())["dependencies"]["@deepseek-ai/dsh"]
+    packages = support["WORKSPACE"].rsplit("/", 1)[0] + f"/.dsh-{version}/dsh/node_modules/@deepseek-ai/"
     source = Path(__file__).with_name("fixtures").joinpath("ptc-lifecycle.mjs").read_text()
     source = source.replace("__MH_DSH_PACKAGES__", json.dumps("file://" + packages))
     source = source.replace("__MH_WORKSPACE__", json.dumps(support["WORKSPACE"]))

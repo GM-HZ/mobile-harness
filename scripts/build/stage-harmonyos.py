@@ -10,6 +10,7 @@ from urllib.parse import quote
 
 from harmonyos_dsh import stage_dsh
 from harmonyos_guest_extras import stage_guest_extras
+from harmonyos_ptc import PORTABLE_ASSETS, portable_assets
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
@@ -90,29 +91,20 @@ def stage_workflow_worker():
 
 
 def stage_ptc_worker():
-    assets = {
-        "amaro.cjs": "efc9e1155df1dacbf1d0605e78140f09d7016e58dba227006e3d362310d3f839",
-        "instantiate.cjs": "cdcdd45f429279c4d966c2d2a6333c4ee06271065fff4f762a041e153be999a3",
-    }
-    override = os.environ.get("HARMONY_PTC_AMARO_DIR")
-    (RAW / "dsh-harmony-ptc-enabled").write_text("1" if override else "0")
+    assets = portable_assets()
+    (RAW / "dsh-harmony-ptc-enabled").write_text("1")
     worker = RAW / "dsh-harmony-ptc-worker.mjs"
-    for name in assets:
-        (RAW / name).unlink(missing_ok=True)
-    worker.unlink(missing_ok=True)
-    if not override:
-        return
-    for name, expected in assets.items():
-        source = Path(override) / name
-        if sha256(source) != expected:
-            raise SystemExit(f"Unexpected portable Amaro input: {name}")
-        copy(source, RAW / name)
+    for name in PORTABLE_ASSETS:
+        copy(assets / name, RAW / name)
+    copy(ROOT / "vendor/repos/node/deps/amaro/LICENSE.md", RAW / "LICENSE.amaro.txt")
     with ZipFile(RAW / "dsh-layer.zip") as layer:
         path = "dsh/node_modules/@deepseek-ai/dsh-ptc-runtime-node/lib/process.js"
         bundled = layer.read(path)
     if hashlib.sha256(bundled).hexdigest() != "c01308c52fc52d5f13edd2b65008f3bbcf67bd753eb17af5e4bc023216eca6b4":
-        raise SystemExit("Expected the pinned RC.3 PTC bootstrap")
+        raise SystemExit("Expected the pinned RC.4 PTC bootstrap")
     entry = "runNodeMain(openInheritedControlChannel(), Number(process.argv[2]), process);"
+    if bundled.decode("utf8").count(entry) != 1:
+        raise SystemExit("Unexpected pinned PTC bootstrap entry")
     overlay = (RUNTIME / "templates/ptc-worker.mjs").read_text()
     worker.write_text(bundled.decode("utf8").replace(entry, overlay, 1))
     node = Path(os.environ.get("DEVECO_HOME", "/Applications/DevEco-Studio.app/Contents")) / "tools/node/bin/node"

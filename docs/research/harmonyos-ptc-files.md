@@ -24,7 +24,7 @@ API 26 ARM64 Phone 模拟器支持 seccomp 用户态通知和 `openat2`。Landlo
 
 ## 正式 Host 的实验接入
 
-构建时设置 `HARMONY_PTC_AMARO_DIR` 可在普通应用的 DSH Host 中启用上游 `ProgramWorker`。鸿蒙适配器提供 TypeScript 擦除与进程启动。独立监督进程持有工作区目录描述符，并为 worker 处理文件请求。默认构建与恢复模式禁用该入口。
+构建时设置 `HARMONY_PTC_AMARO_DIR` 可在普通应用的 DSH Host 中启用上游 `ProgramWorker`。鸿蒙适配器提供 TypeScript 擦除与进程启动。独立监督进程持有工作区目录描述符，并为 worker 处理文件请求。0.4.30 及以前的默认构建与恢复模式禁用该入口。0.4.31 将相同的解析器生成与摘要校验接入普通构建，默认提供 PTC；恢复模式继续禁用。
 
 API 26 Phone 模拟器通过真实模型触发会话内的 `run_code`。实测 TypeScript、工作区读取、独占创建、覆盖、追加和嵌套 DSH 文件工具。工作区外读写均被拒绝，只读会话可读取夹具，其创建、覆盖、追加请求均被拒绝。宿主回读核对了文件内容。取消默认模式的会话后，宿主确认回收对应 worker。覆盖先打开目标并验证描述符对应单链接普通文件，再截断文件。模拟器的 HDC 应用上下文拒绝创建符号链接和硬链接，本轮未验证通过这两类链接发起的文件操作。 [正式 Host 实测](../evidence/emulator-ptc-host-2026-11-17.json) · [扩展工作区操作实测](../evidence/emulator-ptc-access-2026-11-17.json)
 

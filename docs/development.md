@@ -13,7 +13,7 @@ git submodule update --init --depth=1
 
 ## 准备输入并打包
 
-1. 备齐 [输入清单](build-inputs.sha256) 指定的 0.4.24 原始打包输入，保留清单中的相对路径。已有开发机的输入存放在 `.build/inputs/harmonyos/`，也可通过 `HARMONY_INPUTS_DIR` 指向一份外部输入目录。当前配方使用已校验的 Node 和 PRoot 输入。DSH 源码固定到发布标签，构建用 [npm 锁文件](../runtime/harmonyos/dsh/package-lock.json) 装配上游发布包，并核对随包原生绑定对应的上游字节。首次准备需要访问 npm 和 Alpine 稳定仓库。新增 Alpine 包可预填至 `.build/runtime-package-inputs/` 或通过 `HARMONY_GUEST_APKS_DIR` 提供已经校验的归档。
+1. 备齐 [输入清单](build-inputs.sha256) 指定的 0.4.24 原始打包输入，保留清单中的相对路径。已有开发机的输入存放在 `.build/inputs/harmonyos/`，也可通过 `HARMONY_INPUTS_DIR` 指向一份外部输入目录。当前配方使用已校验的 Node 和 PRoot 输入。DSH 源码子模块固定到公开 RC.3 发布标签；当前 RC.4 的公开源码标签尚未发布。运行时不从该源码构建，而是用 [npm 锁文件](../runtime/harmonyos/dsh/package-lock.json) 装配上游发布包，并核对随包原生绑定对应的上游字节。首次准备需要访问 npm 和 Alpine 稳定仓库。新增 Alpine 包可预填至 `.build/runtime-package-inputs/` 或通过 `HARMONY_GUEST_APKS_DIR` 提供已经校验的归档。
 2. 参考 [DevEco 配置示例](../apps/harmonyos/build-profile.example.json5) 设置本机签名。签名配置从仓库根目录的 `build-profile.json5` 或 `HARMONY_SIGNING_PROFILE` 读取。模拟器用 `HARMONY_UNSIGNED=1`。
 3. 在仓库根目录运行：
 
@@ -72,12 +72,12 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-workflow.py <loopback-target> .build/emulator-workflow.json
 ```
 
-## 通用 PTC 实验回归
+## 通用 PTC 回归
 
-按 [TypeScript 探针](research/harmonyos-ptc-typescript.md#复现) 生成 `.build/amaro-probe/portable`。构建会校验两个解析器文件的摘要。安装实验包并通过 HDC 启动后，冒烟测试会经真实 DSH 会话触发 `run_code`，检查工作区文件授权、嵌套工具和取消。测试在退出时清除临时文件与凭据。普通构建无需这些文件。
+0.4.31 起普通构建默认包含通用 PTC。构建机将锁定 Node 子模块中的 Amaro 用固定 Binaryen 132.0.0 转为纯 JavaScript，校验下载包与两个生成文件的摘要并缓存到 `.build/portable-amaro/`；手机无需 WASM 或编译器。恢复模式跳过 PTC。`HARMONY_PTC_AMARO_DIR` 仍可提供相同摘要的预生成文件。安装普通包并通过 HDC 启动后，冒烟测试经真实 DSH 会话触发 `run_code`，检查工作区文件授权、嵌套工具和取消，退出时清除临时文件与凭据。
 
 ```sh
-HARMONY_UNSIGNED=1 HARMONY_PTC_AMARO_DIR="$PWD/.build/amaro-probe/portable" ./build.sh
+HARMONY_UNSIGNED=1 ./build.sh
 hdc -t <loopback-target> install -r .build/stage/harmonyos/entry/build/default/outputs/default/entry-default-unsigned.hap
 hdc -t <loopback-target> shell aa start -a EntryAbility -b org.sayact.nodepoc
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
@@ -88,7 +88,7 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 使用 `--additional-roots` 验证三个显式附加目录，包括重叠授权、跨目录重命名及工作目录切换。再加 `--read-only` 验证附加配置无法允许只读会话写入。夹具创建的目录在退出时清理。实验后端每个进程最多接受 16 个附加目录，根目录路径必须为已存在的规范化物理目录。
 
-同一实验 HAP 可运行 Agent 生命周期回归。脚本通过标准 bundle 机制安装临时测试插件，由插件持有真正的 `AgentHandle`，让模型在其会话运行 PTC，再调用 `dispose()`。测试覆盖空闲及同步死循环中的销毁、进程回收，以及从持久化记录恢复会话。脚本要求用户 profile patch 槽为空，退出时恢复原 manifest、锁文件和启动模式，移除临时配置。
+同一普通 HAP 可运行 Agent 生命周期回归。脚本通过标准 bundle 机制安装临时测试插件，由插件持有真正的 `AgentHandle`，让模型在其会话运行 PTC，再调用 `dispose()`。测试覆盖空闲及同步死循环中的销毁、进程回收，以及从持久化记录恢复会话。脚本要求用户 profile patch 槽为空，退出时恢复原 manifest、锁文件和启动模式，移除临时配置。
 
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \

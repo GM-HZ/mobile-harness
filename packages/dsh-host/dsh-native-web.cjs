@@ -13,7 +13,7 @@ const { performance } = require('node:perf_hooks');
 const started = performance.now();
 const safeMode = process.env.HARMONY_SAFE_MODE === '1';
 const root = process.env.HARMONY_NATIVE_WEB_ROOT;
-const dsh = path.join(root, '.dsh-0.2.2-rc.3/dsh/node_modules');
+const dsh = path.join(root, '.dsh-0.2.2-rc.4/dsh/node_modules');
 const cli = path.join(dsh, '@deepseek-ai/dsh/lib/bin.js');
 const home = path.join(root, 'native-benchmark-home');
 const workspace = path.join(root, 'workspace-native');
