@@ -1,15 +1,14 @@
 #define _GNU_SOURCE
+#include "ptc-file-filter.h"
+#include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <linux/audit.h>
-#include <linux/filter.h>
 #include <linux/openat2.h>
 #include <linux/seccomp.h>
 #include <napi/native_api.h>
 #include <poll.h>
 #include <pthread.h>
 #include <signal.h>
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,16 +25,8 @@
 #define SECCOMP_ADDFD_FLAG_SEND (1UL << 1)
 #endif
 
-enum { CONTROL = STDIN_FILENO, PATH_LIMIT = 256, ATTEMPTS = 4 };
+enum { PATH_LIMIT = 256, MAX_NOTIFICATIONS = 16 };
 static const char marker[] = "ptc-fixture";
-
-struct WorkerReport {
-    int error[ATTEMPTS];
-    int read_correct;
-    int write_correct;
-    int direct_openat2_errno;
-    int existing_thread_openat2_errno;
-};
 
 struct BrokerReport {
     int protocol_error;
@@ -46,6 +37,8 @@ struct BrokerReport {
     const char *stage;
     int atomic_addfd_errno;
     int legacy_injected;
+    int thread_notifications;
+    int requested_flags[ATTEMPTS];
     struct WorkerReport worker;
 };
 
@@ -56,36 +49,6 @@ static int wait_readable(int fd)
     do { result = poll(&item, 1, 2000); } while (result < 0 && errno == EINTR);
     return result > 0 && (item.revents & POLLIN) ? 0 : result == 0 ? ETIMEDOUT : EIO;
 }
-
-static int transfer_listener(int channel, int fd, int receiving)
-{
-    union { struct cmsghdr align; char bytes[CMSG_SPACE(sizeof(fd))]; } control = {{0}};
-    char marker_byte = 'F';
-    struct iovec data = {.iov_base = &marker_byte, .iov_len = 1};
-    struct msghdr message = {
-        .msg_iov = &data, .msg_iovlen = 1,
-        .msg_control = control.bytes, .msg_controllen = sizeof(control.bytes),
-    };
-    struct cmsghdr *header = CMSG_FIRSTHDR(&message);
-    if (receiving) {
-        if (wait_readable(channel) || recvmsg(channel, &message, MSG_CMSG_CLOEXEC) != 1 ||
-            (message.msg_flags & MSG_CTRUNC) || marker_byte != 'F') return -1;
-        header = CMSG_FIRSTHDR(&message);
-        if (!header || header->cmsg_level != SOL_SOCKET || header->cmsg_type != SCM_RIGHTS ||
-            header->cmsg_len != CMSG_LEN(sizeof(fd))) return -1;
-        memcpy(&fd, CMSG_DATA(header), sizeof(fd));
-        return fd;
-    }
-    header->cmsg_level = SOL_SOCKET;
-    header->cmsg_type = SCM_RIGHTS;
-    header->cmsg_len = CMSG_LEN(sizeof(fd));
-    memcpy(CMSG_DATA(header), &fd, sizeof(fd));
-    return sendmsg(channel, &message, MSG_NOSIGNAL) == 1 ? 0 : -1;
-}
-
-#define RETURN(value) BPF_STMT(BPF_RET | BPF_K, value)
-#define ACTION(number, value) BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, number, 0, 1), RETURN(value)
-#define ALLOW(number) ACTION(number, SECCOMP_RET_ALLOW)
 
 struct ThreadProbe {
     const char *outside;
@@ -128,40 +91,7 @@ static void worker(int socket_fd, const char *outside, pid_t parent, int with_th
         if (pipe2(thread_test.ready, O_CLOEXEC) < 0 || pipe2(thread_test.result, O_CLOEXEC) < 0 ||
             pthread_create(&thread, NULL, existing_thread, &thread_test) != 0) _exit(94);
     }
-    struct sock_filter broker_rules[] = {
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, arch)),
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_AARCH64, 1, 0),
-        RETURN(SECCOMP_RET_KILL_PROCESS),
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
-        ACTION(SYS_openat, SECCOMP_RET_USER_NOTIF),
-        ALLOW(SYS_seccomp),
-        ALLOW(SYS_sendmsg),
-        ALLOW(SYS_read),
-        ALLOW(SYS_write),
-        ALLOW(SYS_close),
-        ALLOW(SYS_exit),
-        ALLOW(SYS_exit_group),
-        ALLOW(SYS_rt_sigreturn),
-        RETURN(SECCOMP_RET_ERRNO | EPERM),
-    };
-    const struct sock_fprog broker_filter = {
-        .len = sizeof(broker_rules) / sizeof(broker_rules[0]), .filter = broker_rules,
-    };
-    int listener = (int)syscall(SYS_seccomp, SECCOMP_SET_MODE_FILTER,
-                                SECCOMP_FILTER_FLAG_NEW_LISTENER, &broker_filter);
-    if (listener < 0 || transfer_listener(CONTROL, listener, 0)) _exit(91);
-    close(listener);
-    struct sock_filter startup_only[] = {
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, nr)),
-        ACTION(SYS_sendmsg, SECCOMP_RET_ERRNO | EPERM),
-        ACTION(SYS_seccomp, SECCOMP_RET_ERRNO | EPERM),
-        RETURN(SECCOMP_RET_ALLOW),
-    };
-    const struct sock_fprog sealed = {
-        .len = sizeof(startup_only) / sizeof(startup_only[0]), .filter = startup_only,
-    };
-    const unsigned flags = with_thread ? SECCOMP_FILTER_FLAG_TSYNC : 0;
-    if (syscall(SYS_seccomp, SECCOMP_SET_MODE_FILTER, flags, &sealed) != 0) _exit(92);
+    if (ptc_install_file_filter(with_thread, 0)) _exit(92);
 
     struct WorkerReport report = {.existing_thread_openat2_errno = -1};
     if (with_thread) {
@@ -188,10 +118,13 @@ static void worker(int socket_fd, const char *outside, pid_t parent, int with_th
 
 static int authorize(int root, pid_t child, const struct seccomp_notif *request, int writable, int *read_error)
 {
-    int flags = (int)request->data.args[2];
-    if (request->pid != (unsigned)child || request->data.nr != SYS_openat ||
+    // The libc wrapper automatically adds O_LARGEFILE. It carries no access mode.
+    int flags = (int)request->data.args[2] & ~O_LARGEFILE;
+    const int directory_flags = O_RDONLY | O_CLOEXEC | O_DIRECTORY;
+    const int directory = flags == directory_flags || flags == (directory_flags | O_NONBLOCK);
+    if (!request->pid || syscall(SYS_tgkill, child, request->pid, 0) < 0 || request->data.nr != SYS_openat ||
         (int)request->data.args[0] != AT_FDCWD ||
-        (flags != (O_RDONLY | O_CLOEXEC) &&
+        (flags != (O_RDONLY | O_CLOEXEC) && !directory &&
          (!writable || flags != (O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC)))) {
         errno = EACCES;
         return -1;
@@ -224,6 +157,9 @@ static int serve_open(int listener, int root, pid_t child, int writable, struct 
     if (ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &request) < 0) return errno;
     report->stage = "validate";
     if (ioctl(listener, SECCOMP_IOCTL_NOTIF_ID_VALID, &request.id) < 0) return errno;
+    if (request.pid != (unsigned)child) ++report->thread_notifications;
+    int index = report->injected + report->refused;
+    if (index < ATTEMPTS) report->requested_flags[index] = (int)request.data.args[2];
     int incoming = authorize(root, child, &request, writable, &report->path_copy_error);
     if (incoming < 0) {
         struct seccomp_notif_resp denial = {.id = request.id, .error = -errno};
@@ -258,7 +194,40 @@ static int serve_open(int listener, int root, pid_t child, int writable, struct 
     return error;
 }
 
-static struct BrokerReport run_case(int root, const char *outside, int writable, int with_thread)
+static void node_worker(int channel, const char *entry, pid_t parent)
+{
+    if (prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) < 0 || getppid() != parent ||
+        dup2(channel, STDIN_FILENO) < 0 || dup2(channel, STDOUT_FILENO) < 0 ||
+        dup2(channel, STDERR_FILENO) < 0 || syscall(SYS_close_range, 3u, ~0u, 0u) < 0 ||
+        clearenv() != 0 || ptc_deny_io_uring() != 0) _exit(100);
+    void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
+    typedef int (*NodeStart)(int, char **);
+    NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;
+    if (!start) _exit(101);
+    char *argv[] = {"node", "--jitless", "--no-warnings", (char *)entry, NULL};
+    _exit(start(4, argv));
+}
+
+static int poll_case(int listener, int channel, int root, pid_t child, int writable, struct BrokerReport *report)
+{
+    struct pollfd descriptors[] = {{.fd = listener, .events = POLLIN}, {.fd = channel, .events = POLLIN}};
+    for (int count = 0; count <= MAX_NOTIFICATIONS; ++count) {
+        int ready;
+        do { ready = poll(descriptors, 2, 2000); } while (ready < 0 && errno == EINTR);
+        if (ready <= 0) return ready == 0 ? ETIMEDOUT : errno;
+        if (descriptors[1].revents & POLLIN) {
+            return read(channel, &report->worker, sizeof(report->worker)) ==
+                sizeof(report->worker) ? 0 : EPROTO;
+        }
+        if (!(descriptors[0].revents & POLLIN)) return EIO;
+        if (count == MAX_NOTIFICATIONS) return EOVERFLOW;
+        int error = serve_open(listener, root, child, writable, report);
+        if (error) return error;
+    }
+    return EIO;
+}
+
+static struct BrokerReport run_case(int root, const char *outside, int writable, int with_thread, const char *entry)
 {
     struct BrokerReport report = {
         .stage = "get-sizes",
@@ -282,21 +251,17 @@ static struct BrokerReport run_case(int root, const char *outside, int writable,
     }
     pid_t parent = getpid();
     pid_t child = fork();
-    if (child == 0) worker(sockets[1], outside, parent, with_thread);
+    if (child == 0) {
+        if (entry) node_worker(sockets[1], entry, parent);
+        else worker(sockets[1], outside, parent, with_thread);
+    }
     report.protocol_error = child < 0 ? errno : 0;
     close(sockets[1]);
     if (child > 0) {
-        int listener = transfer_listener(sockets[0], -1, 1);
+        int listener = wait_readable(sockets[0]) ? -1 : ptc_transfer_listener(sockets[0], -1, 1);
         if (listener < 0) report.protocol_error = EPROTO;
         else {
-            for (int i = 0; i < ATTEMPTS && !report.protocol_error; ++i) {
-                report.protocol_error = serve_open(listener, root, child, writable, &report);
-            }
-            if (!report.protocol_error &&
-                (wait_readable(sockets[0]) ||
-                 read(sockets[0], &report.worker, sizeof(report.worker)) != sizeof(report.worker))) {
-                report.protocol_error = EIO;
-            }
+            report.protocol_error = poll_case(listener, sockets[0], root, child, writable, &report);
             if (!report.protocol_error) report.stage = "complete";
             close(listener);
         }
@@ -325,15 +290,20 @@ static int format_case(char *buffer, size_t size, const struct BrokerReport *rep
                     "{\"protocolErrno\":%d,\"pathCopyErrno\":%d,\"injected\":%d,\"refused\":%d,"
                     "\"openErrnos\":[%d,%d,%d,%d],\"readVerified\":%d,\"writeVerified\":%d,"
                     "\"directOpenat2Errno\":%d,\"cleanExit\":%d,\"stage\":\"%s\","
-                    "\"atomicAddfdErrno\":%d,\"legacyInjected\":%d,\"threadOpenat2Errno\":%d}",
+                    "\"atomicAddfdErrno\":%d,\"legacyInjected\":%d,\"threadOpenat2Errno\":%d,"
+                    "\"threadNotifications\":%d,\"requestedFlags\":[%d,%d,%d,%d],"
+                    "\"directoryVerified\":%d,\"typedRead\":%d}",
                     report->protocol_error, report->path_copy_error, report->injected, report->refused,
                     report->worker.error[0], report->worker.error[1], report->worker.error[2], report->worker.error[3],
                     report->worker.read_correct, report->worker.write_correct, report->worker.direct_openat2_errno,
                     report->reaped, report->stage, report->atomic_addfd_errno, report->legacy_injected,
-                    report->worker.existing_thread_openat2_errno);
+                    report->worker.existing_thread_openat2_errno, report->thread_notifications,
+                    report->requested_flags[0], report->requested_flags[1],
+                    report->requested_flags[2], report->requested_flags[3],
+                    report->worker.directory_verified, report->worker.typed_read);
 }
 
-static void run_probe(const char *app_files, char *response, size_t size)
+static void run_probe(const char *app_files, const char *entry, char *response, size_t size)
 {
     char temp[1024], outside[1100];
     snprintf(temp, sizeof(temp), "%s/ptc-files.XXXXXX", app_files);
@@ -348,15 +318,15 @@ static void run_probe(const char *app_files, char *response, size_t size)
     if (root < 0 || seed(root, "read.txt") < 0 || seed(parent, "outside.txt") < 0) {
         snprintf(response, size, "fixture setup errno=%d", errno);
     } else {
-        const struct BrokerReport ro = run_case(root, outside, 0, 0);
+        const struct BrokerReport ro = run_case(root, outside, 0, 0, entry);
         const int read_only_created = faccessat(root, "created.txt", F_OK, 0) == 0;
-        const struct BrokerReport rw = run_case(root, outside, 1, 1);
+        const struct BrokerReport rw = run_case(root, outside, 1, 1, entry);
         const int file = openat(root, "created.txt", O_RDONLY | O_CLOEXEC);
         char data[sizeof(marker)] = {0};
         const int stored = file >= 0 && read(file, data, sizeof(data)) == sizeof(data)
             && !memcmp(data, marker, sizeof(data));
         if (file >= 0) close(file);
-        char a[300], b[300];
+        char a[420], b[420];
         format_case(a, sizeof(a), &ro);
         format_case(b, sizeof(b), &rw);
         snprintf(response, size, "{\"readOnly\":%s,\"workspaceWrite\":%s,\"storedVerified\":%d,"
@@ -377,16 +347,18 @@ static void run_probe(const char *app_files, char *response, size_t size)
 
 napi_value RunPtcFiles(napi_env env, napi_callback_info info)
 {
-    size_t count = 1, length = 0;
-    napi_value args[1], result;
-    char path[900], response[700];
-    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 1 ||
+    size_t count = 2, length = 0, entry_length = 0;
+    napi_value args[2], result;
+    char path[900], entry[1024], response[950];
+    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 2 ||
         napi_get_value_string_utf8(env, args[0], path, sizeof(path), &length) != napi_ok ||
-        !length || length >= sizeof(path) - 1 || length != strlen(path)) {
-        napi_throw_type_error(env, NULL, "Expected app files directory");
+        !length || length >= sizeof(path) - 1 || length != strlen(path) ||
+        napi_get_value_string_utf8(env, args[1], entry, sizeof(entry), &entry_length) != napi_ok ||
+        entry_length >= sizeof(entry) - 1 || entry_length != strlen(entry)) {
+        napi_throw_type_error(env, NULL, "Expected app files directory and optional worker entry");
         return NULL;
     }
-    run_probe(path, response, sizeof(response));
+    run_probe(path, entry_length ? entry : NULL, response, sizeof(response));
     napi_create_string_utf8(env, response, NAPI_AUTO_LENGTH, &result);
     return result;
 }

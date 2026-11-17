@@ -13,6 +13,7 @@ cp "$probe/EntryAbility.ets" "$stage/entry/src/main/ets/entryability/"
 cp "$probe/Index.ets" "$stage/entry/src/main/ets/pages/"
 mkdir -p "$stage/entry/src/main/cpp/types/libworkflowprobe"
 cp "$probe/probe.c" "$probe/launch-node.c" "$probe/workflow-node.c" "$probe/ptc-files.c" "$stage/entry/src/main/cpp/"
+cp "$probe/ptc-file-filter.c" "$probe/ptc-file-filter.h" "$probe/ptc-node.c" "$stage/entry/src/main/cpp/"
 cp "$root/runtime/harmonyos/native/workflow-broker.c" "$root/runtime/harmonyos/native/workflow-broker.h" \
     "$stage/entry/src/main/cpp/"
 mkdir -p "$stage/entry/libs/arm64-v8a" "$stage/entry/src/main/resources/rawfile"
@@ -26,17 +27,20 @@ cp "$root/vendor/repos/node/src/node_api.h" "$root/vendor/repos/node/src/node_ap
 cat > "$stage/entry/src/main/cpp/CMakeLists.txt" <<'CMAKE'
 cmake_minimum_required(VERSION 3.5.0)
 project(workflowprobe)
-add_library(workflowprobe SHARED probe.c launch-node.c workflow-broker.c ptc-files.c)
+add_library(workflowprobe SHARED probe.c launch-node.c workflow-broker.c ptc-files.c ptc-file-filter.c)
 target_link_libraries(workflowprobe PUBLIC libace_napi.z.so dl)
 add_library(workflownode SHARED workflow-node.c)
 target_include_directories(workflownode PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(workflownode PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/arm64-v8a/libnode.so)
+add_library(ptcnodeprobe SHARED ptc-node.c ptc-file-filter.c)
+target_include_directories(ptcnodeprobe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(ptcnodeprobe PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/arm64-v8a/libnode.so)
 CMAKE
 cat > "$stage/entry/src/main/cpp/types/libworkflowprobe/index.d.ts" <<'TYPES'
 interface WorkflowProbe {
   run(): string;
   runNode(entry: string): string;
-  runFiles(directory: string): string;
+  runFiles(directory: string, entry: string): string;
 }
 declare const probe: WorkflowProbe;
 export default probe;
@@ -71,6 +75,8 @@ for name in amaro_files:
         source = probe.parent / 'harmonyos-ptc' if name == 'verify.cjs' else Path(amaro_dir)
         shutil.copyfile(source / name, destination)
 (raw / 'amaro-probe-enabled').write_text('1' if amaro_dir else '0')
+ptc_node = (probe / 'ptc-node-files.cjs').read_text()
+(raw / 'ptc-node-files.cjs').write_text(ptc_node.replace('PACKAGED_AMARO_PROBE_ENABLED', str(bool(amaro_dir)).lower(), 1))
 (raw / 'workflow-worker.cjs').write_text(worker.replace('PACKAGED_AMARO_PROBE_ENABLED', str(bool(amaro_dir)).lower(), 1))
 PY
 install -m 600 "$stage/build-profile.example.json5" "$stage/build-profile.json5"

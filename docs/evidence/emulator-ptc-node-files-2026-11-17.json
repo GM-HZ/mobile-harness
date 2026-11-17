@@ -1,0 +1,47 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "bundle": "org.mobileharness.workflowsandbox",
+  "appBaseline": "5daf3c3ac96e3ff3d8be58ad20b98049d9e18574",
+  "dshVersion": "0.2.2-rc.3",
+  "nodeVersion": "v24.14.1",
+  "unsignedHapSha256": "e1dc9a622b3de992c18b185beb2299b5ae32c82a49bdbbddc1767128984bab19",
+  "unsignedHapBytes": 131950925,
+  "buildExitCode": 0,
+  "installAndStartExitCode": 0,
+  "runLogTimestamps": ["11-17 22:49:59.713", "11-17 22:50:30.689"],
+  "readOnly": {
+    "readFileSyncErrno": 0,
+    "typedReadFileErrno": 0,
+    "createErrno": 13,
+    "outsideReadErrno": 18,
+    "directOpenat2Errno": 1,
+    "readdirMatched": true,
+    "nodeWorkerThreadNotifications": 4,
+    "descriptorsGranted": 3,
+    "cleanExit": true,
+    "fileCreated": false
+  },
+  "workspaceWrite": {
+    "readFileSyncErrno": 0,
+    "typedReadFileErrno": 0,
+    "createErrno": 0,
+    "outsideReadErrno": 18,
+    "directOpenat2Errno": 1,
+    "readdirMatched": true,
+    "nodeWorkerThreadNotifications": 4,
+    "descriptorsGranted": 4,
+    "cleanExit": true,
+    "hostVerifiedWrittenContents": true
+  },
+  "earlierFailures": [
+    "The raw C flag policy denied Node opens because the libc wrapper adds O_LARGEFILE.",
+    "The expected fixed request count missed additional Node opens and did not receive the final report. The completed probe polls both channels and bounds total notifications."
+  ],
+  "scope": {
+    "sameHapPreviousCProbe": "passed",
+    "sameHapTypeErasureComparison": "80 matching cases",
+    "productionDshPtc": "not connected",
+    "mate60": "HDC offline"
+  }
+}
