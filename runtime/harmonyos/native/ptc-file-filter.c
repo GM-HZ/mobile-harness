@@ -64,6 +64,8 @@ int ptc_install_file_filter(int synchronize, int node)
         ACTION(SYS_renameat, SECCOMP_RET_USER_NOTIF),
         ACTION(SYS_renameat2, SECCOMP_RET_USER_NOTIF),
         ACTION(SYS_newfstatat, SECCOMP_RET_USER_NOTIF),
+        ACTION(SYS_chdir, SECCOMP_RET_USER_NOTIF),
+        ALLOW(SYS_fchdir),
         ALLOW(SYS_futex),
         ALLOW(SYS_clock_gettime),
         ALLOW(SYS_getpid),

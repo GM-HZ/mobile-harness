@@ -1,0 +1,137 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "427c1b6a71fcb94311da5a2ddc6a71fe0bd8bfed7268b1eeb06a7467d3c970aa",
+  "unsignedHapBytes": 657078856,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "baseline": {
+    "commit": "683a7f6900f90340077c13106046e8bfe4148765",
+    "unsignedHapSha256": "eae2dc43c11ca9b21bf6f3619835fbb7e438f8d42f3754165c86c0844bdfbaf6",
+    "smokeExitCode": 1,
+    "failure": "process.chdir to an existing workspace subdirectory failed"
+  },
+  "earlierAttempts": [
+    "The first generated worker redeclared the upstream resolve import and failed to parse. Packaging now checks the generated worker with DevEco Node --check.",
+    "Injecting an O_PATH directory descriptor through seccomp ADDFD returned EBADF. The final worker receives an O_RDONLY directory descriptor after workspace validation."
+  ],
+  "cases": {
+    "per-call": {
+      "exitCode": 0,
+      "readyMs": 7299,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "read-only": {
+      "exitCode": 0,
+      "readyMs": 5281,
+      "readOnlyReadsAllowed": true,
+      "readOnlyWritesDenied": true,
+      "readOnlyDirectoryMutationsDenied": true,
+      "readOnlyDiskUnchanged": true,
+      "readOnlyMetadataAllowed": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "repl": {
+      "exitCode": 0,
+      "readyMs": 4446,
+      "executionMode": "persistent-in-memory",
+      "scriptPersistence": false,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "cooperativeCancellationPreservedState": true,
+      "cooperativeCancellationMs": 102,
+      "blockingCancellationReapedWorker": true,
+      "blockingCancellationMs": 3183,
+      "nextTurnStartedWithFreshState": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "retainedStateSurvivedDirectoryChange": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "script": {
+      "exitCode": 0,
+      "readyMs": 5656,
+      "executionMode": "vm-script",
+      "scriptPersistence": true,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "cooperativeCancellationPreservedState": true,
+      "cooperativeCancellationMs": 99,
+      "blockingCancellationReapedWorker": true,
+      "blockingCancellationMs": 3148,
+      "nextTurnStartedWithFreshState": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "retainedStateSurvivedDirectoryChange": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "workflowRegression": {
+    "exitCode": 0,
+    "startupMs": 63,
+    "foreground": {
+      "actualSubagentsStarted": 2,
+      "completed": true,
+      "bothResultsReturned": true,
+      "parallel": true
+    },
+    "timeout": true,
+    "cancelledDuringSyncSlice": true,
+    "cancelledWithActiveChild": true,
+    "backgroundJob": {
+      "started": true,
+      "completed": true,
+      "resultDelivered": true
+    },
+    "temporaryModelCredentialRemoved": true
+  },
+  "defaultBuild": {
+    "exitCode": 0,
+    "unsignedHapSha256": "f824c206ecde985b026cd53e9e1cb33917ca4c1bd4a24afb82d5a980a3b3349a",
+    "unsignedHapBytes": 639383731,
+    "experimentalEnabledMarker": "0",
+    "installedForThisTest": false
+  },
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "pending": [
+      "additional writable roots",
+      "concurrent host moves of parent directories",
+      "idle session disposal"
+    ]
+  }
+}

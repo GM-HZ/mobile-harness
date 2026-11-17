@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('node:fs');
+const path = require('node:path');
 const { Socket } = require('node:net');
 const { constants } = require('node:os');
 const { PassThrough } = require('node:stream');
@@ -18,11 +19,14 @@ function bindPtc(native, mark) {
       if (policy.mode !== 'read-only' && policy.mode !== 'workspace-write') {
         throw new Error('HarmonyOS PTC requires a workspace file policy');
       }
-      if (policy.additionalWritableRoots?.length || fs.realpathSync(cwd) !== cwd || cwd !== policy.workspaceRoot) {
-        throw new Error('HarmonyOS PTC currently requires one canonical workspace root as its working directory');
+      const relative = path.relative(policy.workspaceRoot, cwd);
+      if (policy.additionalWritableRoots?.length || fs.realpathSync(cwd) !== cwd ||
+          fs.realpathSync(policy.workspaceRoot) !== policy.workspaceRoot ||
+          relative === '..' || relative.startsWith('../') || path.isAbsolute(relative)) {
+        throw new Error('HarmonyOS PTC requires a canonical working directory inside one workspace');
       }
-      const { fd, id } = native.launchPtc(cwd, policy.mode === 'workspace-write',
-        config.maxMessageBytes, config.maxOldGenerationSizeMb);
+      const { fd, id } = native.launchPtc(policy.workspaceRoot, policy.mode === 'workspace-write',
+        config.maxMessageBytes, config.maxOldGenerationSizeMb, cwd);
       mark('ptc-worker-admitted', { id, mode: policy.mode });
       const control = new Socket({ fd, readable: true, writable: true, allowHalfOpen: true });
       const stdout = new PassThrough();

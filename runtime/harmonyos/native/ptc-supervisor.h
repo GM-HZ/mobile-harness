@@ -5,6 +5,7 @@
 
 struct PtcLaunch {
     char root[1024];
+    char cwd[1024];
     int writable;
     int message_bytes;
     int heap_mb;

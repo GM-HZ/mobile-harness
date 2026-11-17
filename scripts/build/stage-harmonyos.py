@@ -115,6 +115,8 @@ def stage_ptc_worker():
     entry = "runNodeMain(openInheritedControlChannel(), Number(process.argv[2]), process);"
     overlay = (RUNTIME / "templates/ptc-worker.mjs").read_text()
     worker.write_text(bundled.decode("utf8").replace(entry, overlay, 1))
+    node = Path(os.environ.get("DEVECO_HOME", "/Applications/DevEco-Studio.app/Contents")) / "tools/node/bin/node"
+    subprocess.run([str(node), "--check", str(worker)], check=True)
 
 
 def main():

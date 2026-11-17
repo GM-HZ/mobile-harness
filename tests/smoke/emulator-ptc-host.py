@@ -188,6 +188,7 @@ def verify_mode(emulator, execution_mode, script_persistence, evidence):
                     admittedWorkers=len(admitted() - baseline))
     if retained:
         verify_retained_cancellation(emulator, sid, next(iter(first)), marker, evidence)
+        verify_working_directory(emulator, ws, evidence, sid, True)
 
 
 def verify_cancel(emulator, workspace, evidence):
@@ -355,6 +356,46 @@ return [text, info.isFile(), info.size, directory.isDirectory(), files, missing,
         emulator.app(f"rm -rf {directory} {outside}")
 
 
+def verify_working_directory(emulator, workspace, evidence, sid=None, retained=False):
+    name = "mh-ptc-cwd-" + uuid.uuid4().hex[:12]
+    marker = "MH_CWD_" + uuid.uuid4().hex.upper()
+    directory = f"alpine/workspace-native/{name}"
+    absolute = f"{support['WORKSPACE']}/{name}"
+    if sid is None:
+        sid = model_session(emulator, workspace)
+    result = "" if retained else "return "
+    try:
+        emulator.app(f"mkdir {directory}; printf %s {marker} > {directory}/input.txt")
+        script = f"""
+var cwdFs = await import('node:fs/promises');
+process.chdir('{name}');
+var cwdText = await cwdFs.readFile('input.txt', 'utf8');
+await cwdFs.writeFile('output.txt', cwdText);
+var cwdDenied = false;
+try {{ process.chdir('../..'); }} catch (error) {{ cwdDenied = true; }}
+var cwdMatches = process.cwd() === '{absolute}';
+process.chdir('..');
+{result}[cwdText, cwdDenied, cwdMatches, process.cwd() === '{support['WORKSPACE']}'].join(':');
+""".strip()
+        complete_code(emulator, sid, "Verify process working directory changes", script, f"{marker}:true:true:true")
+        assert emulator.app(f"cat {directory}/output.txt") == marker
+        complete_code(emulator, sid, "Select a subdirectory for the next session program",
+                      f"await tools.working_directory({{ cd: '{name}' }}); {result}'MH_DIRECTORY_SELECTED';",
+                      "MH_DIRECTORY_SELECTED")
+        complete_code(emulator, sid, "Run the next PTC process in the selected directory",
+                      f"var cwdFs = await import('node:fs/promises'); "
+                      f"var cwdText = await cwdFs.readFile('input.txt', 'utf8'); "
+                      f"await tools.working_directory({{ cd: '..' }}); {result}cwdText;", marker)
+        evidence.update(processDirectoryChangesMatched=True, outsideDirectoryChangeDenied=True,
+                        nextTurnStartedInSubdirectory=True)
+        if retained:
+            complete_code(emulator, sid, "Check retained program state after the session directory changes",
+                          "cwdText", marker)
+            evidence["retainedStateSurvivedDirectoryChange"] = True
+    finally:
+        emulator.app(f"rm -rf {directory}")
+
+
 def verify(emulator, evidence):
     name = "mh-ptc-" + uuid.uuid4().hex[:12]
     marker = "HARMONY_PTC_" + uuid.uuid4().hex.upper()
@@ -407,6 +448,7 @@ return {{ text, denied, nestedRead, outsideWriteDenied, duplicateDenied }};
                                 outsideWriteDenied=True, exclusiveCreatePreservedExisting=True)
                 verify_directory_operations(emulator, ws["workspaceId"], evidence)
                 verify_recursive_metadata(emulator, ws["workspaceId"], evidence)
+                verify_working_directory(emulator, ws["workspaceId"], evidence)
                 verify_cancel(emulator, ws["workspaceId"], evidence)
                 return
             if any(event["type"] == "turn/end" for event in events):

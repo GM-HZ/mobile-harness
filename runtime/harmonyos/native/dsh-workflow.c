@@ -103,16 +103,18 @@ static napi_value launch(napi_env env, napi_callback_info info)
 
 static napi_value launch_ptc(napi_env env, napi_callback_info info)
 {
-    size_t count = 4, length = 0;
-    napi_value args[4], result;
+    size_t count = 5, length = 0, cwd_length = 0;
+    napi_value args[5], result;
     struct PtcLaunch spec = {0};
     bool writable;
-    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 4 ||
+    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 5 ||
         napi_get_value_string_utf8(env, args[0], spec.root, sizeof(spec.root), &length) != napi_ok ||
         length == 0 || length >= sizeof(spec.root) - 1 || length != strlen(spec.root) ||
         napi_get_value_bool(env, args[1], &writable) != napi_ok ||
         napi_get_value_int32(env, args[2], &spec.message_bytes) != napi_ok || spec.message_bytes < 4096 ||
-        napi_get_value_int32(env, args[3], &spec.heap_mb) != napi_ok || spec.heap_mb < 16) {
+        napi_get_value_int32(env, args[3], &spec.heap_mb) != napi_ok || spec.heap_mb < 16 ||
+        napi_get_value_string_utf8(env, args[4], spec.cwd, sizeof(spec.cwd), &cwd_length) != napi_ok ||
+        cwd_length == 0 || cwd_length >= sizeof(spec.cwd) - 1 || cwd_length != strlen(spec.cwd)) {
         return error_value(env, "PTC launch arguments", EINVAL);
     }
     spec.writable = writable;
@@ -123,6 +125,26 @@ static napi_value launch_ptc(napi_env env, napi_callback_info info)
     napi_create_object(env, &result);
     set_number(env, result, "id", child.id);
     set_number(env, result, "fd", child.fd);
+    return result;
+}
+
+static napi_value change_ptc_directory(napi_env env, napi_callback_info info)
+{
+    size_t count = 1, length = 0;
+    napi_value argument, result;
+    char path[1024];
+    if (napi_get_cb_info(env, info, &count, &argument, NULL, NULL) != napi_ok || count != 1 ||
+        napi_get_value_string_utf8(env, argument, path, sizeof(path), &length) != napi_ok ||
+        length == 0 || length >= sizeof(path) - 1 || length != strlen(path)) {
+        return error_value(env, "PTC directory", EINVAL);
+    }
+    // The supervisor returns a directory descriptor for this private request.
+    int directory = (int)syscall(SYS_chdir, path);
+    if (directory < 0) return error_value(env, "PTC directory", errno);
+    int error = fchdir(directory) < 0 ? errno : 0;
+    close(directory);
+    if (error) return error_value(env, "PTC directory", error);
+    napi_get_undefined(env, &result);
     return result;
 }
 
@@ -210,6 +232,7 @@ NAPI_MODULE_INIT()
         {"status", NULL, status, NULL, NULL, NULL, napi_default, NULL},
         {"confine", NULL, confine, NULL, NULL, NULL, napi_default, NULL},
         {"confinePtc", NULL, confine_ptc, NULL, NULL, NULL, napi_default, NULL},
+        {"changePtcDirectory", NULL, change_ptc_directory, NULL, NULL, NULL, napi_default, NULL},
         {"finish", NULL, finish, NULL, NULL, NULL, napi_default, NULL},
         {"waitChannel", NULL, wait_channel, NULL, NULL, NULL, napi_default, NULL},
     };

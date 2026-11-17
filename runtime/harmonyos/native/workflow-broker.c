@@ -129,7 +129,9 @@ static void serve(int channel, const char *entry, pid_t parent)
             struct Worker *worker = worker_slot(workers, 0);
             int pair[2];
             if (ptc && (!has_ptc || request.launch.root[0] != '/' ||
-                        !memchr(request.launch.root, 0, sizeof(request.launch.root)))) reply.error = EINVAL;
+                        !memchr(request.launch.root, 0, sizeof(request.launch.root)) ||
+                        request.launch.cwd[0] != '/' ||
+                        !memchr(request.launch.cwd, 0, sizeof(request.launch.cwd)))) reply.error = EINVAL;
             else if (!worker) reply.error = EBUSY;
             else if (next_id == 0) reply.error = EOVERFLOW;
             else if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, pair) < 0) reply.error = errno;

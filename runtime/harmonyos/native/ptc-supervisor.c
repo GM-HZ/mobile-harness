@@ -52,7 +52,7 @@ static void start_node(const char *entry, int control, int setup, int root, pid_
     snprintf(limit, sizeof(limit), "%d", launch->message_bytes);
     snprintf(memory, sizeof(memory), "--max-old-space-size=%d", launch->heap_mb);
     char *argv[] = {"node", "--jitless", "--no-warnings", "--experimental-vm-modules", memory,
-                    (char *)entry, limit, launch->root, NULL};
+                    (char *)entry, limit, (char *)launch->cwd, NULL};
     _exit(start(8, argv));
 }
 
@@ -66,7 +66,21 @@ static char *workspace_path(pid_t worker, uint64_t address, const struct PtcLaun
         errno = EFAULT;
         return NULL;
     }
-    if (path[0] != '/') return path;
+    if (path[0] != '/') {
+        const char *cwd = launch->cwd + strlen(launch->root);
+        while (*cwd == '/') ++cwd;
+        if (*cwd) {
+            size_t prefix = strlen(cwd), length = strlen(path);
+            if (prefix + length + 2 > 4096) {
+                errno = ENAMETOOLONG;
+                return NULL;
+            }
+            memmove(path + prefix + 1, path, length + 1);
+            memcpy(path, cwd, prefix);
+            path[prefix] = '/';
+        }
+        return path;
+    }
     size_t length = strlen(launch->root);
     if (strncmp(path, launch->root, length) || (path[length] && path[length] != '/')) {
         errno = EACCES;
@@ -209,7 +223,32 @@ static int stat_path(int listener, int root, pid_t worker, const struct seccomp_
     return written < 0 ? errno : (size_t)written == sizeof(metadata) ? 0 : EFAULT;
 }
 
-static int mediate(int listener, int root, pid_t worker, const struct PtcLaunch *launch)
+static int directory_path(int root, pid_t worker, const struct seccomp_data *call,
+                          const struct PtcLaunch *launch, char absolute[1024])
+{
+    char path[4096];
+    const char *relative = workspace_path(worker, call->args[0], launch, path);
+    if (!relative) return -1;
+    if (!strcmp(path, ".")) {
+        strcpy(path, launch->root);
+        relative = ".";
+    }
+    // Directory transitions have a single canonical spelling shared by Node and the broker.
+    if (path[0] != '/' || strlen(path) >= 1024 || strstr(path, "/../") || strstr(path, "/./") ||
+        strstr(path, "//") || (strlen(path) >= 3 && !strcmp(path + strlen(path) - 3, "/..")) ||
+        (strlen(path) >= 2 && !strcmp(path + strlen(path) - 2, "/."))) {
+        errno = EACCES;
+        return -1;
+    }
+    const struct open_how how = {
+        .flags = O_RDONLY | O_DIRECTORY | O_CLOEXEC, .resolve = WORKSPACE_RESOLVE,
+    };
+    int directory = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
+    if (directory >= 0) strcpy(absolute, path);
+    return directory;
+}
+
+static int mediate(int listener, int root, pid_t worker, struct PtcLaunch *launch)
 {
     struct seccomp_notif request = {0};
     if (ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &request) < 0 ||
@@ -219,12 +258,15 @@ static int mediate(int listener, int root, pid_t worker, const struct PtcLaunch 
         response.error = -EACCES;
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
     }
-    if (request.data.nr != SYS_openat) {
+    const int change_directory = request.data.nr == SYS_chdir;
+    if (request.data.nr != SYS_openat && !change_directory) {
         response.error = request.data.nr == SYS_newfstatat ? -stat_path(listener, root, worker, &request, launch)
                                                          : -mutate_path(root, worker, &request.data, launch);
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
     }
-    int file = grant_path(root, worker, &request.data, launch);
+    char next_directory[1024];
+    int file = change_directory ? directory_path(root, worker, &request.data, launch, next_directory)
+                                : grant_path(root, worker, &request.data, launch);
     if (file < 0) {
         response.error = -errno;
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
@@ -242,6 +284,7 @@ static int mediate(int listener, int root, pid_t worker, const struct PtcLaunch 
         }
     }
     int error = result < 0 ? errno : 0;
+    if (!error && change_directory) strcpy(launch->cwd, next_directory);
     close(file);
     return error;
 }
@@ -249,6 +292,10 @@ static int mediate(int listener, int root, pid_t worker, const struct PtcLaunch 
 void harmony_ptc_supervise(const char *entry, int channel, pid_t parent, const struct PtcLaunch *launch)
 {
     if (!follow(parent)) _exit(125);
+    size_t root_length = strlen(launch->root);
+    if (strncmp(launch->cwd, launch->root, root_length) ||
+        (launch->cwd[root_length] && launch->cwd[root_length] != '/')) _exit(125);
+    struct PtcLaunch current = *launch;
     const struct sigaction handler = {.sa_handler = request_stop};
     if (sigaction(SIGTERM, &handler, NULL) < 0) _exit(125);
     struct open_how how = {.flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = RESOLVE_NO_SYMLINKS};
@@ -279,7 +326,7 @@ void harmony_ptc_supervise(const char *entry, int channel, pid_t parent, const s
         int ready = poll(&descriptor, 1, 100);
         if (ready < 0 && errno != EINTR) break;
         if (ready > 0 && descriptor.revents & POLLIN) {
-            int error = mediate(listener, root, worker, launch);
+            int error = mediate(listener, root, worker, &current);
             if (error && error != ENOENT && error != EINTR) break;
         }
     }
