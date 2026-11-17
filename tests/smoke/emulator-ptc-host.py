@@ -231,6 +231,7 @@ def verify_read_only(emulator, evidence):
         emulator.app(f"printf frozen > {original} && mkdir {directory}")
         script = f"""
 const fs = await import('node:fs/promises');
+const metadata: boolean = (await fs.stat('{name}.txt')).isFile() && (await fs.lstat('{name}')).isDirectory();
 const denied: string[] = [];
 for (const [name, operation] of [
   ['overwrite', () => fs.writeFile('{name}.txt', 'changed')],
@@ -244,15 +245,15 @@ for (const [name, operation] of [
   try {{ await operation(); }}
   catch (error) {{ if (error.code === 'EACCES') denied.push(name); else throw error; }}
 }}
-return (await fs.readFile('{name}.txt', 'utf8')) + ':' + denied.join(',');
+return (await fs.readFile('{name}.txt', 'utf8')) + ':' + denied.join(',') + ':' + metadata;
 """.strip()
         complete_code(emulator, model_session(emulator, ws), "Verify read-only write restrictions",
-                      script, "frozen:overwrite,append,create,rename,unlink,mkdir,rmdir")
+                      script, "frozen:overwrite,append,create,rename,unlink,mkdir,rmdir:true")
         assert emulator.app(f"cat {original}; test ! -e {new} && test -d {directory} "
                             f"&& test ! -e {directory}-new-dir && printf ':unchanged'") == "frozen:unchanged"
         assert any(row.get("mode") == "read-only" for row in workers(emulator))
         evidence.update(readOnlyReadsAllowed=True, readOnlyWritesDenied=True, readOnlyDirectoryMutationsDenied=True,
-                        readOnlyDiskUnchanged=True)
+                        readOnlyDiskUnchanged=True, readOnlyMetadataAllowed=True)
     finally:
         emulator.app(f"rm -f {original} {new}; rm -rf {directory} {directory}-new-dir")
 
@@ -310,6 +311,50 @@ return [moved, contents, denied.join(','), String(notEmpty)].join(':');
         emulator.app(f"rm -rf {root} {root}.txt {outside}")
 
 
+def verify_recursive_metadata(emulator, workspace, evidence):
+    name = "mh-ptc-recursive-" + uuid.uuid4().hex[:12]
+    directory = f"alpine/workspace-native/{name}"
+    outside = f"alpine/{name}"
+    marker = "MH_RECURSIVE_" + uuid.uuid4().hex.upper()
+    try:
+        emulator.app(f"mkdir {outside} && printf %s {marker} > {outside}/private.txt")
+        script = f"""
+const fs = await import('node:fs/promises');
+await fs.mkdir('{name}/left/right', {{ recursive: true }});
+await fs.mkdir('{name}/left/right', {{ recursive: true }});
+await fs.writeFile('{name}/left/right/item.txt', '{marker}');
+const info = await fs.stat('{name}/left/right/item.txt');
+const directory = await fs.lstat('{name}/left/right');
+const files = (await fs.readdir('{name}', {{ recursive: true }})).sort().join(',');
+let missing = false;
+try {{ await fs.stat('{name}/missing'); }}
+catch (error) {{ if (error.code !== 'ENOENT') throw error; missing = true; }}
+const denied: string[] = [];
+for (const [name, operation] of [
+  ['stat', () => fs.stat('../{name}/private.txt')],
+  ['lstat', () => fs.lstat('../{name}/private.txt')],
+  ['readdir', () => fs.readdir('../{name}', {{ recursive: true }})],
+  ['rm', () => fs.rm('../{name}', {{ recursive: true }})]
+]) {{
+  try {{ await operation(); }}
+  catch (error) {{
+    if (['EACCES', 'EXDEV', 'EPERM'].includes(error.code)) denied.push(name);
+    else throw error;
+  }}
+}}
+const text = await fs.readFile('{name}/left/right/item.txt', 'utf8');
+await fs.rm('{name}', {{ recursive: true }});
+return [text, info.isFile(), info.size, directory.isDirectory(), files, missing, denied.join(',')].join(':');
+""".strip()
+        complete_code(emulator, model_session(emulator, workspace), "Verify recursive file operations and metadata",
+                      script, f"{marker}:true:{len(marker)}:true:left,left/right,left/right/item.txt:true:stat,lstat,readdir,rm")
+        assert emulator.app(f"test ! -e {directory} && cat {outside}/private.txt") == marker
+        evidence.update(metadataMatched=True, recursiveDirectoryOperationsMatched=True,
+                        outsideMetadataAndTraversalDenied=True)
+    finally:
+        emulator.app(f"rm -rf {directory} {outside}")
+
+
 def verify(emulator, evidence):
     name = "mh-ptc-" + uuid.uuid4().hex[:12]
     marker = "HARMONY_PTC_" + uuid.uuid4().hex.upper()
@@ -361,6 +406,7 @@ return {{ text, denied, nestedRead, outsideWriteDenied, duplicateDenied }};
                                 nestedHostToolMatched=True, overwriteAndAppendMatched=True,
                                 outsideWriteDenied=True, exclusiveCreatePreservedExisting=True)
                 verify_directory_operations(emulator, ws["workspaceId"], evidence)
+                verify_recursive_metadata(emulator, ws["workspaceId"], evidence)
                 verify_cancel(emulator, ws["workspaceId"], evidence)
                 return
             if any(event["type"] == "turn/end" for event in events):

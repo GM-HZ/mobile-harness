@@ -1,0 +1,63 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "eae2dc43c11ca9b21bf6f3619835fbb7e438f8d42f3754165c86c0844bdfbaf6",
+  "unsignedHapBytes": 657076244,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "baseline": {
+    "commit": "7db38808cc4955e3acce82fcb4459b0142a53bc7",
+    "unsignedHapSha256": "919ed5095b8d50320ed98e3d2a5ba3459fae2e305d5307adc928b970467cd400",
+    "smokeExitCode": 1,
+    "failure": "Node stat returned EPERM inside read-only workspace"
+  },
+  "cases": {
+    "write-access": {
+      "exitCode": 0,
+      "readyMs": 8337,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    },
+    "read-only": {
+      "exitCode": 0,
+      "readyMs": 4979,
+      "readOnlyReadsAllowed": true,
+      "readOnlyWritesDenied": true,
+      "readOnlyDirectoryMutationsDenied": true,
+      "readOnlyDiskUnchanged": true,
+      "readOnlyMetadataAllowed": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "pending": [
+      "additional roots",
+      "subdirectory cwd",
+      "concurrent host moves",
+      "idle session disposal"
+    ]
+  }
+}

@@ -179,6 +179,36 @@ static int mutate_path(int root, pid_t worker, const struct seccomp_data *call, 
     return error;
 }
 
+static int stat_path(int listener, int root, pid_t worker, const struct seccomp_notif *request,
+                     const struct PtcLaunch *launch)
+{
+    const struct seccomp_data *call = &request->data;
+    if ((int)call->args[0] != AT_FDCWD ||
+        (call->args[3] != 0 && call->args[3] != AT_SYMLINK_NOFOLLOW)) return EACCES;
+    char path[4096];
+    const char *relative = workspace_path(worker, call->args[1], launch, path);
+    if (!relative) return errno;
+    const int nofollow = call->args[3] == AT_SYMLINK_NOFOLLOW;
+    const struct open_how how = {
+        .flags = O_PATH | O_CLOEXEC | (nofollow ? O_NOFOLLOW : 0),
+        .resolve = WORKSPACE_RESOLVE,
+    };
+    int file = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
+    if (file < 0) return errno;
+    // Use the kernel ABI of the worker's syscall, and inspect only the pinned inode.
+    struct stat metadata = {0};
+    int error = syscall(SYS_newfstatat, file, "", &metadata, AT_EMPTY_PATH) < 0 ? errno : 0;
+    close(file);
+    if (error) return error;
+    if (!S_ISREG(metadata.st_mode) && !S_ISDIR(metadata.st_mode) &&
+        !(nofollow && S_ISLNK(metadata.st_mode))) return EACCES;
+    if (ioctl(listener, SECCOMP_IOCTL_NOTIF_ID_VALID, &request->id) < 0) return errno;
+    struct iovec local = {.iov_base = &metadata, .iov_len = sizeof(metadata)};
+    struct iovec remote = {.iov_base = (void *)(uintptr_t)call->args[2], .iov_len = sizeof(metadata)};
+    ssize_t written = syscall(SYS_process_vm_writev, worker, &local, 1, &remote, 1, 0);
+    return written < 0 ? errno : (size_t)written == sizeof(metadata) ? 0 : EFAULT;
+}
+
 static int mediate(int listener, int root, pid_t worker, const struct PtcLaunch *launch)
 {
     struct seccomp_notif request = {0};
@@ -190,7 +220,8 @@ static int mediate(int listener, int root, pid_t worker, const struct PtcLaunch 
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
     }
     if (request.data.nr != SYS_openat) {
-        response.error = -mutate_path(root, worker, &request.data, launch);
+        response.error = request.data.nr == SYS_newfstatat ? -stat_path(listener, root, worker, &request, launch)
+                                                         : -mutate_path(root, worker, &request.data, launch);
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
     }
     int file = grant_path(root, worker, &request.data, launch);
