@@ -85,6 +85,34 @@ function installProotSpawn(workspace) {
   const bridge = addon('libdshshell.so');
   const allowedRoot = fs.realpathSync(workspace);
   const signals = new Map(Object.entries(constants.signals).map(([name, value]) => [value, name]));
+  globalThis.__harmonyHostSpawn = (program, args, options) => {
+    if (safeMode) throw new Error('Guest subprocesses are disabled in HarmonyOS recovery mode');
+    if (!Array.isArray(options.stdio) || options.stdio.length !== 3 ||
+        !['ignore', 'pipe'].includes(options.stdio[0]) ||
+        options.stdio.slice(1).some(mode => !['pipe', 'inherit'].includes(mode))) {
+      throw new Error('Harmony subprocess supports standard input/output pipes; extra control descriptors are unavailable');
+    }
+    const cwd = fs.realpathSync(options.cwd);
+    relativeInWorkspace(fs.realpathSync(root), cwd);
+    const environment = Object.entries(options.env ?? {}).flatMap(([key, value]) => {
+      if (value === undefined) return [];
+      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || /^(?:HARMONY_|PROOT_|LD_)/.test(key) ||
+          typeof value !== 'string' || value.includes('\0')) {
+        throw new TypeError('Invalid or reserved Harmony subprocess environment variable');
+      }
+      return [key + '=' + value];
+    });
+    const child = launchGuest(cwd, 'exec -- ' + [program, ...args].map(quoteShellArgument).join(' '), environment, true);
+    if (options.stdio[0] === 'ignore') child.stdin.end();
+    for (const [index, destination] of [[1, process.stdout], [2, process.stderr]]) {
+      if (options.stdio[index] === 'inherit') {
+        child.stdio[index].pipe(destination, { end: false });
+        child.stdio[index] = null;
+        child[index === 1 ? 'stdout' : 'stderr'] = null;
+      }
+    }
+    return child;
+  };
   globalThis.__harmonyMcpSpawn = (program, args, options) => {
     if (safeMode) throw new Error('Local MCP servers are disabled in HarmonyOS recovery mode');
     if (typeof program !== 'string' || program.length === 0) throw new TypeError('Expected an MCP command');
@@ -130,13 +158,14 @@ function installProotSpawn(workspace) {
     }
     return launchGuest(guest, command);
   };
-  function launchGuest(guest, command, environment) {
+  function launchGuest(guest, command, environment, host = false) {
     const streaming = environment !== undefined;
     const launched = streaming
       ? bridge.launchPiped(path.dirname(root), guest, command, environment)
       : bridge.launch(path.dirname(root), guest, command);
     const child = new EventEmitter();
     child.pid = launched.pid;
+    if (host) mark('host-subprocess-started', { pid: child.pid });
     child.exitCode = null;
     child.signalCode = null;
     child.stdin = streaming ? new Socket({ fd: launched.stdinFd, readable: false, writable: true }) : null;
@@ -174,6 +203,7 @@ function installProotSpawn(workspace) {
         if (!result) return;
         clearInterval(timer);
         exited = true;
+        if (host) mark('host-subprocess-reaped', { pid: child.pid });
         child.exitCode = result.exitCode < 0 ? null : result.exitCode;
         child.signalCode = signals.get(result.signal) ?? null;
         if (child.exitCode === 0) {
@@ -427,7 +457,8 @@ async function main() {
     print(...args);
   };
   const nativePatch = path.join(root, 'tmp/dsh-native.patch.yml');
-  fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n', { mode: 0o600 });
+  fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n' +
+    (safeMode ? '' : '- id: subprocess\n  name: ' + JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n'), { mode: 0o600 });
   const profileArgs = safeMode
     ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
     : ['--profile', 'web'];

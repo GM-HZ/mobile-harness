@@ -310,12 +310,25 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
 #include "guest-tools.inc"
     };
     enum { packaged_count = sizeof(packaged) / sizeof(*packaged) };
+    /* Host subprocesses keep native file URLs/cwd, while legacy Bash/MCP keep
+     * their existing /workspace-native view. Both aliases target the same files.
+     * Repeat signed executable bindings at the native alias: rootfs placeholders
+     * themselves cannot execute under HarmonyOS code-signing policy. */
+    int host_paths = shell && strncmp(shell->cwd, root, strlen(root)) == 0 &&
+        (shell->cwd[strlen(root)] == '/' || shell->cwd[strlen(root)] == '\0');
+    char root_binding[1850];
     char bind_options[packaged_count][1150];
+    char host_bind_options[packaged_count][2050];
     char dsh_binding[1150];
-    char *bound_guest[packaged_count * 2 + sizeof(guest) / sizeof(*guest) + 12];
+    char *bound_guest[packaged_count * 4 + sizeof(guest) / sizeof(*guest) + 14];
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
+        if (host_paths) {
+            snprintf(root_binding, sizeof(root_binding), "%s:%s", root, root);
+            bound_guest[bound_count++] = "-b";
+            bound_guest[bound_count++] = root_binding;
+        }
         if (dsh_test) {
             snprintf(dsh_binding, sizeof(dsh_binding), "%s/.dsh-0.2.2-rc.4/dsh:/dsh", root);
             bound_guest[bound_count++] = "-b";
@@ -326,6 +339,12 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             snprintf(bind_options[n], sizeof(bind_options[n]), "%s/%s:%s", native, packaged[n].name, packaged[n].guest);
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = bind_options[n];
+            if (host_paths) {
+                snprintf(host_bind_options[n], sizeof(host_bind_options[n]), "%s/%s:%s%s",
+                         native, packaged[n].name, root, packaged[n].guest);
+                bound_guest[bound_count++] = "-b";
+                bound_guest[bound_count++] = host_bind_options[n];
+            }
         }
         if (dsh_test) {
             if (access("/system/fonts", R_OK | X_OK) == 0) {
