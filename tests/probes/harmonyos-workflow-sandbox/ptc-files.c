@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include "ptc-file-filter.h"
+#include "ptc-wire.h"
 #include <dlfcn.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -34,11 +35,13 @@ struct BrokerReport {
     int injected;
     int refused;
     int reaped;
+    int status;
     const char *stage;
     int atomic_addfd_errno;
     int legacy_injected;
     int thread_notifications;
     int requested_flags[ATTEMPTS];
+    struct PtcWire wire;
     struct WorkerReport worker;
 };
 
@@ -194,18 +197,23 @@ static int serve_open(int listener, int root, pid_t child, int writable, struct 
     return error;
 }
 
-static void node_worker(int channel, const char *entry, pid_t parent)
+static void node_worker(int channel, const char *entry, pid_t parent, int wire, int root)
 {
     if (prctl(PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) < 0 || getppid() != parent ||
         dup2(channel, STDIN_FILENO) < 0 || dup2(channel, STDOUT_FILENO) < 0 ||
-        dup2(channel, STDERR_FILENO) < 0 || syscall(SYS_close_range, 3u, ~0u, 0u) < 0 ||
+        dup2(channel, STDERR_FILENO) < 0 ||
         clearenv() != 0 || ptc_deny_io_uring() != 0) _exit(100);
+    if (wire >= 0) {
+        if (fchdir(root) < 0 || dup2(wire, 7) < 0 ||
+            syscall(SYS_close_range, 3u, 6u, 0u) < 0 || syscall(SYS_close_range, 8u, ~0u, 0u) < 0 ||
+            setenv("DSH_SUBPROCESS_CONTROL", "pipe", 1) < 0) _exit(102);
+    } else if (syscall(SYS_close_range, 3u, ~0u, 0u) < 0) _exit(102);
     void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
     typedef int (*NodeStart)(int, char **);
     NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;
     if (!start) _exit(101);
-    char *argv[] = {"node", "--jitless", "--no-warnings", (char *)entry, NULL};
-    _exit(start(4, argv));
+    char *argv[] = {"node", "--jitless", "--no-warnings", "--experimental-vm-modules", (char *)entry, "65536", NULL};
+    _exit(start(6, argv));
 }
 
 static int poll_case(int listener, int channel, int root, pid_t child, int writable, struct BrokerReport *report)
@@ -227,7 +235,30 @@ static int poll_case(int listener, int channel, int root, pid_t child, int writa
     return EIO;
 }
 
-static struct BrokerReport run_case(int root, const char *outside, int writable, int with_thread, const char *entry)
+static int poll_wire(int listener, int wire, int root, pid_t child, int cancel, struct BrokerReport *report)
+{
+    struct pollfd descriptors[] = {{.fd = listener, .events = POLLIN}, {.fd = wire, .events = POLLIN}};
+    for (int count = 0; count < 40; ++count) {
+        int ready;
+        const int spinning = cancel == 2 && report->wire.logged;
+        do { ready = poll(descriptors, 2, spinning ? 200 : 2500); } while (ready < 0 && errno == EINTR);
+        if (ready == 0 && spinning) return 0;
+        if (ready <= 0) return ready == 0 ? ETIMEDOUT : errno;
+        if (descriptors[1].revents & POLLIN) {
+            report->stage = "wire";
+            int error = ptc_wire_receive(wire, cancel, &report->wire);
+            if (error) return error;
+            if (report->wire.completed || report->wire.cancelled) return 0;
+        } else if (descriptors[1].revents & (POLLERR | POLLHUP)) return EIO;
+        if (descriptors[0].revents & POLLIN) {
+            int error = serve_open(listener, root, child, 0, report);
+            if (error) return error;
+        }
+    }
+    return EOVERFLOW;
+}
+
+static struct BrokerReport run_case(int root, const char *outside, int writable, int with_thread, const char *entry, int wire_mode)
 {
     struct BrokerReport report = {
         .stage = "get-sizes",
@@ -249,29 +280,50 @@ static struct BrokerReport run_case(int root, const char *outside, int writable,
         report.protocol_error = errno;
         return report;
     }
+    int wire[2] = {-1, -1};
+    if (wire_mode && socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, wire) < 0) {
+        report.protocol_error = errno;
+        close(sockets[0]);
+        close(sockets[1]);
+        return report;
+    }
     pid_t parent = getpid();
     pid_t child = fork();
     if (child == 0) {
-        if (entry) node_worker(sockets[1], entry, parent);
+        if (entry) node_worker(sockets[1], entry, parent, wire[1], root);
         else worker(sockets[1], outside, parent, with_thread);
     }
     report.protocol_error = child < 0 ? errno : 0;
     close(sockets[1]);
+    if (wire[1] >= 0) close(wire[1]);
     if (child > 0) {
         int listener = wait_readable(sockets[0]) ? -1 : ptc_transfer_listener(sockets[0], -1, 1);
         if (listener < 0) report.protocol_error = EPROTO;
         else {
-            report.protocol_error = poll_case(listener, sockets[0], root, child, writable, &report);
+            report.protocol_error = wire_mode
+                ? poll_wire(listener, wire[0], root, child, writable, &report)
+                : poll_case(listener, sockets[0], root, child, writable, &report);
             if (!report.protocol_error) report.stage = "complete";
             close(listener);
         }
-        if (report.protocol_error) kill(child, SIGKILL);
-        int status;
-        pid_t reaped;
-        do { reaped = waitpid(child, &status, 0); } while (reaped < 0 && errno == EINTR);
+        if (wire[0] >= 0) shutdown(wire[0], SHUT_RDWR);
+        int status = 0;
+        pid_t reaped = 0;
+        if (!report.protocol_error && wire_mode && writable != 2) {
+            for (int attempt = 0; attempt < 100 && reaped == 0; ++attempt) {
+                reaped = waitpid(child, &status, WNOHANG);
+                if (reaped == 0) usleep(10000);
+            }
+        }
+        if (reaped == 0) {
+            if (report.protocol_error || wire_mode) kill(child, SIGKILL);
+            do { reaped = waitpid(child, &status, 0); } while (reaped < 0 && errno == EINTR);
+        }
         report.reaped = reaped == child && WIFEXITED(status) && WEXITSTATUS(status) == 0;
+        report.status = reaped == child ? status : -1;
     }
     close(sockets[0]);
+    if (wire[0] >= 0) close(wire[0]);
     return report;
 }
 
@@ -303,7 +355,7 @@ static int format_case(char *buffer, size_t size, const struct BrokerReport *rep
                     report->worker.directory_verified, report->worker.typed_read);
 }
 
-static void run_probe(const char *app_files, const char *entry, char *response, size_t size)
+static void run_probe(const char *app_files, const char *entry, int wire_mode, char *response, size_t size)
 {
     char temp[1024], outside[1100];
     snprintf(temp, sizeof(temp), "%s/ptc-files.XXXXXX", app_files);
@@ -317,10 +369,23 @@ static void run_probe(const char *app_files, const char *entry, char *response, 
         ? openat(parent, "workspace", O_PATH | O_DIRECTORY | O_CLOEXEC) : -1;
     if (root < 0 || seed(root, "read.txt") < 0 || seed(parent, "outside.txt") < 0) {
         snprintf(response, size, "fixture setup errno=%d", errno);
+    } else if (wire_mode) {
+        const struct BrokerReport run = run_case(root, outside, 0, 0, entry, 1);
+        const struct BrokerReport cancel = run_case(root, outside, 1, 0, entry, 1);
+        const struct BrokerReport spin = run_case(root, outside, 2, 0, entry, 1);
+        snprintf(response, size, "{\"run\":{\"errno\":%d,\"stage\":\"%s\",\"ready\":%d,\"binding\":%d,"
+                 "\"log\":%d,\"result42\":%d,\"workerFileRequests\":%d,\"filesGranted\":%d,\"cleanExit\":%d,\"status\":%d},"
+                 "\"cancel\":{\"errno\":%d,\"stage\":\"%s\",\"ready\":%d,\"binding\":%d,\"revoked\":%d,\"cleanExit\":%d,\"status\":%d},"
+                 "\"spin\":{\"errno\":%d,\"binding\":%d,\"entered\":%d,\"killConfirmed\":%d}}",
+                 run.protocol_error, run.stage, run.wire.ready, run.wire.binding, run.wire.logged, run.wire.completed,
+                 run.thread_notifications, run.injected, run.reaped, run.status, cancel.protocol_error, cancel.stage,
+                 cancel.wire.ready, cancel.wire.binding, cancel.wire.cancelled, cancel.reaped, cancel.status,
+                 spin.protocol_error, spin.wire.binding, spin.wire.logged,
+                 spin.status >= 0 && WIFSIGNALED(spin.status) && WTERMSIG(spin.status) == SIGKILL);
     } else {
-        const struct BrokerReport ro = run_case(root, outside, 0, 0, entry);
+        const struct BrokerReport ro = run_case(root, outside, 0, 0, entry, 0);
         const int read_only_created = faccessat(root, "created.txt", F_OK, 0) == 0;
-        const struct BrokerReport rw = run_case(root, outside, 1, 1, entry);
+        const struct BrokerReport rw = run_case(root, outside, 1, 1, entry, 0);
         const int file = openat(root, "created.txt", O_RDONLY | O_CLOEXEC);
         char data[sizeof(marker)] = {0};
         const int stored = file >= 0 && read(file, data, sizeof(data)) == sizeof(data)
@@ -347,10 +412,12 @@ static void run_probe(const char *app_files, const char *entry, char *response, 
 
 napi_value RunPtcFiles(napi_env env, napi_callback_info info)
 {
-    size_t count = 2, length = 0, entry_length = 0;
-    napi_value args[2], result;
+    size_t count = 3, length = 0, entry_length = 0;
+    napi_value args[3], result;
+    bool wire_mode;
     char path[900], entry[1024], response[950];
-    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 2 ||
+    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 3 ||
+        napi_get_value_bool(env, args[2], &wire_mode) != napi_ok ||
         napi_get_value_string_utf8(env, args[0], path, sizeof(path), &length) != napi_ok ||
         !length || length >= sizeof(path) - 1 || length != strlen(path) ||
         napi_get_value_string_utf8(env, args[1], entry, sizeof(entry), &entry_length) != napi_ok ||
@@ -358,7 +425,7 @@ napi_value RunPtcFiles(napi_env env, napi_callback_info info)
         napi_throw_type_error(env, NULL, "Expected app files directory and optional worker entry");
         return NULL;
     }
-    run_probe(path, entry_length ? entry : NULL, response, sizeof(response));
+    run_probe(path, entry_length ? entry : NULL, wire_mode, response, sizeof(response));
     napi_create_string_utf8(env, response, NAPI_AUTO_LENGTH, &result);
     return result;
 }

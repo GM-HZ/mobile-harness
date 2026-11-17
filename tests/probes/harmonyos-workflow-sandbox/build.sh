@@ -14,6 +14,7 @@ cp "$probe/Index.ets" "$stage/entry/src/main/ets/pages/"
 mkdir -p "$stage/entry/src/main/cpp/types/libworkflowprobe"
 cp "$probe/probe.c" "$probe/launch-node.c" "$probe/workflow-node.c" "$probe/ptc-files.c" "$stage/entry/src/main/cpp/"
 cp "$probe/ptc-file-filter.c" "$probe/ptc-file-filter.h" "$probe/ptc-node.c" "$stage/entry/src/main/cpp/"
+cp "$probe/ptc-wire.c" "$probe/ptc-wire.h" "$stage/entry/src/main/cpp/"
 cp "$root/runtime/harmonyos/native/workflow-broker.c" "$root/runtime/harmonyos/native/workflow-broker.h" \
     "$stage/entry/src/main/cpp/"
 mkdir -p "$stage/entry/libs/arm64-v8a" "$stage/entry/src/main/resources/rawfile"
@@ -27,7 +28,7 @@ cp "$root/vendor/repos/node/src/node_api.h" "$root/vendor/repos/node/src/node_ap
 cat > "$stage/entry/src/main/cpp/CMakeLists.txt" <<'CMAKE'
 cmake_minimum_required(VERSION 3.5.0)
 project(workflowprobe)
-add_library(workflowprobe SHARED probe.c launch-node.c workflow-broker.c ptc-files.c ptc-file-filter.c)
+add_library(workflowprobe SHARED probe.c launch-node.c workflow-broker.c ptc-files.c ptc-file-filter.c ptc-wire.c)
 target_link_libraries(workflowprobe PUBLIC libace_napi.z.so dl)
 add_library(workflownode SHARED workflow-node.c)
 target_include_directories(workflownode PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -40,7 +41,7 @@ cat > "$stage/entry/src/main/cpp/types/libworkflowprobe/index.d.ts" <<'TYPES'
 interface WorkflowProbe {
   run(): string;
   runNode(entry: string): string;
-  runFiles(directory: string, entry: string): string;
+  runFiles(directory: string, entry: string, wire: boolean): string;
 }
 declare const probe: WorkflowProbe;
 export default probe;
@@ -49,6 +50,7 @@ cat > "$stage/entry/src/main/cpp/types/libworkflowprobe/oh-package.json5" <<'PAC
 {"name":"libworkflowprobe.so","version":"1.0.0","types":"./index.d.ts"}
 PACKAGE
 python3 - "$stage" "$probe" "$root" <<'PY'
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -78,6 +80,19 @@ for name in amaro_files:
 ptc_node = (probe / 'ptc-node-files.cjs').read_text()
 (raw / 'ptc-node-files.cjs').write_text(ptc_node.replace('PACKAGED_AMARO_PROBE_ENABLED', str(bool(amaro_dir)).lower(), 1))
 (raw / 'workflow-worker.cjs').write_text(worker.replace('PACKAGED_AMARO_PROBE_ENABLED', str(bool(amaro_dir)).lower(), 1))
+bootstrap_path = os.environ.get('HARMONY_PTC_BOOTSTRAP')
+wire = raw / 'ptc-wire-bootstrap.mjs'
+wire.unlink(missing_ok=True)
+if bootstrap_path:
+    original = Path(bootstrap_path).read_bytes()
+    if hashlib.sha256(original).hexdigest() != 'c01308c52fc52d5f13edd2b65008f3bbcf67bd753eb17af5e4bc023216eca6b4':
+        raise SystemExit('Expected the pinned RC.3 PTC process bootstrap')
+    before = 'runNodeMain(openInheritedControlChannel(), Number(process.argv[2]), process);'
+    source = original.decode('utf8')
+    if source.count(before) != 1:
+        raise SystemExit('Unexpected PTC process bootstrap entry')
+    wire.write_text(source.replace(before, (probe / 'ptc-wire-entry.mjs').read_text()))
+(raw / 'ptc-wire-enabled').write_text('1' if bootstrap_path else '0')
 PY
 install -m 600 "$stage/build-profile.example.json5" "$stage/build-profile.json5"
 

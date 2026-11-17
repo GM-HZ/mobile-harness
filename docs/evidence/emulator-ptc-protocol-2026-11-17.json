@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "bundle": "org.mobileharness.workflowsandbox",
+  "appBaseline": "770a1efd6b91d471058df180859b997632403241",
+  "dshVersion": "0.2.2-rc.3",
+  "nodeVersion": "v24.14.1",
+  "upstreamBootstrapSha256": "c01308c52fc52d5f13edd2b65008f3bbcf67bd753eb17af5e4bc023216eca6b4",
+  "unsignedHapSha256": "37a308a74a5b950dda08ac7bc82bb1f6a17451e498fcf13369f6acb38781fd94",
+  "unsignedHapBytes": 132222456,
+  "buildExitCode": 0,
+  "installAndStartExitCode": 0,
+  "runLogTimestamps": ["11-17 22:57:53.976", "11-17 22:58:41.102"],
+  "functionBody": {
+    "programProtocolVersion": 2,
+    "fsPromisesReadMediated": true,
+    "matchedFixtureBindingRequest": true,
+    "capturedConsoleLog": true,
+    "decodedResult": 42,
+    "workerExitStatus": 0
+  },
+  "cancellation": {
+    "revokeWhileAwaitingFixtureBinding": true,
+    "revokedEvaluationReturnedWithoutValue": true,
+    "cooperativeWorkerExitStatus": 0,
+    "spinObservedAfterFixtureBindingReply": true,
+    "spinWorkerReapedWithSigkill": true
+  },
+  "scope": {
+    "earlierBuild": "Evaluation and revoke frames passed but worker exit was not clean when using Node process.exit. The final probe uses its native exit adapter after bootstrap cleanup.",
+    "host": "fixed native fixture for the actual published bootstrap wire",
+    "sameHapNodeFilesystemAndAmaroProbes": "passed",
+    "productionDshPtc": "not connected",
+    "mate60": "HDC offline"
+  }
+}

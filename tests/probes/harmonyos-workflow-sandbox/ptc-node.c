@@ -40,12 +40,23 @@ static napi_value finish(napi_env env, napi_callback_info info)
     _exit(write(CONTROL, data, length) == (ssize_t)length ? 0 : 97);
 }
 
+static napi_value exit_probe(napi_env env, napi_callback_info info)
+{
+    size_t count = 1;
+    uint32_t status;
+    napi_value args[1];
+    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 1 ||
+        napi_get_value_uint32(env, args[0], &status) != napi_ok || status > 255) _exit(98);
+    _exit(status);
+}
+
 NAPI_MODULE_INIT()
 {
     const napi_property_descriptor properties[] = {
         {"confine", NULL, confine, NULL, NULL, NULL, napi_default, NULL},
         {"directOpenat2", NULL, direct_open, NULL, NULL, NULL, napi_default, NULL},
         {"finish", NULL, finish, NULL, NULL, NULL, napi_default, NULL},
+        {"exit", NULL, exit_probe, NULL, NULL, NULL, napi_default, NULL},
     };
     napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
     return exports;
