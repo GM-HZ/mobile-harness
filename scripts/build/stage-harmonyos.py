@@ -11,6 +11,7 @@ from urllib.parse import quote
 from harmonyos_dsh import stage_dsh
 from harmonyos_guest_extras import stage_guest_extras
 from harmonyos_ptc import PORTABLE_ASSETS, portable_assets
+from harmonyos_http import stage_http
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
@@ -142,6 +143,7 @@ def main():
     stage_guest_extras(ROOT, STAGE, RAW)
     stage_dsh(ROOT, RAW, inputs / "entry/src/main/resources/rawfile/dsh-layer.zip")
     stage_ptc_worker()
+    stage_http(ROOT, RAW)
     subprocess.run(
         ["python3", str(RUNTIME / "packaging/build-startup-sources.py")],
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True

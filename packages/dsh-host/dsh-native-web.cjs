@@ -289,6 +289,9 @@ async function main() {
   const workflowUrl = paths('dsh-workflow-ptc/lib/index.js');
   const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
   const officeUrl = paths('dsh-office-kit/lib/index.js');
+  const httpParserUrl = pathToFileURL(path.join(dsh, 'undici/lib/dispatcher/client-h1.js')).href;
+  const { patchClientH1 } = require(path.join(root, 'dsh-harmony-http.cjs'));
+  globalThis.__harmonyLlhttp = imports => require(path.join(root, 'dsh-harmony-llhttp.cjs'))(imports);
   const officeAdapter = pathToFileURL(path.join(root, 'dsh-harmony-office-entry.mjs')).href;
   const ptcEnabled = !safeMode && fs.readFileSync(path.join(root, 'dsh-harmony-ptc-enabled'), 'utf8') === '1';
   if (ptcEnabled) {
@@ -343,6 +346,11 @@ async function main() {
     load(url, context, nextLoad) {
       const start = performance.now();
       const result = nextLoad(url, context);
+      if (url === httpParserUrl && typeof WebAssembly === 'undefined') {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        mark('http-parser-portable', { runtime: 'llhttp-js' });
+        return { ...result, source: patchClientH1(source) };
+      }
       if (booting) {
         loadCount++;
         loadMs += performance.now() - start;
