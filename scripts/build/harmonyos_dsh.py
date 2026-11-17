@@ -74,6 +74,8 @@ def stage_dsh(root, raw, baseline):
     shutil.copy2(archive, raw / ARCHIVE)
     # A same-DSH-version production dependency change must invalidate unpack.
     # User profiles/workspaces live outside this immutable release directory.
+    digest = hashlib.sha256()
     with archive.open("rb") as packed:
-        identity = hashlib.file_digest(packed, "sha256").hexdigest()
-    (raw / "dsh-runtime-id.txt").write_text(identity)
+        for block in iter(lambda: packed.read(1024 * 1024), b''):
+            digest.update(block)
+    (raw / "dsh-runtime-id.txt").write_text(digest.hexdigest())
