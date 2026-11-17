@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <linux/audit.h>
 #include <linux/filter.h>
+#include <linux/openat2.h>
 #include <linux/seccomp.h>
 #include <napi/native_api.h>
 #include <stddef.h>
@@ -20,6 +21,9 @@ struct Outcome {
     int landlock_errno;
     int no_new_privileges_errno;
     int filter_errno;
+    int notification_action_errno;
+    int notification_listener_errno;
+    int openat2_errno;
     int open_errno;
     int socket_errno;
     int exec_errno;
@@ -41,6 +45,12 @@ static void probe_child(int output)
     if (socket_fd >= 0) close(socket_fd);
     outcome.landlock_abi = (int)syscall(SYS_landlock_create_ruleset, NULL, 0, 1);
     outcome.landlock_errno = outcome.landlock_abi < 0 ? errno : 0;
+    const struct open_how how = {.flags = O_RDONLY | O_CLOEXEC};
+    file = (int)syscall(SYS_openat2, AT_FDCWD, "/dev/null", &how, sizeof(how));
+    outcome.openat2_errno = file < 0 ? errno : 0;
+    if (file >= 0) close(file);
+    uint32_t action = SECCOMP_RET_USER_NOTIF;
+    outcome.notification_action_errno = syscall(SYS_seccomp, SECCOMP_GET_ACTION_AVAIL, 0, &action) < 0 ? errno : 0;
 
     struct sock_filter instructions[] = {
         BPF_STMT(BPF_LD | BPF_W | BPF_ABS, offsetof(struct seccomp_data, arch)),
@@ -58,7 +68,14 @@ static void probe_child(int output)
         .filter = instructions,
     };
     outcome.no_new_privileges_errno = prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0 ? errno : 0;
+    outcome.notification_listener_errno = -1;
     if (!outcome.no_new_privileges_errno) {
+        struct sock_filter test[] = {BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW)};
+        const struct sock_fprog listener_filter = {.len = 1, .filter = test};
+        int listener = (int)syscall(SYS_seccomp, SECCOMP_SET_MODE_FILTER,
+                                    SECCOMP_FILTER_FLAG_NEW_LISTENER, &listener_filter);
+        outcome.notification_listener_errno = listener < 0 ? errno : 0;
+        if (listener >= 0) close(listener);
         long installed = syscall(SYS_seccomp, SECCOMP_SET_MODE_FILTER, SECCOMP_FILTER_FLAG_TSYNC, &filter);
         outcome.filter_errno = installed < 0 ? errno : installed == 0 ? 0 : EBUSY;
         if (!outcome.filter_errno) {
@@ -95,10 +112,12 @@ static napi_value run(napi_env env, napi_callback_info info)
             snprintf(response, sizeof(response),
                 "{\"baselineOpenErrno\":%d,\"baselineSocketErrno\":%d,\"landlockAbi\":%d,\"landlockErrno\":%d,"
                 "\"noNewPrivilegesErrno\":%d,\"seccompTsyncErrno\":%d,\"filteredOpenErrno\":%d,"
-                "\"filteredSocketErrno\":%d,\"filteredExecErrno\":%d,\"inheritedPipeWrite\":true}",
+                "\"filteredSocketErrno\":%d,\"filteredExecErrno\":%d,\"inheritedPipeWrite\":true,"
+                "\"notificationActionErrno\":%d,\"notificationListenerErrno\":%d,\"openat2Errno\":%d}",
                 outcome.baseline_open, outcome.baseline_socket, outcome.landlock_abi, outcome.landlock_errno,
                 outcome.no_new_privileges_errno, outcome.filter_errno, outcome.open_errno,
-                outcome.socket_errno, outcome.exec_errno);
+                outcome.socket_errno, outcome.exec_errno, outcome.notification_action_errno,
+                outcome.notification_listener_errno, outcome.openat2_errno);
         } else {
             snprintf(response, sizeof(response), "child report missing fork_errno=%d bytes=%zd wait_status=%d",
                 fork_errno, count, status);
@@ -110,12 +129,14 @@ static napi_value run(napi_env env, napi_callback_info info)
 }
 
 napi_value RunWorkflowNode(napi_env env, napi_callback_info info);
+napi_value RunPtcFiles(napi_env env, napi_callback_info info);
 
 static napi_value init(napi_env env, napi_value exports)
 {
     const napi_property_descriptor properties[] = {
         {"run", NULL, run, NULL, NULL, NULL, napi_default, NULL},
         {"runNode", NULL, RunWorkflowNode, NULL, NULL, NULL, napi_default, NULL},
+        {"runFiles", NULL, RunPtcFiles, NULL, NULL, NULL, napi_default, NULL},
     };
     napi_define_properties(env, exports, sizeof(properties) / sizeof(properties[0]), properties);
     return exports;

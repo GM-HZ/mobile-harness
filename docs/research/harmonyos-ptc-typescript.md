@@ -6,7 +6,7 @@ RC.3 的通用 PTC 在启动执行进程前调用 Node `stripTypeScriptTypes`。
 
 探针用同版本带 WASM 的 Amaro 生成基准，再在鸿蒙原生 Node worker 启用 seccomp 后对照 JavaScript 输出和错误。长脚本实测暴露了缓冲区扩容后仍读取旧视图的问题，包装改为按缓冲区身份刷新。最终在 API 26 Phone 模拟器上，80 个用例全部匹配，其中 69 个成功擦除、11 个按原版规则拒绝。加载解析器和基准数据用时 302 ms，执行对照用时 219 ms。带类型标注和 `await` 的固定脚本在受限进程中返回 `42`。 [探针记录](../evidence/emulator-ptc-amaro-2026-11-17.json)
 
-本轮使用独立 HAP。通用 PTC 仍需接入正式 Host 的运行入口与生命周期，并验证工作区读写授权。模拟器的 Landlock 调用返回 `ENOSYS`，已有 Workflow 的无文件访问策略只能支撑纯计算和明确注册的 Host 回调。 [原生隔离证据](../evidence/emulator-workflow-sandbox-2026-11-17.json)
+本轮使用独立 HAP。通用 PTC 仍需接入正式 Host 的运行入口与生命周期。模拟器的 Landlock 调用返回 `ENOSYS`，独立文件探针已验证另一条工作区授权路径。 [原生隔离证据](../evidence/emulator-workflow-sandbox-2026-11-17.json) · [文件授权探针](harmonyos-ptc-files.md)
 
 ## 复现
 

@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "bundle": "org.mobileharness.workflowsandbox",
+  "appBaseline": "8c8a8e4763cc069dec2ac4f5879ccf8b64879c43",
+  "dshVersion": "0.2.2-rc.3",
+  "unsignedHapSha256": "8655f3e401c37e5f9390e9ed1b0b7782d25c9a97df6374bc0b3c2611781ba3e3",
+  "unsignedHapBytes": 114417530,
+  "buildExitCode": 0,
+  "installAndStartExitCode": 0,
+  "runLogTimestamps": ["11-17 22:41:37.367", "11-17 22:42:09.633"],
+  "kernel": {
+    "notificationActionErrno": 0,
+    "notificationListenerErrno": 0,
+    "openat2Errno": 0,
+    "landlockErrno": 38,
+    "atomicAddfdErrno": 22,
+    "nonAtomicAddfdAndReply": true,
+    "tsyncExistingThreadDirectOpenat2Errno": 1
+  },
+  "workerPaths": ["read.txt", "created.txt", "../outside.txt", "absolute outside fixture"],
+  "readOnly": {
+    "protocolErrno": 0,
+    "pathCopyErrno": 0,
+    "openErrnos": [0, 13, 18, 13],
+    "injected": 1,
+    "readVerified": true,
+    "fileCreated": false,
+    "directOpenat2Errno": 1,
+    "cleanExit": true
+  },
+  "workspaceWrite": {
+    "protocolErrno": 0,
+    "pathCopyErrno": 0,
+    "openErrnos": [0, 0, 18, 13],
+    "injected": 2,
+    "readVerified": true,
+    "writeVerifiedFromHost": true,
+    "directOpenat2Errno": 1,
+    "cleanExit": true
+  },
+  "scope": {
+    "earlierFailure": "The initial probe stopped at the unsupported atomic descriptor grant.",
+    "workflowProbe": "existing restricted Node fixture and timeout completed on the same artifact",
+    "productionPtc": "not integrated",
+    "mate60": "HDC offline"
+  }
+}

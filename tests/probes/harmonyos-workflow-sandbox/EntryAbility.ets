@@ -7,6 +7,7 @@ import probe from 'libworkflowprobe.so';
 export default class EntryAbility extends UIAbility {
   onCreate(): void {
     hilog.info(0xD005, 'WorkflowSandboxProbe', '%{public}s', probe.run());
+    hilog.info(0xD005, 'PtcFilesProbe', '%{public}s', probe.runFiles(this.context.filesDir));
     const amaro = this.context.resourceManager.getRawFileContentSync('amaro-probe-enabled');
     if (amaro[0] === 49) {
       for (const name of ['amaro.cjs', 'instantiate.cjs', 'reference.json', 'verify.cjs']) {
