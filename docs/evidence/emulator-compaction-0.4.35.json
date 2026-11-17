@@ -1,0 +1,798 @@
+{
+  "recordedAt": "2026-11-17T23:16:57.257211+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "baselineCommit": "d0a04e75b9c1f49dad2cbceb6bf2f02a81e5c00a",
+  "scope": "Additional real compaction validation of unchanged installed0.4.35; no new HAP or production version created",
+  "provenance": {
+    "checkedAt": "2026-11-17T23:16:13.813846+00:00",
+    "npmNext": {
+      "url": "https://registry.npmjs.org/@deepseek-ai%2fdsh/next",
+      "version": "0.2.2-rc.4"
+    },
+    "artifact": {
+      "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.35-unsigned.hap",
+      "sourceCommit": "684d101e97a61a8b929e2628d2cd43022dab48d8",
+      "bytes": 662455928,
+      "sha256": "555be71d17877797b50e42c1f6150a1a83898a7668ddc52670226320550ba64e"
+    },
+    "productionDiffSinceInstalledBaseline": []
+  },
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-compaction.py",
+        "127.0.0.1:15557",
+        ".build/compaction/manual.json"
+      ],
+      "environment": "MH_TEST_DEEPSEEK_API_KEY from existing user-authorized local environment (value omitted)",
+      "testSourceCommit": "e4e55374493cd1a2a9cc894b51dd10000672b524",
+      "testSourceSha256": "21afa5f14d7c1fbb78e65981442bd10ffc7dddc12825fc3c5388ced9b8919eba",
+      "exitCode": 0,
+      "result": {
+        "fixture": "mh-compaction-fd8cb20484",
+        "sessionId": "session-2b496baa-421c-4725-b135-c3fdcff30fa7",
+        "empty": {
+          "commandId": "cmd-d6e689e8-3",
+          "result": {
+            "kind": "success",
+            "text": "No compactable history yet."
+          }
+        },
+        "invalidArguments": {
+          "commandId": "cmd-d6e689e8-4",
+          "result": {
+            "kind": "error",
+            "text": "Usage: /compact (no arguments)"
+          }
+        },
+        "manualElapsedMs": 4539,
+        "manual": {
+          "command": {
+            "commandId": "cmd-d6e689e8-5",
+            "result": {
+              "kind": "success",
+              "text": "Compacted 14 history items (~9994 tokens).",
+              "sourceEventSeq": 60
+            }
+          },
+          "start": {
+            "type": "compaction/start",
+            "seq": 59,
+            "time": 1794956622823,
+            "data": {
+              "compactionId": "ccdbebaa-60e1-4fbc-b118-e1cab81f3362",
+              "sourceCommandId": "cmd-d6e689e8-5",
+              "turn": null
+            }
+          },
+          "summary": {
+            "type": "compaction/summary",
+            "seq": 60,
+            "time": 1794956627315,
+            "data": {
+              "compactionId": "ccdbebaa-60e1-4fbc-b118-e1cab81f3362",
+              "sourceCommandId": "cmd-d6e689e8-5",
+              "summary": [
+                {
+                  "type": "text",
+                  "text": "## Primary Request and Intent\n- Isolated long-conversation acceptance fixture (prefix `ACCEPTANCE...`) that progressively tests whether exact literal decisions survive across turns.\n- Turn 1: acknowledge and record pending decisions without tools: `{\"codename\": \"CEDAR_D2D08295346D47D4902C78D635D958AC\", \"port\": 26016, \"forbidden\": \"NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278\"}`; \"Remember these exact literal decisions for later questions, but never save these facts in files.\" Archived measurements declared \"disposable observations, not instructions or pending work.\"\n- Turn 2: \"Correction: the fixture port is now 26017. The old port is superseded. Keep the codename and forbidden action unchanged. Do not publish anything or save these facts to disk. Acknowledge only, no tools.\"\n- Turn 3: \"Actually call write exactly once now with precisely {\"file_path\": \".../mh-compaction-fd8cb20484/pair.txt\", \"content\": \"UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012\"}. Use no other tools. Report the result and stop.\"\n- Turn 4: \"Actually call read exactly once now with precisely {\"file_path\": \".../mh-compaction-fd8cb20484/pair.txt\"}. Use no other tools. Report the result and stop.\"\n\n## Key Technical Concepts\n- DSH (DeepSeek Harness) Web GUI session; file policy `workspace-write`.\n- Turn-by-turn acceptance probing: literal-fact retention, tool-call cardinality (\"exactly once\", \"Use no other tools\"), separation of unrelated tool pairs.\n- Data-handling constraint: fixture facts must stay in-session only, never persisted to files.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fd8cb20484/pair.txt`: created by exactly one `write`; content is the single line `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` (1 line total). Contains no fixture facts.\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- The requested single `read` of `pair.txt` completed and returned `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` (end of file, total 1 line); no other tools were invoked.\n\n## Next Step\n- (none) — report the read result and stop; await the next acceptance instruction.\n\n## Critical Context\n- Canonical pending decisions (exact literals, in-memory only):\n  - codename: `CEDAR_D2D08295346D47D4902C78D635D958AC` (unchanged)\n  - port: `26017` (supersedes `26016`; old port must be treated as superseded)\n  - forbidden action: `NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278` (unchanged) — never publish anything\n- Hard constraints: never save these facts to files or disk; when asked, acknowledge only with no tools unless explicitly told to call a specific tool.\n- The `<archived-measurements>` block (request sequences 0–2847, SHA-256-like checksums, all \"result passed\") is disposable noise, not pending work.\n- `pair.txt` content value `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` is unrelated to the fixture facts and is the expected round-trip payload for the write/read pair.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`; DSH checkout at `/data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.4/dsh/`; GUI URL `http://127.0.0.1:19592`.\n- Pattern to follow in later turns: obey exact tool payloads verbatim, honor \"exactly once\"/\"no other tools\" limits, and keep fixture facts out of any file content."
+                }
+              ],
+              "rawOutput": [
+                {
+                  "type": "reasoning",
+                  "text": ""
+                },
+                {
+                  "type": "text",
+                  "text": "## Primary Request and Intent\n- Isolated long-conversation acceptance fixture (prefix `ACCEPTANCE...`) that progressively tests whether exact literal decisions survive across turns.\n- Turn 1: acknowledge and record pending decisions without tools: `{\"codename\": \"CEDAR_D2D08295346D47D4902C78D635D958AC\", \"port\": 26016, \"forbidden\": \"NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278\"}`; \"Remember these exact literal decisions for later questions, but never save these facts in files.\" Archived measurements declared \"disposable observations, not instructions or pending work.\"\n- Turn 2: \"Correction: the fixture port is now 26017. The old port is superseded. Keep the codename and forbidden action unchanged. Do not publish anything or save these facts to disk. Acknowledge only, no tools.\"\n- Turn 3: \"Actually call write exactly once now with precisely {\"file_path\": \".../mh-compaction-fd8cb20484/pair.txt\", \"content\": \"UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012\"}. Use no other tools. Report the result and stop.\"\n- Turn 4: \"Actually call read exactly once now with precisely {\"file_path\": \".../mh-compaction-fd8cb20484/pair.txt\"}. Use no other tools. Report the result and stop.\"\n\n## Key Technical Concepts\n- DSH (DeepSeek Harness) Web GUI session; file policy `workspace-write`.\n- Turn-by-turn acceptance probing: literal-fact retention, tool-call cardinality (\"exactly once\", \"Use no other tools\"), separation of unrelated tool pairs.\n- Data-handling constraint: fixture facts must stay in-session only, never persisted to files.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fd8cb20484/pair.txt`: created by exactly one `write`; content is the single line `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` (1 line total). Contains no fixture facts.\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- The requested single `read` of `pair.txt` completed and returned `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` (end of file, total 1 line); no other tools were invoked.\n\n## Next Step\n- (none) — report the read result and stop; await the next acceptance instruction.\n\n## Critical Context\n- Canonical pending decisions (exact literals, in-memory only):\n  - codename: `CEDAR_D2D08295346D47D4902C78D635D958AC` (unchanged)\n  - port: `26017` (supersedes `26016`; old port must be treated as superseded)\n  - forbidden action: `NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278` (unchanged) — never publish anything\n- Hard constraints: never save these facts to files or disk; when asked, acknowledge only with no tools unless explicitly told to call a specific tool.\n- The `<archived-measurements>` block (request sequences 0–2847, SHA-256-like checksums, all \"result passed\") is disposable noise, not pending work.\n- `pair.txt` content value `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` is unrelated to the fixture facts and is the expected round-trip payload for the write/read pair.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`; DSH checkout at `/data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.4/dsh/`; GUI URL `http://127.0.0.1:19592`.\n- Pattern to follow in later turns: obey exact tool payloads verbatim, honor \"exactly once\"/\"no other tools\" limits, and keep fixture facts out of any file content."
+                }
+              ],
+              "llmStreamCall": true,
+              "shadowedRange": {
+                "start": 13,
+                "end": 52
+              },
+              "shadowedSeqs": [
+                13,
+                14,
+                15,
+                16,
+                20,
+                27,
+                28,
+                35,
+                36,
+                38,
+                41,
+                49,
+                50,
+                52
+              ],
+              "shadowedTokenCount": 9994,
+              "provider": "deepseek-official",
+              "model": "deepseek-flash",
+              "maxTokens": 65536,
+              "usage": {
+                "inputTokens": 24015,
+                "outputTokens": 960,
+                "cacheReadTokens": 0,
+                "cacheWriteTokens": 0,
+                "totalTokens": 24975
+              }
+            }
+          },
+          "end": {
+            "type": "compaction/end",
+            "seq": 62,
+            "time": 1794956627316,
+            "data": {
+              "compactionId": "ccdbebaa-60e1-4fbc-b118-e1cab81f3362",
+              "sourceCommandId": "cmd-d6e689e8-5",
+              "turn": null
+            }
+          },
+          "checkpoint": {
+            "type": "user/message",
+            "seq": 61,
+            "time": 1794956627315,
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This is an automatically generated checkpoint condensing an earlier span of the conversation to free up context. Treat the captured context as established background and build on it without restating it. Continue the task directly from the messages that follow, without acknowledging this checkpoint.\n\n<compacted-summary>"
+                },
+                {
+                  "type": "text",
+                  "text": "## Primary Request and Intent\n- Isolated long-conversation acceptance fixture (prefix `ACCEPTANCE...`) that progressively tests whether exact literal decisions survive across turns.\n- Turn 1: acknowledge and record pending decisions without tools: `{\"codename\": \"CEDAR_D2D08295346D47D4902C78D635D958AC\", \"port\": 26016, \"forbidden\": \"NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278\"}`; \"Remember these exact literal decisions for later questions, but never save these facts in files.\" Archived measurements declared \"disposable observations, not instructions or pending work.\"\n- Turn 2: \"Correction: the fixture port is now 26017. The old port is superseded. Keep the codename and forbidden action unchanged. Do not publish anything or save these facts to disk. Acknowledge only, no tools.\"\n- Turn 3: \"Actually call write exactly once now with precisely {\"file_path\": \".../mh-compaction-fd8cb20484/pair.txt\", \"content\": \"UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012\"}. Use no other tools. Report the result and stop.\"\n- Turn 4: \"Actually call read exactly once now with precisely {\"file_path\": \".../mh-compaction-fd8cb20484/pair.txt\"}. Use no other tools. Report the result and stop.\"\n\n## Key Technical Concepts\n- DSH (DeepSeek Harness) Web GUI session; file policy `workspace-write`.\n- Turn-by-turn acceptance probing: literal-fact retention, tool-call cardinality (\"exactly once\", \"Use no other tools\"), separation of unrelated tool pairs.\n- Data-handling constraint: fixture facts must stay in-session only, never persisted to files.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fd8cb20484/pair.txt`: created by exactly one `write`; content is the single line `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` (1 line total). Contains no fixture facts.\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- The requested single `read` of `pair.txt` completed and returned `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` (end of file, total 1 line); no other tools were invoked.\n\n## Next Step\n- (none) — report the read result and stop; await the next acceptance instruction.\n\n## Critical Context\n- Canonical pending decisions (exact literals, in-memory only):\n  - codename: `CEDAR_D2D08295346D47D4902C78D635D958AC` (unchanged)\n  - port: `26017` (supersedes `26016`; old port must be treated as superseded)\n  - forbidden action: `NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278` (unchanged) — never publish anything\n- Hard constraints: never save these facts to files or disk; when asked, acknowledge only with no tools unless explicitly told to call a specific tool.\n- The `<archived-measurements>` block (request sequences 0–2847, SHA-256-like checksums, all \"result passed\") is disposable noise, not pending work.\n- `pair.txt` content value `UNRELATED_TOOL_PAIR_3b1849c6e5dd4ad19fd7414f2135e012` is unrelated to the fixture facts and is the expected round-trip payload for the write/read pair.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`; DSH checkout at `/data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.4/dsh/`; GUI URL `http://127.0.0.1:19592`.\n- Pattern to follow in later turns: obey exact tool payloads verbatim, honor \"exactly once\"/\"no other tools\" limits, and keep fixture facts out of any file content."
+                },
+                {
+                  "type": "text",
+                  "text": "</compacted-summary>"
+                }
+              ],
+              "source": {
+                "kind": "compact-checkpoint",
+                "compactionId": "ccdbebaa-60e1-4fbc-b118-e1cab81f3362",
+                "sourceCommandId": "cmd-d6e689e8-5"
+              },
+              "role": "user",
+              "id": "4e27811e-3b5a-453b-a8a9-e66783bb79cd"
+            },
+            "sourceEventSeqs": [
+              59,
+              60,
+              13,
+              14,
+              15,
+              16,
+              20,
+              27,
+              28,
+              35,
+              36,
+              38,
+              41,
+              49,
+              50,
+              52
+            ],
+            "surfaceOp": {
+              "op": "replace",
+              "startSeq": 13,
+              "endSeq": 52
+            }
+          },
+          "selectedToolPairs": 2,
+          "sourceEventDataBytes": 55871,
+          "checkpointTextBytes": 3712
+        },
+        "recallAfterCompaction": "{\"codename\": \"CEDAR_D2D08295346D47D4902C78D635D958AC\", \"port\": 26017, \"forbidden\": \"NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278\"}",
+        "restartReadyMs": 5943,
+        "recallAfterRestart": "{\"codename\": \"CEDAR_D2D08295346D47D4902C78D635D958AC\", \"port\": 26017, \"forbidden\": \"NEVER_PUBLISH_3DCCDBB8210248CA96A977CE433BF278\"}",
+        "sameSessionCheckpointAndFactsAfterRestart": true,
+        "temporaryModelCredentialRemoved": true,
+        "ownedFilesRemoved": true
+      },
+      "log": ".build/compaction/manual.log"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-compaction-faults.py",
+        "127.0.0.1:15557",
+        ".build/compaction/faults.json"
+      ],
+      "environment": "MH_TEST_DEEPSEEK_API_KEY from existing user-authorized local environment (value omitted)",
+      "testSourceCommit": "655e371a2039980d3ba9bc219a24ae28dab78aff",
+      "testSourceSha256": "3751b40666fe8a21caca55f78588f32edf3d2535d295474b83ccbc94388ac72d",
+      "exitCode": 0,
+      "result": {
+        "fixture": "mh-compaction-fault-9ca0fe3c15",
+        "originalHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        },
+        "fixtureReadyMs": 6141,
+        "cancel": {
+          "observedRealProviderChunk": {
+            "sessionId": "session-ff59ddad-df62-4eef-986c-f5031214cc5a",
+            "purpose": "compaction",
+            "provider": "deepseek-official",
+            "model": "deepseek-flash",
+            "chunkType": "text-delta",
+            "realTextCharacters": 2
+          },
+          "concurrentRequestRejected": {
+            "commandId": "cmd-2475ffc5-2",
+            "result": {
+              "kind": "error",
+              "text": "Compaction is unavailable because this process has an active compaction, or the agent is not idle."
+            }
+          },
+          "cancelled": {
+            "start": {
+              "type": "compaction/start",
+              "seq": 47,
+              "time": 1794956921436,
+              "data": {
+                "compactionId": "f3baea21-bf5d-4240-a532-3aba54a37e48",
+                "sourceCommandId": "cmd-2475ffc5-1",
+                "turn": null
+              }
+            },
+            "end": {
+              "type": "compaction/end",
+              "seq": 51,
+              "time": 1794956921968,
+              "data": {
+                "compactionId": "f3baea21-bf5d-4240-a532-3aba54a37e48",
+                "sourceCommandId": "cmd-2475ffc5-1",
+                "turn": null,
+                "error": "This operation was aborted"
+              }
+            },
+            "noSummaryOrCheckpointCommitted": true
+          },
+          "disconnectToSettledMs": 36,
+          "successfulRetry": {
+            "command": {
+              "commandId": "cmd-2475ffc5-3",
+              "result": {
+                "kind": "success",
+                "text": "Compacted 12 history items (~7277 tokens).",
+                "sourceEventSeq": 54
+              }
+            },
+            "start": {
+              "type": "compaction/start",
+              "seq": 53,
+              "time": 1794956922192,
+              "data": {
+                "compactionId": "80f3a17e-5d71-4f61-b011-e1771f7471a1",
+                "sourceCommandId": "cmd-2475ffc5-3",
+                "turn": null
+              }
+            },
+            "summary": {
+              "type": "compaction/summary",
+              "seq": 54,
+              "time": 1794956925081,
+              "data": {
+                "compactionId": "80f3a17e-5d71-4f61-b011-e1771f7471a1",
+                "sourceCommandId": "cmd-2475ffc5-3",
+                "summary": [
+                  {
+                    "type": "text",
+                    "text": "## Primary Request and Intent\n- The session is an \"owned compaction fixture.\" One task asks the assistant to remember an exact label and not save it to disk: \"remember this essential exact label for later recall: FACT_E3F6F089B1AE418EA9D2FD7E722E9BC5. Do not save the label to disk or call tools.\"\n- The archived observations (rows 0–179) are disposable, and the user says to \"Acknowledge only.\"\n- A later request is to call `write` exactly once with an exact payload, use no other tools, and \"Report the result and stop.\"\n- A final request is to call `read` exactly once on the same file, use no other tools, and \"Report the result and stop.\"\n\n## Key Technical Concepts\n- DeepSeek Harness (DSH) Web GUI sessions run in a sandbox whose file policy is `workspace-write`.\n- The file tools are `read` and `write`.\n- Tool-call discipline: exactly one call, no extra tools; report and stop.\n- A compaction-fault fixture: paired write/read operations to verify recovery across compaction boundaries.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-cancel.txt` this file was created by `write` with content `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`, and it was read back successfully; it contains one line and the write tool reported \"Created file\".\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- The single `read` call on `pair-cancel.txt` succeeded. The file contained 1 line: `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`.\n\n## Next Step\n- (none)\n\n## Critical Context\n- Essential label to recall: `FACT_E3F6F089B1AE418EA9D2FD7E722E9BC5`; it was deliberately kept only in context and never written to disk.\n- The archived rows 0–179 contain only \"observation passed, no remaining work\"; they are disposable and require no action.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`.\n- Output of the write call: `<path>.../pair-cancel.txt</path>` and \"Created file.\"\n- Output of the read call: `<path>.../pair-cancel.txt</path>`; line 1 is `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`; the file is 1 line total.\n- Both the write and the read commands were executed exactly once, and the user was told the result; no further action is expected."
+                  }
+                ],
+                "rawOutput": [
+                  {
+                    "type": "reasoning",
+                    "text": ""
+                  },
+                  {
+                    "type": "text",
+                    "text": "## Primary Request and Intent\n- The session is an \"owned compaction fixture.\" One task asks the assistant to remember an exact label and not save it to disk: \"remember this essential exact label for later recall: FACT_E3F6F089B1AE418EA9D2FD7E722E9BC5. Do not save the label to disk or call tools.\"\n- The archived observations (rows 0–179) are disposable, and the user says to \"Acknowledge only.\"\n- A later request is to call `write` exactly once with an exact payload, use no other tools, and \"Report the result and stop.\"\n- A final request is to call `read` exactly once on the same file, use no other tools, and \"Report the result and stop.\"\n\n## Key Technical Concepts\n- DeepSeek Harness (DSH) Web GUI sessions run in a sandbox whose file policy is `workspace-write`.\n- The file tools are `read` and `write`.\n- Tool-call discipline: exactly one call, no extra tools; report and stop.\n- A compaction-fault fixture: paired write/read operations to verify recovery across compaction boundaries.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-cancel.txt` this file was created by `write` with content `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`, and it was read back successfully; it contains one line and the write tool reported \"Created file\".\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- The single `read` call on `pair-cancel.txt` succeeded. The file contained 1 line: `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`.\n\n## Next Step\n- (none)\n\n## Critical Context\n- Essential label to recall: `FACT_E3F6F089B1AE418EA9D2FD7E722E9BC5`; it was deliberately kept only in context and never written to disk.\n- The archived rows 0–179 contain only \"observation passed, no remaining work\"; they are disposable and require no action.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`.\n- Output of the write call: `<path>.../pair-cancel.txt</path>` and \"Created file.\"\n- Output of the read call: `<path>.../pair-cancel.txt</path>`; line 1 is `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`; the file is 1 line total.\n- Both the write and the read commands were executed exactly once, and the user was told the result; no further action is expected."
+                  }
+                ],
+                "llmStreamCall": true,
+                "shadowedRange": {
+                  "start": 9,
+                  "end": 40
+                },
+                "shadowedSeqs": [
+                  9,
+                  10,
+                  11,
+                  12,
+                  16,
+                  23,
+                  24,
+                  26,
+                  29,
+                  37,
+                  38,
+                  40
+                ],
+                "shadowedTokenCount": 7277,
+                "provider": "deepseek-official",
+                "model": "deepseek-flash",
+                "maxTokens": 65536,
+                "usage": {
+                  "inputTokens": 247,
+                  "outputTokens": 634,
+                  "cacheReadTokens": 20608,
+                  "cacheWriteTokens": 0,
+                  "totalTokens": 21489
+                }
+              }
+            },
+            "end": {
+              "type": "compaction/end",
+              "seq": 56,
+              "time": 1794956925082,
+              "data": {
+                "compactionId": "80f3a17e-5d71-4f61-b011-e1771f7471a1",
+                "sourceCommandId": "cmd-2475ffc5-3",
+                "turn": null
+              }
+            },
+            "checkpoint": {
+              "type": "user/message",
+              "seq": 55,
+              "time": 1794956925082,
+              "data": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "This is an automatically generated checkpoint condensing an earlier span of the conversation to free up context. Treat the captured context as established background and build on it without restating it. Continue the task directly from the messages that follow, without acknowledging this checkpoint.\n\n<compacted-summary>"
+                  },
+                  {
+                    "type": "text",
+                    "text": "## Primary Request and Intent\n- The session is an \"owned compaction fixture.\" One task asks the assistant to remember an exact label and not save it to disk: \"remember this essential exact label for later recall: FACT_E3F6F089B1AE418EA9D2FD7E722E9BC5. Do not save the label to disk or call tools.\"\n- The archived observations (rows 0–179) are disposable, and the user says to \"Acknowledge only.\"\n- A later request is to call `write` exactly once with an exact payload, use no other tools, and \"Report the result and stop.\"\n- A final request is to call `read` exactly once on the same file, use no other tools, and \"Report the result and stop.\"\n\n## Key Technical Concepts\n- DeepSeek Harness (DSH) Web GUI sessions run in a sandbox whose file policy is `workspace-write`.\n- The file tools are `read` and `write`.\n- Tool-call discipline: exactly one call, no extra tools; report and stop.\n- A compaction-fault fixture: paired write/read operations to verify recovery across compaction boundaries.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-cancel.txt` this file was created by `write` with content `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`, and it was read back successfully; it contains one line and the write tool reported \"Created file\".\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- The single `read` call on `pair-cancel.txt` succeeded. The file contained 1 line: `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`.\n\n## Next Step\n- (none)\n\n## Critical Context\n- Essential label to recall: `FACT_E3F6F089B1AE418EA9D2FD7E722E9BC5`; it was deliberately kept only in context and never written to disk.\n- The archived rows 0–179 contain only \"observation passed, no remaining work\"; they are disposable and require no action.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`.\n- Output of the write call: `<path>.../pair-cancel.txt</path>` and \"Created file.\"\n- Output of the read call: `<path>.../pair-cancel.txt</path>`; line 1 is `UNRELATED_ea3e85a136fe45e7b7b1bec1019fd207`; the file is 1 line total.\n- Both the write and the read commands were executed exactly once, and the user was told the result; no further action is expected."
+                  },
+                  {
+                    "type": "text",
+                    "text": "</compacted-summary>"
+                  }
+                ],
+                "source": {
+                  "kind": "compact-checkpoint",
+                  "compactionId": "80f3a17e-5d71-4f61-b011-e1771f7471a1",
+                  "sourceCommandId": "cmd-2475ffc5-3"
+                },
+                "role": "user",
+                "id": "5cf1d5f9-9469-41c5-9336-9a7031667896"
+              },
+              "sourceEventSeqs": [
+                53,
+                54,
+                9,
+                10,
+                11,
+                12,
+                16,
+                23,
+                24,
+                26,
+                29,
+                37,
+                38,
+                40
+              ],
+              "surfaceOp": {
+                "op": "replace",
+                "startSeq": 9,
+                "endSeq": 40
+              }
+            },
+            "selectedToolPairs": 2,
+            "sourceEventDataBytes": 42785,
+            "checkpointTextBytes": 2620
+          },
+          "exactRecallAfterRetry": "FACT_E3F6F089B1AE418EA9D2FD7E722E9BC5"
+        },
+        "failure": {
+          "failure": {
+            "start": {
+              "type": "compaction/start",
+              "seq": 47,
+              "time": 1794956931501,
+              "data": {
+                "compactionId": "b25ba429-7df6-4562-bed0-a76b418347af",
+                "sourceCommandId": "cmd-2475ffc5-4",
+                "turn": null
+              }
+            },
+            "end": {
+              "type": "compaction/end",
+              "seq": 48,
+              "time": 1794956932593,
+              "data": {
+                "compactionId": "b25ba429-7df6-4562-bed0-a76b418347af",
+                "sourceCommandId": "cmd-2475ffc5-4",
+                "turn": null,
+                "error": "OWNED_COMPACTION_STREAM_FAILURE"
+              }
+            },
+            "noSummaryOrCheckpointCommitted": true
+          },
+          "observedRealProviderChunk": {
+            "sessionId": "session-36d42064-209f-4438-baa4-8f2306c83b6e",
+            "purpose": "compaction",
+            "provider": "deepseek-official",
+            "model": "deepseek-flash",
+            "chunkType": "text-delta",
+            "realTextCharacters": 2
+          },
+          "successfulRetry": {
+            "command": {
+              "commandId": "cmd-2475ffc5-5",
+              "result": {
+                "kind": "success",
+                "text": "Compacted 12 history items (~7256 tokens).",
+                "sourceEventSeq": 52
+              }
+            },
+            "start": {
+              "type": "compaction/start",
+              "seq": 51,
+              "time": 1794956932847,
+              "data": {
+                "compactionId": "a683338d-79ed-4b08-a816-e36fbcd6d645",
+                "sourceCommandId": "cmd-2475ffc5-5",
+                "turn": null
+              }
+            },
+            "summary": {
+              "type": "compaction/summary",
+              "seq": 52,
+              "time": 1794956935754,
+              "data": {
+                "compactionId": "a683338d-79ed-4b08-a816-e36fbcd6d645",
+                "sourceCommandId": "cmd-2475ffc5-5",
+                "summary": [
+                  {
+                    "type": "text",
+                    "text": "## Primary Request and Intent\n- Compaction-fixture test sequence, each turn carrying an `ACCEPTANCE<hash>` identifier with an exact, verbatim tool directive:\n  - Turn 1: \"remember this essential exact label for later recall: FACT_9E9297679464414DB36FD87A0188D543. Do not save the label to disk or call tools. The following completed observations are disposable. Acknowledge only.\" (180 archived checksum rows, all \"observation passed, no remaining work.\")\n  - Turn 2: \"Actually call write exactly once now with precisely {\"file_path\": \".../pair-failure.txt\", \"content\": \"UNRELATED_f1379b756f8e4db288270fea53492a7a\"}. Use no other tools. Report the result and stop.\"\n  - Turn 3: \"Actually call read exactly once now with precisely {\"file_path\": \".../pair-failure.txt\"}. Use no other tools. Report the result and stop.\"\n\n## Key Technical Concepts\n- DeepSeek Harness (DSH) agent harness checkouts/prefixed e.g. \"ACCEPTANCE<hash>\", exact single-tool-call instructions, workspace-write file sandbox, tool-result verbosity.\n- Compaction/checkpoint fixtures; persistence of a labeled fact across turns without disk writes.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-failure.txt`: created in turn 2 with content `UNRELATED_f1379b756f8e4db288270fea53492a7a`; read in turn 3 (1 line, correct content).\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- Turn 3 `read` returned exactly: `<path>/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-failure.txt</path>` with body `UNRELATED_f1379b756f8e4db288270fea53492a7a` and `(End of file - total 1 lines)`.\n\n## Next Step\n- (none)\n\n## Critical Context\n- Essential label held only in context, not on disk: `FACT_9E9297679464414DB36FD87A0188D543` — retain for any later recall request.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`.\n- Constraints honored: exactly one tool call per instructed turn, no disk writes for the label, archived rows treated as disposable.\n- Each turn ended with a short result report and stop, as instructed."
+                  }
+                ],
+                "rawOutput": [
+                  {
+                    "type": "reasoning",
+                    "text": ""
+                  },
+                  {
+                    "type": "text",
+                    "text": "## Primary Request and Intent\n- Compaction-fixture test sequence, each turn carrying an `ACCEPTANCE<hash>` identifier with an exact, verbatim tool directive:\n  - Turn 1: \"remember this essential exact label for later recall: FACT_9E9297679464414DB36FD87A0188D543. Do not save the label to disk or call tools. The following completed observations are disposable. Acknowledge only.\" (180 archived checksum rows, all \"observation passed, no remaining work.\")\n  - Turn 2: \"Actually call write exactly once now with precisely {\"file_path\": \".../pair-failure.txt\", \"content\": \"UNRELATED_f1379b756f8e4db288270fea53492a7a\"}. Use no other tools. Report the result and stop.\"\n  - Turn 3: \"Actually call read exactly once now with precisely {\"file_path\": \".../pair-failure.txt\"}. Use no other tools. Report the result and stop.\"\n\n## Key Technical Concepts\n- DeepSeek Harness (DSH) agent harness checkouts/prefixed e.g. \"ACCEPTANCE<hash>\", exact single-tool-call instructions, workspace-write file sandbox, tool-result verbosity.\n- Compaction/checkpoint fixtures; persistence of a labeled fact across turns without disk writes.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-failure.txt`: created in turn 2 with content `UNRELATED_f1379b756f8e4db288270fea53492a7a`; read in turn 3 (1 line, correct content).\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- Turn 3 `read` returned exactly: `<path>/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-failure.txt</path>` with body `UNRELATED_f1379b756f8e4db288270fea53492a7a` and `(End of file - total 1 lines)`.\n\n## Next Step\n- (none)\n\n## Critical Context\n- Essential label held only in context, not on disk: `FACT_9E9297679464414DB36FD87A0188D543` — retain for any later recall request.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`.\n- Constraints honored: exactly one tool call per instructed turn, no disk writes for the label, archived rows treated as disposable.\n- Each turn ended with a short result report and stop, as instructed."
+                  }
+                ],
+                "llmStreamCall": true,
+                "shadowedRange": {
+                  "start": 9,
+                  "end": 40
+                },
+                "shadowedSeqs": [
+                  9,
+                  10,
+                  11,
+                  12,
+                  16,
+                  23,
+                  24,
+                  26,
+                  29,
+                  37,
+                  38,
+                  40
+                ],
+                "shadowedTokenCount": 7256,
+                "provider": "deepseek-official",
+                "model": "deepseek-flash",
+                "maxTokens": 65536,
+                "usage": {
+                  "inputTokens": 212,
+                  "outputTokens": 605,
+                  "cacheReadTokens": 20608,
+                  "cacheWriteTokens": 0,
+                  "totalTokens": 21425
+                }
+              }
+            },
+            "end": {
+              "type": "compaction/end",
+              "seq": 54,
+              "time": 1794956935755,
+              "data": {
+                "compactionId": "a683338d-79ed-4b08-a816-e36fbcd6d645",
+                "sourceCommandId": "cmd-2475ffc5-5",
+                "turn": null
+              }
+            },
+            "checkpoint": {
+              "type": "user/message",
+              "seq": 53,
+              "time": 1794956935755,
+              "data": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "This is an automatically generated checkpoint condensing an earlier span of the conversation to free up context. Treat the captured context as established background and build on it without restating it. Continue the task directly from the messages that follow, without acknowledging this checkpoint.\n\n<compacted-summary>"
+                  },
+                  {
+                    "type": "text",
+                    "text": "## Primary Request and Intent\n- Compaction-fixture test sequence, each turn carrying an `ACCEPTANCE<hash>` identifier with an exact, verbatim tool directive:\n  - Turn 1: \"remember this essential exact label for later recall: FACT_9E9297679464414DB36FD87A0188D543. Do not save the label to disk or call tools. The following completed observations are disposable. Acknowledge only.\" (180 archived checksum rows, all \"observation passed, no remaining work.\")\n  - Turn 2: \"Actually call write exactly once now with precisely {\"file_path\": \".../pair-failure.txt\", \"content\": \"UNRELATED_f1379b756f8e4db288270fea53492a7a\"}. Use no other tools. Report the result and stop.\"\n  - Turn 3: \"Actually call read exactly once now with precisely {\"file_path\": \".../pair-failure.txt\"}. Use no other tools. Report the result and stop.\"\n\n## Key Technical Concepts\n- DeepSeek Harness (DSH) agent harness checkouts/prefixed e.g. \"ACCEPTANCE<hash>\", exact single-tool-call instructions, workspace-write file sandbox, tool-result verbosity.\n- Compaction/checkpoint fixtures; persistence of a labeled fact across turns without disk writes.\n\n## Files and Code\n- `/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-failure.txt`: created in turn 2 with content `UNRELATED_f1379b756f8e4db288270fea53492a7a`; read in turn 3 (1 line, correct content).\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- Turn 3 `read` returned exactly: `<path>/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-compaction-fault-9ca0fe3c15/pair-failure.txt</path>` with body `UNRELATED_f1379b756f8e4db288270fea53492a7a` and `(End of file - total 1 lines)`.\n\n## Next Step\n- (none)\n\n## Critical Context\n- Essential label held only in context, not on disk: `FACT_9E9297679464414DB36FD87A0188D543` — retain for any later recall request.\n- Working directory: `/data/storage/el2/base/haps/entry/files/alpine/workspace-native`.\n- Constraints honored: exactly one tool call per instructed turn, no disk writes for the label, archived rows treated as disposable.\n- Each turn ended with a short result report and stop, as instructed."
+                  },
+                  {
+                    "type": "text",
+                    "text": "</compacted-summary>"
+                  }
+                ],
+                "source": {
+                  "kind": "compact-checkpoint",
+                  "compactionId": "a683338d-79ed-4b08-a816-e36fbcd6d645",
+                  "sourceCommandId": "cmd-2475ffc5-5"
+                },
+                "role": "user",
+                "id": "abafa02a-7673-4eec-b8f7-0912e7be0c95"
+              },
+              "sourceEventSeqs": [
+                51,
+                52,
+                9,
+                10,
+                11,
+                12,
+                16,
+                23,
+                24,
+                26,
+                29,
+                37,
+                38,
+                40
+              ],
+              "surfaceOp": {
+                "op": "replace",
+                "startSeq": 9,
+                "endSeq": 40
+              }
+            },
+            "selectedToolPairs": 2,
+            "sourceEventDataBytes": 42350,
+            "checkpointTextBytes": 2506
+          },
+          "exactRecallAfterRetry": "FACT_9E9297679464414DB36FD87A0188D543"
+        },
+        "temporaryModelCredentialRemoved": true,
+        "fixtureRemovedThroughPluginManager": true,
+        "restoredReadyMs": 4696,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "log": ".build/compaction/faults.log"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-compaction-auto.py",
+        "127.0.0.1:15557",
+        ".build/compaction/automatic.json"
+      ],
+      "environment": "MH_TEST_DEEPSEEK_API_KEY from existing user-authorized local environment (value omitted)",
+      "testSourceCommit": "b8ce0aee66ace1c58ef14f011674b62bec33d49d",
+      "testSourceSha256": "f01a3ad446871e2a4fc0b13c40fc7a1d06a4ab9318efdcbd3a18006253b6bb48",
+      "exitCode": 0,
+      "result": {
+        "fixture": "mh-auto-compact-dd8517f5c0",
+        "originalStandardPresetSha256": "815072112f13e8d7760b2cc5154a02d3ff4dae3efffa258a5391a1a2eebedc53",
+        "policy": {
+          "auto": true,
+          "thresholdRatio": 0.01,
+          "headroomTokens": 4096,
+          "retainTokens": 1,
+          "maxTokens": 4096,
+          "compactionRetries": 0
+        },
+        "fullOriginalStandardComposition": "- id: persona\n  name: '@deepseek-ai/dsh-persona'\n  config:\n    prefix: You are a coding agent powered by the {{model}} model.\n- id: agent-instructions\n  name: '@deepseek-ai/dsh-agent-instructions'\n  config:\n    maxBytes: 65536\n- id: time-context\n  name: '@deepseek-ai/dsh-time-context'\n- id: tool-bash\n  name: '@deepseek-ai/dsh-tool-bash'\n  disabled: !!js process.platform === 'win32'\n- id: tool-pwsh\n  name: '@deepseek-ai/dsh-tool-pwsh'\n  disabled: !!js process.platform !== 'win32'\n- id: tool-fs\n  name: '@deepseek-ai/dsh-tool-fs'\n  config:\n    applyPatch: false\n- id: tool-fs-search\n  name: '@deepseek-ai/dsh-tool-fs-search'\n  config:\n    sampleOverCapGlobResults: false\n- id: tool-jobs\n  name: '@deepseek-ai/dsh-tool-jobs'\n- id: tool-schedule\n  name: '@deepseek-ai/dsh-tool-schedule'\n- id: skill-filesystem\n  name: '@deepseek-ai/dsh-skill-filesystem'\n  config:\n    customSkillDirs:\n      - !!js process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('@deepseek-ai/dsh-agent-preset/package.json')), 'skills')\n- id: tool-skill\n  name: '@deepseek-ai/dsh-tool-skill'\n- id: command-goal\n  name: '@deepseek-ai/dsh-command-goal'\n- id: tool-goal\n  name: '@deepseek-ai/dsh-tool-goal'\n- id: planning\n  name: cordis:group\n  group: true\n  isolate:\n    planMode: true\n  config:\n    - id: plan-mode\n      name: '@deepseek-ai/dsh-plan-mode'\n      config:\n        section: |\n          You are in plan mode. Stay in plan mode until the user approves your plan through exit_plan_mode or switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.\n\n          Explore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.\n\n          The tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.\n\n          Resolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.\n\n          Make the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.\n\n          When ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask \"should I proceed?\" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.\n- id: compaction\n  name: cordis:group\n  group: true\n  isolate:\n    compaction: true\n    toolResultPruner: true\n  config:\n    - id: compaction-basic\n      name: '@deepseek-ai/dsh-compaction-basic'\n    - id: command-compact\n      name: '@deepseek-ai/dsh-command-compact'\n    - id: tool-result-pruner\n      name: '@deepseek-ai/dsh-compaction-tool-result-pruner'\n      config:\n        thresholdChars: 8192\n        headChars: 4096\n        tailChars: 1024\n- id: delegation\n  name: cordis:group\n  group: true\n  isolate:\n    workflowEngine: true\n  config:\n    - id: tool-subagent-control\n      name: '@deepseek-ai/dsh-tool-subagent-control'\n      config:\n        interrupt: false\n    - id: tool-subagent\n      name: '@deepseek-ai/dsh-tool-subagent'\n      config:\n        provider: spawn\n        toolName: subagent\n        modelSelection: true\n        modelDiscovery: true\n    - id: tool-subagent-fork\n      name: '@deepseek-ai/dsh-tool-subagent'\n      config:\n        provider: fork\n        toolName: subagent_fork\n    - id: workflow-ptc\n      name: '@deepseek-ai/dsh-workflow-ptc'\n      config:\n        provider: spawn\n    - id: tool-workflow\n      name: '@deepseek-ai/dsh-tool-workflow'\n- id: tool-ask-user\n  name: '@deepseek-ai/dsh-tool-ask-user'\n- id: tool-todo\n  name: '@deepseek-ai/dsh-tool-todo'\n  config:\n    allowParallelInProgress: true\n- id: tool-web\n  name: '@deepseek-ai/dsh-tool-web'\n  config:\n    fetch: true\n    searchTimeoutMs: 60000\n- id: present\n  name: '@deepseek-ai/dsh-tool-present'\n- id: tool-office\n  name: '@deepseek-ai/dsh-tool-office'\n- id: tool-plugin-manager\n  name: '@deepseek-ai/dsh-plugin-manager/tools'\n  disabled: !!js '!ctx.get(''profileContext'')'\n- id: tool-plugin-market\n  name: '@deepseek-ai/dsh-plugin-market/tools'\n  disabled: true\n",
+        "testPresetComposition": "- id: persona\n  name: '@deepseek-ai/dsh-persona'\n  config:\n    prefix: You are a coding agent powered by the {{model}} model.\n- id: agent-instructions\n  name: '@deepseek-ai/dsh-agent-instructions'\n  config:\n    maxBytes: 65536\n- id: time-context\n  name: '@deepseek-ai/dsh-time-context'\n- id: tool-bash\n  name: '@deepseek-ai/dsh-tool-bash'\n  disabled: !!js process.platform === 'win32'\n- id: tool-pwsh\n  name: '@deepseek-ai/dsh-tool-pwsh'\n  disabled: !!js process.platform !== 'win32'\n- id: tool-fs\n  name: '@deepseek-ai/dsh-tool-fs'\n  config:\n    applyPatch: false\n- id: tool-fs-search\n  name: '@deepseek-ai/dsh-tool-fs-search'\n  config:\n    sampleOverCapGlobResults: false\n- id: tool-jobs\n  name: '@deepseek-ai/dsh-tool-jobs'\n- id: tool-schedule\n  name: '@deepseek-ai/dsh-tool-schedule'\n- id: skill-filesystem\n  name: '@deepseek-ai/dsh-skill-filesystem'\n  config:\n    customSkillDirs:\n      - !!js process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(\"file:///data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.4/dsh/package.json\").resolve('@deepseek-ai/dsh-agent-preset/package.json')), 'skills')\n- id: tool-skill\n  name: '@deepseek-ai/dsh-tool-skill'\n- id: command-goal\n  name: '@deepseek-ai/dsh-command-goal'\n- id: tool-goal\n  name: '@deepseek-ai/dsh-tool-goal'\n- id: planning\n  name: cordis:group\n  group: true\n  isolate:\n    planMode: true\n  config:\n    - id: plan-mode\n      name: '@deepseek-ai/dsh-plan-mode'\n      config:\n        section: |\n          You are in plan mode. Stay in plan mode until the user approves your plan through exit_plan_mode or switches the session mode. Imperative language to implement changes means plan the implementation, not execute it. A user's conversational agreement — including an answer confirming something you asked — approves nothing and does not end plan mode; fold the confirmed decision into the plan and submit it through exit_plan_mode.\n\n          Explore first. Use non-mutating reads, searches, static analysis, and checks to ground the plan in the actual repository. Do not edit or write files, change configuration, run formatters or code generation that rewrites tracked files, commit, or otherwise carry out the plan. Prefer existing functions and patterns over new machinery.\n\n          The tool catalog stays the same across modes for request-cache stability. These plan-mode rules override any later tool description or guidance that suggests using mutation tools; those tools remain listed to keep the tool catalog unchanged. Do not use todo_write to track this planning phase: it tracks implementation after an approved plan, while the plan itself belongs in exit_plan_mode.\n\n          Resolve discoverable facts by inspection. Use ask_user_question only for user-owned choices or material ambiguity that inspection cannot answer. Do not ask the user where code lives or how current behavior works when you can find out.\n\n          Make the plan decision-complete: state the goal and success criteria; group implementation changes by subsystem; identify public API, schema, and data-flow changes; cover edge cases, failure modes, tests, acceptance criteria, and explicit assumptions. Keep it concise enough to review but detailed enough that another engineer can implement it without making design decisions.\n\n          When ready, call exit_plan_mode with the complete plan markdown, starting with a # title. Make exit_plan_mode the only and final tool call in that assistant response: it presents the plan for approval, and implementation begins only in a later step after approval. Do not paste the final plan as a plain reply or ask \"should I proceed?\" through prose or ask_user_question. If review rejects it, incorporate the feedback and present again. If the review channel is unavailable or aborted, stay in plan mode and ask the user to switch modes manually; do not proceed with implementation.\n- id: compaction\n  name: cordis:group\n  group: true\n  isolate:\n    compaction: true\n    toolResultPruner: true\n  config:\n    - id: compaction-basic\n      name: '@deepseek-ai/dsh-compaction-basic'\n      config:\n        auto: true\n        thresholdRatio: 0.01\n        headroomTokens: 4096\n        retainTokens: 1\n        maxTokens: 4096\n        compactionRetries: 0\n    - id: command-compact\n      name: '@deepseek-ai/dsh-command-compact'\n    - id: tool-result-pruner\n      name: '@deepseek-ai/dsh-compaction-tool-result-pruner'\n      config:\n        thresholdChars: 8192\n        headChars: 4096\n        tailChars: 1024\n- id: delegation\n  name: cordis:group\n  group: true\n  isolate:\n    workflowEngine: true\n  config:\n    - id: tool-subagent-control\n      name: '@deepseek-ai/dsh-tool-subagent-control'\n      config:\n        interrupt: false\n    - id: tool-subagent\n      name: '@deepseek-ai/dsh-tool-subagent'\n      config:\n        provider: spawn\n        toolName: subagent\n        modelSelection: true\n        modelDiscovery: true\n    - id: tool-subagent-fork\n      name: '@deepseek-ai/dsh-tool-subagent'\n      config:\n        provider: fork\n        toolName: subagent_fork\n    - id: workflow-ptc\n      name: '@deepseek-ai/dsh-workflow-ptc'\n      config:\n        provider: spawn\n    - id: tool-workflow\n      name: '@deepseek-ai/dsh-tool-workflow'\n- id: tool-ask-user\n  name: '@deepseek-ai/dsh-tool-ask-user'\n- id: tool-todo\n  name: '@deepseek-ai/dsh-tool-todo'\n  config:\n    allowParallelInProgress: true\n- id: tool-web\n  name: '@deepseek-ai/dsh-tool-web'\n  config:\n    fetch: true\n    searchTimeoutMs: 60000\n- id: present\n  name: '@deepseek-ai/dsh-tool-present'\n- id: tool-office\n  name: '@deepseek-ai/dsh-tool-office'\n- id: tool-plugin-manager\n  name: '@deepseek-ai/dsh-plugin-manager/tools'\n  disabled: !!js '!ctx.get(''profileContext'')'\n- id: tool-plugin-market\n  name: '@deepseek-ai/dsh-plugin-market/tools'\n  disabled: true\n",
+        "configuredReadyMs": 6176,
+        "effectiveTestPresetSha256": "fbb11b9b19902079f6e73ab6c35d6fac3f8a722df6ecac09033d4090ef57daa4",
+        "sessionId": "session-3ab3de83-188d-47ee-be26-dbb589dc85fd",
+        "automatic": {
+          "start": {
+            "type": "compaction/start",
+            "seq": 22,
+            "time": 1794957191160,
+            "data": {
+              "compactionId": "825f08c0-180c-47de-a025-9f39cadcdc51",
+              "turn": 2
+            }
+          },
+          "summary": {
+            "type": "compaction/summary",
+            "seq": 23,
+            "time": 1794957194863,
+            "data": {
+              "compactionId": "825f08c0-180c-47de-a025-9f39cadcdc51",
+              "summary": [
+                {
+                  "type": "text",
+                  "text": "## Primary Request and Intent\n- User issued acceptance token `ACCEPTANCE4B381BB310EB4620BDB5661E1BDED044` with the request: \"Keep this exact essential pending decision label for later recall: AUTO_FACT_9731CBB8CB97452E87854322BA405AC0. Do not write it to disk or call any tools.\"\n- Explicit constraint: \"Acknowledge in one brief sentence only.\"\n- The 230 `<archive>` samples (sample 0–229, each with a SHA-256-style checksum) are declared \"disposable completed observations\" — \"all measurements complete, nothing to execute\" — and require no action.\n\n## Key Technical Concepts\n- (none) — task is a pure memory-retention / acknowledgment request with no code, framework, or tooling involved.\n\n## Files and Code\n- (none)\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- Awaiting emission of the single-sentence acknowledgment; no tools invoked, no files touched, per instruction.\n\n## Next Step\n- Reply with exactly one brief sentence acknowledging retention of `AUTO_FACT_9731CBB8CB97452E87854322BA405AC0`, without calling tools or writing files.\n\n## Critical Context\n- Exact label to preserve verbatim for later recall: `AUTO_FACT_9731CBB8CB97452E87854322BA405AC0`.\n- Acceptance token, also verbatim: `ACCEPTANCE4B381BB310EB4620BDB5661E1BDED044`.\n- Hard constraints: no tool calls, no disk writes; keep the response to one sentence; ignore archived samples as already-complete noise.\n- Rationale: label is flagged \"essential\" and explicitly \"for later recall,\" so it must survive in-context rather than being externalized."
+                }
+              ],
+              "rawOutput": [
+                {
+                  "type": "reasoning",
+                  "text": "The user's request is a simple acknowledgment task: keep a label in memory, don't write to disk, don't call tools, acknowledge in one brief sentence. The user asked to acknowledge in one brief sentence only.\n\nBut now I'm acting as a compaction engine. So I need to output the checkpoint structure.\n\nThere's a tension: the user said \"Do not write it to disk or call any tools\" and \"Acknowledge in one brief sentence only.\" However, the current instruction says to produce a structured checkpoint. The label is a \"pending decision label for later recall\" — that must be preserved in Critical Context. Actually, that's the whole point — preserving it in context. I should preserve the exact label string.\n\nWait — but is preserving it in a checkpoint \"writing to disk\"? The checkpoint is model context, not disk. And it's the compaction engine's job. So include the exact label.\n\nLet me write the checkpoint.\n\nNote the user said don't call tools — I won't call tools. Output only checkpoint text.\n\nPrimary request: acknowledge with one brief sentence keeping exact label, no tools, no disk writes. Archived samples disposable.\n\nNext step: acknowledge in one brief sentence with the exact label preserved (or none?). The most recent request: acknowledge in one brief sentence only. So next step is to output that one-sentence acknowledgment.\n\nCritical context: exact label AUTO_FACT_9731CBB8CB97452E87854322BA405AC0 must be retained for later recall; acceptance token ACCEPTANCE4B381BB310EB4620BDB5661E1BDED044; no tools; no disk writes.\n\nKeep it terse."
+                },
+                {
+                  "type": "text",
+                  "text": "## Primary Request and Intent\n- User issued acceptance token `ACCEPTANCE4B381BB310EB4620BDB5661E1BDED044` with the request: \"Keep this exact essential pending decision label for later recall: AUTO_FACT_9731CBB8CB97452E87854322BA405AC0. Do not write it to disk or call any tools.\"\n- Explicit constraint: \"Acknowledge in one brief sentence only.\"\n- The 230 `<archive>` samples (sample 0–229, each with a SHA-256-style checksum) are declared \"disposable completed observations\" — \"all measurements complete, nothing to execute\" — and require no action.\n\n## Key Technical Concepts\n- (none) — task is a pure memory-retention / acknowledgment request with no code, framework, or tooling involved.\n\n## Files and Code\n- (none)\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- Awaiting emission of the single-sentence acknowledgment; no tools invoked, no files touched, per instruction.\n\n## Next Step\n- Reply with exactly one brief sentence acknowledging retention of `AUTO_FACT_9731CBB8CB97452E87854322BA405AC0`, without calling tools or writing files.\n\n## Critical Context\n- Exact label to preserve verbatim for later recall: `AUTO_FACT_9731CBB8CB97452E87854322BA405AC0`.\n- Acceptance token, also verbatim: `ACCEPTANCE4B381BB310EB4620BDB5661E1BDED044`.\n- Hard constraints: no tool calls, no disk writes; keep the response to one sentence; ignore archived samples as already-complete noise.\n- Rationale: label is flagged \"essential\" and explicitly \"for later recall,\" so it must survive in-context rather than being externalized."
+                }
+              ],
+              "llmStreamCall": true,
+              "shadowedRange": {
+                "start": 9,
+                "end": 12
+              },
+              "shadowedSeqs": [
+                9,
+                10,
+                11,
+                12
+              ],
+              "shadowedTokenCount": 9038,
+              "provider": "deepseek-official",
+              "model": "deepseek-flash",
+              "maxTokens": 4096,
+              "usage": {
+                "inputTokens": 13954,
+                "outputTokens": 744,
+                "cacheReadTokens": 9088,
+                "cacheWriteTokens": 0,
+                "totalTokens": 23786
+              }
+            }
+          },
+          "end": {
+            "type": "compaction/end",
+            "seq": 25,
+            "time": 1794957194865,
+            "data": {
+              "compactionId": "825f08c0-180c-47de-a025-9f39cadcdc51",
+              "turn": 2
+            }
+          },
+          "checkpoint": {
+            "type": "user/message",
+            "seq": 24,
+            "time": 1794957194864,
+            "data": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "This is an automatically generated checkpoint condensing an earlier span of the conversation to free up context. Treat the captured context as established background and build on it without restating it. Continue the task directly from the messages that follow, without acknowledging this checkpoint.\n\n<compacted-summary>"
+                },
+                {
+                  "type": "text",
+                  "text": "## Primary Request and Intent\n- User issued acceptance token `ACCEPTANCE4B381BB310EB4620BDB5661E1BDED044` with the request: \"Keep this exact essential pending decision label for later recall: AUTO_FACT_9731CBB8CB97452E87854322BA405AC0. Do not write it to disk or call any tools.\"\n- Explicit constraint: \"Acknowledge in one brief sentence only.\"\n- The 230 `<archive>` samples (sample 0–229, each with a SHA-256-style checksum) are declared \"disposable completed observations\" — \"all measurements complete, nothing to execute\" — and require no action.\n\n## Key Technical Concepts\n- (none) — task is a pure memory-retention / acknowledgment request with no code, framework, or tooling involved.\n\n## Files and Code\n- (none)\n\n## Errors and Fixes\n- (none)\n\n## Pending Jobs\n- (none)\n\n## Current Work\n- Awaiting emission of the single-sentence acknowledgment; no tools invoked, no files touched, per instruction.\n\n## Next Step\n- Reply with exactly one brief sentence acknowledging retention of `AUTO_FACT_9731CBB8CB97452E87854322BA405AC0`, without calling tools or writing files.\n\n## Critical Context\n- Exact label to preserve verbatim for later recall: `AUTO_FACT_9731CBB8CB97452E87854322BA405AC0`.\n- Acceptance token, also verbatim: `ACCEPTANCE4B381BB310EB4620BDB5661E1BDED044`.\n- Hard constraints: no tool calls, no disk writes; keep the response to one sentence; ignore archived samples as already-complete noise.\n- Rationale: label is flagged \"essential\" and explicitly \"for later recall,\" so it must survive in-context rather than being externalized."
+                },
+                {
+                  "type": "text",
+                  "text": "</compacted-summary>"
+                }
+              ],
+              "source": {
+                "kind": "compact-checkpoint",
+                "compactionId": "825f08c0-180c-47de-a025-9f39cadcdc51"
+              },
+              "role": "user",
+              "id": "263bd891-6553-43b1-a238-537628e751ef"
+            },
+            "sourceEventSeqs": [
+              22,
+              23,
+              9,
+              10,
+              11,
+              12
+            ],
+            "surfaceOp": {
+              "op": "replace",
+              "startSeq": 9,
+              "endSeq": 12
+            }
+          },
+          "exactRecall": "AUTO_FACT_9731CBB8CB97452E87854322BA405AC0",
+          "turnElapsedMs": 4799,
+          "noCompactCommandInvoked": true,
+          "originalLogPreserved": true
+        },
+        "temporaryModelCredentialRemoved": true,
+        "restoredReadyMs": 4727,
+        "originalPresetsAndDefaultRestored": true
+      },
+      "log": ".build/compaction/automatic.log"
+    }
+  ],
+  "finalAudit": {
+    "command": "python3 .build/compaction/audit.py",
+    "exitCode": 0,
+    "source": "import json,hashlib,runpy\nfrom pathlib import Path\nx=runpy.run_path('tests/smoke/emulator-agent-continuation.py');s=x['support'];e=s['Emulator']('127.0.0.1:15557',19644);f=('tcp:19644','tcp:19592');e.hdc('fport',*f)\ntry:\n e.ready('normal');r={'boot':e.state(),'anonymousHttp':e.web_status(False),'authenticatedHttp':e.web_status(True),'credentials':e.rpc('credentials/describe',{'refs':['DEEPSEEK_API_KEY']}),'defaultPermissionPreset':e.rpc('permissionPresets/catalog',{})['defaultPreset']}\n assert r['boot']=={'mode':'normal','pending':False} and r['anonymousHttp']==401 and r['authenticatedHttp']==200\n assert not r['credentials']['DEEPSEEK_API_KEY']['configured'] and r['defaultPermissionPreset']=='workspace-write'\n assert e.app('test ! -e alpine/native-benchmark-home/cordis.patch.yml && printf ABSENT')=='ABSENT';r['temporaryHomePatchAbsent']=True\n root='alpine/native-benchmark-home/profiles/web/'\n r['configurationHashes']={file:hashlib.sha256(x['read_bytes'](e,root+file)).hexdigest() for file in ['package.json','pnpm-lock.yaml']}\n assert r['configurationHashes']=={'package.json':'c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8','pnpm-lock.yaml':'3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e'}\n r['presetRoster']=e.rpc('agentPresets/list',{});assert [v['id'] for v in r['presetRoster']['presets']]==['standard','ptc','cordis']\n doc=e.rpc('agentPresets/read',{'agentPreset':'standard'})['content'];before=json.loads(Path('.build/compaction/standard-preset.json').read_text())['content'];assert doc==before\n r['originalStandardPresetSha256']=hashlib.sha256(doc.encode()).hexdigest()\n r['ownedFixturesAbsent']=[]\n for filename in ['manual.json','faults.json','automatic.json']:\n  data=json.loads(Path('.build/compaction/'+filename).read_text());name=data['fixture'];assert name.replace('-','').isalnum()\n  for p in ['alpine/workspace-native/'+name,root+'node_modules/'+name]:\n   assert e.app('test ! -e '+p+' && printf ABSENT')=='ABSENT',p\n  r['ownedFixturesAbsent'].append(name)\n  if filename!='faults.json':\n   rows=s['events'](e,data['sessionId']);summary=data['manual']['summary'] if filename=='manual.json' else data['automatic']['summary'];assert next(v for v in rows if v['seq']==summary['seq'])==summary\n r['manualAndArchivedAutomaticSummariesRemainDurable']=True\n assert not any(row.get('moduleName','').startswith('mh-compaction-') for row in e.rpc('pluginManager/listPlugins',{}));r['faultPluginAbsent']=True\n rows=s['events'](e,'session-ecf0df3c-47a9-4df4-b71e-6d4261d13419');assert len(rows)==30;r['oldRc3SessionEventCount']=len(rows)\n Path('.build/compaction/audit.json').write_text(json.dumps(r,indent=2)+'\\n');print(json.dumps(r))\nfinally:e.hdc('fport','rm',*f)\n",
+    "sourceSha256": "d65bb8c3c200287b3f6e48da0cb16fb6bba74b949d6fd7f1e9e063b673df4ab7",
+    "result": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "credentials": {
+        "DEEPSEEK_API_KEY": {
+          "configured": false,
+          "writable": true
+        }
+      },
+      "defaultPermissionPreset": "workspace-write",
+      "temporaryHomePatchAbsent": true,
+      "configurationHashes": {
+        "package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      },
+      "presetRoster": {
+        "presets": [
+          {
+            "id": "standard",
+            "order": 1,
+            "isDefault": true
+          },
+          {
+            "id": "ptc",
+            "order": 2,
+            "isDefault": false
+          },
+          {
+            "id": "cordis",
+            "order": 4,
+            "isDefault": false
+          }
+        ]
+      },
+      "originalStandardPresetSha256": "815072112f13e8d7760b2cc5154a02d3ff4dae3efffa258a5391a1a2eebedc53",
+      "ownedFixturesAbsent": [
+        "mh-compaction-fd8cb20484",
+        "mh-compaction-fault-9ca0fe3c15",
+        "mh-auto-compact-dd8517f5c0"
+      ],
+      "manualAndArchivedAutomaticSummariesRemainDurable": true,
+      "faultPluginAbsent": true,
+      "oldRc3SessionEventCount": 30
+    }
+  },
+  "validationMeaning": {
+    "manual": "Actual official /compact, DeepSeek summary and usage, exact identifiers, tool-pair balance, source event and durable command/lifecycle links, shorter checkpoint, old log preserved, same-session recall before and after force-stop/reopen.",
+    "faults": "Temporary standard bundle forwards the real LLM stream; only the named test session and purpose=compaction are intercepted after a genuine non-empty text-delta. Actual HTTP socket disconnect cancels through the normal public carrier; concurrent command is refused. Explicit stream failure is injected separately; no fake summary, capability or model result is emitted. Each interrupted operation closes with error, commits no successful summary/checkpoint, then real retry and exact recall succeed.",
+    "automatic": "Public agentPresets/read copies the entire official standard plugin composition into a separate temporary preset. No tool is removed; moving YAML uses an explicit equivalent runtime package resolver for its baseUrl expression. Only compaction policy differs: threshold0.01, retention1 token, summary cap4096, one attempt. Actual step-pressure compaction has numbered turn ownership, no manual compact command, real LLM usage and exact recall. Original presets/default and host patch restored. Not a default1M-token-load benchmark."
+  },
+  "verificationChanges": {
+    "newTestsOnly": true,
+    "productionCodeUnchanged": true,
+    "noNewBinaryOrRelabel": true,
+    "priorElevenSuiteResultsNotRerun": "Previous0.4.35 LSP and regression proof remains separately bound; this record adds only these three executed suites and final audit.",
+    "failedTestRunsInThisBatch": []
+  },
+  "remaining": [
+    "Full-capacity automatic pressure, actual remote API context-overflow recovery and long repeated-compaction stress are not established by the small configured-pressure fixture.",
+    "Other applicable optional bundles and worktree restore/dedicated cancellation still need verification.",
+    "This batch uses only the Phone emulator; no new Mate60 results, OS isolation, system PTY or Phone Use claim.",
+    "The original all-applicable-DSH-capabilities objective remains active."
+  ]
+}

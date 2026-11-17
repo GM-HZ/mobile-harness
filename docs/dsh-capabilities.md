@@ -31,6 +31,7 @@
 | 定时任务 | 持久化后强停重开，任务到期投递并由模型回复通过 |
 | 插件及恢复 | 标准 bundle 安装、注入真实崩溃、自动安全模式及旧会话回读通过；实际点击设置恢复入口、原生正常模式按钮后恢复通过 |
 | 插件管理补验 | 本版经实际 API 安装、启用、禁用和卸载自建 bundle，pnpm remove 退出0；postinstall 没有执行。恢复测试安装前备份原配置，结束后回普通模式且 manifest／lock 摘要一致；任意插件升级与安装脚本仍不据此承诺 |
+| 会话压缩 | 官方 /compact 的真实摘要、命令／日志来源、完整工具配对、精确事实回忆与重启恢复通过；真实输出后 HTTP取消、忙碌拒绝、流故障及重试通过。完整standard临时预设的低阈值自动压力通过；原配置恢复。见 [补验证据](evidence/emulator-compaction-0.4.35.json)，非默认满容量或真实远端overflow压力保证 |
 | LSP | 官方三插件与真实 TypeScript server；四种语义查询、精确位置／标准库、UTF-16、新内容、无结果、越界源拒绝、复用与进程组崩溃重建通过。自带 bundle 启停及重启保留通过，真实语义响应暂扣场景中的取消、provider 销毁及重试通过，非所有语言服务器保证。见 [实现](research/harmonyos-lsp.md) |
 | Office | Office skill、DOCX／PPTX PDF、页面附件、Excel 公式重算、缓存、损坏文档拒绝和实际取消已通过；原生 worker 正常操作约 2–3 秒。销毁、超时、故障后新请求恢复及所有 helper 回收均已验证。见[实现与证据](research/harmonyos-native-office.md) |
 | 目标、待办、团队任务与交付 | todo、内置 dsh-doc、present、目标创建／暂停／旧 revision 拒绝，以及团队依赖、认领、完成通过；目标和任务强停后保留，测试目标已清除、团队模式恢复关闭 |
@@ -48,7 +49,7 @@
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：没有随包 Chromium／Playwright；手机 ArkWeb 不等于可供 Agent 使用的浏览器。完整官方账号授权、每一种模型提供者和每个实验插件尚未逐一回归。
 - **后台**：定时任务跨 App 重启已测，不代表 App 被系统终止时仍会唤醒执行。运行中 Bash 的 OS 进程、PTC 的内存变量不能据此承诺跨进程存活。
-- **剩余能力清点**：Ralph、会话搜索和工作树的限定场景已通过；压缩、长目标压力、其他可选 bundle 尚未全部端到端回归。LSP 已由本工程补充装配，当前验收为 TypeScript；工作树的 restore 与专门取消场景仍未全量验收。公共 provider 不提供额外控制 fd，进程范围沿用上游 fallback 的观测限制。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
+- **剩余能力清点**：Ralph、会话搜索和工作树的限定场景已通过；压缩核心与可控自动压力已补验；真实API overflow、反复压缩／长目标压力及其他可选 bundle 尚未全部端到端回归。LSP 已由本工程补充装配，当前验收为 TypeScript；工作树的 restore 与专门取消场景仍未全量验收。公共 provider 不提供额外控制 fd，进程范围沿用上游 fallback 的观测限制。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。

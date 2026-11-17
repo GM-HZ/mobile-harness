@@ -37,7 +37,7 @@
 
 官方还提供 16 个默认关闭的可选 bundle，以及 Claude Code／Codex 两个按需安装入口。Phone／Computer Use、系统 PTY 的既有暂缓要求保持；任意外部 CLI、其他供应商账号、语音提供者或桌面插件不能凭组件存在宣称鸿蒙兼容。
 
-已补验 [工作目录、fork 与自动目标](../evidence/emulator-agent-continuation-0.4.33.json)。[Ralph 与会话搜索的限定场景](../evidence/emulator-optional-iteration-0.4.33.json)亦已通过。[0.4.34](../evidence/emulator-subprocess-worktree-0.4.34.json)补齐公共子进程、官方 create_worktree、重启续接和归档清理，实际插件启停／卸载及崩溃恢复也通过；工作树的 restore 与专门取消未全量测试。0.4.35 进一步补齐限定的 TypeScript LSP；优先继续压缩与其他适用可选能力。每一项先复现、优先使用上游插件／provider seam，验证实际结果、取消与生命周期；不通过关闭能力或移除断言假称补齐。
+已补验 [工作目录、fork 与自动目标](../evidence/emulator-agent-continuation-0.4.33.json)。[Ralph 与会话搜索的限定场景](../evidence/emulator-optional-iteration-0.4.33.json)亦已通过。[0.4.34](../evidence/emulator-subprocess-worktree-0.4.34.json)补齐公共子进程、官方 create_worktree、重启续接和归档清理，实际插件启停／卸载及崩溃恢复也通过；工作树的 restore 与专门取消未全量测试。0.4.35 进一步补齐限定的 TypeScript LSP；[0.4.35 压缩补验](../evidence/emulator-compaction-0.4.35.json)进一步通过真实手动摘要、持久恢复、HTTP取消／忙碌／流故障重试及完整standard临时预设的自动压力场景；默认满容量和真实API overflow不据此承诺。继续Inspector、替代编辑入口和其他适用可选能力。每一项先复现、优先使用上游插件／provider seam，验证实际结果、取消与生命周期；不通过关闭能力或移除断言假称补齐。
 
 [当前能力矩阵](../dsh-capabilities.md) · [0.4.33 证据](../evidence/emulator-http-standard-0.4.33.json) · [官方 RC.4 源码](https://github.com/deepseek-ai/deepseek-harness/tree/3f321d32bfe382212a8ed8785c1d47a5a300aa23)
 

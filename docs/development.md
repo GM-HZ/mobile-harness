@@ -203,3 +203,16 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```
 
 源码 pins 与 npm 锁一致；构建在 DSH release 内提供独立编译器工具链，并以整个实际层的 SHA-256 判断是否重新解包。不能仅凭包目录存在判断插件启用或测试通过。见 [LSP 设计](research/harmonyos-lsp.md)。
+
+## 会话压缩模拟器回归
+
+以下三个脚本要求已经安装普通0.4.35包。手动脚本验证真实摘要、事实回忆和同会话重启；故障脚本临时安装一个标准 bundle，在收到真实模型文本后才取消或注入流错误；自动脚本复制完整standard到独立临时预设，仅降低压缩阈值／保留预算，保留全部工具，不修改正式默认配置。结束后恢复原预设、profile、锁文件、凭据和普通模式。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-compaction.py <loopback-target> .build/compaction.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-compaction-faults.py <loopback-target> .build/compaction-faults.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-compaction-auto.py <loopback-target> .build/compaction-auto.json
+```
