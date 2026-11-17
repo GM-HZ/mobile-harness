@@ -88,6 +88,15 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 使用 `--additional-roots` 验证三个显式附加目录，包括重叠授权、跨目录重命名及工作目录切换。再加 `--read-only` 验证附加配置无法允许只读会话写入。夹具创建的目录在退出时清理。实验后端每个进程最多接受 16 个附加目录，根目录路径必须为已存在的规范化物理目录。
 
+同一实验 HAP 可运行 Agent 生命周期回归。脚本通过标准 bundle 机制安装临时测试插件，由插件持有真正的 `AgentHandle`，让模型在其会话运行 PTC，再调用 `dispose()`。测试覆盖空闲及同步死循环中的销毁、进程回收，以及从持久化记录恢复会话。脚本要求用户 profile patch 槽为空，退出时恢复原 manifest、锁文件和启动模式，移除临时配置。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-ptc-lifecycle.py <loopback-target> .build/ptc-lifecycle-repl.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-ptc-lifecycle.py <loopback-target> .build/ptc-lifecycle-script.json --mode vm-script
+```
+
 ## Host 进程探针
 
 ```sh

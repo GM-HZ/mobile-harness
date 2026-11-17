@@ -1,0 +1,72 @@
+{
+  "date": "2026-11-18",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "installedHapCommit": "00b0263d5a17e335feeda2ce85718e3facbf7976",
+  "unsignedHapSha256": "11f31fae500fb7bb96cf1a3266123e8ec674e83f28238271edadcf373ccb0290",
+  "unsignedHapBytes": 657082335,
+  "deviceWorkerSourceSha256": "8d2a03a191ab0ce2fdde2e0ba3c75f54bd07b4cc2a3cfbc0294f49c573b3ef99",
+  "smoke": "tests/smoke/emulator-ptc-lifecycle.py",
+  "testSourceSha256": {
+    "tests/smoke/emulator-ptc-lifecycle.py": "071064a9074e4d33fc13ece11f4bd278d280962e84633404eff105cb5e4d32f4",
+    "tests/smoke/fixtures/ptc-lifecycle.mjs": "2f56dbc9cd07757b626acb9a0abec536d38e33a69e44f19e64e25b981a273055"
+  },
+  "cases": {
+    "persistent-in-memory": {
+      "exitCode": 0,
+      "readyMs": 4930,
+      "idle": {
+        "ownedHandleDisposed": true,
+        "agentUnregistered": true,
+        "sessionUnregistered": true,
+        "workerReaped": true,
+        "disposeMs": 41,
+        "durableSessionResumedWithFreshWorker": true
+      },
+      "active": {
+        "ownedHandleDisposed": true,
+        "agentUnregistered": true,
+        "sessionUnregistered": true,
+        "workerReaped": true,
+        "disposeMs": 3054,
+        "durableSessionResumedWithFreshWorker": true
+      },
+      "executionMode": "persistent-in-memory",
+      "temporaryModelCredentialRemoved": true,
+      "originalProfileRestored": true
+    },
+    "vm-script": {
+      "exitCode": 0,
+      "readyMs": 4386,
+      "idle": {
+        "ownedHandleDisposed": true,
+        "agentUnregistered": true,
+        "sessionUnregistered": true,
+        "workerReaped": true,
+        "disposeMs": 40,
+        "durableSessionResumedWithFreshWorker": true
+      },
+      "active": {
+        "ownedHandleDisposed": true,
+        "agentUnregistered": true,
+        "sessionUnregistered": true,
+        "workerReaped": true,
+        "disposeMs": 3041,
+        "durableSessionResumedWithFreshWorker": true
+      },
+      "executionMode": "vm-script",
+      "temporaryModelCredentialRemoved": true,
+      "originalProfileRestored": true
+    }
+  },
+  "scope": {
+    "lifecycleEntry": "Fixture-owned AgentHandle.dispose through the upstream Agent SDK",
+    "sessionRecoveryEntry": "Ordinary session/selectModel and session/prompt RPCs on the disposed Session id",
+    "timing": "Date.now around the awaited AgentHandle.dispose call inside the fixture",
+    "nativeWorkerExit": "Confirmed in Host ptc-worker-reaped events before profile restoration and App stop",
+    "defaultEnabled": false,
+    "mate60": "HDC offline"
+  }
+}

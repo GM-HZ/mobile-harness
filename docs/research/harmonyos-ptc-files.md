@@ -38,13 +38,15 @@ Node 的 `stat` 和 `lstat` 通过监督进程读取已授权描述符的元数�
 
 PTC 可以在工作区子目录启动，也可通过 `process.chdir` 切换到同一工作区的其他目录。监督进程校验目标目录并将目录描述符交给 worker，由 worker 执行 `fchdir`。之后的相对文件请求按当前目录解析，工作区根继续来自会话的文件策略。实际会话先调用 DSH 的 `working_directory`，下一轮程序在所选子目录读取了夹具，向工作区外切换目录被拒绝。 [工作目录实测](../evidence/emulator-ptc-cwd-2026-11-17.json)
 
-真实会话通过 `workspace/archiveSession` 归档再恢复后，两种持久模式均继续读取原变量，宿主确认原 worker 保留。这与上游归档语义一致。真正的 Agent 销毁由创建者持有的 `AgentHandle.dispose` 管理，归档 API 保留该 Agent。销毁时的 PTC 释放入口仍待独立设备验证。 [归档恢复实测](../evidence/emulator-ptc-archive-2026-11-18.json)
+真实会话通过 `workspace/archiveSession` 归档再恢复后，两种持久模式均继续读取原变量，宿主确认原 worker 保留。这与上游归档语义一致。真正的 Agent 销毁由创建者持有的 `AgentHandle.dispose` 管理，归档 API 保留该 Agent。 [归档恢复实测](../evidence/emulator-ptc-archive-2026-11-18.json)
+
+标准 bundle 测试插件通过上游 Agent SDK 持有独立 `AgentHandle`。在 REPL 和持久化 Script 两种模式中，真实模型先创建持久 PTC 状态，再由另一个会话调用插件销毁该 Agent。空闲进程约 40 毫秒回收，同步死循环约 3 秒回收，Agent 和实时会话均从注册表移除。随后通过普通 Session API 从原记录恢复，两种情况都启动了新 worker，旧变量已清空。测试退出时恢复原 profile、锁文件和启动模式。 [Agent 销毁与恢复实测](../evidence/emulator-ptc-lifecycle-2026-11-18.json)
 
 文件代理还接收 DSH `additionalWritableRoots`。每个进程启动时校验并打开主工作区及最多 16 个附加物理目录。路径匹配按完整目录边界选择最长授权根，文件操作继续以预打开的描述符解析。模拟器实际会话验证了三个附加目录中的读写、跨授权根重命名、重叠根、递归文件操作和工作目录切换。同名前缀的未授权相邻目录被拒绝。只读模式忽略附加可写授权，并验证附加目录中没有新文件。 [附加目录实测](../evidence/emulator-ptc-roots-2026-11-18.json)
 
 相对文件路径也可跨越两个授权根。代理根据规范化后的目标选择授权根，同时通过内核校验原始父路径，再从预打开的授权目录解析目标。真实会话验证了跨根的相对读取、写入、元数据查询和重命名。`missing/../file` 返回 `ENOENT`，`file/../file` 和 `file/.` 返回 `ENOTDIR`，未授权相邻目录仍被拒绝。模拟器未提供可创建符号链接的夹具，本轮未验证符号链接操作。 [相对路径实测](../evidence/emulator-ptc-relative-2026-11-18.json) · [内核路径解析说明](https://docs.kernel.org/filesystems/path-lookup.html)
 
-宿主并发移动父目录，以及会话销毁时回收空闲持久进程仍需验证。Mate 60 在本轮离线。
+宿主并发移动父目录仍需验证。Mate 60 在本轮离线。
 
 ## 复现
 
