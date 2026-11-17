@@ -111,3 +111,12 @@ HARMONY_EXPERIMENTAL_HOST_PROCESS=1 ./build.sh
 ```
 
 此模式在 `.build/stage/harmonyos-process-probe/` 生成独立包 `org.mobileharness.processprobe`。它使用实验性的进程启动方式，适用于 Phone 模拟器实验。原生恢复页在实验包中终止并重新启动 Host，同时 UI 可继续运行。普通构建仍由应用内 Node 启动，恢复页以重新打开应用为恢复边界。使用同一模拟器验证两种包时，应先停止另一包，两个 DSH 实例使用同一个回环端口。
+
+## 工具链与文件工具回归
+
+普通包可运行真实模型驱动的完整工具链测试。默认 Bash 必须拒绝；随后仅批准精确夹具命令一次，验证 pip target、两套 venv、Git、Node fetch、curl、SQLite、时区和五个文件工具。完整 Python 夹具采用 180 秒命令预算；PRoot 下的安装执行时间与原生 Host 启动时间分别记录。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-toolkit.py <loopback-target> .build/emulator-toolkit.json
+```

@@ -8,14 +8,16 @@ ArkUI / ArkWeb
 HAP 内的鸿蒙 Node.js / DSH Host
   ├─ 会话、工作区、文件工具、Skills 和插件
   ├─ 按权限与审批调用的命令桥 → PRoot → 随包命令行工具
+  ├─ PTC / Workflow → 原生监督进程 → 受限的鸿蒙 Node worker
   └─ 模型请求 → 模型服务
 ```
 
 | 边界 | 现有实现 |
 | --- | --- |
-| 宿主 | ArkTS 管理启动和界面，N-API 桥在 HAP 中加载鸿蒙 Node.js 24.14.1，运行固定版本 DSH 0.2.2-rc.3 |
+| 宿主 | ArkTS 管理启动和界面，N-API 桥在 HAP 中加载鸿蒙 Node.js 24.14.1，运行固定版本 DSH 0.2.2-rc.4 |
 | Web | DSH Web 仅绑定本机回环。应用完成令牌交换后把会话 Cookie 配置到 ArkWeb。真机匿名请求 401，鉴权请求 200 |
 | 执行 | 本机文件工具与工作区规则复用 DSH。部分 Linux 用户态工具由 PRoot 按需运行，普通 Bash 在没有可用系统沙箱时按默认权限拒绝，可对具体命令单次批准 |
+| PTC | 0.4.31 普通包包含 TypeScript 擦除、REPL／Script、工具回调与独立 worker；文件代理通过 seccomp 按目录授权。上游报告 partial enforcement，不等同完整 Linux 沙箱或任意 Node 系统 API。恢复模式不启用此后端 |
 | 数据 | 会话、工具依赖、配置及默认工作区位于应用私有数据。覆盖安装保留数据；强停重启时复用已展开资源 |
 | 安全边界 | 系统边界由鸿蒙 App 沙箱提供。PRoot 提供工具兼容与路径映射。工作区外写入已验证拒绝；应用私有根内已有文件的读取仍遵循 DSH 策略 |
 
