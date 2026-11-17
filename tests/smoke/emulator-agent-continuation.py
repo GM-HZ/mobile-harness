@@ -13,7 +13,7 @@ support = office["support"]
 toolkit = office["toolkit"]
 
 
-def prompt(emulator, sid, instruction, timeout=80):
+def prompt(emulator, sid, instruction, timeout=80, allow_error=False):
     text = "ACCEPTANCE" + uuid.uuid4().hex.upper() + ": " + instruction
     emulator.rpc("session/prompt", {"request": {
         "sessionId": sid, "requestId": str(uuid.uuid4()), "mode": "queue",
@@ -35,23 +35,26 @@ def prompt(emulator, sid, instruction, timeout=80):
                 ids = {c["callId"] for c in calls}
                 results = [r["data"]["message"] for r in rows if r["type"] == "tool/result"
                            and r["data"]["message"].get("toolCallId") in ids]
-                assert len(calls) == len(results) and not any(r["isError"] for r in results), results
+                assert len(calls) == len(results), results
+                assert allow_error or not any(r["isError"] for r in results), results
                 return calls, results, rows
         time.sleep(.1)
     raise AssertionError("The specifically addressed acceptance request did not finish")
 
 
-def tool(emulator, sid, name, args, may_wait=False):
+def tool(emulator, sid, name, args, may_wait=False, expect_error=False):
     instruction = "Actually call " + name + " exactly once now with precisely " + json.dumps(args) + ". "
     if name == "working_directory" and not args:
         instruction += "This is READ ONLY: {} is an empty object. Omit cd entirely; do not add a default directory or change it. "
     instruction += ("You may use wait_agent if required to collect that child's completion; use no other tools. " if may_wait
                     else "Use no other tools. ")
-    calls, results, rows = prompt(emulator, sid, instruction + "Report the result and stop.")
+    calls, results, rows = prompt(emulator, sid, instruction + "Report the result and stop.", allow_error=expect_error)
     selected = [c for c in calls if c["name"] == name]
     assert len(selected) == 1 and json.loads(selected[0]["arguments"]) == args, calls
     assert all(c["name"] in ({name, "wait_agent"} if may_wait else {name}) for c in calls), calls
     result = next(r for r in results if r["toolCallId"] == selected[0]["callId"])
+    assert bool(result["isError"]) == expect_error, result
+    assert not any(r["isError"] for r in results if r is not result), results
     return result, rows
 
 
