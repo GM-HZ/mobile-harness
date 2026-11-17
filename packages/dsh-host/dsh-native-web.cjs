@@ -94,6 +94,9 @@ function installProotSpawn(workspace) {
       throw new Error('Invalid Harmony subprocess root');
     }
     for (const entry of fs.readdirSync(root)) {
+      // Reserve the native absolute-prefix tree for the self-binding. An old
+      // Alpine/data glue directory must not become a recursive /data symlink.
+      if (entry === root.split(path.sep)[1]) continue;
       const destination = path.join(hostRoot, entry);
       const target = path.join(root, entry);
       try { fs.symlinkSync(target, destination); }
