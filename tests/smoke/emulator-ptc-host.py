@@ -14,6 +14,12 @@ support = runpy.run_path(str(Path(__file__).with_name("emulator-dsh-capabilities
 PTC_PROFILE_PATCH = "alpine/native-benchmark-home/cordis.patch.yml"
 
 
+def app_path(path):
+    prefix = support["WORKSPACE"].rsplit("/alpine/", 1)[0] + "/"
+    assert path.startswith(prefix), path
+    return shlex.quote(path[len(prefix):])
+
+
 def model_session(emulator, workspace):
     session = emulator.rpc("session/create", {"request": {"workspaceId": workspace, "agentPreset": "ptc"}})
     assert session.get("agentPreset") == "ptc", session
@@ -40,8 +46,8 @@ def workers(emulator):
 
 
 @contextmanager
-def profile_mode(emulator, execution_mode, script_persistence, read_only):
-    if not (execution_mode or read_only):
+def profile_mode(emulator, execution_mode, script_persistence, read_only, extra_roots=()):
+    if not (execution_mode or read_only or extra_roots):
         yield
         return
     patch = ""
@@ -49,8 +55,12 @@ def profile_mode(emulator, execution_mode, script_persistence, read_only):
         patch += ("- id: ptc-runtime\n  config:\n"
                   f"    executionMode: {execution_mode}\n"
                   f"    scriptPersistence: {str(script_persistence).lower()}\n")
-    if read_only:
-        patch += "- id: sandbox-policy\n  config:\n    mode: read-only\n"
+    if read_only or extra_roots:
+        patch += "- id: sandbox-policy\n  config:\n"
+        patch += f"    mode: {'read-only' if read_only else 'workspace-write'}\n"
+        if extra_roots:
+            patch += f"    additionalWritableRoots: {json.dumps(extra_roots)}\n"
+    emulator.ready("normal")
     emulator.stop()
     try:
         # noclobber ensures an existing user patch never changes.
@@ -406,6 +416,69 @@ process.chdir('..');
         emulator.app(f"rm -rf {directory}")
 
 
+def verify_additional_roots(emulator, paths, read_only, evidence):
+    workspace = emulator.rpc("workspace/create", {"request": {"path": support["WORKSPACE"]}})["workspace"]["workspaceId"]
+    sid = model_session(emulator, workspace)
+    first, second, nested = paths
+    blocked = first + "-neighbor"
+    marker = "MH_EXTRA_" + uuid.uuid4().hex.upper()
+    if read_only:
+        script = f"""
+const fs = await import('node:fs/promises');
+let denied = 0;
+for (const path of {json.dumps(paths)}) {{
+  try {{ await fs.writeFile(path + '/denied.txt', 'changed'); }}
+  catch (error) {{ if (error.code === 'EACCES') denied++; else throw error; }}
+}}
+return 'MH_READ_ONLY_EXTRA_DENIED_' + denied;
+""".strip()
+        complete_code(emulator, sid, "Ensure additional grants cannot override read-only mode", script,
+                      "MH_READ_ONLY_EXTRA_DENIED_3")
+        for path in paths:
+            assert emulator.app(f"test ! -e {app_path(path + '/denied.txt')} && printf OK") == "OK"
+        evidence["readOnlyIgnoredAdditionalGrants"] = True
+        return
+    script = f"""
+const fs = await import('node:fs/promises');
+await fs.writeFile('{first}/source.txt', '{marker}');
+await fs.rename('{first}/source.txt', '{second}/moved.txt');
+await fs.mkdir('{nested}/left/right', {{ recursive: true }});
+await fs.writeFile('{nested}/left/right/item.txt', '{marker}');
+const metadata = (await fs.stat('{second}/moved.txt')).size;
+process.chdir('{second}');
+const text = await fs.readFile('moved.txt', 'utf8');
+process.chdir('{support['WORKSPACE']}');
+const denied = [];
+for (const [name, operation] of [
+  ['write', () => fs.writeFile('{blocked}/denied.txt', 'changed')],
+  ['stat', () => fs.stat('{blocked}/input.txt')],
+  ['move-out', () => fs.rename('{second}/moved.txt', '{blocked}/moved.txt')],
+  ['cwd', () => Promise.resolve().then(() => process.chdir('{blocked}'))]
+]) {{
+  try {{ await operation(); }}
+  catch (error) {{
+    if (['EACCES', 'EXDEV', 'EPERM'].includes(error.code) || name === 'cwd') denied.push(name);
+    else throw error;
+  }}
+}}
+await fs.rm('{nested}/left', {{ recursive: true }});
+return [text, metadata, denied.join(',')].join(':');
+""".strip()
+    complete_code(emulator, sid, "Verify explicitly authorized extra roots and their boundaries", script,
+                  f"{marker}:{len(marker)}:write,stat,move-out,cwd")
+    complete_code(emulator, sid, "Set the next program directory to an extra authorized root",
+                  f"await tools.working_directory({{ cd: '{second}' }}); return 'MH_EXTRA_SELECTED';", "MH_EXTRA_SELECTED")
+    complete_code(emulator, sid, "Read from an extra root as the next program working directory",
+                  f"const fs = await import('node:fs/promises'); const text = await fs.readFile('moved.txt', 'utf8'); "
+                  f"await tools.working_directory({{ cd: '{support['WORKSPACE']}' }}); return text;", marker)
+    assert emulator.app(f"cat {app_path(second + '/moved.txt')}") == marker
+    assert emulator.app(f"test ! -e {app_path(first + '/source.txt')} && test ! -e {app_path(nested + '/left')} && "
+                        f"test ! -e {app_path(blocked + '/denied.txt')} && test ! -e {app_path(blocked + '/moved.txt')} "
+                        "&& printf OK") == "OK"
+    evidence.update(additionalRootsReadWriteMatched=True, crossRootRenameMatched=True, nestedGrantMatched=True,
+                    extraRootWorkingDirectoryMatched=True, unauthorizedSiblingDenied=True)
+
+
 def verify(emulator, evidence):
     name = "mh-ptc-" + uuid.uuid4().hex[:12]
     marker = "HARMONY_PTC_" + uuid.uuid4().hex.upper()
@@ -476,32 +549,47 @@ def main():
     parser.add_argument("--mode", choices=("persistent-in-memory", "vm-script"))
     parser.add_argument("--script-persistence", action="store_true")
     parser.add_argument("--read-only", action="store_true")
+    parser.add_argument("--additional-roots", action="store_true")
     options = parser.parse_args()
     if options.script_persistence and options.mode != "vm-script":
         parser.error("--script-persistence requires --mode vm-script")
     if options.mode and options.read_only:
         parser.error("--read-only exercises per-call mode")
+    if options.mode and options.additional_roots:
+        parser.error("--additional-roots exercises per-call mode")
     if not os.environ.get("MH_TEST_DEEPSEEK_API_KEY"):
         raise SystemExit("MH_TEST_DEEPSEEK_API_KEY is required")
     emulator = support["Emulator"](options.target, 19647)
     forward = ("tcp:19647", "tcp:19592")
     assert "Forwardport result:OK" in emulator.hdc("fport", *forward)
     evidence = {}
+    extra_roots = []
+    fixture_roots = []
     try:
-        with profile_mode(emulator, options.mode, options.script_persistence, options.read_only):
+        if options.additional_roots:
+            base = support["WORKSPACE"].rsplit("/", 1)[0] + "/mh-ptc-extra-" + uuid.uuid4().hex[:12]
+            extra_roots = [base + "-a", base + "-b", base + "-a/nested"]
+            fixture_roots = [base + "-a", base + "-b", base + "-a-neighbor"]
+            for path in [*fixture_roots, extra_roots[2]]:
+                assert emulator.app(f"mkdir {app_path(path)} && test -d {app_path(path)} && printf CREATED") == "CREATED"
+        with profile_mode(emulator, options.mode, options.script_persistence, options.read_only, extra_roots):
             evidence["readyMs"] = emulator.ready("normal")
             with support["model_key"](emulator):
-                if options.mode:
+                if options.additional_roots:
+                    verify_additional_roots(emulator, extra_roots, options.read_only, evidence)
+                elif options.mode:
                     verify_mode(emulator, options.mode, options.script_persistence, evidence)
                 elif options.read_only:
                     verify_read_only(emulator, evidence)
                 else:
                     verify(emulator, evidence)
             evidence["temporaryModelCredentialRemoved"] = True
-        if options.mode or options.read_only:
+        if options.mode or options.read_only or options.additional_roots:
             evidence["temporaryProfilePatchRemoved"] = emulator.app(f"test ! -e {PTC_PROFILE_PATCH} && printf OK") == "OK"
             assert evidence["temporaryProfilePatchRemoved"]
     finally:
+        for path in fixture_roots:
+            assert emulator.app(f"rm -rf {app_path(path)} && test ! -e {app_path(path)} && printf REMOVED") == "REMOVED"
         emulator.hdc("fport", "rm", *forward)
         options.output.write_text(json.dumps(evidence, indent=2) + "\n")
 

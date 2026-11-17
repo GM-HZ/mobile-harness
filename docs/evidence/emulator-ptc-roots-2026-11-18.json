@@ -1,0 +1,114 @@
+{
+  "date": "2026-11-18",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "eff38d5af5f035d9c975dd0b907f2bed05f97fb8940f54fcfae623b27eccbe86",
+  "unsignedHapBytes": 657080775,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "baseline": {
+    "commit": "c01698ad399978e5f5aeef8a3f25b2884fbb3d37",
+    "unsignedHapSha256": "427c1b6a71fcb94311da5a2ddc6a71fe0bd8bfed7268b1eeb06a7467d3c970aa",
+    "exitCode": 1,
+    "failure": "workspace-write PTC rejected configured additional writable roots"
+  },
+  "earlierFixtureFailures": [
+    "Replacing the policy node without an explicit mode selected its read-only default. The fixture now specifies workspace-write.",
+    "The fixture stopped an in-progress boot, activating recovery. It now waits for normal readiness before changing the profile.",
+    "A direct shell write of the recovery JSON lost quoting. Recovery was restored using a transferred JSON file with readback.",
+    "HDC absolute paths did not create directories in the App's data view. Fixtures now use relative App-data paths and assert creation and removal."
+  ],
+  "cases": {
+    "extra-roots": {
+      "exitCode": 0,
+      "readyMs": 4707,
+      "additionalRootsReadWriteMatched": true,
+      "crossRootRenameMatched": true,
+      "nestedGrantMatched": true,
+      "extraRootWorkingDirectoryMatched": true,
+      "unauthorizedSiblingDenied": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "read-only-extra": {
+      "exitCode": 0,
+      "readyMs": 4398,
+      "readOnlyIgnoredAdditionalGrants": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "core": {
+      "exitCode": 0,
+      "readyMs": 70,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    }
+  },
+  "workflowRegression": {
+    "exitCode": 0,
+    "startupMs": 67,
+    "foreground": {
+      "actualSubagentsStarted": 2,
+      "completed": true,
+      "bothResultsReturned": true,
+      "parallel": true
+    },
+    "timeout": true,
+    "cancelledDuringSyncSlice": true,
+    "cancelledWithActiveChild": true,
+    "backgroundJob": {
+      "started": true,
+      "completed": true,
+      "resultDelivered": true
+    },
+    "temporaryModelCredentialRemoved": true
+  },
+  "localHostValidation": {
+    "exitCode": 0,
+    "acceptedSixteen": true,
+    "rejectedSeventeen": true,
+    "rejectedSymlink": true,
+    "rejectedUnmappedCwd": true,
+    "readOnlyDropsExtraGrants": true,
+    "scope": "Host prevalidation with local temporary directories and a native-launch stub"
+  },
+  "defaultBuild": {
+    "exitCode": 0,
+    "unsignedHapSha256": "6c97305ea3552a8e086d9f8c1e31fd6c37506c24aee95b2098964f8267dd7a42",
+    "unsignedHapBytes": 639385650,
+    "experimentalEnabledMarker": "0",
+    "installedForTheseTests": false
+  },
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "additionalRootLimit": 16,
+    "pending": [
+      "direct relative file paths crossing between authorized roots",
+      "concurrent host moves",
+      "actual Agent disposal"
+    ]
+  }
+}

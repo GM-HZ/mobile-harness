@@ -103,11 +103,11 @@ static napi_value launch(napi_env env, napi_callback_info info)
 
 static napi_value launch_ptc(napi_env env, napi_callback_info info)
 {
-    size_t count = 5, length = 0, cwd_length = 0;
-    napi_value args[5], result;
+    size_t count = 6, length = 0, cwd_length = 0;
+    napi_value args[6], result;
     struct PtcLaunch spec = {0};
     bool writable;
-    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 5 ||
+    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 6 ||
         napi_get_value_string_utf8(env, args[0], spec.root, sizeof(spec.root), &length) != napi_ok ||
         length == 0 || length >= sizeof(spec.root) - 1 || length != strlen(spec.root) ||
         napi_get_value_bool(env, args[1], &writable) != napi_ok ||
@@ -117,6 +117,22 @@ static napi_value launch_ptc(napi_env env, napi_callback_info info)
         cwd_length == 0 || cwd_length >= sizeof(spec.cwd) - 1 || cwd_length != strlen(spec.cwd)) {
         return error_value(env, "PTC launch arguments", EINVAL);
     }
+    bool array;
+    uint32_t extra_count;
+    if (napi_is_array(env, args[5], &array) != napi_ok || !array ||
+        napi_get_array_length(env, args[5], &extra_count) != napi_ok || extra_count > MH_PTC_EXTRA_ROOTS ||
+        (!writable && extra_count)) return error_value(env, "PTC writable roots", EINVAL);
+    for (uint32_t i = 0; i < extra_count; ++i) {
+        napi_value root;
+        size_t size = 0;
+        if (napi_get_element(env, args[5], i, &root) != napi_ok ||
+            napi_get_value_string_utf8(env, root, spec.extra_roots[i], sizeof(spec.extra_roots[i]), &size) != napi_ok ||
+            size == 0 || size >= sizeof(spec.extra_roots[i]) - 1 ||
+            size != strlen(spec.extra_roots[i]) || spec.extra_roots[i][0] != '/') {
+            return error_value(env, "PTC writable root", EINVAL);
+        }
+    }
+    spec.extra_count = (int)extra_count;
     spec.writable = writable;
     int (*spawn)(const struct PtcLaunch *, struct WorkflowChild *) = broker_symbol("harmony_ptc_spawn");
     struct WorkflowChild child;

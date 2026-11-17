@@ -56,7 +56,29 @@ static void start_node(const char *entry, int control, int setup, int root, pid_
     _exit(start(8, argv));
 }
 
-static char *workspace_path(pid_t worker, uint64_t address, const struct PtcLaunch *launch, char path[4096])
+struct PtcRoots {
+    int fd[MH_PTC_EXTRA_ROOTS + 1];
+    const char *path[MH_PTC_EXTRA_ROOTS + 1];
+    int count;
+};
+
+static int root_index(const struct PtcRoots *roots, const char *path)
+{
+    int selected = -1;
+    size_t longest = 0;
+    for (int i = 0; i < roots->count; ++i) {
+        size_t length = strlen(roots->path[i]);
+        if (length >= longest && !strncmp(path, roots->path[i], length) &&
+            (!path[length] || path[length] == '/')) {
+            selected = i;
+            longest = length;
+        }
+    }
+    return selected;
+}
+
+static char *workspace_path(const struct PtcRoots *roots, pid_t worker, uint64_t address,
+                            const struct PtcLaunch *launch, char path[4096], int *root)
 {
     struct iovec local = {.iov_base = path, .iov_len = 4096};
     struct iovec remote = {.iov_base = (void *)(uintptr_t)address, .iov_len = 4096};
@@ -67,35 +89,27 @@ static char *workspace_path(pid_t worker, uint64_t address, const struct PtcLaun
         return NULL;
     }
     if (path[0] != '/') {
-        const char *cwd = launch->cwd + strlen(launch->root);
-        while (*cwd == '/') ++cwd;
-        if (*cwd) {
-            size_t prefix = strlen(cwd), length = strlen(path);
-            if (prefix + length + 2 > 4096) {
-                errno = ENAMETOOLONG;
-                return NULL;
-            }
-            memmove(path + prefix + 1, path, length + 1);
-            memcpy(path, cwd, prefix);
-            path[prefix] = '/';
+        size_t prefix = strlen(launch->cwd), length = strlen(path);
+        if (prefix + length + 2 > 4096) {
+            errno = ENAMETOOLONG;
+            return NULL;
         }
-        return path;
+        memmove(path + prefix + 1, path, length + 1);
+        memcpy(path, launch->cwd, prefix);
+        path[prefix] = '/';
     }
-    size_t length = strlen(launch->root);
-    if (strncmp(path, launch->root, length) || (path[length] && path[length] != '/')) {
+    int selected = root_index(roots, path);
+    if (selected < 0) {
         errno = EACCES;
         return NULL;
     }
-    char *relative = path + length;
+    *root = roots->fd[selected];
+    char *relative = path + strlen(roots->path[selected]);
     while (*relative == '/') ++relative;
-    if (!*relative) {
-        strcpy(path, ".");
-        return path;
-    }
-    return relative;
+    return *relative ? relative : ".";
 }
 
-static int grant_path(int root, pid_t worker, const struct seccomp_data *call, const struct PtcLaunch *launch)
+static int grant_path(const struct PtcRoots *roots, pid_t worker, const struct seccomp_data *call, const struct PtcLaunch *launch)
 {
     int flags = (int)call->args[2] & ~O_LARGEFILE;
     const int directory = O_DIRECTORY | O_CLOEXEC;
@@ -111,7 +125,8 @@ static int grant_path(int root, pid_t worker, const struct seccomp_data *call, c
         return -1;
     }
     char path[4096];
-    const char *relative = workspace_path(worker, call->args[1], launch, path);
+    int root;
+    const char *relative = workspace_path(roots, worker, call->args[1], launch, path, &root);
     if (!relative) return -1;
     struct open_how how = {
         // Opening without O_TRUNC lets us validate the exact inode first.
@@ -153,7 +168,7 @@ static int open_parent(int root, char *path, const char **leaf)
     return (int)syscall(SYS_openat2, root, slash ? path : ".", &how, sizeof(how));
 }
 
-static int mutate_path(int root, pid_t worker, const struct seccomp_data *call, const struct PtcLaunch *launch)
+static int mutate_path(const struct PtcRoots *roots, pid_t worker, const struct seccomp_data *call, const struct PtcLaunch *launch)
 {
     const int rename = call->nr == SYS_renameat || call->nr == SYS_renameat2;
     if (!launch->writable || (int)call->args[0] != AT_FDCWD ||
@@ -161,9 +176,10 @@ static int mutate_path(int root, pid_t worker, const struct seccomp_data *call, 
         (call->nr == SYS_renameat2 && call->args[4] != 0) ||
         (call->nr == SYS_unlinkat && call->args[2] != 0 && call->args[2] != AT_REMOVEDIR)) return EACCES;
     char source[4096], destination[4096];
-    char *path = workspace_path(worker, call->args[1], launch, source);
+    int root, target_root;
+    char *path = workspace_path(roots, worker, call->args[1], launch, source, &root);
     if (!path) return errno;
-    char *target = rename ? workspace_path(worker, call->args[3], launch, destination) : NULL;
+    char *target = rename ? workspace_path(roots, worker, call->args[3], launch, destination, &target_root) : NULL;
     if (rename && !target) return errno;
     const char *name, *target_name;
     int parent = open_parent(root, path, &name);
@@ -178,7 +194,7 @@ static int mutate_path(int root, pid_t worker, const struct seccomp_data *call, 
         break;
     case SYS_renameat:
     case SYS_renameat2: {
-        int target_parent = open_parent(root, target, &target_name);
+        int target_parent = open_parent(target_root, target, &target_name);
         if (target_parent < 0) error = errno;
         else {
             error = renameat(parent, name, target_parent, target_name) == 0 ? 0 : errno;
@@ -193,14 +209,15 @@ static int mutate_path(int root, pid_t worker, const struct seccomp_data *call, 
     return error;
 }
 
-static int stat_path(int listener, int root, pid_t worker, const struct seccomp_notif *request,
+static int stat_path(int listener, const struct PtcRoots *roots, pid_t worker, const struct seccomp_notif *request,
                      const struct PtcLaunch *launch)
 {
     const struct seccomp_data *call = &request->data;
     if ((int)call->args[0] != AT_FDCWD ||
         (call->args[3] != 0 && call->args[3] != AT_SYMLINK_NOFOLLOW)) return EACCES;
     char path[4096];
-    const char *relative = workspace_path(worker, call->args[1], launch, path);
+    int root;
+    const char *relative = workspace_path(roots, worker, call->args[1], launch, path, &root);
     if (!relative) return errno;
     const int nofollow = call->args[3] == AT_SYMLINK_NOFOLLOW;
     const struct open_how how = {
@@ -223,16 +240,13 @@ static int stat_path(int listener, int root, pid_t worker, const struct seccomp_
     return written < 0 ? errno : (size_t)written == sizeof(metadata) ? 0 : EFAULT;
 }
 
-static int directory_path(int root, pid_t worker, const struct seccomp_data *call,
+static int directory_path(const struct PtcRoots *roots, pid_t worker, const struct seccomp_data *call,
                           const struct PtcLaunch *launch, char absolute[1024])
 {
     char path[4096];
-    const char *relative = workspace_path(worker, call->args[0], launch, path);
+    int root;
+    const char *relative = workspace_path(roots, worker, call->args[0], launch, path, &root);
     if (!relative) return -1;
-    if (!strcmp(path, ".")) {
-        strcpy(path, launch->root);
-        relative = ".";
-    }
     // Directory transitions have a single canonical spelling shared by Node and the broker.
     if (path[0] != '/' || strlen(path) >= 1024 || strstr(path, "/../") || strstr(path, "/./") ||
         strstr(path, "//") || (strlen(path) >= 3 && !strcmp(path + strlen(path) - 3, "/..")) ||
@@ -248,7 +262,7 @@ static int directory_path(int root, pid_t worker, const struct seccomp_data *cal
     return directory;
 }
 
-static int mediate(int listener, int root, pid_t worker, struct PtcLaunch *launch)
+static int mediate(int listener, const struct PtcRoots *roots, pid_t worker, struct PtcLaunch *launch)
 {
     struct seccomp_notif request = {0};
     if (ioctl(listener, SECCOMP_IOCTL_NOTIF_RECV, &request) < 0 ||
@@ -260,13 +274,13 @@ static int mediate(int listener, int root, pid_t worker, struct PtcLaunch *launc
     }
     const int change_directory = request.data.nr == SYS_chdir;
     if (request.data.nr != SYS_openat && !change_directory) {
-        response.error = request.data.nr == SYS_newfstatat ? -stat_path(listener, root, worker, &request, launch)
-                                                         : -mutate_path(root, worker, &request.data, launch);
+        response.error = request.data.nr == SYS_newfstatat ? -stat_path(listener, roots, worker, &request, launch)
+                                                         : -mutate_path(roots, worker, &request.data, launch);
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
     }
     char next_directory[1024];
-    int file = change_directory ? directory_path(root, worker, &request.data, launch, next_directory)
-                                : grant_path(root, worker, &request.data, launch);
+    int file = change_directory ? directory_path(roots, worker, &request.data, launch, next_directory)
+                                : grant_path(roots, worker, &request.data, launch);
     if (file < 0) {
         response.error = -errno;
         return ioctl(listener, SECCOMP_IOCTL_NOTIF_SEND, &response) < 0 ? errno : 0;
@@ -292,24 +306,30 @@ static int mediate(int listener, int root, pid_t worker, struct PtcLaunch *launc
 void harmony_ptc_supervise(const char *entry, int channel, pid_t parent, const struct PtcLaunch *launch)
 {
     if (!follow(parent)) _exit(125);
-    size_t root_length = strlen(launch->root);
-    if (strncmp(launch->cwd, launch->root, root_length) ||
-        (launch->cwd[root_length] && launch->cwd[root_length] != '/')) _exit(125);
     struct PtcLaunch current = *launch;
     const struct sigaction handler = {.sa_handler = request_stop};
     if (sigaction(SIGTERM, &handler, NULL) < 0) _exit(125);
     struct open_how how = {.flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = RESOLVE_NO_SYMLINKS};
-    int root = (int)syscall(SYS_openat2, AT_FDCWD, launch->root, &how, sizeof(how));
+    if (launch->extra_count < 0 || launch->extra_count > MH_PTC_EXTRA_ROOTS ||
+        (!launch->writable && launch->extra_count)) _exit(125);
+    struct PtcRoots roots = {.count = launch->extra_count + 1};
+    roots.path[0] = launch->root;
+    for (int i = 0; i < launch->extra_count; ++i) roots.path[i + 1] = launch->extra_roots[i];
+    for (int i = 0; i < roots.count; ++i) {
+        roots.fd[i] = (int)syscall(SYS_openat2, AT_FDCWD, roots.path[i], &how, sizeof(how));
+        if (roots.fd[i] < 0) _exit(125);
+    }
+    if (root_index(&roots, launch->cwd) < 0) _exit(125);
     struct seccomp_notif_sizes sizes;
     int setup[2];
-    if (root < 0 || syscall(SYS_seccomp, SECCOMP_GET_NOTIF_SIZES, 0, &sizes) < 0 ||
+    if (syscall(SYS_seccomp, SECCOMP_GET_NOTIF_SIZES, 0, &sizes) < 0 ||
         sizes.seccomp_notif != sizeof(struct seccomp_notif) ||
         sizes.seccomp_notif_resp != sizeof(struct seccomp_notif_resp) ||
         socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, setup) < 0) _exit(125);
     if (stop_requested) _exit(128 + SIGTERM);
     pid_t supervisor = getpid();
     pid_t worker = fork();
-    if (worker == 0) start_node(entry, channel, setup[1], root, supervisor, launch);
+    if (worker == 0) start_node(entry, channel, setup[1], roots.fd[0], supervisor, launch);
     if (worker < 0) _exit(125);
     close(channel);
     close(setup[1]);
@@ -326,7 +346,7 @@ void harmony_ptc_supervise(const char *entry, int channel, pid_t parent, const s
         int ready = poll(&descriptor, 1, 100);
         if (ready < 0 && errno != EINTR) break;
         if (ready > 0 && descriptor.revents & POLLIN) {
-            int error = mediate(listener, root, worker, &current);
+            int error = mediate(listener, &roots, worker, &current);
             if (error && error != ENOENT && error != EINTR) break;
         }
     }

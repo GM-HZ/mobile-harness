@@ -125,10 +125,15 @@ static void serve(int channel, const char *entry, pid_t parent)
         struct Reply reply = {0};
         int worker_fd = -1;
         const int ptc = request.action == START_PTC;
+        int invalid_roots = request.launch.extra_count < 0 || request.launch.extra_count > MH_PTC_EXTRA_ROOTS;
+        for (int i = 0; !invalid_roots && i < request.launch.extra_count; ++i) {
+            invalid_roots = request.launch.extra_roots[i][0] != '/' ||
+                !memchr(request.launch.extra_roots[i], 0, sizeof(request.launch.extra_roots[i]));
+        }
         if (request.action == START || ptc) {
             struct Worker *worker = worker_slot(workers, 0);
             int pair[2];
-            if (ptc && (!has_ptc || request.launch.root[0] != '/' ||
+            if (ptc && (invalid_roots || !has_ptc || request.launch.root[0] != '/' ||
                         !memchr(request.launch.root, 0, sizeof(request.launch.root)) ||
                         request.launch.cwd[0] != '/' ||
                         !memchr(request.launch.cwd, 0, sizeof(request.launch.cwd)))) reply.error = EINVAL;

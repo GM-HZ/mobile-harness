@@ -86,6 +86,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 可选参数 `--read-only` 验证只读会话。用 `--mode persistent-in-memory` 验证 REPL，用 `--mode vm-script` 验证 Script，给后者加 `--script-persistence` 验证 Script 跨轮保留变量。这些回归会临时写入官方 Host profile patch 并重启应用，要求独立模拟器的用户 patch 槽为空。测试结束会移除临时 patch，恢复正常模式。
 
+使用 `--additional-roots` 验证三个显式附加目录，包括重叠授权、跨目录重命名及工作目录切换。再加 `--read-only` 验证附加配置无法允许只读会话写入。夹具创建的目录在退出时清理。实验后端每个进程最多接受 16 个附加目录，根目录路径必须为已存在的规范化物理目录。
+
 ## Host 进程探针
 
 ```sh
