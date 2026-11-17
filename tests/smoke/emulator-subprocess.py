@@ -67,6 +67,10 @@ def run(emulator, output):
             evidence['contract'] = json.loads(toolkit['texts']([result]))
             assert len(evidence['contract']) == 7, evidence['contract']
             evidence['allHelpersReaped'] = worktree['helpers_reaped'](emulator)
+            # tool() already required this exact turn to finish. A later App
+            # restart does not prepare that completed session for cancel RPC.
+            sid = None
+            evidence['sessionSettledBeforeRestart'] = True
         evidence['temporaryModelCredentialRemoved'] = True
         evidence['disable'] = emulator.rpc('pluginManager/setBundleEnabled', {'name': name, 'enabled': False})
         assert evidence['disable']['application'] != 'failed', evidence['disable']
@@ -79,17 +83,19 @@ def run(emulator, output):
         evidence['removedThroughActualPluginManager'] = True
     finally:
         try:
-            if sid: emulator.rpc('session/cancel', {'request': {'sessionId': sid}})
-            if saved:
-                emulator.stop(); emulator.app(f'cp {backup} {PROFILE}/package.json && cp {boot_backup} mobile-harness-boot.json')
-                if had_lock: emulator.app(f'cp {lock_backup} {PROFILE}/pnpm-lock.yaml')
-                else: emulator.app(f'rm -f {PROFILE}/pnpm-lock.yaml')
-                emulator.app(f'rm -f {backup} {lock_backup} {boot_backup}; rm -rf alpine/workspace-native/{name} {PROFILE}/node_modules/{name}')
-                emulator.start(); emulator.ready('normal')
-                evidence['manifestAfterSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/package.json')).hexdigest()
-                evidence['lockAfterSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/pnpm-lock.yaml')).hexdigest() if had_lock else None
-                assert evidence['manifestBeforeSha256'] == evidence['manifestAfterSha256']
-                assert evidence['lockBeforeSha256'] == evidence['lockAfterSha256']
+            try:
+                if sid: emulator.rpc('session/cancel', {'request': {'sessionId': sid}})
+            finally:
+                if saved:
+                    emulator.stop(); emulator.app(f'cp {backup} {PROFILE}/package.json && cp {boot_backup} mobile-harness-boot.json')
+                    if had_lock: emulator.app(f'cp {lock_backup} {PROFILE}/pnpm-lock.yaml')
+                    else: emulator.app(f'rm -f {PROFILE}/pnpm-lock.yaml')
+                    emulator.app(f'rm -f {backup} {lock_backup} {boot_backup}; rm -rf alpine/workspace-native/{name} {PROFILE}/node_modules/{name}')
+                    emulator.start(); emulator.ready('normal')
+                    evidence['manifestAfterSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/package.json')).hexdigest()
+                    evidence['lockAfterSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/pnpm-lock.yaml')).hexdigest() if had_lock else None
+                    assert evidence['manifestBeforeSha256'] == evidence['manifestAfterSha256']
+                    assert evidence['lockBeforeSha256'] == evidence['lockAfterSha256']
         finally:
             emulator.hdc('shell', 'rm', '-f', remote + '.tgz', remote + '.json')
             output.write_text(json.dumps(evidence, indent=2) + '\n')
