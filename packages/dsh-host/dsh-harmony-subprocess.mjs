@@ -51,7 +51,7 @@ export default class HarmonySubprocessRuntime extends LocalSubprocessRuntime {
           (!signed && executable !== 'x')) {
         throw new SubprocessExecutableNotFoundError('Harmony subprocess: command ' + JSON.stringify(command) + ' was not found as an executable');
       }
-      return signed ? root + guest : resolved;
+      return root + guest;
     } finally {
       child.terminate();
       await child.waitForExit();
@@ -60,5 +60,10 @@ export default class HarmonySubprocessRuntime extends LocalSubprocessRuntime {
 
   async spawnTerminal() {
     throw new SubprocessError('HarmonyOS system PTY is unavailable; use non-interactive Bash', 'SUBPROCESS_PTY_UNAVAILABLE');
+  }
+
+  async terminalEnvironment(signal) {
+    signal?.throwIfAborted();
+    return { platform: 'posix', defaultShell: path.join(root, 'bin/bash') };
   }
 }

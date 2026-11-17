@@ -93,7 +93,7 @@ function installProotSpawn(workspace) {
       throw new Error('Harmony subprocess supports standard input/output pipes; extra control descriptors are unavailable');
     }
     const cwd = fs.realpathSync(options.cwd);
-    relativeInWorkspace(fs.realpathSync(root), cwd);
+    relativeInWorkspace(allowedRoot, cwd);
     const environment = Object.entries(options.env ?? {}).flatMap(([key, value]) => {
       if (value === undefined) return [];
       if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key) || /^(?:HARMONY_|PROOT_|LD_)/.test(key) ||
@@ -221,7 +221,7 @@ function installProotSpawn(workspace) {
         if (!result) fs.closeSync(launched.statusFd);
         child.emit('error', error);
         if (streaming) {
-          for (const stream of child.stdio) stream.destroy();
+          for (const stream of child.stdio) stream?.destroy();
           child.emit('exit', child.exitCode, child.signalCode);
         }
         return;

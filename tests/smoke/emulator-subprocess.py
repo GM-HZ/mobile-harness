@@ -63,7 +63,7 @@ def run(emulator, output):
             evidence['sessionId'] = sid
             result, _ = agent['tool'](emulator, sid, 'mh_subprocess_contract', {})
             evidence['contract'] = json.loads(toolkit['texts']([result]))
-            assert len(evidence['contract']) == 6, evidence['contract']
+            assert len(evidence['contract']) == 7, evidence['contract']
             evidence['allHelpersReaped'] = worktree['helpers_reaped'](emulator)
         evidence['temporaryModelCredentialRemoved'] = True
     finally:

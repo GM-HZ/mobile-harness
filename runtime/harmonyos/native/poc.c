@@ -317,10 +317,11 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
     int host_paths = shell && strncmp(shell->cwd, root, strlen(root)) == 0 &&
         (shell->cwd[strlen(root)] == '/' || shell->cwd[strlen(root)] == '\0');
     char root_binding[1850];
+    char workspace_binding[2200];
     char bind_options[packaged_count][1150];
-    char host_bind_options[packaged_count][2050];
+    char host_bind_options[packaged_count][4096];
     char dsh_binding[1150];
-    char *bound_guest[packaged_count * 4 + sizeof(guest) / sizeof(*guest) + 14];
+    char *bound_guest[packaged_count * 4 + sizeof(guest) / sizeof(*guest) + 16];
     int bound_count = 0;
     if (strstr(stage, "packaged")) {
         for (int n = 0; n < 8; ++n) bound_guest[bound_count++] = guest[n];
@@ -328,6 +329,12 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             snprintf(root_binding, sizeof(root_binding), "%s:%s", root, root);
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = root_binding;
+            /* Rootfs reverse translation wins an equal-prefix self-binding.
+             * A more specific workspace alias keeps Git realpath/gitdir and
+             * language-server URIs in the same namespace as the Host fs. */
+            snprintf(workspace_binding, sizeof(workspace_binding), "%s/workspace-native:%s/workspace-native", root, root);
+            bound_guest[bound_count++] = "-b";
+            bound_guest[bound_count++] = workspace_binding;
         }
         if (dsh_test) {
             snprintf(dsh_binding, sizeof(dsh_binding), "%s/.dsh-0.2.2-rc.4/dsh:/dsh", root);

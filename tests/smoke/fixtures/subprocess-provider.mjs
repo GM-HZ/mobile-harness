@@ -40,6 +40,10 @@ async function run() {
     assert.deepEqual(JSON.parse(Buffer.concat(chunks)), { cwd, args: [literal], stdin: 'two chunks\n汉字' });
     assert.match(child.collected.stderr.readFrom(0).text, /STDERR_MARKER/);
     result.literalArgvNativeCwdStreamingAndEof = true;
+    const nested = spawn([node, '-e', 'const cp=require("node:child_process");process.stdout.write(JSON.stringify({execPath:process.execPath,child:cp.execFileSync(process.execPath,["-e","process.stdout.write(process.cwd())"],{encoding:"utf8"})}))']);
+    assert.equal((await settle(nested)).exitCode, 0);
+    const nestedResult = JSON.parse(nested.collected.stdout.readFrom(0).text);
+    assert.equal(nestedResult.child, cwd); result.realNestedNodeProcess = nestedResult;
     // Only fake ambient values are installed; real credentials are never read.
     const fake = { MH_PARENT_SECRET: 'ambient-fake-secret', DSH_FAKE_IDENTITY: 'ambient-fake-id', MH_AMBIENT: 'remove-me' };
     const saved = Object.fromEntries(Object.keys(fake).map(key => [key, process.env[key]]));
@@ -74,7 +78,10 @@ async function run() {
       if (action === 'abort') controller.abort(new Error('Owned active subprocess cancellation'));
       else await owner.fiber.dispose();
       const outcome = await settle(active);
-      assert.ok(outcome.signal === 'SIGTERM' || outcome.signal === 'SIGKILL', JSON.stringify(outcome));
+      // PRoot catches group TERM, reaps its tracees and may itself exit 1.
+      // Require truthful non-success exit facts and actual range quiescence;
+      // do not relabel that proxy exit as a direct-command POSIX signal.
+      assert.ok(outcome.signal !== null || (Number.isInteger(outcome.exitCode) && outcome.exitCode !== 0), JSON.stringify(outcome));
       assert.ok(Date.now() - started < 5000);
       result[action] = { actualRunningObserved: true, managedRangeExited: true, elapsedMs: Date.now() - started, outcome };
     }
