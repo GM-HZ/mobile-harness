@@ -1,0 +1,72 @@
+'use strict';
+
+const fs = require('node:fs');
+const { Socket } = require('node:net');
+const { constants } = require('node:os');
+const { PassThrough } = require('node:stream');
+
+function bindPtc(native, mark) {
+  const signals = new Map(Object.entries(constants.signals).map(([name, code]) => [code, name]));
+  return {
+    strip(source) {
+      const result = require('./amaro.cjs').transformSync(source, { mode: 'strip-only' });
+      if (typeof result?.code !== 'string') throw new Error('Invalid PTC compiler result');
+      return result.code;
+    },
+    launch(cwd, policy, config, signal) {
+      signal.throwIfAborted();
+      if (policy.mode !== 'read-only' && policy.mode !== 'workspace-write') {
+        throw new Error('HarmonyOS PTC requires a workspace file policy');
+      }
+      if (policy.additionalWritableRoots?.length || fs.realpathSync(cwd) !== cwd || cwd !== policy.workspaceRoot) {
+        throw new Error('HarmonyOS PTC currently requires one canonical workspace root as its working directory');
+      }
+      const { fd, id } = native.launchPtc(cwd, policy.mode === 'workspace-write',
+        config.maxMessageBytes, config.maxOldGenerationSizeMb);
+      mark('ptc-worker-admitted', { id, mode: policy.mode });
+      const control = new Socket({ fd, readable: true, writable: true, allowHalfOpen: true });
+      const stdout = new PassThrough();
+      const stderr = new PassThrough();
+      const completion = Promise.withResolvers();
+      let exited = false;
+      let stopping = false;
+      const timer = setInterval(() => {
+        let status;
+        try {
+          status = native.status(id);
+          if (!status) return;
+          mark('ptc-worker-reaped', { id, exitCode: status.exitCode, signal: status.signal });
+          const signal = signals.get(status.signal) ?? (stopping && status.exitCode === 143 ? 'SIGTERM' : null);
+          completion.resolve({
+            exitCode: signal ? null : status.exitCode,
+            signal,
+          });
+        } catch (error) {
+          completion.reject(error);
+        }
+        exited = true;
+        clearInterval(timer);
+        stdout.end();
+        stderr.end();
+      }, 25);
+      return {
+        control, stdout, stderr, collected: {}, done: completion.promise,
+        terminate() {
+          if (exited || stopping) return;
+          native.terminate(id);
+          stopping = true;
+        },
+        async waitForExit(bound) {
+          if (bound?.aborted) return false;
+          const aborted = Promise.withResolvers();
+          const onAbort = () => aborted.resolve(false);
+          bound?.addEventListener('abort', onAbort, { once: true });
+          try { return await Promise.race([completion.promise.then(() => true), aborted.promise]); }
+          finally { bound?.removeEventListener('abort', onAbort); }
+        },
+      };
+    },
+  };
+}
+
+module.exports = { bindPtc };

@@ -72,6 +72,18 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-workflow.py <loopback-target> .build/emulator-workflow.json
 ```
 
+## 通用 PTC 实验回归
+
+按 [TypeScript 探针](research/harmonyos-ptc-typescript.md#复现) 生成 `.build/amaro-probe/portable`。构建会校验两个解析器文件的摘要。安装实验包并通过 HDC 启动后，冒烟测试会经真实 DSH 会话触发 `run_code`，检查工作区文件授权、嵌套工具和取消。测试在退出时清除临时文件与凭据。普通构建无需这些文件。
+
+```sh
+HARMONY_UNSIGNED=1 HARMONY_PTC_AMARO_DIR="$PWD/.build/amaro-probe/portable" ./build.sh
+hdc -t <loopback-target> install -r .build/stage/harmonyos/entry/build/default/outputs/default/entry-default-unsigned.hap
+hdc -t <loopback-target> shell aa start -a EntryAbility -b org.sayact.nodepoc
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-ptc-host.py <loopback-target> .build/emulator-ptc-host.json
+```
+
 ## Host 进程探针
 
 ```sh

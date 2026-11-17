@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include "ptc-file-filter.h"
+#include "ptc-files-report.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <linux/openat2.h>

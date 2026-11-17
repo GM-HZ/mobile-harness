@@ -13,7 +13,8 @@ cp "$probe/EntryAbility.ets" "$stage/entry/src/main/ets/entryability/"
 cp "$probe/Index.ets" "$stage/entry/src/main/ets/pages/"
 mkdir -p "$stage/entry/src/main/cpp/types/libworkflowprobe"
 cp "$probe/probe.c" "$probe/launch-node.c" "$probe/workflow-node.c" "$probe/ptc-files.c" "$stage/entry/src/main/cpp/"
-cp "$probe/ptc-file-filter.c" "$probe/ptc-file-filter.h" "$probe/ptc-node.c" "$stage/entry/src/main/cpp/"
+cp "$probe/ptc-node.c" "$probe/ptc-files-report.h" "$stage/entry/src/main/cpp/"
+cp "$root/runtime/harmonyos/native/"ptc-{file-filter,supervisor}.{c,h} "$stage/entry/src/main/cpp/"
 cp "$probe/ptc-wire.c" "$probe/ptc-wire.h" "$stage/entry/src/main/cpp/"
 cp "$root/runtime/harmonyos/native/workflow-broker.c" "$root/runtime/harmonyos/native/workflow-broker.h" \
     "$stage/entry/src/main/cpp/"
@@ -28,7 +29,7 @@ cp "$root/vendor/repos/node/src/node_api.h" "$root/vendor/repos/node/src/node_ap
 cat > "$stage/entry/src/main/cpp/CMakeLists.txt" <<'CMAKE'
 cmake_minimum_required(VERSION 3.5.0)
 project(workflowprobe)
-add_library(workflowprobe SHARED probe.c launch-node.c workflow-broker.c ptc-files.c ptc-file-filter.c ptc-wire.c)
+add_library(workflowprobe SHARED probe.c launch-node.c workflow-broker.c ptc-files.c ptc-file-filter.c ptc-wire.c ptc-supervisor.c)
 target_link_libraries(workflowprobe PUBLIC libace_napi.z.so dl)
 add_library(workflownode SHARED workflow-node.c)
 target_include_directories(workflownode PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

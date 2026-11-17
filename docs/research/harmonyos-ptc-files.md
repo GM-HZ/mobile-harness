@@ -22,7 +22,11 @@ API 26 ARM64 Phone 模拟器支持 seccomp 用户态通知和 `openat2`。Landlo
 
 探针校验 RC.3 发布包内 `dsh-ptc-runtime-node/lib/process.js` 的版本与摘要，只替换最后的进程入口。上游 evaluator、控制通道协议、日志和绑定编解码均按原样运行。固定 Host 夹具通过独立 Unix 套接字发送程序并回复工具请求。模拟器两次验证了工作区异步读取、日志、工具结果 `42`、等待工具期间的 `revoke`、以及进入死循环后强制终止并回收 worker。 [协议实测](../evidence/emulator-ptc-protocol-2026-11-17.json)
 
-正式通用 PTC 仍需由实际 DSH Host 启动 worker，将会话的工作区和附加可写根传给文件代理。目录修改、持久执行模式和真实模型入口仍待验证，Mate 60 离线。
+## 正式 Host 的实验接入
+
+构建时设置 `HARMONY_PTC_AMARO_DIR` 可在普通应用的 DSH Host 中启用上游 `ProgramWorker`。鸿蒙适配器提供 TypeScript 擦除与进程启动。独立监督进程持有工作区目录描述符，并为 worker 处理文件请求。默认构建与恢复模式禁用该入口。
+
+API 26 Phone 模拟器通过真实模型触发会话内的 `run_code`。实测 TypeScript、工作区读取、独占文件创建、越界拒绝和嵌套 DSH 文件工具。取消会话后宿主确认回收对应 worker。实验入口接受单一规范化的工作区根，拒绝附加可写根，以及工作目录与根不一致的请求。覆盖、删除、重命名、创建目录和持久 worker 模式尚未提供或验证。Mate 60 在本轮离线。 [正式 Host 实测](../evidence/emulator-ptc-host-2026-11-17.json) · [构建与回归](../development.md#通用-ptc-实验回归)
 
 ## 复现
 

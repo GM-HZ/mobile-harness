@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include "workflow-broker.h"
+#include "ptc-file-filter.h"
 #include <dlfcn.h>
 #include <errno.h>
 #include <linux/audit.h>
@@ -9,6 +10,7 @@
 #include <poll.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <sys/prctl.h>
 #include <sys/syscall.h>
@@ -99,6 +101,41 @@ static napi_value launch(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_value launch_ptc(napi_env env, napi_callback_info info)
+{
+    size_t count = 4, length = 0;
+    napi_value args[4], result;
+    struct PtcLaunch spec = {0};
+    bool writable;
+    if (napi_get_cb_info(env, info, &count, args, NULL, NULL) != napi_ok || count != 4 ||
+        napi_get_value_string_utf8(env, args[0], spec.root, sizeof(spec.root), &length) != napi_ok ||
+        length == 0 || length >= sizeof(spec.root) - 1 || length != strlen(spec.root) ||
+        napi_get_value_bool(env, args[1], &writable) != napi_ok ||
+        napi_get_value_int32(env, args[2], &spec.message_bytes) != napi_ok || spec.message_bytes < 4096 ||
+        napi_get_value_int32(env, args[3], &spec.heap_mb) != napi_ok || spec.heap_mb < 16) {
+        return error_value(env, "PTC launch arguments", EINVAL);
+    }
+    spec.writable = writable;
+    int (*spawn)(const struct PtcLaunch *, struct WorkflowChild *) = broker_symbol("harmony_ptc_spawn");
+    struct WorkflowChild child;
+    int error = spawn ? spawn(&spec, &child) : ENOSYS;
+    if (error) return error_value(env, "PTC launch", error);
+    napi_create_object(env, &result);
+    set_number(env, result, "id", child.id);
+    set_number(env, result, "fd", child.fd);
+    return result;
+}
+
+static napi_value confine_ptc(napi_env env, napi_callback_info info)
+{
+    (void)info;
+    napi_value result;
+    int error = ptc_install_file_filter(1, 1);
+    if (error) return error_value(env, "PTC confinement", error);
+    napi_get_undefined(env, &result);
+    return result;
+}
+
 static napi_value request(napi_env env, napi_callback_info info, int stop)
 {
     size_t argc = 1;
@@ -168,9 +205,11 @@ NAPI_MODULE_INIT()
 {
     const napi_property_descriptor properties[] = {
         {"launch", NULL, launch, NULL, NULL, NULL, napi_default, NULL},
+        {"launchPtc", NULL, launch_ptc, NULL, NULL, NULL, napi_default, NULL},
         {"terminate", NULL, terminate, NULL, NULL, NULL, napi_default, NULL},
         {"status", NULL, status, NULL, NULL, NULL, napi_default, NULL},
         {"confine", NULL, confine, NULL, NULL, NULL, napi_default, NULL},
+        {"confinePtc", NULL, confine_ptc, NULL, NULL, NULL, napi_default, NULL},
         {"finish", NULL, finish, NULL, NULL, NULL, napi_default, NULL},
         {"waitChannel", NULL, wait_channel, NULL, NULL, NULL, napi_default, NULL},
     };

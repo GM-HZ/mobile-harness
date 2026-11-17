@@ -9,6 +9,7 @@
 #include <poll.h>
 #include <pthread.h>
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/prctl.h>
@@ -17,10 +18,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-enum { START = 1, STOP, STATUS, MAX_WORKERS = 8 };
-struct Request { int action; uint32_t id; };
+enum { START = 1, STOP, STATUS, START_PTC, MAX_WORKERS = 8 };
+struct Request { int action; uint32_t id; struct PtcLaunch launch; };
 struct Reply { int error; uint32_t id; pid_t pid; int finished; int status; };
-struct Worker { uint32_t id; pid_t pid; int finished; int status; };
+struct Worker { uint32_t id; pid_t pid; int finished; int status; int ptc; };
 
 static pthread_mutex_t client_lock = PTHREAD_MUTEX_INITIALIZER;
 static int client = -1;
@@ -110,6 +111,12 @@ static void serve(int channel, const char *entry, pid_t parent)
     struct Worker workers[MAX_WORKERS] = {{0}};
     uint32_t next_id = 1;
     struct Request request;
+    char ptc_entry[1024];
+    snprintf(ptc_entry, sizeof(ptc_entry), "%s", entry);
+    char *basename = strrchr(ptc_entry, '/');
+    const char ptc_name[] = "/dsh-harmony-ptc-worker.mjs";
+    int has_ptc = basename && (size_t)(basename - ptc_entry) + sizeof(ptc_name) <= sizeof(ptc_entry);
+    if (has_ptc) memcpy(basename, ptc_name, sizeof(ptc_name));
     for (;;) {
         ssize_t count = recv(channel, &request, sizeof(request), 0);
         if (count < 0 && errno == EINTR) continue;
@@ -117,20 +124,27 @@ static void serve(int channel, const char *entry, pid_t parent)
         for (int i = 0; i < MAX_WORKERS; ++i) reap(&workers[i]);
         struct Reply reply = {0};
         int worker_fd = -1;
-        if (request.action == START) {
+        const int ptc = request.action == START_PTC;
+        if (request.action == START || ptc) {
             struct Worker *worker = worker_slot(workers, 0);
             int pair[2];
-            if (!worker) reply.error = EBUSY;
+            if (ptc && (!has_ptc || request.launch.root[0] != '/' ||
+                        !memchr(request.launch.root, 0, sizeof(request.launch.root)))) reply.error = EINVAL;
+            else if (!worker) reply.error = EBUSY;
             else if (next_id == 0) reply.error = EOVERFLOW;
             else if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, pair) < 0) reply.error = errno;
             else {
                 pid_t pid = fork();
-                if (pid == 0) run_worker(entry, pair[1], broker_pid);
+                if (pid == 0) {
+                    close(pair[0]);
+                    if (ptc) harmony_ptc_supervise(ptc_entry, pair[1], broker_pid, &request.launch);
+                    else run_worker(entry, pair[1], broker_pid);
+                }
                 if (pid < 0) {
                     reply.error = errno;
                     close(pair[0]);
                 } else {
-                    *worker = (struct Worker){.id = next_id++, .pid = pid};
+                    *worker = (struct Worker){.id = next_id++, .pid = pid, .ptc = ptc};
                     reply.id = worker->id;
                     reply.pid = pid;
                     worker_fd = pair[0];
@@ -145,7 +159,8 @@ static void serve(int channel, const char *entry, pid_t parent)
                 reply.status = worker->status;
                 if (worker->finished) worker->id = 0;
             } else if (request.action == STOP) {
-                if (!worker->finished && kill(worker->pid, SIGKILL) < 0 && errno != ESRCH) reply.error = errno;
+                if (!worker->finished && kill(worker->pid, worker->ptc ? SIGTERM : SIGKILL) < 0 && errno != ESRCH)
+                    reply.error = errno;
             } else reply.error = EINVAL;
         }
         const int sent = send_reply(channel, reply, worker_fd);
@@ -234,6 +249,17 @@ int harmony_workflow_spawn(struct WorkflowChild *child)
 {
     struct Reply reply;
     int error = exchange((struct Request){.action = START}, &reply, &child->fd);
+    if (!error) {
+        child->id = reply.id;
+        child->pid = reply.pid;
+    }
+    return error;
+}
+
+int harmony_ptc_spawn(const struct PtcLaunch *launch, struct WorkflowChild *child)
+{
+    struct Reply reply;
+    int error = exchange((struct Request){.action = START_PTC, .launch = *launch}, &reply, &child->fd);
     if (!error) {
         child->id = reply.id;
         child->pid = reply.pid;

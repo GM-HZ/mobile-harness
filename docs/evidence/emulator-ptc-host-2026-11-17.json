@@ -1,0 +1,55 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "buildMode": "HARMONY_UNSIGNED=1 with HARMONY_PTC_AMARO_DIR",
+  "unsignedHapSha256": "0c68b16fa57cf3a8691fe2b9e82fa7502e4fb84845bf3c491664b11c76b90aee",
+  "unsignedHapBytes": 657072236,
+  "buildExitCode": 0,
+  "installResult": "install bundle successfully",
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "smokeExitCode": 0,
+  "results": {
+    "readyMs": 6812,
+    "runCodeObserved": true,
+    "typeScriptResultReturned": true,
+    "fileContentsMatched": true,
+    "outsideReadDenied": true,
+    "nestedHostToolMatched": true,
+    "cancelledViaSession": true,
+    "cancelledWorkerReaped": true,
+    "temporaryModelCredentialRemoved": true
+  },
+  "workers": {
+    "admitted": 2,
+    "reaped": 2,
+    "policy": "workspace-write"
+  },
+  "earlierAttempts": [
+    "HDC rejected installation for insufficient device space. The old installed build returned ERR_WEBASSEMBLY_NOT_SUPPORTED. Two standalone probe apps were then removed from the emulator.",
+    "The first installed experimental build rejected wx because Node included O_TRUNC with O_EXCL. The final broker normalizes O_TRUNC only for exclusive creation."
+  ],
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "testedFileAccess": "read, exclusive create and traversal denial in one workspace",
+    "pending": [
+      "overwrite",
+      "rename",
+      "remove",
+      "create directory",
+      "additional roots",
+      "persistent mode",
+      "physical device validation"
+    ]
+  },
+  "defaultBuild": {
+    "buildExitCode": 0,
+    "unsignedHapSha256": "ef22e92d3ed20600dff97498560a58749e37efbf7cbb7357853f2197c6f058e7",
+    "unsignedHapBytes": 639377256,
+    "enableMarker": "0",
+    "experimentalRawResourcesPresent": false
+  }
+}

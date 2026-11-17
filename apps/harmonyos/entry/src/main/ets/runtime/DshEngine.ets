@@ -119,6 +119,13 @@ class DshEngine {
     this.copyGuest(context, 'dsh-harmony-workflow.cjs', root + '/dsh-harmony-workflow.cjs');
     this.copyGuest(context, 'dsh-harmony-workflow-wire.cjs', root + '/dsh-harmony-workflow-wire.cjs');
     this.copyGuest(context, 'dsh-harmony-workflow-worker.cjs', root + '/dsh-harmony-workflow-worker.cjs');
+    const ptc = context.resourceManager.getRawFileContentSync('dsh-harmony-ptc-enabled');
+    this.copyGuest(context, 'dsh-harmony-ptc-enabled', root + '/dsh-harmony-ptc-enabled');
+    if (ptc[0] === 49) {
+      for (const name of ['amaro.cjs', 'instantiate.cjs', 'dsh-harmony-ptc.cjs', 'dsh-harmony-ptc-worker.mjs']) {
+        this.copyGuest(context, name, root + '/' + name);
+      }
+    }
     const recovery = new BootRecovery(context.filesDir);
     recovery.write(mode, true);
     this.publish(mode === 'safe' ? '正在启动安全模式…' : '正在启动本机 DeepSeek Harness…');

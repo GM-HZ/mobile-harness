@@ -51,6 +51,32 @@ function patchWorkflow(source) {
     '\t\t\tconst outcome = await globalThis.__harmonyWorkflowRun(this.bindings(), this.controller.signal);\n' +
     source.slice(stop);
 }
+function patchPtc(source) {
+  const start = '\t\tconst executable = await this.ctx.subprocess.resolveExecutable';
+  const end = '\t\tthis.handle = handle;';
+  const index = source.indexOf(start);
+  const stop = source.indexOf(end, index);
+  if (index < 0 || stop < 0 || source.indexOf(start, index + 1) !== -1 ||
+      !source.slice(index, stop).includes('const handle = this.ctx.subprocess.spawn({')) {
+    throw new Error('Unexpected pinned PTC worker entry');
+  }
+  const replacement = `    if (this.closed) return;
+    let handle;
+    try {
+      handle = globalThis.__harmonyPtc.launch(cwd, this.policy, this.config, this.controller.signal);
+    } catch (error) {
+      throw new SandboxUnavailableError(this.policy.mode, String(error?.message ?? error));
+    }
+    this.confined = {
+      argv: ["harmonyos-ptc"], enforcement: "partial",
+      denialSignatures: ["permission denied", "eacces", "eperm", "exdev"],
+      runnerFailureRules: [],
+    };
+`;
+  return replacePinned(source.slice(0, index) + replacement + source.slice(stop),
+    'import { stripTypeScriptTypes } from "node:module";',
+    'const stripTypeScriptTypes = globalThis.__harmonyPtc.strip;');
+}
 function quoteShellArgument(value) {
   if (typeof value !== 'string' || value.includes('\0')) throw new TypeError('Invalid command argument');
   return "'" + value.replaceAll("'", "'\\''") + "'";
@@ -260,6 +286,11 @@ async function main() {
   const packageUrl = paths('dsh-plugin-manager/lib/index.js');
   const mcpClientUrl = paths('dsh-mcp-client/lib/index.js');
   const workflowUrl = paths('dsh-workflow-ptc/lib/index.js');
+  const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
+  const ptcEnabled = !safeMode && fs.readFileSync(path.join(root, 'dsh-harmony-ptc-enabled'), 'utf8') === '1';
+  if (ptcEnabled) {
+    globalThis.__harmonyPtc = require(path.join(root, 'dsh-harmony-ptc.cjs')).bindPtc(addon('libdshworkflow.so'), mark);
+  }
   const mcpStdioUrl = pathToFileURL(path.join(dsh, '@modelcontextprotocol/client/dist/stdio.mjs')).href;
   const launchGuest = installProotSpawn(workspace);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
@@ -310,8 +341,9 @@ async function main() {
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
           url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl &&
-          url !== mcpClientUrl && url !== mcpStdioUrl && url !== workflowUrl) return result;
+          url !== mcpClientUrl && url !== mcpStdioUrl && url !== workflowUrl && !(ptcEnabled && url === ptcUrl)) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+      if (url === ptcUrl) return { ...result, source: patchPtc(source) };
       if (url === workflowUrl) return { ...result, source: patchWorkflow(source) };
       if (url === mcpClientUrl) {
         return { ...result, source: replacePinned(source, 'env: buildChildEnv(config.env),', 'env: config.env,') };

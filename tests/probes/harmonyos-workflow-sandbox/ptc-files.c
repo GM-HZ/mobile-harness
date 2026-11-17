@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include "ptc-file-filter.h"
+#include "ptc-files-report.h"
 #include "ptc-wire.h"
 #include <dlfcn.h>
 #include <errno.h>

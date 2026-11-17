@@ -89,6 +89,34 @@ def stage_workflow_worker():
     worker.write_text(contents.replace("PACKAGED_WORKFLOW_GUEST_URL", json.dumps(guest_url)), encoding="utf-8")
 
 
+def stage_ptc_worker():
+    assets = {
+        "amaro.cjs": "efc9e1155df1dacbf1d0605e78140f09d7016e58dba227006e3d362310d3f839",
+        "instantiate.cjs": "cdcdd45f429279c4d966c2d2a6333c4ee06271065fff4f762a041e153be999a3",
+    }
+    override = os.environ.get("HARMONY_PTC_AMARO_DIR")
+    (RAW / "dsh-harmony-ptc-enabled").write_text("1" if override else "0")
+    worker = RAW / "dsh-harmony-ptc-worker.mjs"
+    for name in assets:
+        (RAW / name).unlink(missing_ok=True)
+    worker.unlink(missing_ok=True)
+    if not override:
+        return
+    for name, expected in assets.items():
+        source = Path(override) / name
+        if sha256(source) != expected:
+            raise SystemExit(f"Unexpected portable Amaro input: {name}")
+        copy(source, RAW / name)
+    with ZipFile(RAW / "dsh-layer.zip") as layer:
+        path = "dsh/node_modules/@deepseek-ai/dsh-ptc-runtime-node/lib/process.js"
+        bundled = layer.read(path)
+    if hashlib.sha256(bundled).hexdigest() != "c01308c52fc52d5f13edd2b65008f3bbcf67bd753eb17af5e4bc023216eca6b4":
+        raise SystemExit("Expected the pinned RC.3 PTC bootstrap")
+    entry = "runNodeMain(openInheritedControlChannel(), Number(process.argv[2]), process);"
+    overlay = (RUNTIME / "templates/ptc-worker.mjs").read_text()
+    worker.write_text(bundled.decode("utf8").replace(entry, overlay, 1))
+
+
 def main():
     inputs = Path(os.environ.get("HARMONY_INPUTS_DIR") or ROOT / ".build/inputs/harmonyos").resolve()
     for source in files_from_index(APP):
@@ -102,7 +130,8 @@ def main():
     copy(dshm / "hostcore/app/fetch-shim.js", RAW / "fetch-shim.cjs")
     copy(dshm / "LICENSE", RAW / "LICENSE.dshm.txt")
     stage_workflow_worker()
-    for name in ("poc.c", "nativehost.c", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h"):
+    for name in ("poc.c", "nativehost.c", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h",
+                 "ptc-supervisor.c", "ptc-supervisor.h", "ptc-file-filter.c", "ptc-file-filter.h"):
         copy(RUNTIME / "native" / name, CPP / name)
     if EXPERIMENTAL:
         app_config = STAGE / "AppScope/app.json5"
@@ -118,6 +147,7 @@ def main():
     )
     stage_guest_extras(ROOT, STAGE, RAW)
     stage_dsh(ROOT, RAW, inputs / "entry/src/main/resources/rawfile/dsh-layer.zip")
+    stage_ptc_worker()
     subprocess.run(
         ["python3", str(RUNTIME / "packaging/build-startup-sources.py")],
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
