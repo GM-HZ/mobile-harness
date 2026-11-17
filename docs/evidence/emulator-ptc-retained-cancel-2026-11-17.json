@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-17",
+  "target": "DevEco ARM64 Phone emulator, API 26",
+  "appVersion": "0.4.30",
+  "dshVersion": "0.2.2-rc.3",
+  "dshSourceCommit": "38a6a5c965aa99ab525161efb7cc5cf1fe62fced",
+  "installedHapCommit": "a6c9be2bd2502998c541086dc886acfaf164be50",
+  "unsignedHapSha256": "919ed5095b8d50320ed98e3d2a5ba3459fae2e305d5307adc928b970467cd400",
+  "unsignedHapBytes": 657075220,
+  "smoke": "tests/smoke/emulator-ptc-host.py",
+  "cancelTiming": "Elapsed milliseconds from issuing session/cancel until observing the aborted turn/end",
+  "cases": {
+    "repl": {
+      "exitCode": 0,
+      "readyMs": 5030,
+      "executionMode": "persistent-in-memory",
+      "scriptPersistence": false,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "cooperativeCancellationPreservedState": true,
+      "cooperativeCancellationMs": 101,
+      "blockingCancellationReapedWorker": true,
+      "blockingCancellationMs": 3117,
+      "nextTurnStartedWithFreshState": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    },
+    "script": {
+      "exitCode": 0,
+      "readyMs": 4622,
+      "executionMode": "vm-script",
+      "scriptPersistence": true,
+      "topLevelAwait": true,
+      "sameSessionRetained": true,
+      "otherSessionIsolated": true,
+      "admittedWorkers": 2,
+      "cooperativeCancellationPreservedState": true,
+      "cooperativeCancellationMs": 103,
+      "blockingCancellationReapedWorker": true,
+      "blockingCancellationMs": 3144,
+      "nextTurnStartedWithFreshState": true,
+      "temporaryModelCredentialRemoved": true,
+      "temporaryProfilePatchRemoved": true
+    }
+  },
+  "scope": {
+    "defaultEnabled": false,
+    "mate60": "HDC offline",
+    "idleSessionDisposal": "not exercised"
+  }
+}

@@ -95,6 +95,73 @@ def complete_code(emulator, sid, description, script, result_marker):
     raise AssertionError(f"No completed run_code result for {description}")
 
 
+def abort_retained_turn(emulator, sid, fixture, script, after_cancel):
+    before = sum(row["type"] == "turn/end" for row in support["events"](emulator, sid))
+    prompt_run_code(emulator, sid, "Run a controlled cancellation fixture", script)
+    deadline = time.monotonic() + 25
+    while time.monotonic() < deadline:
+        if emulator.app(f"test -f {fixture} && printf READY") == "READY":
+            break
+        events = support["events"](emulator, sid)
+        if sum(row["type"] == "turn/end" for row in events) > before:
+            raise AssertionError("The cancellation program ended without reaching its ready marker")
+        time.sleep(0.1)
+    else:
+        raise AssertionError("The cancellation program never wrote its ready marker")
+
+    started = time.monotonic()
+    assert emulator.rpc("session/cancel", {"request": {"sessionId": sid}})["accepted"]
+    after_cancel()
+    deadline = started + 12
+    while time.monotonic() < deadline:
+        turns = [row["data"]["reason"]["kind"] for row in support["events"](emulator, sid) if row["type"] == "turn/end"]
+        if len(turns) > before:
+            assert turns[before] == "aborted", turns[before]
+            return round((time.monotonic() - started) * 1000)
+        time.sleep(0.15)
+    raise AssertionError("DSH did not settle the canceled retained turn")
+
+
+def verify_retained_cancellation(emulator, sid, worker_id, marker, evidence):
+    name = "mh-ptc-cancel-" + uuid.uuid4().hex[:12]
+    ready = f"alpine/workspace-native/{name}-ready"
+    gate = f"alpine/workspace-native/{name}-gate"
+    stopped = f"alpine/workspace-native/{name}-stopped"
+    try:
+        cooperative = f"""
+var workerFs = await import('node:fs/promises');
+await workerFs.writeFile('{name}-ready', 'ready', {{ flag: 'wx' }});
+for (;;) {{
+  try {{ await workerFs.readFile('{name}-gate'); break; }}
+  catch (error) {{ if (error.code !== 'ENOENT') throw error; }}
+  await new Promise(resolve => setTimeout(resolve, 30));
+}}
+fixtureValue
+""".strip()
+        coop_ms = abort_retained_turn(emulator, sid, ready, cooperative,
+                                     lambda: emulator.app(f"printf done > {gate}"))
+        complete_code(emulator, sid, "Read the retained value after cooperative cancellation", "fixtureValue", marker)
+        trace = workers(emulator)
+        assert not any(row["event"] == "ptc-worker-reaped" and row["id"] == worker_id for row in trace)
+
+        blocking = f"""
+await workerFs.writeFile('{name}-stopped', 'ready', {{ flag: 'wx' }});
+for (;;) {{}}
+""".strip()
+        forced_ms = abort_retained_turn(emulator, sid, stopped, blocking, lambda: None)
+        trace = workers(emulator)
+        assert any(row["event"] == "ptc-worker-reaped" and row["id"] == worker_id for row in trace)
+        previous = {row["id"] for row in trace}
+        complete_code(emulator, sid, "Verify forced cancellation cleared the retained variables",
+                      '"MH_TYPE_" + typeof fixtureValue', "MH_TYPE_undefined")
+        assert sum(row["event"] == "ptc-worker-admitted" and row["id"] not in previous for row in workers(emulator)) == 1
+        evidence.update(cooperativeCancellationPreservedState=True, cooperativeCancellationMs=coop_ms,
+                        blockingCancellationReapedWorker=True, blockingCancellationMs=forced_ms,
+                        nextTurnStartedWithFreshState=True)
+    finally:
+        emulator.app(f"rm -f {ready} {gate} {stopped}")
+
+
 def verify_mode(emulator, execution_mode, script_persistence, evidence):
     retained = script_persistence or execution_mode == "persistent-in-memory"
     marker = "MH_RETAINED_" + uuid.uuid4().hex.upper()
@@ -119,6 +186,8 @@ def verify_mode(emulator, execution_mode, script_persistence, evidence):
     evidence.update(executionMode=execution_mode, scriptPersistence=script_persistence, topLevelAwait=True,
                     sameSessionRetained=retained, otherSessionIsolated=True,
                     admittedWorkers=len(admitted() - baseline))
+    if retained:
+        verify_retained_cancellation(emulator, sid, next(iter(first)), marker, evidence)
 
 
 def verify_cancel(emulator, workspace, evidence):
