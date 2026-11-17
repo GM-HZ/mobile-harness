@@ -458,7 +458,8 @@ async function main() {
   };
   const nativePatch = path.join(root, 'tmp/dsh-native.patch.yml');
   fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n' +
-    (safeMode ? '' : '- id: subprocess\n  name: ' + JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n'), { mode: 0o600 });
+    (safeMode ? '' : '- id: subprocess\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
+      JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n'), { mode: 0o600 });
   const profileArgs = safeMode
     ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
     : ['--profile', 'web'];
