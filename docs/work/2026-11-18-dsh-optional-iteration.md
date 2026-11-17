@@ -13,3 +13,7 @@
 已观察到两轮 Ralph 的真实 write／read／structured_output、两个不同且无父 seed 的子会话，文件字节一致；归档会话重启后五个 query 工具通过。Ralph 在真实 child request 期间取消，约150ms内父子回合中止且 helper 回收。首次跨工作区测试已返回正确拒绝，但夹具错误匹配其他措辞；改为锁定源码中的精确错误文案，错误结果、空搜索和私有内容不回传断言保留。
 
 辅助工具新增显式 expect_error 分支只用于拒绝场景；默认仍拒绝任何错误，目标工具的错误与否必须精确匹配，其他工具结果仍不得出错。增加 manifest／锁文件在重启恢复后的摘要对照。先前正向脚本运行时尚不包含新增两项，因此不拿它冒充最终四项来源；接下来以提交快照的完整 all 场景作为正式验收。
+
+本阶段完成：固定测试提交 `75497512e42e3f56d8e0b473c2be96e3312282e6` 的 all 场景退出0，四项合计约62.6秒。两个 fresh 子会话实际使用 write／read／structured_output，独立回读每份41字节；真实子请求中取消约167ms，父子中止与helper回收均验。归档会话重启后 session_search、event_search、event_read、event_trace、session_trace 全部实际调用；跨工作区无结果，显式读取精确拒绝，私有文本未返回。manifest 与锁文件在最终正常重启后摘要相同，原可选开关、测试凭据和目录均恢复／清理。
+
+[准确源码、HAP、命令与全部尝试](../evidence/emulator-optional-iteration-0.4.33.json)。没有新增运行时代码或重新打包，仅补验原0.4.33的官方可选能力。总目标继续处理工作树、LSP、压缩及剩余平台依赖。

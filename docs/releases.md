@@ -202,3 +202,7 @@ API 26 Phone 模拟器通过 16 组 PTC／Workflow／MCP／定时任务／故障
 ### 0.4.33 Agent 续接补验
 
 同一准确 HAP 通过工作目录、fork 上下文、独立 cwd、消息控制与应用重启后继续同一子会话。自动目标轮实际执行文件工具并完成；隐藏夹具精确43字节回读通过。仅新增验证和证据，没有把旧包改名成新版本，未额外宣称长期任务／后台唤醒。[续接与失败记录](evidence/emulator-agent-continuation-0.4.33.json)
+
+### 0.4.33 官方可选能力补验
+
+同一准确 HAP 临时启用官方 Ralph／session-search bundle，四项固定来源组合验收退出0：两轮不同 fresh 子代理与文件字节结果、执行中取消并回收 helper、归档会话跨重启索引与五个查询工具、工作区边界。原 profile／锁文件恢复摘要一致，可选项仍遵循默认开关。仅新增验证，不生成或重命名应用包。[完整证据](evidence/emulator-optional-iteration-0.4.33.json)

@@ -29,6 +29,7 @@
 | 目标、待办、团队任务与交付 | todo、内置 dsh-doc、present、目标创建／暂停／旧 revision 拒绝，以及团队依赖、认领、完成通过；目标和任务强停后保留，测试目标已清除、团队模式恢复关闭 |
 | 提问、计划与插件发现 | 实际 Remote Events 的回答、取消、同会话继续，计划拒绝保持 active／批准退出，以及绑定本次工具的单次插件列表审批均通过。此项不等于 ArkWeb 视觉布局完整验收 |
 | 网页工具 | HTTP/1、分块、HTML→Markdown、同源跳转、跨源目标拒绝、URL 校验、限额、实际取消及后续抓取、公网 HTTPS 和 DeepSeek 搜索通过。保留原 Undici 代理机制；电脑的原生／jitless 代理对照通过，见 [HTTP 实现](research/harmonyos-http.md) |
+| 可选 Ralph 与会话搜索 | 临时标准 bundle 启用后，两轮不同 fresh 子代理、无父会话 seed、41字节文件结果、实际子请求中取消与 helper 回收均通过；归档会话重启后五个查询工具、跨工作区空搜索与拒绝读取通过。原 manifest／lock 字节恢复，见 [可选能力补验](evidence/emulator-optional-iteration-0.4.33.json) |
 | 图片、Skills、插件纯 JS 依赖等 | 保留上游机制和既有适配，本轮未把所有可选插件逐一实测；图片与插件历史记录见[版本记录](releases.md) |
 
 ## 平台限制与未验项
@@ -40,7 +41,7 @@
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：没有随包 Chromium／Playwright；手机 ArkWeb 不等于可供 Agent 使用的浏览器。完整官方账号授权、每一种模型提供者和每个实验插件尚未逐一回归。
 - **后台**：定时任务跨 App 重启已测，不代表 App 被系统终止时仍会唤醒执行。运行中 Bash 的 OS 进程、PTC 的内存变量不能据此承诺跨进程存活。
-- **剩余能力清点**：Ralph、会话搜索等可选 bundle、压缩与长目标压力尚未全部端到端回归。LSP 未随默认 npm DSH 安装，工作树依赖的 Host 子进程需继续验证。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
+- **剩余能力清点**：Ralph 与会话搜索的限定场景已通过；压缩、长目标压力、其他可选 bundle 尚未全部端到端回归。LSP 未随默认 npm DSH 安装，工作树依赖的 Host 子进程需继续验证。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。

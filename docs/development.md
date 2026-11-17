@@ -165,3 +165,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-goal-continuation.py <loopback-target> .build/goal-continuation.json
 ```
+
+## 官方可选 Ralph 与会话搜索补验
+
+测试临时把两个随包官方 bundle 加到独立模拟器的标准 profile，保持默认开关不变。all 场景覆盖两轮真正 fresh 子会话及字节结果、实际子模型请求中取消与 helper 回收、归档会话重启后的五个查询工具，以及跨工作区的空搜索／精确拒绝。manifest、锁文件与 boot 备份恢复，正常重启后再次对照摘要。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-optional-iteration.py <loopback-target> .build/optional-iteration.json
+```
+
+可用 `--case ralph`、`search`、`cancel` 或 `scope` 单独复现。scope 的工具错误是明确要求的拒绝结果，仍精确检查错误内容和无数据泄露，其他调用继续要求成功。该测试不认证任意长循环，也不把工具级工作区授权说成操作系统沙箱。

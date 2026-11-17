@@ -1,0 +1,210 @@
+{
+  "recordedAt": "2026-11-17T20:23:07.360567+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "testSourcesCommit": "75497512e42e3f56d8e0b473c2be96e3312282e6",
+  "artifact": {
+    "sourceCommit": "d764559f8e3cb279591777ba55dc7106319f4ad9",
+    "hap": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.33-unsigned.hap",
+    "bytes": 650927151,
+    "sha256": "8d5158a203cb1e9801b4976a6dca8534faa19de56ac25e289bd10ea6cf3a3035",
+    "overinstallReadyMs": 8816,
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200
+  },
+  "runtimeChanged": false,
+  "newHapBuildRequired": false,
+  "finalCommand": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-optional-iteration.py",
+      "127.0.0.1:15557",
+      ".build/optional-iteration/final/result.json"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 62.595,
+    "testSourceCommit": "75497512e42e3f56d8e0b473c2be96e3312282e6"
+  },
+  "verified": {
+    "fixture": "mh-optional-233b8d8d55",
+    "enabledBundles": [
+      "@deepseek-ai/dsh-experimental-ralph-bundle",
+      "@deepseek-ai/dsh-experimental-session-search"
+    ],
+    "manifestBeforeSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+    "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+    "optionalProfileReadyMs": 6509,
+    "ralph": {
+      "sessionId": "session-e5133902-71d7-493a-97b4-bb8b6ed69104",
+      "twoDistinctFreshChildren": [
+        {
+          "id": "9b294491-4b08-410f-b324-e165cbc2fb24",
+          "provider": "spawn",
+          "noParentSeed": true,
+          "actualTools": [
+            "write",
+            "structured_output"
+          ]
+        },
+        {
+          "id": "efd87e02-161a-439d-877a-0c0b4b37aab4",
+          "provider": "spawn",
+          "noParentSeed": true,
+          "actualTools": [
+            "read",
+            "write",
+            "read",
+            "structured_output"
+          ]
+        }
+      ],
+      "actualFilesByteEqual": true,
+      "actualFileBytes": 41,
+      "report": {
+        "status": "complete",
+        "summary": "Ralph round 2 of 2. Read /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-233b8d8d55/stage.txt and confirmed its single line is exactly RALPHFILEC09CB9997DBC4DC9A787330A7C9C0DBB (marker verified, no final newline). Then used the write tool exactly once to create /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-233b8d8d55/verified.txt with the exact same content RALPHFILEC09CB9997DBC4DC9A787330A7C9C0DBB and no final newline; the tool reported \"Created file\". Read the file back and confirmed total 1 line with the exact marker. Only the two owned files were touched; no Bash, subagents, goals, or other files were used.",
+        "evidence": [
+          "read tool on /data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-233b8d8d55/stage.txt returned: line 1 = RALPHFILEC09CB9997DBC4DC9A787330A7C9C0DBB, \"(End of file - total 1 lines)\" — marker matches exactly.",
+          "write tool call #1 (the only write this round): {\"file_path\": \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-233b8d8d55/verified.txt\", \"content\": \"RALPHFILEC09CB9997DBC4DC9A787330A7C9C0DBB\"} returned <path>/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-optional-233b8d8d55/verified.txt</path> with status \"Created file\".",
+          "read-back verification of verified.txt returned: line 1 = RALPHFILEC09CB9997DBC4DC9A787330A7C9C0DBB, \"(End of file - total 1 lines)\" — content exact, no trailing newline.",
+          "Only stage.txt (read) and verified.txt (read + single write) were accessed; no Bash, no subagents, no goals, no other files touched."
+        ],
+        "nextSteps": [],
+        "blocker": ""
+      }
+    },
+    "search": {
+      "sourceSessionId": "session-6107b052-14fa-4562-806c-05714d6ea551",
+      "sourceEventSeq": 18,
+      "restartReadyMs": 4639,
+      "querySessionId": "session-3bd8dfc1-a7f6-4511-87c7-4e7c64598526",
+      "persistedArchivedSessionFoundAfterRestart": true,
+      "exactEventRead": true,
+      "eventAndSessionTrace": true,
+      "sourceArchiveStateRestored": true
+    },
+    "cancel": {
+      "sessionId": "session-d94a48a9-249a-4569-b69f-5ca1caab80da",
+      "actualChildRequestObserved": true,
+      "childSessionId": "99516933-15a3-4ded-895f-41c3e9031024",
+      "rootAndChildAborted": true,
+      "helpersCreatedAndReaped": [
+        1
+      ],
+      "elapsedMs": 167
+    },
+    "scope": {
+      "foreignSessionId": "session-ae2569a4-4b70-4d91-b01b-40137fe93191",
+      "callerSessionId": "session-f01e091f-a416-48e3-8450-cf6b0d4f355f",
+      "crossWorkspaceSearchEmpty": true,
+      "explicitForeignReadDenied": true,
+      "privateContentNotReturned": true
+    },
+    "temporaryModelCredentialRemoved": true,
+    "exactOriginalManifestRestored": true,
+    "exactOriginalLockRestored": true,
+    "manifestAfterSha256": "dcbbdc7f9ecbc7790905bbcff55950ae8fc3d7b7a1393d18ed660908bd63ff04",
+    "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+  },
+  "finalState": {
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "credentialConfigured": false,
+    "temporaryHostPatchAbsent": true,
+    "optionalBundlesRemovedFromProfile": true,
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "ownedDirectoriesRemoved": true
+  },
+  "preservedAttempts": [
+    {
+      "record": "first/status.json",
+      "status": {
+        "command": [
+          "python3",
+          "tests/smoke/emulator-optional-iteration.py",
+          "127.0.0.1:15557",
+          ".build/optional-iteration/first/result.json"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 51.186
+      },
+      "coverage": "Earlier uncommitted positive-only all script: real2-round Ralph and persisted archived session search passed; not presented as final4-case snapshot"
+    },
+    {
+      "record": "lifecycle-scope/status.json",
+      "status": [
+        {
+          "case": "cancel",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-optional-iteration.py",
+            "127.0.0.1:15557",
+            ".build/optional-iteration/lifecycle-scope/cancel.json",
+            "--case",
+            "cancel"
+          ],
+          "exitCode": 0,
+          "elapsedSeconds": 15.64
+        },
+        {
+          "case": "scope",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-optional-iteration.py",
+            "127.0.0.1:15557",
+            ".build/optional-iteration/lifecycle-scope/scope.json",
+            "--case",
+            "scope"
+          ],
+          "exitCode": 1,
+          "elapsedSeconds": 20.283
+        }
+      ],
+      "coverage": "Real child-request cancellation passed150ms. Workspace-scope case returned the correct denial, but test expected a different phrase; original failure retained"
+    },
+    {
+      "record": "scope-verified/status.json",
+      "status": {
+        "command": [
+          "python3",
+          "tests/smoke/emulator-optional-iteration.py",
+          "127.0.0.1:15557",
+          ".build/optional-iteration/scope-verified/result.json",
+          "--case",
+          "scope"
+        ],
+        "exitCode": 0,
+        "elapsedSeconds": 21.79
+      },
+      "coverage": "Exact upstream error phrase, empty cross-workspace results and no private data passed; manifest/lock byte hashes matched after restart"
+    }
+  ],
+  "testChanges": [
+    "Explicit expect_error support preserves positive error refusal, exact tool names/args and all other tool results; negative case requires the exact workspace denial error",
+    "Final committed source ran all four cases together; source commit and app HAP are separate identities",
+    "Manifest and lock backed up/restored byte-for-byte and rehashed after normal restart",
+    "Worker reports are self-reports; actual files were independently checked as41 bytes each, and fresh child events checked for no parent conversation seed"
+  ],
+  "localEvidenceSha256": {
+    ".build/optional-iteration/first/status.json": "1a864a2f8be46d61d93ffddfca26f3d7b9935418ab13575f3e738cd2cbe12623",
+    ".build/optional-iteration/first/result.json": "7f76fd2b54d446d44b71de4ca440ab65712dd1010749ddd0da70e33d153b6b88",
+    ".build/optional-iteration/lifecycle-scope/status.json": "27dfcbf8346ea15dc5bb5359ab1c565b7036a25e0185d7c8b6ee7eb12518fa0f",
+    ".build/optional-iteration/lifecycle-scope/cancel.json": "9c704be5f234e7bf6164133fa004ccd92043eaa38275c5d246218308923d36e5",
+    ".build/optional-iteration/lifecycle-scope/scope.log": "cb71ab1f82af7ace477ae034b89c36fc822258bcfbee6a1b7b9a95f8883b0e99",
+    ".build/optional-iteration/scope-verified/status.json": "ac8e7f335252e5bffff55a87cfa05e025eb206df9c92410978de4264f5ca468b",
+    ".build/optional-iteration/scope-verified/result.json": "7a37c8c2363c64c738ecd72059cf1ee1bd4c4974266121f78dfaa66f9bc7cd66",
+    ".build/optional-iteration/final/status.json": "e0eeca716b5121ed821dfc563b76ea42299c3f0dc883865018296ce6c9a61f65",
+    ".build/optional-iteration/final/result.json": "b5a859cd085797ef7d07013a6dc60d0dbdf7a4dc97f4f8b8b964ad288a886a6f",
+    ".build/optional-iteration/final/audit.json": "f527cb4e64b6deb241078e968c5101371c87d003947748e3f05b1ba45cfc9907"
+  },
+  "limitations": [
+    "Optional bundles were temporarily enabled through the official profile mechanism and then removed; defaults were not changed",
+    "Same existing0.4.33 HAP; no new product build or physical-device claim",
+    "Session query authorization is a tool/workspace boundary, not kernel filesystem isolation",
+    "Freshness, two rounds and real cancellation tested; not arbitrary long Ralph loops, recursion budgets or every terminal variant",
+    "LSP, worktree Host processes, compaction and other platform-specific optional capabilities remain in audit",
+    "Mate60 offline; system PTY and Phone Use remain deferred"
+  ]
+}

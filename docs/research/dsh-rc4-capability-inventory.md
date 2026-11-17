@@ -22,9 +22,9 @@
 | goal | 是 | 创建、暂停、旧 revision 拒绝及重启后恢复已验；自动一轮真实读写与完成通过，长期压力仍待验 |
 | schedule | 是 | 持久任务强停重开后投递和实际模型回复已验；非系统唤醒 |
 | lsp | 否 | 默认 npm DSH 未安装此工具及 provider；语言服务器路径待单独装配与验证 |
-| ralph | 是 | 随包的可选 bundle 默认关闭；实际多轮 fresh-child 验收待完成 |
+| ralph | 是 | 默认关闭；实际两轮 fresh-child、无父 seed、字节结果、子请求取消与 helper 回收通过 |
 | skill | 是 | 内置 dsh-doc／Office 已验；自定义 Skill 有历史证据 |
-| session-query | 是 | 随包可选 session-search；实际索引与查询待验 |
+| session-query | 是 | 默认关闭；归档持久会话重启索引、五个查询工具与跨工作区拒绝通过 |
 | subagent | 是 | Workflow spawn 的真实并行子任务已验；fork 继承、消息续接、独立 cwd 与同一子会话跨重启继续通过 |
 | subagent-control | 是 | 运行中取消／子任务取消有证据；list／send／wait 与消息续接已实际调用并通过 |
 | jobs | 是 | Workflow 后台投递本轮通过；Bash job 输出与取消有历史证据 |
@@ -37,7 +37,7 @@
 
 官方还提供 16 个默认关闭的可选 bundle，以及 Claude Code／Codex 两个按需安装入口。Phone／Computer Use、系统 PTY 的既有暂缓要求保持；任意外部 CLI、其他供应商账号、语音提供者或桌面插件不能凭组件存在宣称鸿蒙兼容。
 
-已补验 [工作目录、fork 与自动目标](../evidence/emulator-agent-continuation-0.4.33.json)。优先继续：压缩、Ralph 和会话搜索，随后验证工作树与 LSP 对 Host 子进程、路径和工具链的真实要求。每一项先复现、优先使用上游插件／provider seam，验证实际结果、取消与生命周期；不通过关闭能力或移除断言假称补齐。
+已补验 [工作目录、fork 与自动目标](../evidence/emulator-agent-continuation-0.4.33.json)。[Ralph 与会话搜索的限定场景](../evidence/emulator-optional-iteration-0.4.33.json)亦已通过。优先继续：压缩、工作树与 LSP 对 Host 子进程、路径和工具链的真实要求。每一项先复现、优先使用上游插件／provider seam，验证实际结果、取消与生命周期；不通过关闭能力或移除断言假称补齐。
 
 [当前能力矩阵](../dsh-capabilities.md) · [0.4.33 证据](../evidence/emulator-http-standard-0.4.33.json) · [官方 RC.4 源码](https://github.com/deepseek-ai/deepseek-harness/tree/3f321d32bfe382212a8ed8785c1d47a5a300aa23)
 
