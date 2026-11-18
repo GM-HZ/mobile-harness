@@ -122,17 +122,20 @@ def verify_counter(emulator,title,evidence):
     with flow['browser'](emulator) as run:
         flow['open_session'](emulator,run,title)
         try:
-            evidence['counterViewNavigation']=open_view(run,['Local Counter'])
+            evidence['counterViewNavigation']=open_view(run,['Local Counter','本地计数器'])
         except AssertionError:
             evidence['counterVisibleViewLabels']=run('''[...document.querySelectorAll(
               '[data-conversation-tabs] [role=tab], [role=menu] [role=menuitem]'
             )].filter(node=>node.getClientRects().length).map(node=>node.textContent.trim())''')
             raise
-        flow['wait'](run,"document.body.innerText.includes('Count: 0')",'initial counter value')
-        button(run, 'button', ['Increment'])
-        flow['wait'](run,"document.body.innerText.includes('Count: 1')",'incremented counter value')
-        button(run, 'button', ['Reset'])
-        flow['wait'](run,"document.body.innerText.includes('Count: 0')",'reset counter value')
+        def expect_count(value, description):
+            flow['wait'](run,rf'/\bCount\s*:\s*{value}\b|计数\s*[:：]\s*{value}(?!\d)/.test(document.body.innerText)',
+                         description)
+        expect_count(0,'initial counter value')
+        button(run,'button',['Increment','增加','加一','加一（+1）'])
+        expect_count(1,'incremented counter value')
+        button(run,'button',['Reset','重置'])
+        expect_count(0,'reset counter value')
 
 
 def verify_official(emulator,workspace,name,sessions,evidence):
