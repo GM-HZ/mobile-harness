@@ -381,6 +381,7 @@ async function main() {
   const temp = path.join(root, 'tmp');
   process.env = Object.assign(Object.create(null), process.env, {
     HOME: home, DSH_HOME: home, TMPDIR: temp,
+    HARMONY_NATIVE_WEB_ROOT: root,
     DSH_TELEMETRY_DISABLED: '1', DSH_PERMISSION_MODE: 'workspace-write', NO_COLOR: '1',
   });
   // Node's native os getters still read the system environment. Give the
