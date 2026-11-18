@@ -80,6 +80,28 @@ function patchPtc(source) {
     'import { stripTypeScriptTypes } from "node:module";',
     'const stripTypeScriptTypes = globalThis.__harmonyPtc.strip;');
 }
+function patchCompaction(source) {
+  // A failed request can end with runtime-context or time-context messages.
+  // Those are part of the active turn and must not hide its real user input.
+  let patched = replacePinned(source,
+    'function selectCompactableRange(session, measurement, retainTokens) {',
+    'function selectCompactableRange(session, measurement, retainTokens, protectActiveTurn = false) {');
+  const guard = '\tif (keepFromIdx <= firstIdx) return null;\n\twhile (keepFromIdx > firstIdx) {';
+  patched = replacePinned(patched, guard, `\tif (protectActiveTurn) {
+    for (let seq = session.seq - 1; seq >= 0; seq -= 1) {
+      const event = session.eventAt(seq);
+      if (event?.type === "turn/end") break;
+      if (event?.type !== "turn/start") continue;
+      const firstActive = surfaceNodes.findIndex((node, index) => index >= firstIdx && node > seq);
+      if (firstActive >= 0) keepFromIdx = Math.min(keepFromIdx, firstActive);
+      break;
+    }
+  }
+` + guard);
+  return replacePinned(patched,
+    'case "context-overflow": {\n\t\t\t\tthis.ctx.get("toolResultPruner")?.pruneSession(agent.session);\n\t\t\t\tconst measurement = this.ctx.tokenMeter.measure(agent.session);\n\t\t\t\tconst range = selectCompactableRange(agent.session, measurement, 0);',
+    'case "context-overflow": {\n\t\t\t\tthis.ctx.get("toolResultPruner")?.pruneSession(agent.session);\n\t\t\t\tconst measurement = this.ctx.tokenMeter.measure(agent.session);\n\t\t\t\tconst range = selectCompactableRange(agent.session, measurement, 0, true);');
+}
 function quoteShellArgument(value) {
   if (typeof value !== 'string' || value.includes('\0')) throw new TypeError('Invalid command argument');
   return "'" + value.replaceAll("'", "'\\''") + "'";
@@ -340,6 +362,7 @@ async function main() {
   const packageUrl = paths('dsh-plugin-manager/lib/index.js');
   const mcpClientUrl = paths('dsh-mcp-client/lib/index.js');
   const workflowUrl = paths('dsh-workflow-ptc/lib/index.js');
+  const compactionUrl = paths('dsh-compaction-basic/lib/index.js');
   const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
   const officeUrl = paths('dsh-office-kit/lib/index.js');
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
@@ -505,10 +528,12 @@ async function main() {
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
           url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl &&
-          url !== mcpClientUrl && url !== mcpStdioUrl && url !== workflowUrl && !(ptcEnabled && url === ptcUrl)) return result;
+          url !== mcpClientUrl && url !== mcpStdioUrl && url !== workflowUrl && url !== compactionUrl &&
+          !(ptcEnabled && url === ptcUrl)) return result;
       const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
       if (url === ptcUrl) return { ...result, source: patchPtc(source) };
       if (url === workflowUrl) return { ...result, source: patchWorkflow(source) };
+      if (url === compactionUrl) return { ...result, source: patchCompaction(source) };
       if (url === mcpClientUrl) {
         return { ...result, source: replacePinned(source, 'env: buildChildEnv(config.env),', 'env: config.env,') };
       }
