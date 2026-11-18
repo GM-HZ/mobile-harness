@@ -1,10 +1,12 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.44，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.45，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
 ## 当前验收
+
+0.4.45 提供默认关闭的思考内容翻译。ArkWeb 展开合成会话、切换原译文、重启复用、失败重试和停用取消通过，原会话事件逐条不变。受控 Bing／Google 验证协议与凭据隔离，真实 DeepSeek Flash 验证付费 API Key 路径。公开 Bing 返回 400 并报告不支持当前客户端，Google 在设备探针中超时。[0.4.45 证据](evidence/emulator-cot-translation-0.4.45.json)
 
 0.4.44 提供默认关闭的官方 Inspector。模拟器用快捷键打开 ArkWeb 的 DevTools，实际 ArkWeb 和 Host 均经同源鉴权代理完成 CDP 查询。匿名代理与直接 Worker 请求被拒，跨重启启用和停用释放端口通过。[0.4.44 证据](evidence/emulator-inspector-0.4.44.json)
 

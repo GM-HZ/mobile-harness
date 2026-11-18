@@ -274,3 +274,9 @@ DSH 保持最新官方 RC.4，随包331个 DSH 组件版本一致。补充官方
 发布官方 Inspector bundle，默认关闭。鸿蒙 Worker 通过 Node 内置解析接口启动。DevTools 使用既有的同源会话鉴权，Worker 的发现和直连 CDP 需要内部令牌。模拟器通过真实 Host 和 ArkWeb 求值、原生快捷键打开 DevTools、停用回收及三组 Cordis／LSP／恢复回归。原配置、旧会话事件与回环鉴权保持。
 
 未签名 HAP 662,477,680 字节，SHA-256 `65f055bfffd9f5068f49250cc444bf495439faa922375f6f5eb9ba62adf8ce05`，生产源 `1823a4846b87f01f5422d93f0694e5facc4191f7`。0.4.43 的安装空间及 Worker 参数初始化失败保留在证据中。本版为模拟器验证。[制品、命令与审计](evidence/emulator-inspector-0.4.44.json)
+
+## 0.4.45 思考内容翻译
+
+登记官方 RC.5 翻译 bundle，默认关闭。实际 ArkWeb 通过展开、查看原文和译文、复用已保存结果、失败重试、停用取消和原会话核对。受控匿名请求通过两种上游协议。真实 DeepSeek Flash 的合成文本翻译、Inspector 和故障恢复通过。公开 Bing 返回 HTTP 400，Google 设备探针超时，两条公网匿名路径继续验收。
+
+未签名 HAP 662,477,690 字节，SHA-256 `352182591fcfcd34afb326636e400074d7aef8cd4ba753e84d36b855460eefc1`，生产源 `c234fc2f5456736bad348c5abcb393453f9a4449`。最终记录存储、认证、默认开关、原权限和旧会话摘要。本版为模拟器验证。[制品、命令、失败及审计](evidence/emulator-cot-translation-0.4.45.json)

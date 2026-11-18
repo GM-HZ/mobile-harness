@@ -1,6 +1,6 @@
 # DSH 剩余工作清点
 
-截至 0.4.44，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.45，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
 - 28类工具包：23类已有实际调用证据，覆盖深度不同；5类为当前不适用／暂缓项（pwsh、pwsh-persistent、bash-persistent、terminal、workspace-dependencies）。
 - 16 个官方可选 bundle 中，8 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector），2 个暂缓（cua、terminal），6 个待完成。Forge 已通过本地工作树场景。
@@ -12,7 +12,7 @@
 | --- | --- |
 | personalized-recommendations | 未完成端到端验收 |
 | voice-input | 未完成音频／提供者实际验收 |
-| cot-translation | 未完成端到端验收 |
+| cot-translation | 正式 ArkWeb 界面、受控 Bing／Google、真实 DeepSeek Flash、重启复用和停用取消已验。两个公开匿名端点仍待验收 |
 | auto-review | 未完成实际审批策略与生命周期验收 |
 | liveshare | 未完成；涉及远端共享，沿用路线图阶段区分 |
 | forge | 本地工作树正式接口已验证恢复、取消、重试和重启。Forge UI 和托管平台联动待验 |
@@ -30,5 +30,7 @@
 0.4.41 通过插件市场、LSP 开关与恢复回归。0.4.42 升级 RC.5，覆盖安装后验证原权限、旧会话、实际搜索路由及受影响能力。[0.4.41 证据](../evidence/emulator-plugin-market-0.4.41.json) · [0.4.42 证据](../evidence/emulator-dsh-rc5-0.4.42.json)
 
 0.4.44 通过 Inspector 的真实 Host 和 ArkWeb 诊断。官方 bundle 默认关闭，关闭时回收 Worker。[0.4.44 证据](../evidence/emulator-inspector-0.4.44.json)
+
+0.4.45 通过翻译界面、真实 Flash、Inspector 和恢复。公开匿名端点的失败仍计入剩余项。[0.4.45 证据](../evidence/emulator-cot-translation-0.4.45.json)
 
 [能力矩阵](../dsh-capabilities.md) · [官方包级清点](../research/dsh-rc4-capability-inventory.md)

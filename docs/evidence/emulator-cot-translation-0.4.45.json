@@ -1,0 +1,638 @@
+{
+  "recordedAt": "2026-11-18T14:32:02.639958+00:00",
+  "baselineCommit": "56d2d634ce42f64908f8cf9eb260c62b83150bb6",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "dsh": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.45-unsigned.hap",
+    "version": "0.4.45",
+    "versionCode": 52,
+    "sha256": "352182591fcfcd34afb326636e400074d7aef8cd4ba753e84d36b855460eefc1",
+    "bytes": 662477690,
+    "layerSha256": "f947d69634f01f4942d2fde522b49943a0ca32eda6486bf87f9639a4f84c3980",
+    "sourceCommit": "c234fc2f5456736bad348c5abcb393453f9a4449",
+    "compatibilityAssets": {
+      "packages/dsh-host/dsh-native-web.cjs": "38b96a8a68b3bed3d846a19822e986113e13b15d7cbe5f174497062a9fdab8cc",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "layerDelta": {
+    "sameLayerMembers": 94347,
+    "changes": [
+      "dsh/package.json"
+    ],
+    "newCatalogEntry": {
+      "@deepseek-ai/dsh-experimental-cot-translation-bundle": "0.2.2-rc.5"
+    },
+    "baseLayerSha256": "3c4013c6931fb591ee8460ca631d5bf6f208ffc6de5b4a450296577293fd0cf4",
+    "newLayerSha256": "f947d69634f01f4942d2fde522b49943a0ca32eda6486bf87f9639a4f84c3980"
+  },
+  "build": {
+    "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pinned input directory> ./build.sh --package",
+    "exitCode": 0,
+    "logSha256": "2fbfe066e74d1ac1ec0f575fe0194d79d450534ad77558d876a236a2f3ed1981"
+  },
+  "install": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.45-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "e6455fd258437260039d2cfa68506023ac5c39aa52dcdd2ba5e4678adf1af744"
+  },
+  "commands": [
+    {
+      "case": "fixture",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-cot-translation.py",
+        "127.0.0.1:15557",
+        ".build/cot-translation/fixture-0.4.45.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 48.506,
+      "testSourceCommit": "7b765c2a57fb0d5445d2e080fb33736f3fc027d8",
+      "log": ".build/cot-translation/fixture-0.4.45.log",
+      "result": {
+        "defaultCatalog": {
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "availableProviders": [
+          "bing",
+          "google",
+          "deepseek-official"
+        ],
+        "originalAndTranslatedViews": true,
+        "appendedEventTypes": [
+          "session/end-seed",
+          "plugin:translator/request",
+          "plugin:translator/result",
+          "session/end-seed",
+          "plugin:translator/request",
+          "plugin:translator/request",
+          "plugin:translator/result",
+          "plugin:translator/request"
+        ],
+        "providerCalls": [
+          {
+            "provider": "bing",
+            "target": "zh-Hans",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          },
+          {
+            "provider": "google",
+            "target": "ja",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          },
+          {
+            "provider": "google",
+            "target": "ja",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          },
+          {
+            "provider": "google",
+            "target": "de",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          }
+        ],
+        "persistedAcrossRestart": true,
+        "failureRetainedOriginal": true,
+        "pendingRequestCancelledOnDisable": true,
+        "originalConversationUnchanged": true,
+        "restoredReadyMs": 5021,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "resultSha256": "1b8fdf461a1d59baace2bfdb479c720a618ccf8d3adce332a608ae746324a260",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "flash",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-cot-translation.py",
+        "127.0.0.1:15557",
+        ".build/cot-translation/flash-0.4.45.json",
+        "--live",
+        "deepseek-official"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 22.347,
+      "testSourceCommit": "7b765c2a57fb0d5445d2e080fb33736f3fc027d8",
+      "log": ".build/cot-translation/flash-0.4.45.log",
+      "result": {
+        "defaultCatalog": {
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "availableProviders": [
+          "bing",
+          "google",
+          "deepseek-official"
+        ],
+        "selectedLiveProvider": "deepseek-official",
+        "liveTranslation": "仅在归档的导出上下文中搜索。",
+        "isolatedFlashRequest": {
+          "model": "deepseek-flash",
+          "reasoningEffort": "off",
+          "messages": 1
+        },
+        "restoredReadyMs": 5586,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "resultSha256": "bda81e3a0809fbccf31c811730293bfa5d80539fdc2451a8d60add887e0dbd1d",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "bing",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-cot-translation.py",
+        "127.0.0.1:15557",
+        ".build/cot-translation/bing-0.4.45.json",
+        "--live",
+        "bing"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 21.3,
+      "testSourceCommit": "7b765c2a57fb0d5445d2e080fb33736f3fc027d8",
+      "log": ".build/cot-translation/bing-0.4.45.log",
+      "result": {
+        "defaultCatalog": {
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "availableProviders": [
+          "bing",
+          "google",
+          "deepseek-official"
+        ],
+        "selectedLiveProvider": "bing",
+        "recordsAfterFailure": [
+          "plugin:translator/request"
+        ],
+        "restoredReadyMs": 5220,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "resultSha256": "966c49bb4bcb6795daf6e437b8847c99c74e22a90bf43dbaaeda8da44a7892fe",
+      "logSha256": "7d7c11e3db54db3a6fb53343ed1543a890a566bf03a5a084c54ab8896402925f"
+    },
+    {
+      "case": "google",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-cot-translation.py",
+        "127.0.0.1:15557",
+        ".build/cot-translation/google-0.4.45.json",
+        "--live",
+        "google"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 32.449,
+      "testSourceCommit": "7b765c2a57fb0d5445d2e080fb33736f3fc027d8",
+      "log": ".build/cot-translation/google-0.4.45.log",
+      "result": {
+        "defaultCatalog": {
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "availableProviders": [
+          "bing",
+          "google",
+          "deepseek-official"
+        ],
+        "selectedLiveProvider": "google",
+        "recordsAfterFailure": [
+          "plugin:translator/request"
+        ],
+        "restoredReadyMs": 5304,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "resultSha256": "e6083ca8c11a77856fe28b715148655b2bd7c171295081284d10237d697a51dc",
+      "logSha256": "7d7c11e3db54db3a6fb53343ed1543a890a566bf03a5a084c54ab8896402925f"
+    },
+    {
+      "case": "inspector",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-inspector.py",
+        "127.0.0.1:15557",
+        ".build/cot-translation/inspector-0.4.45.json",
+        "--panel"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 16.237,
+      "testSourceCommit": "3022c77ae8435b6cf342f4ce4bab41a7d1324fbf",
+      "log": ".build/cot-translation/inspector-0.4.45.log",
+      "result": {
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "enable": "applied",
+        "cdp": {
+          "workerPort": 9230,
+          "anonymousDiscoveryStatus": 403,
+          "targetCount": 1,
+          "devtoolsAssetSha256": "371c96a262a80fcbf7f6bbd8122a06168b7c3de2acfc34bd4a3dd0afce5cb1e1",
+          "anonymousProxyStatus": 401,
+          "directCdpStatus": 403,
+          "hostEvaluation": 42,
+          "arkWeb": {
+            "origin": "http://127.0.0.1:19592",
+            "document": 9
+          },
+          "panel": {
+            "visible": true,
+            "path": "/inspector/devtools/devtools_app.html",
+            "ready": true
+          }
+        },
+        "disable": "applied",
+        "workerReleasedOnDisable": true,
+        "restoredReadyMs": 5004,
+        "restoredConfiguration": true
+      },
+      "resultSha256": "10df99bab1bcabbc672808b64cf79185ec25d3484cc364e1ce238030140677b8",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "recovery",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/cot-translation/recovery-0.4.45.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 33.119,
+      "testSourceCommit": "3022c77ae8435b6cf342f4ce4bab41a7d1324fbf",
+      "log": ".build/cot-translation/recovery-0.4.45.log",
+      "result": {
+        "fixture": "mobile-harness-crash-323619af96",
+        "normalReadyMs": 67,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 5206,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 4939,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      },
+      "resultSha256": "4730917a1cb3074f4b7ca544bfbe958d7e24297e13c255d50814278436d09b08",
+      "logSha256": "0c0916ee8441efcccc57f7113eaa4029c5f9a5539b20ad2b7b93d246b945092d"
+    }
+  ],
+  "retainedAttempts": [
+    {
+      "attempt": "initial sidebar session selection",
+      "source": "947b908",
+      "exitCode": 1,
+      "logSha256": "c038185524b4eef8ba0cfbfc0c3b9637a20c141782778e511c38f7949e71a248"
+    },
+    {
+      "attempt": "session search selected a workspace row with the same name",
+      "source": "ac2a6f6",
+      "exitCode": 1,
+      "logSha256": "e29bd23d80d715ec531a3e06d102d9084efe9a72911779d8766308195654686d"
+    },
+    {
+      "attempt": "initial live verification on imported session",
+      "source": "ac2a6f6",
+      "exitCode": 1,
+      "logSha256": "4ff97038f2e5dbd74fb2cbd1c88e27fd4398be2c71976c38af01232df00f5eeb"
+    },
+    {
+      "attempt": "real translation completed but resume added session/end-seed metadata",
+      "source": "3022c77",
+      "exitCode": 1,
+      "logSha256": "7fa063c4483f526efea8b1b06282a737995bcfce0f7fdaf9b623299fcbeb78e2",
+      "eventOrder": {
+        "events": [
+          [
+            0,
+            "turn/start"
+          ],
+          [
+            1,
+            "step/start"
+          ],
+          [
+            2,
+            "system/message"
+          ],
+          [
+            3,
+            "user/message"
+          ],
+          [
+            4,
+            "assistant/message"
+          ],
+          [
+            5,
+            "tool/call"
+          ],
+          [
+            6,
+            "tool/result"
+          ],
+          [
+            7,
+            "step/end"
+          ],
+          [
+            8,
+            "step/start"
+          ],
+          [
+            9,
+            "assistant/message"
+          ],
+          [
+            10,
+            "step/end"
+          ],
+          [
+            11,
+            "turn/end"
+          ],
+          [
+            12,
+            "session/title"
+          ],
+          [
+            13,
+            "session/end-seed"
+          ],
+          [
+            14,
+            "permission/preset"
+          ],
+          [
+            15,
+            "sandbox/mode"
+          ],
+          [
+            16,
+            "approval/policy"
+          ],
+          [
+            17,
+            "model/selection"
+          ],
+          [
+            18,
+            "session/end-seed"
+          ],
+          [
+            19,
+            "plugin:translator/request"
+          ],
+          [
+            20,
+            "plugin:translator/result"
+          ],
+          [
+            21,
+            "session/end-seed"
+          ],
+          [
+            22,
+            "plugin:translator/request"
+          ],
+          [
+            23,
+            "plugin:translator/request"
+          ],
+          [
+            24,
+            "plugin:translator/result"
+          ],
+          [
+            25,
+            "plugin:translator/request"
+          ],
+          [
+            26,
+            "session/end-seed"
+          ]
+        ],
+        "translations": [
+          [
+            "plugin:translator/request",
+            "bing",
+            "zh"
+          ],
+          [
+            "plugin:translator/result",
+            null,
+            null
+          ],
+          [
+            "plugin:translator/request",
+            "google",
+            "ja"
+          ],
+          [
+            "plugin:translator/request",
+            "google",
+            "ja"
+          ],
+          [
+            "plugin:translator/result",
+            null,
+            null
+          ],
+          [
+            "plugin:translator/request",
+            "google",
+            "de"
+          ]
+        ]
+      }
+    },
+    {
+      "attempt": "default live Bing durably recorded request and failed",
+      "source": "3022c77",
+      "exitCode": 1,
+      "logSha256": "24c2b2dd1e4959b482962a8df3b206641a76d33bd6764bc730331301936d8e0e",
+      "result": {
+        "defaultCatalog": {
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "availableProviders": [
+          "bing",
+          "google",
+          "deepseek-official"
+        ],
+        "liveTranslations": {},
+        "selectedLiveProvider": "bing",
+        "recordsAfterFailure": [
+          "plugin:translator/request"
+        ],
+        "restoredReadyMs": 5209,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    }
+  ],
+  "publicEndpointDiagnostics": {
+    "Bing": {
+      "status": 400,
+      "translated": false,
+      "contentType": "text/plain; charset=utf-8",
+      "diagnostic": "Client Browser Version not supported"
+    },
+    "Google": {
+      "error": "PROBE_TIMEOUT"
+    }
+  },
+  "audit": {
+    "target": "127.0.0.1:15557",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "readyMs": 102,
+    "profileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+    },
+    "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+    "legacySessionEvents": 30,
+    "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "permission": "workspace-write",
+    "testCredentialAbsent": true,
+    "installedRuntime": "0.2.2-rc.5",
+    "installedLayerSha256": "f947d69634f01f4942d2fde522b49943a0ca32eda6486bf87f9639a4f84c3980",
+    "titlesAndBadgeDefaultOff": {
+      "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      }
+    },
+    "fourOptionalBundlesDefaultOff": {
+      "@deepseek-ai/dsh-experimental-ralph-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-session-search": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-tool-worktree": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-forge-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      }
+    },
+    "chatImportDefaultOff": {
+      "availability": "installation",
+      "official": true,
+      "optional": true,
+      "enabled": false,
+      "version": "0.2.2-rc.5"
+    },
+    "inspectorDefaultOff": true,
+    "translationDefaultOff": true
+  },
+  "limits": [
+    "Only the synthetic fixture fragment is used for translation; the default bundle is disabled.",
+    "Anonymous request shapes, error handling, cancellation and durable reuse were validated with loopback fixtures.",
+    "The runtime made a real selected DeepSeek Flash translation. The live anonymous public provider checks failed.",
+    "The physical device and DeepSeek account subscription route remain unverified."
+  ]
+}

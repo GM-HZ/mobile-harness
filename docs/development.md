@@ -277,3 +277,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-plugin-market-ui.py <loopback-target> .build/plugin-market-ui.json
 ```
+
+## 思考内容翻译
+
+安装 0.4.45 后在独立 Phone 模拟器执行。脚本通过正式导入接口创建合成会话，并用内嵌 ArkWeb 检查展开、原译文、跨重启复用、重试及取消。正常模式使用回环服务，`--live` 显式使用指定提供者。只提交合成的文本，结束后恢复测试配置。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-translation.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-flash.json --live deepseek-official
+```
