@@ -6,9 +6,9 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 
 ## 当前基线
 
-鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.4，源码子模块同步锁定官方 RC.4 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。普通包默认带通用 PTC；Office 与 HTTP/1 适配沿用已有实现。
+鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.5，源码子模块同步锁定官方 RC.5 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。普通包默认带通用 PTC；Office 与 HTTP/1 适配沿用已有实现。
 
-0.4.41 提供默认关闭的官方插件市场。模拟器验证发现、安装确认与取消、纯 JS 依赖、升级后重启、激活失败回滚及卸载。0.4.39 的 DeepSeek 会话导入继续随包。[能力矩阵](docs/dsh-capabilities.md) · [本轮证据](docs/evidence/emulator-plugin-market-0.4.41.json)
+0.4.42 升级官方 RC.5。模拟器覆盖安装后保留旧会话和配置，真实 DeepSeek 模型搜索走官方 Messages 端点。0.4.41 的插件市场和 0.4.39 的 DeepSeek 会话导入继续随包。[能力矩阵](docs/dsh-capabilities.md) · [本轮证据](docs/evidence/emulator-dsh-rc5-0.4.42.json)
 
 ## 文档
 

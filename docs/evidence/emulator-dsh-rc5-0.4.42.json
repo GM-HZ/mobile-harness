@@ -1,0 +1,1105 @@
+{
+  "recordedAt": "2026-11-18T13:53:10.610781+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "upgradeFrom": {
+    "version": "0.4.41",
+    "dsh": "0.2.2-rc.4",
+    "releaseCommit": "cb5ba03b698b051c549937c1240c4418cebbf3f7",
+    "artifactSha256": "a68ca83b6660a95fcad1341a509a08a4eec9f14933f3536f394ab8ab3e94d132"
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.42-unsigned.hap",
+    "sourceCommit": "fa97d2eb281d39370033573122164f8b5e7cb1f5",
+    "version": "0.4.42",
+    "versionCode": 49,
+    "unsigned": true,
+    "bytes": 662474000,
+    "sha256": "3ea9d25db0a553732e0c73e3b6398b2ca040b2cd9cc8e4ec3150af494d09c7ce",
+    "layerSha256": "bf5cbca36f04f8fbfdb62f565c66a80edc764110d26080021c2581798bbc5efe",
+    "officialPinsInLock": 331,
+    "officialPinsInLayer": 330,
+    "excludedOptionalPins": [
+      "node_modules/@deepseek-ai/dsh-experimental-cua-macos"
+    ],
+    "unchangedNativeBindingsSha256": {
+      "node-addon-require-builtin-linux-arm64-musl/prebuilt/linux-arm64-musl-napi-v9.node": "f973d48df2892965052b9bc3d6fb3d0a1538724ba51583e6b7d57cfd6df59352",
+      "@deepseek-ai/node-addon-system-linux-arm64/bin/musl/system.node": "5a30225892269c7b9a6cf8db568fe8497e417dd8c4e163375784768c072427f0",
+      "@deepseek-ai/node-addon-system-linux-arm64/bin/landlock-run": "f6ae2ad5893e3123f45329ade5518b33c3ac3b102978001ff1c6a6a8ebe2ad9b",
+      "@vscode/ripgrep-linux-arm64/bin/rg": "e152ea689d6e8420357e592f0d8253b96476c164118ca3e6e13074fa1705ddda",
+      "@koromix/koffi-linux-arm64/musl_arm64/koffi.node": "7344d15a078df5692eafe8d4b35a398389a1b1a792b0e206ccc27e20f3126aa8",
+      "@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node": "df8b81cc62b4a8546b01a52145d8ce3480de0f2e09d9d379e0fc8b79d864cb13",
+      "@img/sharp-libvips-linuxmusl-arm64/lib/libvips-cpp.so.8.18.7": "26e2e3405ac4e9ad4dbad4d5ac60a448a76561388782104492aa15fe3a0c0509"
+    },
+    "sourceTag": "dsh-v0.2.2-rc.5",
+    "sourceTagCommit": "9c2670d3bce5275e0d1610272958121af87787bb"
+  },
+  "npmNext": {
+    "name": "@deepseek-ai/dsh",
+    "version": "0.2.2-rc.5",
+    "dist": {
+      "shasum": "b540ae0577939a34c43fdc6bf44f034b2de040e5",
+      "tarball": "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.2.2-rc.5.tgz",
+      "fileCount": 536,
+      "integrity": "sha512-cNbp12tLYLUTXaVli7zwwMjzmmEVCD1PRldg4oKtXM4+lFYckcaliMS2PU/FoThB4iAN/fKOSID0nrtRZU4Gjw==",
+      "signatures": [
+        {
+          "sig": "MEYCIQC1WWioUR9hruIpHh/7ooxskOBo1BOL1cq1Oa2/Dok2PQIhALXnfkH+GpW8a1i+DcIY89q2W184BqQqps/WkIZIzA+g",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        },
+        {
+          "sig": "MEQCIC87VSpEUhKh0jVu6JDbbTi/F18mHjM77Ht8deOHKpB4AiAAu2oz0hcnirDomRByc0Ohcm65fld35pnZkopAGYRSMw==",
+          "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+        }
+      ],
+      "unpackedSize": 6230712
+    }
+  },
+  "successfulBuild": {
+    "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pinned input directory> ./build.sh --package",
+    "exitCode": 0,
+    "logSha256": "1424c6dae1630b98701372ef361583facdb4b2277a1841a96d8aa55201238e47"
+  },
+  "install": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.42-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "a3f384399a4f41c026c39d40be20a951d3d290584c445c2933ef9edff6e7164f"
+  },
+  "preUpgrade": {
+    "target": "127.0.0.1:15557",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "readyMs": 95,
+    "profileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+    },
+    "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+    "legacySessionEvents": 30,
+    "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "permission": "workspace-write",
+    "testCredentialAbsent": true
+  },
+  "postInstall": {
+    "target": "127.0.0.1:15557",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "readyMs": 24246,
+    "profileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+    },
+    "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+    "legacySessionEvents": 30,
+    "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "permission": "workspace-write",
+    "testCredentialAbsent": true,
+    "installedRuntime": "0.2.2-rc.5",
+    "installedLayerSha256": "bf5cbca36f04f8fbfdb62f565c66a80edc764110d26080021c2581798bbc5efe",
+    "titlesAndBadgeDefaultOff": {
+      "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      }
+    },
+    "fourOptionalBundlesDefaultOff": {
+      "@deepseek-ai/dsh-experimental-ralph-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-session-search": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-tool-worktree": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-forge-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      }
+    },
+    "chatImportDefaultOff": {
+      "availability": "installation",
+      "official": true,
+      "optional": true,
+      "enabled": false,
+      "version": "0.2.2-rc.5"
+    }
+  },
+  "deviceSuites": [
+    {
+      "case": "web-messages-search",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-web-tools.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc5/regressions/web-messages-search.json",
+        "--search",
+        "--require-messages-search"
+      ],
+      "testSourceCommit": "a9f079a48c9e392753d14ba8e130e8d758c5378e",
+      "exitCode": 0,
+      "elapsedSeconds": 34.29,
+      "log": ".build/dsh-rc5/regressions/web-messages-search.log",
+      "resultSha256": "e31f7233110a1a3a0d2857c6d165bc6fa5a7a91cb94ff794b24e004589303281",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "readyMs": 74,
+        "sessionId": "session-fbbaa884-27c5-45b9-8f6a-3bb744c30ab2",
+        "html": {
+          "status": 200,
+          "actualMarker": "HARMONYWEB6637DFF607A64CF599B613E5515D7EC0"
+        },
+        "chunked": {
+          "status": 200,
+          "actualMarker": "HARMONYWEB6637DFF607A64CF599B613E5515D7EC0"
+        },
+        "redirect": {
+          "status": 200,
+          "actualMarker": "HARMONYWEB6637DFF607A64CF599B613E5515D7EC0"
+        },
+        "error": {
+          "status": 418,
+          "actualMarker": "HARMONYWEB6637DFF607A64CF599B613E5515D7EC0"
+        },
+        "crossRejected": true,
+        "largeRejected": true,
+        "crossOriginDestinationNotContacted": true,
+        "invalidUrlRefusedBeforeNetwork": true,
+        "actualHttpCancelledMs": 74,
+        "sameSessionAfterCancellation": true,
+        "publicHttpsFetch": true,
+        "deepseekSearch": true,
+        "deepseekMessagesSearch": {
+          "endpoint": "https://api.deepseek.com/anthropic/v1/messages",
+          "apiVersion": "2023-06-01",
+          "model": "deepseek-v4-flash"
+        },
+        "temporaryModelCredentialRemoved": true,
+        "parserTrace": [
+          {
+            "event": "http-parser-portable",
+            "ms": 9293,
+            "runtime": "llhttp-js"
+          }
+        ],
+        "observedPaths": [
+          "/html",
+          "/chunked",
+          "/redirect",
+          "/html",
+          "/error",
+          "/cross",
+          "/large",
+          "/slow",
+          "/html"
+        ]
+      }
+    },
+    {
+      "case": "ptc-host",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc5/regressions/ptc-host.json"
+      ],
+      "testSourceCommit": "a9f079a48c9e392753d14ba8e130e8d758c5378e",
+      "exitCode": 0,
+      "elapsedSeconds": 27.236,
+      "log": ".build/dsh-rc5/regressions/ptc-host.log",
+      "resultSha256": "1f618e84acb375cb619a767ba62f5f96dea85413ab2b336ae4752f0e083af4d8",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "readyMs": 66,
+        "runCodeObserved": true,
+        "typeScriptResultReturned": true,
+        "fileContentsMatched": true,
+        "outsideReadDenied": true,
+        "nestedHostToolMatched": true,
+        "overwriteAndAppendMatched": true,
+        "outsideWriteDenied": true,
+        "exclusiveCreatePreservedExisting": true,
+        "directoryOperationsMatched": true,
+        "crossBoundaryDirectoryMutationsDenied": true,
+        "nonemptyDirectoryPreserved": true,
+        "metadataMatched": true,
+        "recursiveDirectoryOperationsMatched": true,
+        "outsideMetadataAndTraversalDenied": true,
+        "processDirectoryChangesMatched": true,
+        "outsideDirectoryChangeDenied": true,
+        "nextTurnStartedInSubdirectory": true,
+        "cancelledViaSession": true,
+        "cancelledWorkerReaped": true,
+        "temporaryModelCredentialRemoved": true
+      }
+    },
+    {
+      "case": "lsp-semantics",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc5/regressions/lsp-semantics.json"
+      ],
+      "testSourceCommit": "a9f079a48c9e392753d14ba8e130e8d758c5378e",
+      "exitCode": 0,
+      "elapsedSeconds": 64.674,
+      "log": ".build/dsh-rc5/regressions/lsp-semantics.log",
+      "resultSha256": "57898c9825fe8a33731a7fe22921ce83c500653161fa78ac22df0a6b341bb599",
+      "logSha256": "6da69749f4b0f553794f5288f665a5d4986c74fc318481c7bdba4555036e298f",
+      "result": {
+        "fixture": "mh-lsp-6910849143",
+        "installedVersions": {
+          "@deepseek-ai/dsh-lsp": "0.2.2-rc.5",
+          "@deepseek-ai/dsh-lsp-stdio": "0.2.2-rc.5",
+          "@deepseek-ai/dsh-tool-lsp": "0.2.2-rc.5",
+          "typescript": "6.0.3",
+          "typescript-language-server": "5.0.0"
+        },
+        "noServerBeforeFirstQuery": true,
+        "sessionId": "session-a93786dc-9efb-41c8-b6c3-be6b03deb7e1",
+        "definition": {
+          "args": {
+            "operation": "goToDefinition",
+            "file_path": "consumer.ts",
+            "line": 2,
+            "character": 24
+          },
+          "text": "shapes.ts:10:17",
+          "elapsedMs": 11403,
+          "isError": false
+        },
+        "pooledServerPid": 18742,
+        "references": {
+          "args": {
+            "operation": "findReferences",
+            "file_path": "shapes.ts",
+            "line": 10,
+            "character": 18
+          },
+          "text": "shapes.ts:10:17\nconsumer.ts:1:18\nconsumer.ts:2:23\nconsumer.ts:4:45",
+          "elapsedMs": 2004,
+          "isError": false
+        },
+        "implementation": {
+          "args": {
+            "operation": "goToImplementation",
+            "file_path": "shapes.ts",
+            "line": 1,
+            "character": 19
+          },
+          "text": "shapes.ts:5:14",
+          "elapsedMs": 2595,
+          "isError": false
+        },
+        "hover": {
+          "args": {
+            "operation": "hover",
+            "file_path": "consumer.ts",
+            "line": 2,
+            "character": 37
+          },
+          "text": "\n```typescript\n(alias) new Circle(r: number): Circle\nimport Circle\n```\n",
+          "elapsedMs": 1997,
+          "isError": false
+        },
+        "utf16AfterAstralCharacter": {
+          "args": {
+            "operation": "goToDefinition",
+            "file_path": "consumer.ts",
+            "line": 4,
+            "character": 46
+          },
+          "text": "shapes.ts:10:17",
+          "elapsedMs": 2055,
+          "isError": false
+        },
+        "standardLibrary": {
+          "args": {
+            "operation": "goToDefinition",
+            "file_path": "consumer.ts",
+            "line": 3,
+            "character": 31
+          },
+          "text": "/data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.5/toolchains/lsp/node_modules/typescript/lib/lib.es5.d.ts:670:14",
+          "elapsedMs": 2006,
+          "isError": false
+        },
+        "freshSource": {
+          "args": {
+            "operation": "hover",
+            "file_path": "consumer.ts",
+            "line": 5,
+            "character": 15
+          },
+          "text": "\n```typescript\nconst rewritten: boolean\n```\n",
+          "elapsedMs": 2586,
+          "isError": false
+        },
+        "noResult": {
+          "args": {
+            "operation": "goToDefinition",
+            "file_path": "empty.ts",
+            "line": 1,
+            "character": 1
+          },
+          "text": "No results.",
+          "elapsedMs": 2026,
+          "isError": false
+        },
+        "outsideWorkspace": {
+          "args": {
+            "operation": "hover",
+            "file_path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-lsp-6910849143-outside.ts",
+            "line": 1,
+            "character": 1
+          },
+          "text": "Error: source \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-lsp-6910849143-outside.ts\" resolves outside the workspace",
+          "elapsedMs": 2582,
+          "isError": true
+        },
+        "sameServerReusedAcrossQueries": true,
+        "ownedCrashCommandResult": "KILLED",
+        "afterServerCrash": {
+          "args": {
+            "operation": "hover",
+            "file_path": "consumer.ts",
+            "line": 5,
+            "character": 15
+          },
+          "text": "\n```typescript\nconst rewritten: boolean\n```\n",
+          "elapsedMs": 11496,
+          "isError": false
+        },
+        "crashedServerReplacedAndReaped": true,
+        "temporaryModelCredentialRemoved": true,
+        "finalNormalReadyMs": 6792
+      }
+    },
+    {
+      "case": "plugin-market",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc5/regressions/plugin-market.json"
+      ],
+      "testSourceCommit": "a9f079a48c9e392753d14ba8e130e8d758c5378e",
+      "exitCode": 0,
+      "elapsedSeconds": 239.991,
+      "log": ".build/dsh-rc5/regressions/plugin-market.log",
+      "resultSha256": "ce24c661740a5ecaad214feb4becc22ce1a995650171b4a93c01d8ce8ea428d5",
+      "logSha256": "f583e841e7e1c5d7d85b3a87cc5d01af3afa4fb2c2e1b08892baa2916701a39a",
+      "result": {
+        "fixture": "mh-market-0ddf725754",
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "enabledReadyMs": 4981,
+        "enabledCatalog": {
+          "availability": "installation",
+          "enabled": true,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "firstPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795009649903,
+          "entries": [
+            {
+              "name": "mh-market-0ddf725754",
+              "title": "Harmony market fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "2.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": ">=99.0.0"
+                  },
+                  "install": {
+                    "spec": "mh-market-0ddf725754@2.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": false,
+                    "runtimeVersion": "0.2.2-rc.5",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    },
+                    "exempted": false
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.2.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-0ddf725754@1.2.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.1.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-0ddf725754@1.1.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-0ddf725754@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.2.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": 1
+        },
+        "secondPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795009649903,
+          "entries": [
+            {
+              "name": "mh-market-0ddf725754-dep",
+              "title": "Dependency metadata fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-0ddf725754-dep@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.0.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": null
+        },
+        "indexSummaries": [
+          {
+            "url": "http://127.0.0.1:19742/market.json",
+            "title": "Owned test market"
+          },
+          {
+            "url": "http://127.0.0.1:19742/invalid.json",
+            "error": "http://127.0.0.1:19742/invalid.json: $.format must be 1"
+          }
+        ],
+        "firstInstall": {
+          "stage": "enable",
+          "target": "mh-market-0ddf725754",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "registries": [
+            "http://127.0.0.1:19742/"
+          ],
+          "packageResult": {
+            "exitCode": 0,
+            "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2 -1\n++-\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 5, downloaded 2, added 2, done\n\ndependencies:\n+ mh-market-0ddf725754 1.0.0\n- mobile-harness-crash-a09b217c36\n\nDone in 8.4s using pnpm v11.28.5\n",
+            "truncated": false,
+            "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-pcGOja/pnpm.log"
+          },
+          "bundle": "mh-market-0ddf725754",
+          "version": "1.0.0",
+          "warnings": []
+        },
+        "marketAfterInstall": {
+          "status": "update-available",
+          "installedVersion": "1.0.0"
+        },
+        "registryVersionListing": {
+          "status": "listed",
+          "installed": "1.0.0",
+          "registry": "http://127.0.0.1:19742/",
+          "attempts": [
+            {
+              "registry": "http://127.0.0.1:19742/"
+            }
+          ],
+          "versions": [
+            {
+              "version": "2.0.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true,
+              "incompatible": {
+                "name": "mh-market-0ddf725754",
+                "version": "2.0.0",
+                "runtimeVersion": "0.2.2-rc.5",
+                "requirements": {
+                  "engines.dsh": ">=99.0.0"
+                }
+              }
+            },
+            {
+              "version": "1.2.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true
+            },
+            {
+              "version": "1.1.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [
+                "latest"
+              ],
+              "prerelease": false,
+              "bundle": true
+            }
+          ],
+          "omitted": 0
+        },
+        "sessionId": "session-6d5e4207-9929-4530-9359-2f4b50733c65",
+        "firstPluginToolResult": {
+          "version": "1.0.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_90ECD16085E140F490B08433BFF86824"
+        },
+        "updates": {
+          "2.0.0": {
+            "from": "1.0.0",
+            "to": "2.0.0",
+            "step": "check",
+            "result": {
+              "changed": false,
+              "application": "failed",
+              "stage": "install",
+              "target": "mh-market-0ddf725754",
+              "error": {
+                "code": "incompatible-version",
+                "incompatible": [
+                  {
+                    "name": "mh-market-0ddf725754",
+                    "version": "2.0.0",
+                    "runtimeVersion": "0.2.2-rc.5",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "1.1.0": {
+            "from": "1.0.0",
+            "to": "1.1.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-0ddf725754",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-0ddf725754 1.1.0\n\nDone in 7s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-omKHKP/pnpm.log"
+              },
+              "bundle": "mh-market-0ddf725754",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          },
+          "1.2.0": {
+            "from": "1.1.0",
+            "to": "1.2.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-0ddf725754",
+              "enabled": true,
+              "changed": true,
+              "application": "failed",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-0ddf725754 1.2.0\n\nDone in 6.1s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-eCpCCP/pnpm.log"
+              },
+              "bundle": "mh-market-0ddf725754",
+              "version": "1.2.0",
+              "error": {
+                "code": "operation-error",
+                "diagnostic": "dsh: warning: 1 entry did not activate\nmh-market-0ddf725754 (mh-market-0ddf725754/candidate): Error: Owned fixture refused activation"
+              }
+            },
+            "restore": {
+              "stage": "enable",
+              "target": "mh-market-0ddf725754",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 7, downloaded 0, added 2, done\n\ndependencies:\n+ mh-market-0ddf725754 1.1.0\n\nDone in 8s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-kldgNe/pnpm.log"
+              },
+              "bundle": "mh-market-0ddf725754",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          }
+        },
+        "activationRestarts": {
+          "1.1.0": {
+            "reason": "module-comparison",
+            "readyMs": 5908
+          }
+        },
+        "registryOriginAfterRestart": {
+          "name": "mh-market-0ddf725754",
+          "version": "1.1.0",
+          "registry": "http://127.0.0.1:19742/"
+        },
+        "updatedToolResult": {
+          "version": "1.1.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_B8FB5063D1D64AE6892CDCA69BC05741"
+        },
+        "rollbackRestarts": {
+          "1.1.0": {
+            "reason": "module-comparison",
+            "readyMs": 6069
+          }
+        },
+        "toolAfterRollback": {
+          "version": "1.1.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_BFEBB8959BCB463AB688F388F64D2B28"
+        },
+        "testCredentialRemoved": true,
+        "realLifecycle": [
+          "start 1.0.0",
+          "stop 1.0.0",
+          "start 1.0.0",
+          "start 1.1.0",
+          "stop 1.1.0",
+          "start 1.2.0",
+          "start 1.1.0",
+          "start 1.1.0"
+        ],
+        "lifecycleScriptWasSuppressed": true,
+        "removedReadyMs": 5236,
+        "removedViaManager": true,
+        "disabledReadyMs": 4950,
+        "disabledCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "restoredReadyMs": 5975,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "fixtureRequestPaths": [
+          "/invalid.json",
+          "/market.json",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754-dep",
+          "/mh-market-0ddf725754/-/mh-market-0ddf725754-1.0.0.tgz",
+          "/mh-market-0ddf725754-dep/-/mh-market-0ddf725754-dep-1.0.0.tgz",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754/-/mh-market-0ddf725754-1.1.0.tgz",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754",
+          "/mh-market-0ddf725754/-/mh-market-0ddf725754-1.2.0.tgz",
+          "/mh-market-0ddf725754"
+        ]
+      }
+    },
+    {
+      "case": "plugin-market-ui",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market-ui.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc5/regressions/plugin-market-ui.json"
+      ],
+      "testSourceCommit": "a9f079a48c9e392753d14ba8e130e8d758c5378e",
+      "exitCode": 0,
+      "elapsedSeconds": 37.339,
+      "log": ".build/dsh-rc5/regressions/plugin-market-ui.log",
+      "resultSha256": "106ce9690d844116b98cbb682b692eb032e7890f432a133bd12e7dfa45e47116",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "enabledReadyMs": 5294,
+        "discoverTab": {
+          "type": "tab",
+          "text": "发现",
+          "description": "",
+          "bounds": "[426,555][786,645]"
+        },
+        "listedEntry": {
+          "type": "button",
+          "text": "查看 Harmony market fixture",
+          "description": "",
+          "bounds": "[248,1038][713,1098]"
+        },
+        "installConfirmation": {
+          "type": "dialog",
+          "text": "安装「Harmony market fixture」？",
+          "description": "",
+          "bounds": "[72,542][1248,1723]"
+        },
+        "displayedRegistry": {
+          "type": "code",
+          "text": "http://127.0.0.1:19742/",
+          "description": "",
+          "bounds": "[756,1215][1170,1269]"
+        },
+        "cancelledBeforeDownloadOrInstall": true,
+        "disabledReadyMs": 5242,
+        "testCredentialRemoved": true,
+        "restoredReadyMs": 5057,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    {
+      "case": "recovery",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/dsh-rc5/regressions/recovery.json"
+      ],
+      "testSourceCommit": "a9f079a48c9e392753d14ba8e130e8d758c5378e",
+      "exitCode": 0,
+      "elapsedSeconds": 28.953,
+      "log": ".build/dsh-rc5/regressions/recovery.log",
+      "resultSha256": "1ffab3116d879ec53ca3ed5ed8b96abfc4e782ce447ea902296a136979ee8ab4",
+      "logSha256": "c39caf2e32a7211e118ce23d3355658ee488b105426017a37722f976104573af",
+      "result": {
+        "fixture": "mobile-harness-crash-3bdc36f3d6",
+        "normalReadyMs": 73,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 5190,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 4930,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      }
+    }
+  ],
+  "postRegression": {
+    "target": "127.0.0.1:15557",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "readyMs": 88,
+    "profileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+    },
+    "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+    "legacySessionEvents": 30,
+    "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "permission": "workspace-write",
+    "testCredentialAbsent": true,
+    "installedRuntime": "0.2.2-rc.5",
+    "installedLayerSha256": "bf5cbca36f04f8fbfdb62f565c66a80edc764110d26080021c2581798bbc5efe",
+    "titlesAndBadgeDefaultOff": {
+      "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      }
+    },
+    "fourOptionalBundlesDefaultOff": {
+      "@deepseek-ai/dsh-experimental-ralph-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-session-search": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-tool-worktree": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-forge-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      }
+    },
+    "chatImportDefaultOff": {
+      "availability": "installation",
+      "official": true,
+      "optional": true,
+      "enabled": false,
+      "version": "0.2.2-rc.5"
+    }
+  },
+  "computerSearchRouting": {
+    "command": "DevEco Node 24.14.1 --jitless .build/dsh-rc5/search-routes.mjs <locked RC.5 node_modules>",
+    "exitCode": 0,
+    "source": "import assert from 'node:assert/strict';\nimport { createRequire } from 'node:module';\nimport path from 'node:path';\nimport { pathToFileURL } from 'node:url';\n\nconst modules = path.resolve(process.argv[2]);\nconst resolve = createRequire(path.join(modules, '../package.json'));\nconst { Context } = await import(pathToFileURL(resolve.resolve('@deepseek-ai/cordis')).href);\nconst { default: WebRuntime } = await import(pathToFileURL(resolve.resolve('@deepseek-ai/dsh-web')).href);\nconst setup = async config => {\n  const ctx = new Context();\n  const fiber = await ctx.plugin(WebRuntime, config);\n  const available = new Map([['deepseek-official',true],['deepseek-search-api',true]]);\n  const readyCalls = [];\n  for (const id of available.keys()) {\n    ctx.web.registerSearchProvider({\n      id,\n      available: () => available.get(id),\n      async search() { return {content:id,sources:[],truncated:false}; },\n      async ready(route) { readyCalls.push({id,route}); return true; },\n    });\n  }\n  return { web:ctx.web,fiber,available,readyCalls };\n};\nconst automatic = await setup({});\nconst checks = [];\ntry {\n  for (const [route, expected] of [\n    ['deepseek-official','deepseek-official'],\n    ['deepseek-account','deepseek-official'],\n    ['openai','deepseek-search-api'],\n    [undefined,'deepseek-search-api'],\n  ]) {\n    assert(await automatic.web.searchReady(route));\n    assert.deepEqual(automatic.readyCalls.at(-1), {id:expected,route});\n    const result = await automatic.web.search({query:'fixture',llmProvider:route});\n    assert.equal(result.content,expected);\n    checks.push({route:route ?? null,provider:expected});\n  }\n  automatic.available.set('deepseek-official',false);\n  assert.equal((await automatic.web.search({query:'fixture',llmProvider:'deepseek-official'})).content,'deepseek-search-api');\n  checks.push({unavailablePreferred:'deepseek-official',fallback:'deepseek-search-api'});\n} finally {\n  await automatic.fiber.dispose();\n}\nconst pinned = await setup({searchProvider:'deepseek-search-api'});\ntry {\n  const result = await pinned.web.search({query:'fixture',llmProvider:'deepseek-official'});\n  assert.equal(result.content,'deepseek-search-api');\n  checks.push({configured:'deepseek-search-api',provider:result.content});\n} finally {\n  await pinned.fiber.dispose();\n}\nconsole.log(JSON.stringify(checks,null,2));\n",
+    "result": [
+      {
+        "route": "deepseek-official",
+        "provider": "deepseek-official"
+      },
+      {
+        "route": "deepseek-account",
+        "provider": "deepseek-official"
+      },
+      {
+        "route": "openai",
+        "provider": "deepseek-search-api"
+      },
+      {
+        "route": null,
+        "provider": "deepseek-search-api"
+      },
+      {
+        "unavailablePreferred": "deepseek-official",
+        "fallback": "deepseek-search-api"
+      },
+      {
+        "configured": "deepseek-search-api",
+        "provider": "deepseek-search-api"
+      }
+    ]
+  },
+  "failedAttempts": [
+    {
+      "task": "update the old npm lock in place",
+      "exitCode": 1,
+      "logSha256": "5e8bcf6f00be4899b18d68540b240660b3a8270d03aec1d570f5d6a9b5276e99",
+      "reason": "npm ERESOLVE on old exact LSP peers. Clean strict resolution succeeded; the unrelated standardwebhooks pin was carried forward."
+    },
+    {
+      "task": "online HAP build",
+      "exitCode": 1,
+      "logSha256": "7e4172daf87023581986d910da0928022650b9afd1bfd22c1ad5bb81a914c0cf",
+      "reason": "The npm network reset left five archives unavailable. Downloaded their official URLs, verified the locked SHA-512 values, then built from npm cache."
+    },
+    {
+      "task": "first artifact audit",
+      "exitCode": 1,
+      "reason": "The initial audit assumed optional darwin CUA was embedded. Correction verifies it is excluded by the lock's platform tag and still checks all 330 included RC.5 package manifests."
+    }
+  ],
+  "limits": [
+    "The HAP was deployed over an existing emulator installation and profile.",
+    "Credentialed model web_search verified the actual DeepSeek Messages endpoint; other model route decisions used controlled provider fixtures.",
+    "The physical Mate 60 was offline. This verification covers the named suites."
+  ]
+}

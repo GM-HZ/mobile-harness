@@ -1,10 +1,10 @@
 # DSH 剩余工作清点
 
-截至 0.4.41，按当前随包 RC.4 锁定源码与本工程的实际调用证据统计。各版验收见各自制品记录。
+截至 0.4.42，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
 - 28类工具包：23类已有实际调用证据，覆盖深度不同；5类为当前不适用／暂缓项（pwsh、pwsh-persistent、bash-persistent、terminal、workspace-dependencies）。
 - 16 个官方可选 bundle 中，7 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market），2 个暂缓（cua、terminal），7 个待完成。Inspector 已复现绑定缺失，Forge 已通过本地工作树场景。
-- 7 个可选 bundle、5 组补充验收及 RC.5 升级合计 13 个工作项。官方源码标签和 npm `next` 均已发布 RC.5。
+- 7 个可选 bundle 和 5 组补充验收合计 12 个工作项。官方 RC.5 升级已在 0.4.42 验证。
 
 ## 7 个待完成的可选 bundle
 
@@ -28,6 +28,6 @@
 
 系统 PTY、Phone／Computer Use、Windows 专用工具和 desktop-only workspace-dependencies 按既有范围单列。语言服务器、原生 wheel、WASM 与原生 addon 组合按具体需要验收。
 
-0.4.41 通过插件市场、LSP 开关与恢复回归。RC.5 升级单独锁定官方源码及 npm 生产依赖，并验证原权限、既有会话与新搜索路由。[0.4.41 证据](../evidence/emulator-plugin-market-0.4.41.json) · [官方 RC.5 发布](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
+0.4.41 通过插件市场、LSP 开关与恢复回归。0.4.42 升级 RC.5，覆盖安装后验证原权限、旧会话、实际搜索路由及受影响能力。[0.4.41 证据](../evidence/emulator-plugin-market-0.4.41.json) · [0.4.42 证据](../evidence/emulator-dsh-rc5-0.4.42.json)
 
 [能力矩阵](../dsh-capabilities.md) · [官方包级清点](../research/dsh-rc4-capability-inventory.md)

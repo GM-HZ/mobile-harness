@@ -15,7 +15,7 @@ HAP 内的鸿蒙 Node.js / DSH Host
 
 | 边界 | 现有实现 |
 | --- | --- |
-| 宿主 | ArkTS 管理启动和界面，N-API 桥在 HAP 中加载鸿蒙 Node.js 24.14.1，运行固定版本 DSH 0.2.2-rc.4 |
+| 宿主 | ArkTS 管理启动和界面，N-API 桥在 HAP 中加载鸿蒙 Node.js 24.14.1，运行固定版本 DSH 0.2.2-rc.5 |
 | Web | DSH Web 仅绑定本机回环。应用完成令牌交换后把会话 Cookie 配置到 ArkWeb。真机匿名请求 401，鉴权请求 200 |
 | 执行 | 本机文件工具与工作区规则复用 DSH。部分 Linux 用户态工具由 PRoot 按需运行，普通 Bash 在没有可用系统沙箱时按默认权限拒绝，可对具体命令单次批准 |
 | Host 子进程 | 0.4.34 通过公共 provider 连接随包 Git／Node，保留上游输出与生命周期；使用空根加目录绑定保持 Host 原生工作区路径，Bash／MCP 保留旧视图并能读取原生别名。没有第二套 rootfs，见[设计与验收](research/harmonyos-host-subprocess.md) |

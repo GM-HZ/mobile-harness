@@ -1,10 +1,12 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.41，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.4`。331 个随包 DSH 组件均固定为 RC.4，生产依赖由锁文件装配。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.42，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
-官方现已发布 RC.4 源码标签，Git 子模块固定 `3f321d32bfe382212a8ed8785c1d47a5a300aa23`，与 npm 精确版本配套。0.4.31 最初升级时的公开源码延迟保留在历史证据中。发布包前端内嵌的短提交是构建标识，源码 pin 使用官方发布标签的完整提交。
+Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
 ## 当前验收
+
+0.4.42 确认升级前后的会话和配置摘要一致。实际 DeepSeek 模型的 `web_search` 返回来源链接，会话事件确认调用官方 Messages 搜索。电脑通过正式 WebRuntime 的 provider 接口补验 DeepSeek 账号路由、其他模型路由、显式选择和可用性回退。[0.4.42 证据](evidence/emulator-dsh-rc5-0.4.42.json)
 
 0.4.41 提供默认关闭的官方插件市场。模拟器用自建索引及 npm 仓库验证真实安装、纯 JS 依赖、升级和重启、用已保存仓库来源回滚激活失败的候选、模型再次调用旧版本工具、卸载和移除来源。ArkWeb 的安装确认显示来源，取消后未下载归档。更新允许按官方结果重启生效。[0.4.41 证据](evidence/emulator-plugin-market-0.4.41.json)
 
