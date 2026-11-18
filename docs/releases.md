@@ -350,3 +350,7 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 ### 0.4.57 Forge 写入与调试签名包
 
 已验收的模拟器包通过隔离服务验证评审、邀请评审、旧提交拒绝与重启后合并，并保留 403 拒绝和 503 未知结果。新构建的调试签名包通过 DevEco 应用签名和 debug profile 校验。Node、原生 Host、ArkWeb 字节码和 DSH 层的 SHA-256 与模拟器包一致。Mate 60 离线，仍需验证 UDID 覆盖和实际安装。 [补验记录](evidence/emulator-forge-writes-signed-0.4.57.json)
+
+### 0.4.57 公网上下文错误与后台任务补验
+
+公网 DeepSeek Flash 的 Messages API 实际拒绝 1,060,044 token 的合成流式请求，返回 1,048,576 token 的上下文上限。模拟器回放同一错误后，DSH 两次完成自动压缩、原回合重试和重启恢复。模拟器另在后台约 81 秒完成三次真实模型任务，返回前台核对 Host、历史和准确回忆。 [补验记录](evidence/emulator-context-background-0.4.57.json)

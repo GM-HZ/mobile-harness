@@ -229,6 +229,15 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 python3 tests/smoke/emulator-compaction-overflow.py <loopback-target> .build/compaction-overflow.json
 ```
 
+公网探针用一次合成的流式 Messages 请求读取服务端报出的实际上限。可把返回报告交给模拟器夹具回放同一错误的类型和消息，验证正式 DSH 的压缩、重试及重启恢复。实时请求只发送合成文本。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/bench/deepseek-public-context.py .build/context-limit.json
+python3 tests/smoke/emulator-compaction-overflow.py <loopback-target> .build/overflow-replay.json \
+  --provider-error-report .build/context-limit.json
+```
+
 以下三个脚本要求已经安装普通0.4.35包。手动脚本验证真实摘要、事实回忆和同会话重启；故障脚本临时安装一个标准 bundle，在收到真实模型文本后才取消或注入流错误；自动脚本复制完整standard到独立临时预设，仅降低压缩阈值／保留预算，保留全部工具，不修改正式默认配置。结束后恢复原预设、profile、锁文件、凭据和普通模式。
 
 ```sh
@@ -238,6 +247,15 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-compaction-faults.py <loopback-target> .build/compaction-faults.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-compaction-auto.py <loopback-target> .build/compaction-auto.json
+```
+
+## 后台定时任务回归
+
+模拟器从应用进入系统桌面，持续通过 AbilityManager 核对应用处于 `BACKGROUND`，在同一会话等待计划任务投递和真实模型回复。回到前台核对 Host 启动身份、历史完整性和最初消息的准确回忆。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-background-schedule.py <loopback-target> .build/background-schedule.json
 ```
 
 ## Cordis 与替代编辑回归

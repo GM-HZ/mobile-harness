@@ -17,11 +17,11 @@
 
 ## 5 组补充验收
 
-1. 长会话已通过受控 Messages HTTP 400 的两次自动压缩、重试及重启恢复。真实 DeepSeek Flash 已驱动同一 Goal 完成三轮文件操作，跨两次重启恢复，旧修订无法续跑。真实公网模型的上下文上限和长时压力仍待实测。
+1. 公网 DeepSeek Flash Messages 实际拒绝 1,060,044 token 的流式请求，报出上限 1,048,576 token。将实际错误回放给 DSH 后通过两次压缩、重试和重启恢复。真实 Flash 驱动同一 Goal 完成三轮文件操作和两次重启恢复。大输入经 DSH 直接触发公网溢出并完成全链恢复、多小时压力仍待验。
 2. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
 3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。其他原生依赖组合与用户指定的公网索引待验。DSH 官方市场接受自定义索引。
 4. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。0.4.57 已从 ArkWeb 打开 DeepSeek 官方登录页，隔离回环服务通过授权回调、重启保留与登出撤销。真实账号完成授权与其他提供者待验。
-5. 0.4.57 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
+5. 0.4.57 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。模拟器后台约 81 秒完成三次计划任务并准确恢复会话。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
 
 系统 PTY、Phone／Computer Use、Windows 专用工具和 desktop-only workspace-dependencies 按既有范围单列。语言服务器、原生 wheel、WASM 与原生 addon 组合按具体需要验收。
 
@@ -54,3 +54,5 @@
 同一制品通过官方登录入口、回环账号交换及真实 PyPI ARM64 musllinux wheel。设备上的账号授权和其他原生 wheel 保留待验。 [本轮证据](../evidence/emulator-account-python-wheel-0.4.57.json)
 
 Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提交、403 拒绝和 503 未知结果。调试签名 HAP 通过离线验签，真机安装待验。 [本轮证据](../evidence/emulator-forge-writes-signed-0.4.57.json)
+
+公网 DeepSeek Flash 实际返回上下文上限，模拟器以同一错误回放两次自动恢复。独立前后台回归在三次实际模型任务完成后核对同一个 Host 和完整历史。 [本轮证据](../evidence/emulator-context-background-0.4.57.json)

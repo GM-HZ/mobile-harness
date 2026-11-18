@@ -1,0 +1,234 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "testSource": "bb965e193aaffb2dee693421bb6e470974661ceb",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "publicStreamingContext": {
+    "command": [
+      "python3",
+      "tests/bench/deepseek-public-context.py",
+      ".build/batch-064/context-stream.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "5f24c130221d388f0a7a3e926556685c79addc526257318a97d2f763e5d50469",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "route": "https://api.deepseek.com/anthropic/v1/messages",
+      "model": "deepseek-flash",
+      "requestBytes": 1060170,
+      "syntheticRepetitions": 530000,
+      "streamRequested": true,
+      "httpStatus": 400,
+      "error": {
+        "type": "invalid_request_error",
+        "message": "This model's maximum context length is 1048576 tokens. However, you requested 1060044 tokens (1060012 in the messages, 32 in the completion). Please reduce the length of the messages or completion."
+      },
+      "providerContextLimit": 1048576,
+      "providerCountedTokens": 1060044,
+      "explicitWindowRejection": true,
+      "elapsedMs": 2214
+    }
+  },
+  "errorReplay": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-compaction-overflow.py",
+      "127.0.0.1:15557",
+      ".build/batch-064/overflow-replay.json",
+      "--provider-error-report",
+      ".build/batch-064/context-stream.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "aa48c1260073f7330cee5df5a7e9891c322776ec88466f9c403cf91d826abfe3",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "replayedError": {
+        "type": "invalid_request_error",
+        "message": "This model's maximum context length is 1048576 tokens. However, you requested 1060044 tokens (1060012 in the messages, 32 in the completion). Please reduce the length of the messages or completion."
+      },
+      "recoveries": [
+        {
+          "overflow": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 3,
+            "historyBytes": 19758,
+            "staleArchivePresent": true,
+            "action": "overflow",
+            "step": 1,
+            "status": 400
+          },
+          "retry": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 1,
+            "historyBytes": 1897,
+            "staleArchivePresent": false,
+            "action": "retry",
+            "step": 1,
+            "status": 200,
+            "checkpointPresent": true
+          },
+          "compactionEvents": [
+            "compaction/start",
+            "compaction/summary",
+            "compaction/end"
+          ],
+          "oldJournalUnchanged": true
+        },
+        {
+          "overflow": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 5,
+            "historyBytes": 20197,
+            "staleArchivePresent": true,
+            "action": "overflow",
+            "step": 2,
+            "status": 400
+          },
+          "retry": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 1,
+            "historyBytes": 1897,
+            "staleArchivePresent": false,
+            "action": "retry",
+            "step": 2,
+            "status": 200,
+            "checkpointPresent": true
+          },
+          "compactionEvents": [
+            "compaction/start",
+            "compaction/summary",
+            "compaction/end"
+          ],
+          "oldJournalUnchanged": true
+        }
+      ],
+      "reopenedAtLatestCheckpoint": true,
+      "fixtureConfigRemoved": true
+    }
+  },
+  "background": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-background-schedule.py",
+      "127.0.0.1:15557",
+      ".build/batch-064/background.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "3a8b625eefcbb3c1d09b7e8de12ab44af95d0d0fb8865f93822c9699b590b1a1",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "deliveries": [
+        {
+          "afterSeconds": 16,
+          "finishedTurn": 2,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T18:43:51.943Z",
+            "deliveredAt": "2026-11-18T18:43:51.976Z",
+            "messageId": "2a5e5a7c-4428-46f7-9ab9-233272e364eb",
+            "targetSessionId": "session-464f85b6-f74e-4135-a21d-9eb0a6f3d166"
+          },
+          "observedAtMs": 17365
+        },
+        {
+          "afterSeconds": 48,
+          "finishedTurn": 3,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T18:44:23.989Z",
+            "deliveredAt": "2026-11-18T18:44:24.086Z",
+            "messageId": "dec42f86-9fce-4ed5-9672-d8083fdcfb79",
+            "targetSessionId": "session-464f85b6-f74e-4135-a21d-9eb0a6f3d166"
+          },
+          "observedAtMs": 49668
+        },
+        {
+          "afterSeconds": 80,
+          "finishedTurn": 4,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T18:44:56.032Z",
+            "deliveredAt": "2026-11-18T18:44:56.080Z",
+            "messageId": "1bf86a5d-3b4d-44b0-adfb-2528beea3fd8",
+            "targetSessionId": "session-464f85b6-f74e-4135-a21d-9eb0a6f3d166"
+          },
+          "observedAtMs": 81078
+        }
+      ],
+      "backgroundDurationMs": 81110,
+      "backgroundStateSamples": 49,
+      "hostLaunchIdentityUnchanged": true,
+      "journalPreservedWhileBackgrounded": true,
+      "foregroundExactRecall": true,
+      "testCredentialRemoved": true
+    }
+  },
+  "audit": {
+    "command": [
+      "python3",
+      ".build/batch-064/audit.py",
+      "post-regression"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "963ae54d7b20cc4dfc13c4b468790ecf52efe5159bdc6dfd580bdf484c051011",
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "observed": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      }
+    }
+  },
+  "earlierRuns": [
+    {
+      "exitCode": 0,
+      "reportSha256": "241d62e0d9c81b6aa833674c953540501381b1d071e999275d51389461c0550e",
+      "finding": "Initial public non-streaming calibration rejected 2,160,044 tokens. The final streaming request was closer to the reported limit."
+    },
+    {
+      "exitCode": 1,
+      "logSha256": "ca7b49cecf4e9e699233c2213d02afa4c08adcc99bb9856cb31aff2091ba40d4",
+      "reportSha256": "90483627ee5fb0f4755875d96401423049d5881e8194b5eb1f1ef68a594da384",
+      "finding": "HDC did not emit the assumed text for the Home key. The final run verifies the system ability state itself."
+    }
+  ],
+  "unverified": [
+    "One direct full-size DSH turn triggering real public HTTP overflow and completing recovery in the same run.",
+    "Multi-hour soak, system-killed app wake-up, network changes and the offline Mate 60."
+  ]
+}

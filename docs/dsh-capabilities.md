@@ -66,7 +66,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 自动目标续跑 | 初始轮只创建目标；实际自动轮通过 read／write／get_goal／update_goal 完成任务，隐藏输入／输出均为精确43字节，目标已清理；非长期压力或系统唤醒保证 |
 | Workflow／子代理 | 两个真实并行子任务、同步超时、运行中取消、活跃子任务取消、后台结果投递通过 |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
-| 定时任务 | 持久化后强停重开，任务到期投递并由模型回复通过 |
+| 定时任务 | 持久化后强停重开已验。0.4.57 模拟器进入后台约 81 秒，三次任务投递并由真实模型回复，返回前台保留同一个 Host 与会话 |
 | 插件及恢复 | 标准 bundle 安装、注入真实崩溃、自动安全模式及旧会话回读通过；实际点击设置恢复入口、原生正常模式按钮后恢复通过 |
 | 插件管理补验 | 本版经实际 API 安装、启用、禁用和卸载自建 bundle，pnpm remove 退出0；postinstall 没有执行。恢复测试安装前备份原配置，结束后回普通模式且 manifest／lock 摘要一致；任意插件升级与安装脚本仍不据此承诺 |
 | 官方插件市场 | 受控索引发现、分页缓存、仓库安装与纯 JS 依赖、拒绝不兼容版本、升级后重启、激活失败后跨重启回滚、卸载和 ArkWeb 确认／取消已验。公共索引与 Git 来源升级另行验收 |
@@ -87,7 +87,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包和公网 CPython 3.12 ARM64 musllinux `xxhash`。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。其他 wheel、addon、APK 和安装脚本需按具体包验收。 [Node 补验](evidence/emulator-node-extensions-0.4.57.json) · [Python 补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权及其他模型提供者待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
-- **后台**：定时任务跨 App 重启已测，不代表 App 被系统终止时仍会唤醒执行。运行中 Bash 的 OS 进程、PTC 的内存变量不能据此承诺跨进程存活。
+- **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
 - **剩余能力清点**：Ralph、会话搜索和工作树的限定场景已通过；压缩核心与可控自动压力已补验；真实API overflow、反复压缩／长目标压力及其他可选 bundle 尚未全部端到端回归。LSP 已由本工程补充装配，当前验收为 TypeScript；Forge 的工作树恢复、取消与重启已验，托管平台联动和 UI 继续验收。公共 provider 不提供额外控制 fd，进程范围沿用上游 fallback 的观测限制。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
