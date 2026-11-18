@@ -109,7 +109,7 @@ struct Index {
     const secure = address.protocol === 'https:';
     const testRelay = address.protocol === 'http:' && address.hostname === '127.0.0.1' &&
       address.origin !== LOCAL_ORIGIN;
-    const params = address.searchParams;
+    const params = address.params;
     return (secure || testRelay) && address.pathname.endsWith('/__liveshare/owner-authorize') &&
       params.get('origin') === LOCAL_ORIGIN && /^[A-Za-z0-9_-]{22}$/.test(params.get('state') ?? '') &&
       /^[A-Za-z0-9_-]{43}$/.test(params.get('code_challenge') ?? '') && !!params.get('instance');
