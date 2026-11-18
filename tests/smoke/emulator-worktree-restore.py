@@ -95,7 +95,7 @@ def cancel_restore(emulator, session, folder, evidence):
         connection.close()
 
 
-def check_restore(emulator, folder, repo, evidence, sessions):
+def check_restore(emulator, folder, repo, evidence, sessions, panel=None):
     commit_template = 'git -c user.name=MHFixture -c user.email=fixture@example.invalid commit -qm '
     initializer = folder_session(emulator, repo)
     sessions.append(initializer)
@@ -116,6 +116,20 @@ def check_restore(emulator, folder, repo, evidence, sessions):
     assert re.fullmatch('[a-z0-9-]+', branch), branch
     assert created['baseCommit'] == base and created['path'] == repo + '/.agents/worktrees/' + branch, created
     evidence['created'] = created
+    if panel:
+        title = 'Forge workspace '+folder.rsplit('/',1)[-1]
+        emulator.rpc('session/rename',{'request':{'sessionId':session,'title':title}})
+        with panel['browser'](emulator) as browser:
+            panel['open_session'](emulator,browser,title)
+            panel['wait'](browser,'''(() => {
+              const button=document.querySelector('[data-forge-header]');
+              if (!button || !button.getClientRects().length) return false;
+              if (button.getAttribute('aria-pressed')!=='true') button.click();
+              return true;
+            })()''','visible Forge header action')
+            panel['wait'](browser,"Boolean(document.querySelector('[data-forge-panel] [data-forge-checkout]'))",
+                          'visible Forge worktree checkout')
+        evidence['arkWebForgeCheckout'] = True
     agent['tool'](emulator, session, 'write', {'file_path': 'tracked.txt', 'content': 'COMMITTED_TIP'})
     tip = bash(emulator, session, 'git add tracked.txt && ' + commit_template + 'tip && git rev-parse HEAD')
     assert re.fullmatch('[a-f0-9]{40}', tip) and tip != base, tip
@@ -196,7 +210,7 @@ def enable_from_catalog(emulator):
     return evidence
 
 
-def run(emulator, output, use_catalog):
+def run(emulator, output, use_catalog, verify_panel=False):
     name = 'mh-worktree-restore-' + uuid.uuid4().hex[:10]
     repo = support['WORKSPACE'] + '/' + name
     folder = 'alpine/workspace-native/' + name
@@ -228,10 +242,15 @@ def run(emulator, output, use_catalog):
             evidence['catalog'] = enable_from_catalog(emulator)
             assert agent['read_bytes'](emulator, original_paths[1]) == originals[original_paths[1]]
             evidence['catalogTogglesDidNotChangeLock'] = True
+        panel = None
+        if verify_panel:
+            panel = runpy.run_path(str(Path(__file__).with_name('emulator-cot-translation.py')))
+            panel['switch'](emulator,panel['inspector']['NAME'],True)
+            panel['restart'](emulator)
         sessions = []
         with support['model_key'](emulator):
             try:
-                check_restore(emulator, folder, repo, evidence, sessions)
+                check_restore(emulator, folder, repo, evidence, sessions, panel)
             except Exception:
                 for session in sessions:
                     try:
@@ -263,6 +282,7 @@ if __name__ == '__main__':
     parser.add_argument('target')
     parser.add_argument('output', type=Path)
     parser.add_argument('--catalog', action='store_true', help='Enable bundles using the 0.4.37 installation catalog')
+    parser.add_argument('--panel', action='store_true', help='Also verify the worktree checkout in ArkWeb')
     options = parser.parse_args()
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('MH_TEST_DEEPSEEK_API_KEY is required')
@@ -270,6 +290,6 @@ if __name__ == '__main__':
     forward = ('tcp:19643', 'tcp:19592')
     emulator.hdc('fport', *forward)
     try:
-        run(emulator, options.output, options.catalog)
+        run(emulator, options.output, options.catalog, options.panel)
     finally:
         emulator.hdc('fport', 'rm', *forward)
