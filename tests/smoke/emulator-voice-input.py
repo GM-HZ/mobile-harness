@@ -276,7 +276,8 @@ def run(emulator,args):
         finally:
             try:
                 if reverse:
-                    emulator.hdc('rport','rm',*reverse)
+                    emulator.hdc('fport','rm',*reverse)
+                    assert ' '.join(reverse) not in emulator.hdc('fport','ls')
             finally:
                 if mirror:
                     mirror.shutdown()
