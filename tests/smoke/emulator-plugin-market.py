@@ -4,6 +4,7 @@ import base64
 import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
+from itertools import groupby
 import json
 import os
 from pathlib import Path
@@ -289,8 +290,9 @@ def verify(emulator, server, name, folder, evidence):
     evidence['testCredentialRemoved'] = True
     evidence['realLifecycle'] = snapshot(emulator, folder, name)
     starts = [event for event in evidence['realLifecycle'] if event.startswith('start ')]
-    assert starts[0] == 'start 1.0.0' and starts[-2:] == ['start 1.2.0', 'start 1.1.0'], starts
-    assert 'start 1.1.0' in starts[1:-2], starts
+    transitions = [event for event, _ in groupby(starts)]
+    assert transitions == ['start 1.0.0', 'start 1.1.0', 'start 1.2.0', 'start 1.1.0'], starts
+    assert starts.count('start 1.2.0') == 1, starts
     evidence['lifecycleScriptWasSuppressed'] = True
     removed = emulator.rpc('pluginManager/removeBundle', {'name': name}, timeout=100)
     assert removed['application'] in ['applied', 'restart-required'] and removed['packageResult']['exitCode'] == 0, removed
