@@ -21,9 +21,11 @@ ARCHIVE = "dsh-layer.zip"
 # remains in the user's profile; an installation dependency only makes a
 # bundle available to PluginManager without downloading another copy.
 OPTIONAL_BUNDLES = (
+    "@deepseek-ai/dsh-experimental-badge-skill-bundle",
     "@deepseek-ai/dsh-experimental-forge-bundle",
     "@deepseek-ai/dsh-experimental-ralph-bundle",
     "@deepseek-ai/dsh-experimental-session-search",
+    "@deepseek-ai/dsh-experimental-session-titles-bundle",
     "@deepseek-ai/dsh-experimental-tool-worktree",
 )
 
