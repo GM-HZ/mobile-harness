@@ -463,11 +463,13 @@ async function main() {
       if (url === creatorUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         // RC.5 retired cordis-plugin-development while the shipped Creator still asks for it.
-        const patched = replacePinned(source, 'Read and use the cordis-plugin-development skill.',
-          'Load the dsh-doc skill with the skill tool. Follow references/plugin-development.md and references/ui-plugin.md for the installed version.');
-        return { ...result, source: replacePinned(patched,
-          'they supplement the cordis-plugin-development skill.',
-          'they supplement the dsh-doc skill and its plugin references.') };
+        let patched = replacePinned(source, 'Read and use the cordis-plugin-development skill.',
+          'Load dsh-doc. Follow its plugin and Web UI references. Use the bundled slot reference and shipped package source when client inspection is unavailable.');
+        patched = replacePinned(patched, 'they supplement the cordis-plugin-development skill.',
+          'they supplement the dsh-doc skill and its plugin references.');
+        patched = replacePinned(patched, 'Build and export all runtime entry points before reporting ready.',
+          'Export all runtime entry points before reporting ready. On HarmonyOS under workspace-write, shell execution may be unavailable. For dependency-free pages, use the shipped browser JavaScript template, write loadable JavaScript without JSX or TypeScript compilation, and read back the manifest, patch and exported modules using file tools. The parent performs installation and live activation checks. Report ready:false if the actual request requires a build or cannot be supported within the current permissions.');
+        return { ...result, source: patched };
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
           url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl &&
