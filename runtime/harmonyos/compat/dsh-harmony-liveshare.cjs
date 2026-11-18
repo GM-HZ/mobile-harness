@@ -86,9 +86,8 @@ function createSharedPtcPolicy(mark) {
 function installViewerUploads() {
   if (globalThis.__DSH_FILE_UPLOAD__ !== undefined) return;
   const maxBytes = 16 * 1024 * 1024;
-  const upload = async (input, init) => {
-    const url = new URL(input, document.baseURI);
-    if (!url.pathname.endsWith('/api/session/uploadFileBinary')) return fetch(input, init);
+  let pending = Promise.resolve();
+  const upload = async (url, init) => {
     const replyError = (code, message) => Response.json({ ok: false, error: { code, message, details: {} } });
     const sessionId = url.searchParams.get('sessionId');
     const transport = globalThis.__DSH_TRANSPORT__;
@@ -124,7 +123,16 @@ function installViewerUploads() {
     }
     return Response.json(frame.result);
   };
-  globalThis.__DSH_FILE_UPLOAD__ = { fetch: upload };
+  globalThis.__DSH_FILE_UPLOAD__ = {
+    fetch(input, init) {
+      const url = new URL(input, document.baseURI);
+      if (!url.pathname.endsWith('/api/session/uploadFileBinary')) return fetch(input, init);
+      // The composer starts several uploads together. Hand the Relay one body at a time.
+      const next = pending.then(() => upload(url, init));
+      pending = next.then(() => undefined, () => undefined);
+      return next;
+    },
+  };
 }
 
 function addViewerUploads(answer) {
