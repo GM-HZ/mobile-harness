@@ -13,7 +13,7 @@ approval = runpy.run_path(str(Path(__file__).with_name("emulator-ptc-approval.py
 support = approval["support"]
 
 
-def prompt(emulator, sid, text, answerer=None, expected_command=None, timeout=100):
+def prompt(emulator, sid, text, answerer=None, expected_command=None, timeout=100, *, return_on_tool_result=False):
     old = support["events"](emulator, sid)
     before = sum(row["type"] == "turn/end" for row in old)
     calls = {row["data"]["callId"] for row in old if row["type"] == "tool/call"}
@@ -46,12 +46,17 @@ def prompt(emulator, sid, text, answerer=None, expected_command=None, timeout=10
                     outcome = {"kind": "result", "value": "allowed-once"}
                 emulator.rpc("$events/result", {"clientId": client, "eventId": frame["eventId"], "outcome": outcome})
         rows = support["events"](emulator, sid)
-        if sum(row["type"] == "turn/end" for row in rows) > before:
+        turn_ended = sum(row["type"] == "turn/end" for row in rows) > before
+        if turn_ended or return_on_tool_result:
             current = {row["data"]["callId"] for row in rows if row["type"] == "tool/call"} - calls
             invoked = [row["data"] for row in rows if row["type"] == "tool/call"
                        and row["data"]["callId"] in current]
             results = [row["data"]["message"] for row in rows if row["type"] == "tool/result"
                        and row["data"]["message"].get("toolCallId") in current]
+            if not turn_ended and not (results and (not answerer or
+                    any(result["toolCallId"] in accepted for result in results))):
+                time.sleep(.15)
+                continue
             if answerer:
                 assert len(accepted) == 1 and accepted[0] in current, accepted
             return invoked, results
