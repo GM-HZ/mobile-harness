@@ -117,7 +117,7 @@ def run(emulator, output, scripted_review):
             if scripted_review:
                 result,_ = agent['tool'](emulator,sid,'write',
                     {'file_path':'malformed.txt','content':'FORBIDDEN_FIXTURE_WRITE'},expect_error=True)
-                assert 'AUTO_REVIEW_FAILED' in str(result),result
+                assert 'its body was not executed' in str(result) and 'risk/decision protocol' in str(result),result
                 assert emulator.app('test ! -e '+relative+'/malformed.txt && printf ABSENT')=='ABSENT'
                 evidence['invalidReviewDeniedBeforeWrite'] = True
                 evidence['rejectedAfterReviewerDenial'] = denied_write(emulator,sid,relative,'rejected')
