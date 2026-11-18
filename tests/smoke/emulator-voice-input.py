@@ -80,10 +80,7 @@ def transcribe(emulator,payload):
 def verify_arkweb(emulator,audio,evidence):
     with browser['browser'](emulator) as run:
         sidebar = browser['ui']
-        if not run('''[...document.querySelectorAll('button')].some(button=>
-          button.getClientRects().length&&['新建会话','New session','新建聊天','New chat'].includes(
-            (button.getAttribute('aria-label')||button.textContent).trim()))'''):
-            sidebar['open_sidebar'](emulator)
+        sidebar['open_sidebar'](emulator)
         sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'新建会话','New session','新建聊天','New chat'},'button'))
         start_hit = '''(() => {
           const button=Array.from(document.querySelectorAll('button')).find(node =>
