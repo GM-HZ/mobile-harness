@@ -1,0 +1,400 @@
+{
+  "recordedAt": "2026-11-18T00:27:18.377714+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "baselineCommit": "baed827bf465c7db0c1dbbeb3ffde4184fdc7276",
+  "productionHap": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.38-unsigned.hap",
+    "sourceCommit": "b8c1914c49f1ad8a64690eaa0922f24563fd68b5",
+    "version": "0.4.38",
+    "versionCode": 45,
+    "unsigned": true,
+    "bytes": 662457519,
+    "sha256": "e30e2d40d39062521670d8570a78f299e7797fe3bd40e6e500f1af256f681b60",
+    "layerSha256": "68da1d9e586d67ceba19347824327f37221cd908000a4f6038eec40c70fd02bb",
+    "sameLayerMemberNames": 94345,
+    "layerMemberSizeOrCrcDifferences": [
+      "dsh/package.json"
+    ],
+    "newCarrierDependencies": {
+      "@deepseek-ai/dsh-experimental-badge-skill-bundle": "0.2.2-rc.4",
+      "@deepseek-ai/dsh-experimental-session-titles-bundle": "0.2.2-rc.4"
+    }
+  },
+  "build": {
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pin directory> ./build.sh --package",
+    "exitCode": 0,
+    "hvigorElapsedMs": 8068,
+    "logSha256": "73f5f176c529f138867817f3e116e3fb2dcb673fc13a488d681c35ea8548cdd3"
+  },
+  "installation": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.38-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "f10af0add43fdeccbef2266bd2e1a6125c931a0942a0ea155ec31c66168495c4"
+  },
+  "latestNpmNext": {
+    "checkedAt": "2026-11-18T00:25:03.246774+00:00",
+    "url": "https://registry.npmjs.org/@deepseek-ai%2fdsh/next",
+    "version": "0.2.2-rc.4"
+  },
+  "officialSourceTag": {
+    "tag": "dsh-v0.2.2-rc.4",
+    "commit": "3f321d32bfe382212a8ed8785c1d47a5a300aa23"
+  },
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-titles-badge.py",
+        "127.0.0.1:15557",
+        ".build/titles-badge/titles-badge-0.4.38.json"
+      ],
+      "testSourceCommit": "b07191f3a8f0c50e0d5f49c15d1d3ee24479c6d7",
+      "exitCode": 0,
+      "elapsedSeconds": 70.47,
+      "log": ".build/titles-badge/titles-badge-0.4.38.log",
+      "resultSha256": "08648e85ba7595bc0b3990bc6f5402c8b755fcac46610f869200e48d44532746",
+      "logSha256": "60b64a516699b7ac181be4643095aa8d3de073796bac2f6317fe0c481ef645b2",
+      "result": {
+        "fixture": "mh-titles-badge-cb564e924d",
+        "initialCatalog": {
+          "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": false,
+            "version": "0.2.2-rc.4"
+          },
+          "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": false,
+            "version": "0.2.2-rc.4"
+          }
+        },
+        "enableReadyMs": 5803,
+        "enabledCatalog": {
+          "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": true,
+            "version": "0.2.2-rc.4"
+          },
+          "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": true,
+            "version": "0.2.2-rc.4"
+          }
+        },
+        "titleSessionId": "session-574b28b7-b4fa-4115-8c70-9e96f6ef3a11",
+        "firstProviderTitle": {
+          "type": "session/title",
+          "seq": 20,
+          "time": 1794961549592,
+          "data": {
+            "title": "Vegetable garden planning request",
+            "messageSeqs": [
+              9
+            ],
+            "source": {
+              "kind": "provider",
+              "provider": "session-title-all-prompts-llm",
+              "model": {
+                "provider": "deepseek-official",
+                "model": "deepseek-flash"
+              }
+            }
+          }
+        },
+        "allPromptsProviderTitle": {
+          "type": "session/title",
+          "seq": 27,
+          "time": 1794961550609,
+          "data": {
+            "title": "Vegetable garden with greenhouse plan",
+            "messageSeqs": [
+              9,
+              25
+            ],
+            "source": {
+              "kind": "provider",
+              "provider": "session-title-all-prompts-llm",
+              "model": {
+                "provider": "deepseek-official",
+                "model": "deepseek-flash"
+              }
+            }
+          }
+        },
+        "pinnedRestartReadyMs": 5256,
+        "pinnedTitleAndEventsSurvivedLaterPromptsAndRestart": {
+          "type": "session/title",
+          "seq": 31,
+          "time": 1794961550925,
+          "data": {
+            "title": "Pinned garden plan 902ad219",
+            "messageSeqs": [],
+            "source": {
+              "kind": "user"
+            }
+          }
+        },
+        "badgeSessionId": "session-be1dc2f1-eab6-489e-aa66-e0778dbe901d",
+        "catalogSkill": {
+          "name": "dsh-badge",
+          "description": "Add the official “powered by dsh” badge to documents, pull requests, merge requests, and other content produced with DeepSeek Harness. Use whenever creating a pull request or merge request. Also use when the user asks for a dsh badge, powered-by-dsh attribution, or a reusable dsh badge asset or snippet.",
+          "modelInvocable": true
+        },
+        "skillResultInstructionsSha256": "cab3e7a7356a977fb0d82110e8cfccb1c2e6340323b5130434fa4b15caa7d213",
+        "officialPngBytes": 12339,
+        "officialPngSha256": "f2c4f5ec9cbe847c0c763545c4d839efa8485bc74203733d0a0e8259f233c653",
+        "markdownBytes": 174,
+        "markdownSha256": "7ab12e725e3f5fd6c3c50f02cec9ded1cab532a93a7cfe9e21375b6e22c61cab",
+        "disableReadyMs": 5216,
+        "disabledCatalog": {
+          "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": false,
+            "version": "0.2.2-rc.4"
+          },
+          "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": false,
+            "version": "0.2.2-rc.4"
+          }
+        },
+        "defaultProviderTitleAfterDisable": {
+          "type": "session/title",
+          "seq": 20,
+          "time": 1794961572308,
+          "data": {
+            "title": "OK-only greenhouse plan request",
+            "messageSeqs": [
+              9
+            ],
+            "source": {
+              "kind": "provider",
+              "provider": "session-title-first-prompt-llm",
+              "model": {
+                "provider": "deepseek-official",
+                "model": "deepseek-flash"
+              }
+            }
+          }
+        },
+        "bundleTogglesPreservedLock": true,
+        "testCredentialRemoved": true,
+        "restoredReadyMs": 5636,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp-bundle.py",
+        "127.0.0.1:15557",
+        ".build/titles-badge/lsp-bundle-0.4.38.json"
+      ],
+      "testSourceCommit": "b07191f3a8f0c50e0d5f49c15d1d3ee24479c6d7",
+      "exitCode": 0,
+      "elapsedSeconds": 21.737,
+      "log": ".build/titles-badge/lsp-bundle-0.4.38.log",
+      "resultSha256": "877be2a3664237bee1ba5ce646c12075c4b6a8a4e346c592cdf156aee2cefd3e",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "before": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "disable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": false,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "disabledRestartReadyMs": 5231,
+        "afterDisabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": false,
+          "version": "0.1.0"
+        },
+        "defaultMigrationDidNotReenable": true,
+        "enable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "enabledRestartReadyMs": 5249,
+        "afterEnabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "officialProviderActive": true,
+        "restoredReadyMs": 5272,
+        "configurationHashesRestored": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/titles-badge/recovery-0.4.38.json"
+      ],
+      "testSourceCommit": "b07191f3a8f0c50e0d5f49c15d1d3ee24479c6d7",
+      "exitCode": 0,
+      "elapsedSeconds": 31.164,
+      "log": ".build/titles-badge/recovery-0.4.38.log",
+      "resultSha256": "8e8a61f914b3e4ee2ca985ef3f0c82300add2ac3a64687994b1fac5c8a8c4e31",
+      "logSha256": "12b4b27c2da3abfd1afdeb9c893b57afa56f50591a3f878dbce9b78253258958",
+      "result": {
+        "fixture": "mobile-harness-crash-daa9bffa95",
+        "normalReadyMs": 83,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 4994,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 5508,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      }
+    }
+  ],
+  "audit": {
+    "command": "python3 .build/titles-badge/audit.py",
+    "exitCode": 0,
+    "source": "import hashlib\nimport json\nfrom pathlib import Path\nimport runpy\n\nscript = runpy.run_path('tests/smoke/emulator-titles-badge.py')\nsupport = script['support']\nagent = script['agent']\nroot = Path('.build/titles-badge')\ne = support['Emulator']('127.0.0.1:15557', 19644)\nforward = ('tcp:19644', 'tcp:19592')\ne.hdc('fport', *forward)\ntry:\n    e.ready('normal')\n    audit = {'boot':e.state(), 'anonymousHttp':e.web_status(False), 'authenticatedHttp':e.web_status(True),\n             'defaultPermissionPreset':e.rpc('permissionPresets/catalog',{})['defaultPreset'],\n             'testCredentialAbsent':not e.rpc('credentials/describe',{'refs':['DEEPSEEK_API_KEY']})['DEEPSEEK_API_KEY']['configured']}\n    assert audit['boot'] == {'mode':'normal','pending':False}\n    assert (audit['anonymousHttp'],audit['authenticatedHttp']) == (401,200)\n    assert audit['defaultPermissionPreset'] == 'workspace-write' and audit['testCredentialAbsent']\n    assert e.app('test ! -e ' + 'alpine/native-benchmark-home/cordis.patch.yml' + ' && printf ABSENT') == 'ABSENT'\n    audit['homePatchAbsent'] = True\n    profile = script['PROFILE']\n    digests = {name:hashlib.sha256(agent['read_bytes'](e,profile+'/'+name)).hexdigest() for name in ['package.json','pnpm-lock.yaml']}\n    assert digests == {'package.json':'c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8',\n                       'pnpm-lock.yaml':'3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e'}\n    audit['profileHashes'] = digests\n    audit['catalogRestoredToDisabled'] = script['catalog'](e,False)\n    script['assert_providers'](e, False)\n    audit['defaultTitleProviderRestored'] = True\n    prior_catalog = runpy.run_path('tests/smoke/emulator-worktree-restore.py')\n    audit['priorFourOptionalBundlesStillOfferedAndDisabled'] = prior_catalog['catalog_state'](e, set())\n    rows = support['events'](e,'session-ecf0df3c-47a9-4df4-b71e-6d4261d13419')\n    assert len(rows)==30\n    audit['oldRc3SessionEventCount'] = len(rows)\n    recorded = json.loads((root/'artifact.json').read_text())\n    release = 'alpine/.dsh-0.2.2-rc.4'\n    manifest = json.loads(agent['read_bytes'](e,release+'/dsh/package.json'))\n    assert recorded['newCarrierDependencies'].items() <= manifest['dependencies'].items()\n    assert e.app('test -f '+release+'/.validated-unpack-v2-dsh-layer.zip-'+recorded['layerSha256']+' && printf PRESENT') == 'PRESENT'\n    audit['installedDshLayerSha256'] = recorded['layerSha256']\n    (root/'audit.json').write_text(json.dumps(audit,indent=2)+'\\n')\n    print(json.dumps(audit))\nfinally:\n    e.hdc('fport','rm',*forward)\n",
+    "result": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "defaultPermissionPreset": "workspace-write",
+      "testCredentialAbsent": true,
+      "homePatchAbsent": true,
+      "profileHashes": {
+        "package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      },
+      "catalogRestoredToDisabled": {
+        "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.4"
+        },
+        "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.4"
+        }
+      },
+      "defaultTitleProviderRestored": true,
+      "priorFourOptionalBundlesStillOfferedAndDisabled": {
+        "@deepseek-ai/dsh-experimental-ralph-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-session-search": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-tool-worktree": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-forge-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        }
+      },
+      "oldRc3SessionEventCount": 30,
+      "installedDshLayerSha256": "68da1d9e586d67ceba19347824327f37221cd908000a4f6038eec40c70fd02bb"
+    }
+  },
+  "limits": [
+    "Default settings leave both bundles disabled. Plugin Manager exercised via authenticated RPC.",
+    "Badge output is an owned local Markdown file referencing the official remote image, plus local PNG byte verification.",
+    "Title verification covers two automatic model revisions, pin, restart and default provider restoration. Model wording varies.",
+    "No physical deployment in this phase. Previous features keep separate evidence."
+  ]
+}

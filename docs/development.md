@@ -240,3 +240,12 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-worktree-restore.py <loopback-target> .build/worktree-restore.json --catalog
 ```
+
+## 会话标题与徽标技能
+
+在独立 Phone 模拟器安装 0.4.38 后，用临时模型凭据执行以下验证。脚本通过插件管理启停两个包，核对标题来源、固定与重启，以及技能目录、内容、官方资源和工作区产出。退出时恢复原配置及锁文件。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-titles-badge.py <loopback-target> .build/titles-badge.json
+```
