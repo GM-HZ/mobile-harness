@@ -2,6 +2,7 @@
 import argparse
 from contextlib import contextmanager
 import hashlib
+from http.client import HTTPResponse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
@@ -35,6 +36,7 @@ PUBLIC_ENDPOINTS = {
     'bing': 'https://edge.microsoft.com/translate/translatetext',
     'google': 'https://translate.googleapis.com/translate_a/single',
 }
+HARNESS_ENV = 'alpine/native-benchmark-home/.env'
 
 
 class RefuseRedirects(HTTPRedirectHandler):
@@ -42,20 +44,59 @@ class RefuseRedirects(HTTPRedirectHandler):
         return None
 
 
-def public_proxy():
+def proxy_endpoint():
     proxy = getproxies().get('https', '')
     endpoint = urlsplit(proxy)
     if (endpoint.scheme != 'http' or endpoint.hostname not in {'localhost', '127.0.0.1', '::1'}
             or endpoint.username is not None or endpoint.password is not None or not endpoint.port
             or endpoint.path not in {'', '/'} or endpoint.query or endpoint.fragment):
         raise ValueError('Use an existing unauthenticated HTTP CONNECT proxy on Mac loopback')
-    return build_opener(ProxyHandler({'https': proxy}), RefuseRedirects())
+    return endpoint
+
+
+def public_proxy():
+    return build_opener(ProxyHandler({'https': proxy_endpoint().geturl()}), RefuseRedirects())
 
 
 def profile_bytes(emulator, file):
-    if file == PROFILE + '/pnpm-lock.yaml' and emulator.app(f'test -e {file} || printf MISSING') == 'MISSING':
+    if file in {PROFILE + '/pnpm-lock.yaml', HARNESS_ENV} and emulator.app(f'test -e {file} || printf MISSING') == 'MISSING':
         return None
     return agent['read_bytes'](emulator, file)
+
+
+class ConnectProxy(BaseHTTPRequestHandler):
+    authorities = {urlsplit(endpoint).hostname + ':443' for endpoint in PUBLIC_ENDPOINTS.values()}
+
+    def log_message(self, *_):
+        pass
+
+    def do_CONNECT(self):
+        if self.path not in self.authorities:
+            self.send_error(403)
+            return
+        target = self.server.upstream
+        mark = {'authority': self.path}
+        self.server.calls.append(mark)
+        with socket.create_connection((target.hostname, target.port), timeout=10) as upstream:
+            upstream.sendall(f'CONNECT {self.path} HTTP/1.1\r\nHost: {self.path}\r\n\r\n'.encode('ascii'))
+            with HTTPResponse(upstream, method='CONNECT') as response:
+                response.begin()
+                mark['connectStatus'] = response.status
+            if mark['connectStatus'] != 200:
+                self.send_error(502)
+                return
+            self.send_response_only(200, 'Connection established')
+            self.end_headers()
+            clients = {self.connection: upstream, upstream: self.connection}
+            try:
+                while readable := select.select(list(clients), [], [], 18)[0]:
+                    for client in readable:
+                        chunk = client.recv(65536)
+                        if not chunk:
+                            return
+                        clients[client].sendall(chunk)
+            except (BrokenPipeError, ConnectionResetError):
+                pass
 
 
 class Provider(BaseHTTPRequestHandler):
@@ -325,6 +366,8 @@ def run(emulator, output, live, arkweb_live=False):
     try:
         emulator.ready('normal')
         files = [PROFILE+'/'+name for name in ['package.json','pnpm-lock.yaml','cordis.patch.yml']]+['mobile-harness-boot.json']
+        if live == 'profile-proxy':
+            files.append(HARNESS_ENV)
         originals = {file:profile_bytes(emulator,file) for file in files}
         catalog = market['catalog'](emulator, NAME)
         assert catalog and catalog['optional'] and catalog['official'] and not catalog['enabled'], catalog
@@ -332,10 +375,13 @@ def run(emulator, output, live, arkweb_live=False):
         for name in [flow['BUNDLE'],inspector['NAME'], NAME]:
             assert not market['catalog'](emulator,name)['enabled']
             switch(emulator,name,True)
-        if not live or live == 'public-proxy':
-            proxy = public_proxy() if live == 'public-proxy' else None
-            server = ThreadingHTTPServer(('127.0.0.1',0),Provider)
-            server.public_proxy = proxy
+        if not live or live in {'public-proxy', 'profile-proxy'}:
+            if live == 'profile-proxy':
+                server = ThreadingHTTPServer(('127.0.0.1',0),ConnectProxy)
+                server.upstream = proxy_endpoint()
+            else:
+                server = ThreadingHTTPServer(('127.0.0.1',0),Provider)
+                server.public_proxy = public_proxy() if live == 'public-proxy' else None
             server.calls, server.fail, server.hold = [], False, False
             server.started, server.closed = threading.Event(), threading.Event()
             threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -343,13 +389,19 @@ def run(emulator, output, live, arkweb_live=False):
             assert 'Forwardport result:OK' in emulator.hdc('rport',*candidate)
             reverse = candidate
             base = f'http://127.0.0.1:{SERVER_PORT}'
-            config = {'bingEndpoint':base+'/bing','googleEndpoint':base+'/google','timeoutMs':30000}
-            patch = originals[PROFILE+'/cordis.patch.yml'].rstrip()
-            if patch == b'[]' or patch.endswith(b'\n[]'):
-                patch = patch[:-2].rstrip()
-            patch += ('\n- id: translator\n  config: '+json.dumps(config)+'\n').encode()
             emulator.stop()
-            lsp['restore_bytes'](emulator,PROFILE+'/cordis.patch.yml',patch,remote+'-translator')
+            if live == 'profile-proxy':
+                env = (originals[HARNESS_ENV] or b'').rstrip()
+                assert not any(name in env.lower() for name in (b'http_proxy', b'https_proxy', b'all_proxy', b'no_proxy'))
+                env += f'\nHTTPS_PROXY={base}\n'.encode()
+                lsp['restore_bytes'](emulator,HARNESS_ENV,env,remote+'-env')
+            else:
+                config = {'bingEndpoint':base+'/bing','googleEndpoint':base+'/google','timeoutMs':30000}
+                patch = originals[PROFILE+'/cordis.patch.yml'].rstrip()
+                if patch == b'[]' or patch.endswith(b'\n[]'):
+                    patch = patch[:-2].rstrip()
+                patch += ('\n- id: translator\n  config: '+json.dumps(config)+'\n').encode()
+                lsp['restore_bytes'](emulator,PROFILE+'/cordis.patch.yml',patch,remote+'-translator')
             emulator.start()
             emulator.ready('normal')
         else:
@@ -375,7 +427,7 @@ def run(emulator, output, live, arkweb_live=False):
                 setting(emulator,'deepseek-official','zh')
                 restart(emulator)
                 paid_rows=verify_paid_arkweb(emulator,title,fixture,session,evidence)
-            elif live == 'public-proxy':
+            elif live in {'public-proxy', 'profile-proxy'}:
                 evidence['publicTranslations'] = {}
                 evidence['publicRequests'] = server.calls
                 for provider in PUBLIC_ENDPOINTS:
@@ -386,13 +438,19 @@ def run(emulator, output, live, arkweb_live=False):
                     }}, timeout=40)
                     assert translated != SOURCE and any('\u4e00' <= char <= '\u9fff' for char in translated)
                     evidence['publicTranslations'][provider] = translated
-                assert [(row['provider'], row.get('upstreamStatus')) for row in server.calls] == [('bing', 200), ('google', 200)]
+                if live == 'profile-proxy':
+                    assert {row['authority'] for row in server.calls} == ConnectProxy.authorities
+                    assert all(row.get('connectStatus') == 200 for row in server.calls)
+                    evidence['officialProviderEndpointsUnmodified'] = True
+                else:
+                    assert [(row['provider'], row.get('upstreamStatus')) for row in server.calls] == [('bing', 200), ('google', 200)]
                 rows = [row for row in support['events'](emulator,session) if row['type'].startswith('plugin:translator/')]
                 assert [row['type'].split('/')[-1] for row in rows] == ['request', 'result', 'request', 'result']
                 assert [row['data']['provider'] for row in rows if row['type'].endswith('/request')] == list(PUBLIC_ENDPOINTS)
                 restart(emulator)
                 assert [row for row in support['events'](emulator,session) if row['type'].startswith('plugin:translator/')] == rows
-                assert len(server.calls) == 2
+                if live == 'public-proxy':
+                    assert len(server.calls) == 2
                 evidence['publicTranslationRecordsRestored'] = True
             elif live:
                 assert live in limits['availableProviders'], limits
@@ -461,8 +519,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
-    parser.add_argument('--live',choices=['bing','google','deepseek-official','public-proxy'],
-                        help='Use a real provider with the synthetic fixture. public-proxy tests Bing and Google through an existing Mac loopback proxy.')
+    parser.add_argument('--live',choices=['bing','google','deepseek-official','public-proxy','profile-proxy'],
+                        help='Use real providers. profile-proxy tests the original Bing and Google endpoints with HTTPS_PROXY in the app-owned environment.')
     parser.add_argument('--arkweb-live',action='store_true',help='Drive the selected DeepSeek Flash provider through ArkWeb')
     parser.add_argument('--host-port', type=int, default=19643)
     args = parser.parse_args()

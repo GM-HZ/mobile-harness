@@ -354,6 +354,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 `--live public-proxy` 在同一次模拟器回归调用 Bing 和 Google 公网端点。需已有 macOS 回环 HTTP CONNECT 代理，临时服务只转发本夹具的固定合成文本。单独使用 `--live bing` 或 `--live google` 验证模拟器默认网络路径。
 
+0.4.59 的匿名翻译读取 DSH 的代理路由。将 `HTTPS_PROXY` 写在应用私有 DSH home 的 `.env` 中并重新启动 Host，路由可同时配置 `NO_PROXY`。工程验收使用 `--live profile-proxy`，临时代理只接收对两个上游地址的 HTTPS CONNECT，保留原始翻译端点与 TLS 校验。应用退出测试后恢复原 `.env`。
+
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-translation.json
@@ -365,6 +367,9 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-public-proxy.json \
   --live public-proxy
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-profile-proxy.json \
+  --live profile-proxy
 ```
 
 ## 个性化推荐
