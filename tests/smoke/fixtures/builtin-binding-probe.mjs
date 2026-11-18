@@ -15,7 +15,8 @@ export function apply(ctx) {
   ctx.effect(async () => {
     const result = {};
     try {
-      result.host = inspectBinding();
+      try { result.host = inspectBinding(); }
+      catch (error) { result.hostBindingError = { code: error.code, message: error.message }; }
       const body = `const { parentPort } = require('node:worker_threads');
         (async () => {
           const result = {};
