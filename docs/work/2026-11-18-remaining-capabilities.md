@@ -1,6 +1,6 @@
 # DSH 剩余工作清点
 
-截至 0.4.59，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.60，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
 - 28类工具包：23类已有实际调用证据，覆盖深度不同；5类为当前不适用／暂缓项（pwsh、pwsh-persistent、bash-persistent、terminal、workspace-dependencies）。
 - 16 个官方可选 bundle 中，11 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector、auto-review、personalized-recommendations、cot-translation），2 个暂缓（cua、terminal），3 个待完成。Forge 已通过本地工作树场景。
@@ -11,7 +11,7 @@
 | 工作项 | 当前状态 |
 | --- | --- |
 | voice-input | 0.4.57 已从空缓存经默认公网来源选择下载三个锁定文件，并完成 ArkWeb 合成录音、草稿回填、取消和 worker 回收。显式公网镜像也通过 SHA-256 和转写，Hugging Face 主站在本模拟器上连接被拒。真机麦克风授权和采集待验 |
-| liveshare | 0.4.57 已通过独立客户端在回环 Relay 查看已共享会话，并用真实 DeepSeek Flash 对话。Host 拒绝查看未共享会话和调用 Owner 接口，撤销立即生效。公网 Relay、真实账户授权和实际跨设备交互待验 |
+| liveshare | 0.4.60 修复 ArkWeb 拦截 Relay 授权地址，真实窗口点击、隔离 Relay 的 PKCE 交换和身份绑定通过。重启恢复分享，独立查看端完成真实模型回合，范围拒绝和撤销通过。公网 Relay、真实身份提供方及公网跨设备部署待验 |
 | forge | 本地工作树正式接口已验证恢复、取消、重试和重启。0.4.47 已验 ArkWeb 面板。0.4.57 通过包内 gh 在隔离 TLS 服务验证文件读取、分页提交、评审、邀请评审和合并。公网账号与托管仓库操作待验 |
 
 ## 5 组补充验收
@@ -20,7 +20,7 @@
 2. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
 3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。其他原生依赖组合与用户指定的公网索引待验。DSH 官方市场接受自定义索引。
 4. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。0.4.57 已从 ArkWeb 打开 DeepSeek 官方登录页，隔离回环服务通过授权回调、重启保留与登出撤销。0.4.58 经标准设置添加 pi-ai 路由，使用 DeepSeek 公网通过 Chat Completions 和 Responses 两种协议的模型发现、工具往返与重启续接。真实账号授权与其他供应商端点待验。
-5. 0.4.59 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。0.4.58 模拟器两小时测试已在第 106 秒强停重启后完成第 4 次后台投递，原会话及排队任务保留。最终结果待记录。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
+5. 0.4.60 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。0.4.58 模拟器两小时测试已跨过半小时并完成第 5 次后台投递，此前在第 106 秒强停后保留了会话及排队任务。最终结果待记录。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
 
 系统 PTY、Phone／Computer Use、Windows 专用工具和 desktop-only workspace-dependencies 按既有范围单列。语言服务器、原生 wheel、WASM 与原生 addon 组合按具体需要验收。
 
@@ -63,3 +63,5 @@ Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提�
 独立模拟器通过 Bing、Google 公网代理链路和 ArkWeb 受控回归。同时启动两小时后台定时任务测试，首个检查点涵盖一次强停重启与四次成功投递。 [本轮证据](../evidence/emulator-translation-schedule-0.4.58.json)
 
 0.4.59 修复了匿名翻译对 DSH 代理配置的应用。使用两个官方默认地址完成真实 CONNECT 和中文翻译，重启后完整回读两次译文。ArkWeb 的取消、失败保留原文和 DeepSeek Flash 复验通过。该模拟器的直接公网访问仍受环境限制。 [本轮证据](../evidence/emulator-translation-proxy-0.4.59.json)
+
+0.4.60 通过原生 LiveShare 弹窗和隔离 Relay 的所有者登录。复验真实 DeepSeek 登录入口及回环账号生命周期。0.4.58 并行后台测试在 30 分钟检查点完成第五次投递。 [本轮证据](../evidence/emulator-liveshare-owner-0.4.60.json)

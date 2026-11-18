@@ -1,0 +1,367 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15559",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "testSource": "ebddd528b22a6ff4f7c23751b196d90d854576b8",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.60-unsigned.hap",
+    "version": "0.4.60",
+    "versionCode": 67,
+    "sha256": "46a930c796f2da483e8f875e33c04befaddf98c6d302711fd58cee88a241ceb5",
+    "bytes": 720526301,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "18b2b90c285f7f3d3c1bb2b6275fdde1d9a15782",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "47db914e6bb60e5bbadcc0402e8984254bf4b97d2e287ad5af2d210e8a4c8085",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "signedArtifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.60-signed.hap",
+    "sha256": "67ef2fad340b3a6aac2925755eae984ca23d12809746e0a0773c8f0fb029bb3d",
+    "bytes": 724203216,
+    "matchingPayloadEntries": 204,
+    "arktsModuleSha256": "f8bff1502b002eda43df0aa54c65cc8a50509fc0f6eab6a68c2997878a699306",
+    "profileVerified": true,
+    "signatureVerified": true
+  },
+  "build": {
+    "command": [
+      "./build.sh",
+      "--package"
+    ],
+    "exitCode": 0,
+    "logSha256": "1a2e37d1d9d23cee767dfbb14bc3a4636866c6238ca2b5fed3e61b20b2fbb0c4"
+  },
+  "install": {
+    "from": "0.4.59",
+    "to": "0.4.60",
+    "exitCode": 0,
+    "logSha256": "d36ce6d5eeb0eccabde3303fc85f3739696271c5cc18ced2710f6715b6cf9d3d"
+  },
+  "baseline": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-liveshare-relay.py",
+      "127.0.0.1:15559",
+      ".build/batch-069/owner-0.4.59.json",
+      "--owner-login",
+      "--host-port",
+      "19648"
+    ],
+    "exitCode": 1,
+    "logSha256": "39d12d349540ed722447c197b701784a9db2b108dfb4383c2ac0cda9a067850d",
+    "jsonSha256": "db82fb84f3dc2e9014966b336f8077f56b3b6e82093efd77d09331a3d07ab222",
+    "observed": {
+      "reachable": {
+        "ok": true,
+        "httpReachable": true,
+        "blocking": false
+      },
+      "nativeNavigationBlocked": "这个登录地址不受支持。返回聊天后可以重试，或使用 API Key。",
+      "restoredReadyMs": 4630,
+      "configRestored": true,
+      "relayMessages": []
+    }
+  },
+  "live": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-liveshare-relay.py",
+      "127.0.0.1:15559",
+      ".build/batch-069/owner-0.4.60.json",
+      "--owner-login",
+      "--model",
+      "--host-port",
+      "19648"
+    ],
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "482f01a59c28a83f97fff959d7967800112bb491e6843a9523c5657881a5e141",
+    "observed": {
+      "reachable": {
+        "ok": true,
+        "httpReachable": true,
+        "blocking": false
+      },
+      "arkwebOwnerVerified": true,
+      "authorized": {
+        "ok": true,
+        "blocking": false
+      },
+      "created": {
+        "link": "http://127.0.0.1:19769/?shareId=wlZV_12lDM_v",
+        "shareId": "wlZV_12lDM_v",
+        "sessionId": "44aeb4b2-f727-42f8-83f1-a8a2f54f1366",
+        "sessionIds": [
+          "44aeb4b2-f727-42f8-83f1-a8a2f54f1366"
+        ],
+        "sessionMode": "view",
+        "access": {
+          "mode": "selected",
+          "selected": [],
+          "deploymentAllowedSubjectIds": [],
+          "shareAllowedSubjectIds": [
+            "fixture:local:reader"
+          ],
+          "broadenedByDeploymentSubjects": false,
+          "identityKeyAcl": true
+        }
+      },
+      "addedSecondSource": true,
+      "restoredOnlineSources": [
+        "44aeb4b2-f727-42f8-83f1-a8a2f54f1366",
+        "91fb8ca3-b9e4-47cd-ae21-3911c751030a"
+      ],
+      "readerBeforeRevocation": {
+        "anonymousRefused": true,
+        "htmlBytes": 44304,
+        "visibleSessionIds": [
+          "44aeb4b2-f727-42f8-83f1-a8a2f54f1366",
+          "91fb8ca3-b9e4-47cd-ae21-3911c751030a"
+        ],
+        "accessRefusalCodes": {
+          "outsideSession": "remote-access/denied",
+          "ownerManagement": "remote-access/denied"
+        },
+        "sharedHistoryReadable": true
+      },
+      "actualViewerModelTurn": {
+        "principal": {
+          "kind": "share-viewer",
+          "shareId": "wlZV_12lDM_v",
+          "actor": {
+            "providerId": "fixture",
+            "tenantId": "local",
+            "subjectId": "reader"
+          }
+        },
+        "exactReply": true,
+        "endReason": "completed"
+      },
+      "testModelKeyRemoved": true,
+      "ownerAppliedLiveRevocation": true,
+      "stop": {
+        "ok": true
+      },
+      "stoppedShareUnavailable": true,
+      "gatewayThreadStopped": true,
+      "restoredReadyMs": 4733,
+      "configRestored": true,
+      "relayMessages": [
+        {
+          "ownerAuthorizationDisplayed": true
+        },
+        {
+          "ownerCredentialRedeemed": true,
+          "pkceMatched": true
+        },
+        {
+          "registered": "test-SuF1Ido0",
+          "probe": true
+        },
+        {
+          "closed": "test-SuF1Ido0",
+          "code": 1000
+        },
+        {
+          "registered": "test-75PoFZIC",
+          "probe": true
+        },
+        {
+          "closed": "test-75PoFZIC",
+          "code": 1000
+        },
+        {
+          "registered": "wlZV_12lDM_v",
+          "probe": false
+        },
+        {
+          "closed": "wlZV_12lDM_v",
+          "code": 1006
+        },
+        {
+          "registered": "wlZV_12lDM_v",
+          "probe": false
+        },
+        {
+          "closed": "wlZV_12lDM_v",
+          "code": 1000
+        },
+        {
+          "deleted": "wlZV_12lDM_v"
+        }
+      ]
+    }
+  },
+  "deepSeekAccount": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-account.py",
+      "127.0.0.1:15559",
+      ".build/batch-069/account-0.4.60.json",
+      "--host-port",
+      "19648"
+    ],
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "d568a84120c38294aa654244c290bb6e74f47d527e0ef8e6c5c02f1d7da0621b",
+    "observed": {
+      "public": {
+        "popupOpened": true,
+        "platformPageVisible": true,
+        "publicPath": "/dsh/authorize",
+        "returnedToDsh": true,
+        "finalPhase": "cancelled"
+      },
+      "fixture": {
+        "pkceExchangeAndCommit": true,
+        "persistedAcrossRestart": true,
+        "signedOutAndRevoked": true,
+        "originalProfileRestored": true
+      },
+      "originalProfileRestored": true
+    }
+  },
+  "profileAudit": {
+    "installedVersion": "0.4.60",
+    "installedVersionCode": 67,
+    "profileMatches0.4.59": true,
+    "testKeyAbsent": true,
+    "signedOut": true,
+    "testBundlesDefaultOff": true,
+    "reversePortsRemoved": true,
+    "unauthenticatedStatus": 401
+  },
+  "earlierFixtureFailures": [
+    {
+      "logSha256": "2a8653e1f6664daeab4e2151914543eef184065dba525b871f13a482f25c6ca6",
+      "cause": "The Web fixture could not find an empty, unread session."
+    },
+    {
+      "logSha256": "71585a5afcfad55fddc733f1da7537c1778ded60c2b176c62eb53c38e2e54193",
+      "cause": "The archive import bundle had not been enabled."
+    },
+    {
+      "logSha256": "0cace674b8015778413488a72c02686accda9b004bd928286b0973501c7781d2",
+      "cause": "The fixture supplied two valid imported sessions while its assertion expected one."
+    },
+    {
+      "logSha256": "b0f4a29c8f1b5d9696178417eb33da170ac2a3d943aeb5142ed440eaa00fe2b5",
+      "cause": "The Web session list was inspected before the selected fixture workspace appeared."
+    },
+    {
+      "logSha256": "57dcd31c15306ed2ebabec7b5c1f539e7e55b59f4a41c0935ada9ee24c935120",
+      "cause": "The original onboarding and session-list selection still needed a fresh Host mount."
+    },
+    {
+      "logSha256": "fa115e255e81ca73186f0370078d02dfb4d34c69878398f60cd73eead45167ef",
+      "cause": "A fresh profile showed the official preview notice before the login control."
+    },
+    {
+      "jsonSha256": "06faa4b1fb68684030825711d3bbc680755c06e81551f7f608e5bf81029e22ed",
+      "cause": "The preview click wrote welcomeNoticeVersion. A final audit caught it, and the account test now restores the pre-run profile."
+    }
+  ],
+  "background0.4.58": {
+    "snapshotUtc": "2026-11-18T19:58:15+00:00",
+    "state": "running",
+    "jsonSha256": "dc1a7d3f353f425a71dbfb4710d73e5c26303d867dac4ed93d71ab4009b77d13",
+    "observed": {
+      "deliveries": [
+        {
+          "afterSeconds": 16,
+          "finishedTurn": 2,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:12:39.773Z",
+            "deliveredAt": "2026-11-18T19:12:39.811Z",
+            "messageId": "57a3673c-9547-49db-96e7-09a0ce5f3abd",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 16876
+        },
+        {
+          "afterSeconds": 48,
+          "finishedTurn": 3,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:13:11.818Z",
+            "deliveredAt": "2026-11-18T19:13:11.843Z",
+            "messageId": "688c6723-36c9-457a-ba0c-48fd21c6660c",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 49645
+        },
+        {
+          "afterSeconds": 80,
+          "finishedTurn": 4,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:13:43.860Z",
+            "deliveredAt": "2026-11-18T19:13:43.889Z",
+            "messageId": "51adf218-7706-4bee-8c65-0c6a8304ce59",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 81869
+        },
+        {
+          "afterSeconds": 160,
+          "finishedTurn": 5,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:15:03.901Z",
+            "deliveredAt": "2026-11-18T19:15:04.013Z",
+            "messageId": "0168fc81-d81d-4ec7-be28-7dababa3297d",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 161448
+        },
+        {
+          "afterSeconds": 1800,
+          "finishedTurn": 6,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:42:23.939Z",
+            "deliveredAt": "2026-11-18T19:42:24.060Z",
+            "messageId": "aea9f860-8aa6-4951-86de-35e1dda08904",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 1813297
+        }
+      ],
+      "delaysSeconds": [
+        16,
+        48,
+        80,
+        160,
+        1800,
+        3600,
+        7200
+      ],
+      "restartAtSeconds": 105,
+      "finished": false,
+      "restart": {
+        "atMs": 106412,
+        "readyMs": 5689,
+        "priorJournalPreserved": true,
+        "undeliveredTasksPreserved": 4
+      }
+    }
+  },
+  "unverified": [
+    "Public Relay and real identity-provider redirect round trip",
+    "Physical Mate 60 installation"
+  ]
+}

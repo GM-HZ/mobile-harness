@@ -366,3 +366,9 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 鸿蒙的匿名翻译使用 DSH 已配置的代理策略。独立模拟器从 0.4.58 覆盖安装，两条官方默认翻译地址均实际建立 HTTPS 隧道并返回译文。重启后回读译文，ArkWeb 受控回归及真实 DeepSeek Flash 通过。
 
 未签名 HAP SHA-256 `662b1e28302f0a997aca46ebce2929d7f720f459729272c727e675b3d456a72b`。调试签名 HAP SHA-256 `9026c2b5843a9dc8ac45f15de0501b7fddf6b291b0134250809c7920fe7fb125`，离线验签及 204 个 payload 条目比对通过。Mate 60 安装待验。 [制品与实测](evidence/emulator-translation-proxy-0.4.59.json)
+
+## 0.4.60 LiveShare 所有者授权
+
+鸿蒙 ArkWeb 支持 LiveShare 所有者登录窗口及授权回传。模拟器覆盖安装后完成隔离 Relay 的 PKCE 交换，验证重启恢复、独立查看端对话、范围拒绝及撤销。真实 DeepSeek 登录入口与受控账号回调均通过。
+
+未签名 HAP SHA-256 `46a930c796f2da483e8f875e33c04befaddf98c6d302711fd58cee88a241ceb5`。调试签名 HAP SHA-256 `67ef2fad340b3a6aac2925755eae984ca23d12809746e0a0773c8f0fb029bb3d`，离线验签及 204 个 payload 条目比对通过。公网 Relay 和 Mate 60 安装待验。 [制品与实测](evidence/emulator-liveshare-owner-0.4.60.json)

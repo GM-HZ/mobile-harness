@@ -396,10 +396,15 @@ python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-gith
 
 独立 Phone 模拟器使用仅回环可达的测试 Relay 和一次性会话。独立查看者读取已共享的页面和历史，同工作区未共享会话及 Owner 管理接口会拒绝访问。验收也覆盖 Host 重启重连、撤销查看者授权、删除共享及停用网关。加 `--model` 可验证查看者通过真实 DeepSeek Flash 完成一轮对话，并在历史中核对其身份。脚本在结束时恢复 profile，移除测试凭据和转发。
 
+加 `--owner-login` 可以通过实际 ArkWeb 的分享对话框打开授权，点击测试 Relay 的同意按钮并检查 PKCE 交换与身份显示。测试 Relay 使用本机回环和临时身份，生产 Relay 的部署与真实身份提供方单独验证。
+
 ```sh
 python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-relay.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-model.json --model
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-owner.json \
+  --owner-login --model
 ```
 
 ## Goal 跨重启续跑
