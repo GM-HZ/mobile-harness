@@ -314,10 +314,21 @@ python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-gith
 
 ## LiveShare
 
-独立 Phone 模拟器临时启用 LiveShare，使用仅回环可达的测试 Relay 和一次性测试会话。验收覆盖连接、发布授权探针、发布、添加来源会话、Host 重启重连、Relay 删除及停用后网关回收。脚本会恢复原 profile 并清除转发。
+独立 Phone 模拟器使用仅回环可达的测试 Relay 和一次性会话。独立查看者读取已共享的页面和历史，同工作区未共享会话及 Owner 管理接口会拒绝访问。验收也覆盖 Host 重启重连、撤销查看者授权、删除共享及停用网关。加 `--model` 可验证查看者通过真实 DeepSeek Flash 完成一轮对话，并在历史中核对其身份。脚本在结束时恢复 profile，移除测试凭据和转发。
 
 ```sh
 python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-relay.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-model.json --model
+```
+
+## Goal 跨重启续跑
+
+使用 DeepSeek Flash 驱动同一个 Goal 的三轮文件操作。前两轮达到轮次上限后重启 Host，检查历史、轮次和文件保持一致。修改目标和上限后先验证旧修订无法恢复，再通过当前修订恢复。第三轮实际写入检查点并完成 Goal。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-goal-restart.py <loopback-target> .build/goal-restart.json
 ```
 
 ## 鸿蒙语音

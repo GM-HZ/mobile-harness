@@ -1,0 +1,424 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "testSource": "cc3439e3063c10a9334343a533eb52cbb7f701e6",
+  "liveshareReaderAndModel": {
+    "exitCode": 0,
+    "command": [
+      "python3",
+      "tests/smoke/emulator-liveshare-relay.py",
+      "127.0.0.1:15557",
+      ".build/batch-059/liveshare-model.json",
+      "--model"
+    ],
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "d527c3aec318707b32d00b59fc6666ba0deac55ee2f6e7b96ee502ce22a5a0c5",
+    "observed": {
+      "reachable": {
+        "ok": true,
+        "httpReachable": true,
+        "blocking": false
+      },
+      "authorized": {
+        "ok": true,
+        "blocking": false
+      },
+      "created": {
+        "link": "http://127.0.0.1:19769/?shareId=0aH-i5wo-y28",
+        "shareId": "0aH-i5wo-y28",
+        "sessionId": "session-a6334419-39a5-4bbc-b39c-06b84120edf0",
+        "sessionIds": [
+          "session-a6334419-39a5-4bbc-b39c-06b84120edf0"
+        ],
+        "sessionMode": "view",
+        "access": {
+          "mode": "selected",
+          "selected": [],
+          "deploymentAllowedSubjectIds": [],
+          "shareAllowedSubjectIds": [
+            "fixture:local:reader"
+          ],
+          "broadenedByDeploymentSubjects": false,
+          "identityKeyAcl": true
+        }
+      },
+      "addedSecondSource": true,
+      "restoredOnlineSources": [
+        "session-a6334419-39a5-4bbc-b39c-06b84120edf0",
+        "session-b00d0e97-a006-489b-8b8d-cc004547ed85"
+      ],
+      "readerBeforeRevocation": {
+        "anonymousRefused": true,
+        "htmlBytes": 41977,
+        "visibleSessionIds": [
+          "session-a6334419-39a5-4bbc-b39c-06b84120edf0",
+          "session-b00d0e97-a006-489b-8b8d-cc004547ed85"
+        ],
+        "accessRefusalCodes": {
+          "outsideSession": "remote-access/denied",
+          "ownerManagement": "remote-access/denied"
+        },
+        "sharedHistoryReadable": true
+      },
+      "actualViewerModelTurn": {
+        "principal": {
+          "kind": "share-viewer",
+          "shareId": "0aH-i5wo-y28",
+          "actor": {
+            "providerId": "fixture",
+            "tenantId": "local",
+            "subjectId": "reader"
+          }
+        },
+        "exactReply": true,
+        "endReason": "completed"
+      },
+      "testModelKeyRemoved": true,
+      "ownerAppliedLiveRevocation": true,
+      "stop": {
+        "ok": true
+      },
+      "stoppedShareUnavailable": true,
+      "gatewayThreadStopped": true,
+      "restoredReadyMs": 5258,
+      "configRestored": true,
+      "relayMessages": [
+        {
+          "registered": "test-aiES-33J",
+          "probe": true
+        },
+        {
+          "closed": "test-aiES-33J",
+          "code": 1000
+        },
+        {
+          "registered": "0aH-i5wo-y28",
+          "probe": false
+        },
+        {
+          "closed": "0aH-i5wo-y28",
+          "code": 1006
+        },
+        {
+          "registered": "0aH-i5wo-y28",
+          "probe": false
+        },
+        {
+          "closed": "0aH-i5wo-y28",
+          "code": 1000
+        },
+        {
+          "deleted": "0aH-i5wo-y28"
+        }
+      ]
+    }
+  },
+  "goalRestart": {
+    "exitCode": 0,
+    "command": [
+      "python3",
+      "tests/smoke/emulator-goal-restart.py",
+      "127.0.0.1:15557",
+      ".build/batch-059/goal-batch.json"
+    ],
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "40ad01913ed3c96c5d1d09c8d7d0a4c2a93e3f0093168cc75ce5e085ec2ba56d",
+    "observed": {
+      "stages": [
+        {
+          "round": 1,
+          "state": {
+            "id": "goal-f0389526-dae4-46e2-a565-0ed5462b56eb",
+            "revision": 2
+          },
+          "phase": "blocked",
+          "checkpointSha256": "a2a9bd8e7f1f0f7cf38f3f6a0e87e222a30df6134a4fd6c0029e01b63413119c",
+          "tools": [
+            "read",
+            "write"
+          ],
+          "blockedReason": "round-limit",
+          "restartReadyMs": 6125,
+          "restoredWorkEvents": 20,
+          "extraRestartEventTypes": [
+            "session/end-seed"
+          ],
+          "exhaustedResumeError": "goals/resume: gateway/internal",
+          "staleResumeError": "goals/resume: gateway/internal",
+          "explicitResumeRevision": 4
+        },
+        {
+          "round": 2,
+          "state": {
+            "id": "goal-f0389526-dae4-46e2-a565-0ed5462b56eb",
+            "revision": 5
+          },
+          "phase": "blocked",
+          "checkpointSha256": "a2a9bd8e7f1f0f7cf38f3f6a0e87e222a30df6134a4fd6c0029e01b63413119c",
+          "tools": [
+            "read",
+            "write"
+          ],
+          "blockedReason": "round-limit",
+          "restartReadyMs": 5012,
+          "restoredWorkEvents": 30,
+          "extraRestartEventTypes": [
+            "session/end-seed"
+          ],
+          "exhaustedResumeError": "goals/resume: gateway/internal",
+          "staleResumeError": "goals/resume: gateway/internal",
+          "explicitResumeRevision": 7
+        },
+        {
+          "round": 3,
+          "state": {
+            "id": "goal-f0389526-dae4-46e2-a565-0ed5462b56eb",
+            "revision": 8
+          },
+          "phase": "complete",
+          "checkpointSha256": "a2a9bd8e7f1f0f7cf38f3f6a0e87e222a30df6134a4fd6c0029e01b63413119c",
+          "tools": [
+            "read",
+            "write",
+            "get_goal",
+            "update_goal"
+          ]
+        }
+      ],
+      "sessionId": "session-15af1e49-79df-4817-8bbf-f7845aee8dbb",
+      "eachCheckpointMatched": true,
+      "sameGoalId": "goal-f0389526-dae4-46e2-a565-0ed5462b56eb",
+      "testKeyRemoved": true
+    }
+  },
+  "audit": {
+    "exitCode": 0,
+    "command": [
+      "python3",
+      ".build/batch-059/audit.py",
+      "post-regression"
+    ],
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "jsonSha256": "a56421c55782f4ce1772c767793ee2b3a4a8aefa381c69569f88e9262871ac4d",
+    "observed": {
+      "target": "127.0.0.1:15557",
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "readyMs": 58,
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      },
+      "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "titlesAndBadgeDefaultOff": {
+        "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.5"
+        },
+        "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.5"
+        }
+      },
+      "fourOptionalBundlesDefaultOff": {
+        "@deepseek-ai/dsh-experimental-ralph-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-session-search": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-tool-worktree": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-forge-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        }
+      },
+      "chatImportDefaultOff": {
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "inspectorDefaultOff": true,
+      "translationDefaultOff": true,
+      "recommendationsDefaultOff": {
+        "name": "@deepseek-ai/dsh-personalized-recommendations",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "badgeDefaultOff": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "batchDefaultOff": [
+        {
+          "name": "@deepseek-ai/dsh-experimental-auto-review",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        {
+          "name": "@deepseek-ai/dsh-experimental-liveshare",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        }
+      ],
+      "voiceDefaultOff": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "temporaryVoiceCacheRemoved": true
+    }
+  },
+  "earlierAttempts": [
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-liveshare-relay.py",
+        "127.0.0.1:15557",
+        ".build/batch-059/liveshare.json"
+      ],
+      "logSha256": "7353eb871487926a9fdca1a77354feab0911ebf182cac7f70b4477d3949ec858",
+      "jsonSha256": "3ea410ae0ff9e962e177d7fdd9544da3119ba609f06702cca6c8aad5604a6407",
+      "finding": "The initial fixture used request rather than the session/list _request argument."
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-goal-restart.py",
+        "127.0.0.1:15557",
+        ".build/batch-059/goal.json"
+      ],
+      "logSha256": "f4239bc05702baeeb8386e535e7da145a9411291a242c6f9930a049291aece2b",
+      "jsonSha256": "8480a931e41917ed57ec4ef60830c499507fe4cd2a04e03aaf996de7acabb011",
+      "finding": "The initial fixture attempted automatic pause, which requires a direct top-level human turn."
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-goal-restart.py",
+        "127.0.0.1:15557",
+        ".build/batch-059/goal-confirm.json"
+      ],
+      "logSha256": "b3c67bc08986be0121886771afa77d9490d782ca2924fd0236a043732191f88a",
+      "jsonSha256": "aa136105ba4d2e45f45ef8115a73f03e60f3feb728e0d6c701d26192bbfcde7f",
+      "finding": "Flash marked the first checkpoint complete because the objective did not carry a clear remaining completion condition."
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-goal-restart.py",
+        "127.0.0.1:15557",
+        ".build/batch-059/goal-final.json"
+      ],
+      "logSha256": "1b6445d2d08e7aa451b34fd51521fb859cb1d2ddee1da711a61b4d7d1fc3c219",
+      "jsonSha256": "260fdf6682150fc9d15a9f32e30dbe18dc57188459947f68d33ca7e11ff097e3",
+      "finding": "The round budget stopped stage one correctly. The fixture rejected a read-only grep on its own seed file, so the final fixture checks exact read and write arguments and allows grep only on the source and destination."
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-goal-restart.py",
+        "127.0.0.1:15557",
+        ".build/batch-059/goal-history.json"
+      ],
+      "logSha256": "36e32ae03417e83e5cc1e944531c16aa7fb70b867d7341c2192e082325db4b0b",
+      "jsonSha256": "7a7dba082a4f8fc17ad04fbb790bbe09bb3dad41b2340b1f083d832505641d1d",
+      "finding": "The first restart restored the goal and its checkpoint. The journal appended session/end-seed, so the fixture separately verifies exact work events and admits only that restart marker."
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-goal-restart.py",
+        "127.0.0.1:15557",
+        ".build/batch-059/goal-gateway.json"
+      ],
+      "logSha256": "474acefd85c5d54496482493d4240ae2ed0cc1d2f4abec4c99c3fc530ecc5e00",
+      "jsonSha256": "c4ac9e54cc2db15d7757686118c96abff6f3ef3068b427c8bb4c6634f8026506",
+      "finding": "The gateway returned its generic error for an exhausted goal. The regression verifies that both rejected requests leave state unchanged and that the current revision with remaining budget can resume."
+    }
+  ],
+  "unverified": [
+    "Public LiveShare Relay, actual identity provider authorization and physical cross-device use.",
+    "Long-duration Goal soak and the public model context limit.",
+    "Mate 60 USB target was offline. No physical device run."
+  ]
+}
