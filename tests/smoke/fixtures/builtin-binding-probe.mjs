@@ -20,20 +20,28 @@ export function apply(ctx) {
       const body = `const { parentPort } = require('node:worker_threads');
         (async () => {
           const result = {};
+          parentPort.postMessage({ stage: 'worker-start' });
           try { result.binding = (${inspectBinding.toString()})(); }
           catch (error) { result.bindingError = { code: error.code, message: error.message }; }
+          parentPort.postMessage({ stage: 'binding-finished' });
           try {
             const { Session } = require('node:inspector'); const session = new Session();
+            parentPort.postMessage({ stage: 'inspector-imported' });
             session.connectToMainThread();
+            parentPort.postMessage({ stage: 'inspector-connected' });
             try { result.inspector = await new Promise((resolve,reject) => session.post('Runtime.evaluate', { expression: '1 + 41', returnByValue: true }, (error, value) => error ? reject(error) : resolve(value))); }
             finally { session.disconnect(); }
           } catch (error) { result.inspectorError = { code: error.code, message: error.message }; }
-          parentPort.postMessage(result);
+          parentPort.postMessage({ done: true, result });
         })();`;
       worker = new Worker(body, { eval: true, execArgv: [] });
+      result.workerStages = [];
       result.worker = await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error('Worker probe timeout')), 10000);
-        worker.once('message', value => { clearTimeout(timeout); resolve(value); });
+        worker.on('message', value => {
+          if (value.done) { clearTimeout(timeout); resolve(value.result); }
+          else result.workerStages.push(value.stage);
+        });
         worker.once('error', error => { clearTimeout(timeout); reject(error); });
         worker.once('exit', code => { if (code !== 0) { clearTimeout(timeout); reject(new Error('Worker exit ' + code)); } });
       });
