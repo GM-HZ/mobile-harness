@@ -55,7 +55,9 @@ class ModelMirror(BaseHTTPRequestHandler):
         pass
 
     def do_GET(self):
-        path=self.server.assets.get(urlsplit(self.path).path)
+        request_path=urlsplit(self.path).path
+        self.server.requests.append(request_path)
+        path=self.server.assets.get(request_path)
         if path is None:
             self.send_error(404)
             return
@@ -64,7 +66,7 @@ class ModelMirror(BaseHTTPRequestHandler):
         self.send_header('Content-Length',str(path.stat().st_size))
         self.end_headers()
         with path.open('rb') as model:
-            shutil.copyfileobj(model,self.wfile)
+            shutil.copyfileobj(model,self.wfile,1024*1024)
         self.server.completed.append(path.name)
 
 
@@ -77,6 +79,7 @@ def model_mirror(root):
     server=ThreadingHTTPServer(('127.0.0.1',0),ModelMirror)
     server.assets=files
     server.completed=[]
+    server.requests=[]
     threading.Thread(target=server.serve_forever,daemon=True).start()
     return server
 
@@ -219,9 +222,6 @@ def run(emulator,args):
         browser['switch'](emulator,INSPECTOR,True)
         if args.download:
             mirror=model_mirror(args.model_root)
-            candidate=('tcp:19758',f'tcp:{mirror.server_port}')
-            assert 'Forwardport result:OK' in emulator.hdc('rport',*candidate)
-            reverse=candidate
             patch=PROFILE+'/cordis.patch.yml'
             overlay=(b'\n- id: speech-to-text-sensevoice\n  config:\n'
                      b"    dataRoot: !!js dshHomePath('speech-to-text', 'sensevoice')\n"
@@ -230,6 +230,10 @@ def run(emulator,args):
         browser['restart'](emulator)
         if args.download:
             evidence['downloadInitialState']=readiness(emulator,phases=('unprepared',))
+            candidate=('tcp:19758',f'tcp:{mirror.server_port}')
+            reply=emulator.hdc('rport',*candidate)
+            assert 'Forwardport result:OK' in reply,reply
+            reverse=candidate
             emulator.rpc('speech/prepare',{'providerId':PROVIDER})
             evidence['downloadPreparation']=readiness(emulator,timeout=100)
             evidence['downloadedAssets']=sorted(mirror.completed)
@@ -282,6 +286,7 @@ def run(emulator,args):
                 if mirror:
                     mirror.shutdown()
                     mirror.server_close()
+                    evidence['mirrorRequests']=mirror.requests
                 args.output.write_text(json.dumps(evidence,indent=2,ensure_ascii=False)+'\n')
 
 
