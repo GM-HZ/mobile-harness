@@ -39,7 +39,7 @@ class Registry(BaseHTTPRequestHandler):
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
-        gate = self.server.download_gates.get(path)
+        gate = getattr(self.server, 'download_gates', {}).get(path)
         if gate:
             started, release = gate
             started.set()
@@ -258,7 +258,8 @@ def verify_install_cancellation(emulator, server, name, folder, target):
             assert cancellation == {'status': 'cancelled'} and result['application'] == 'cancelled', (cancellation, result)
             assert emulator.rpc('pluginManager/cancelInstall', {'requestId': request_id}) == {'status': 'not-running'}
             assert all(agent['read_bytes'](emulator, file) == body for file, body in originals.items())
-            assert not catalog(emulator, name)['installed']
+            row = catalog(emulator, name)
+            assert row is None or not row['installed'], row
             assert emulator.app(f'test ! -e {folder}/events.log && printf ABSENT') == 'ABSENT'
         finally:
             release.set()
