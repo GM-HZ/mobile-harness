@@ -1,0 +1,2240 @@
+{
+  "recordedAt": "2026-11-18T13:31:27.169116+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "baselineCommit": "9ba560fb0a33d84774afb7fbb0d75273bcb7d35d",
+  "firstMarketHap": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.40-unsigned.hap",
+    "sourceCommit": "c7092a84077f5a28f1c03c6e9506b1bc017f592a",
+    "version": "0.4.40",
+    "versionCode": 47,
+    "unsigned": true,
+    "bytes": 662457541,
+    "sha256": "4740072916088f2c7f2bbee0892fb0b3bfbed7725e8c7fe495436ad4bc1e2672",
+    "layerSha256": "060a3ac039cc79aefc0024cb277f88210e3fad5e13c2d34bdee23ffa5e492b3e",
+    "sameLayerMemberNames": 94345,
+    "layerMemberSizeOrCrcDifferences": [
+      "dsh/package.json"
+    ],
+    "newCarrierDependencies": {
+      "@deepseek-ai/dsh-experimental-plugin-market-bundle": "0.2.2-rc.4"
+    }
+  },
+  "productionHap": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.41-unsigned.hap",
+    "sourceCommit": "e28c9672ff621a2c68b581161496ab69dae3597a",
+    "sha256": "a68ca83b6660a95fcad1341a509a08a4eec9f14933f3536f394ab8ab3e94d132",
+    "bytes": 662461574,
+    "version": "0.4.41",
+    "versionCode": 48,
+    "unsigned": true,
+    "layerSha256": "060a3ac039cc79aefc0024cb277f88210e3fad5e13c2d34bdee23ffa5e492b3e",
+    "sameOfficialLayerAs040": true,
+    "compatibilityAssetsSha256": {
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "ebf844f04bdc740cdb20bb4df652f34ddc787d2d627c6eb248d83bf8ea3b3dee",
+      "packages/dsh-host/dsh-native-web.cjs": "5f0fa9efb3658cd60f549bc8f1b902de30f074ad512f1f00513563c53e4f0242"
+    }
+  },
+  "build": {
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pin directory> ./build.sh --package",
+    "exitCode": 0,
+    "hvigorElapsedMs": 7426,
+    "logSha256": "2d7524aba03759bc403ea0c8dc587cfdd052e6bd7821e6da7a145fd7e1637d07"
+  },
+  "installation": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.41-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "8062e80703d94c09e4d4df4dd570b3d13e3dd66def8088a00f0d4f7e2d674e51"
+  },
+  "latestNpmNext": {
+    "checkedAt": "2026-11-18T00:45:08.170557+00:00",
+    "url": "https://registry.npmjs.org/@deepseek-ai%2fdsh/next",
+    "version": "0.2.2-rc.4"
+  },
+  "officialSourceTag": {
+    "tag": "dsh-v0.2.2-rc.4",
+    "commit": "3f321d32bfe382212a8ed8785c1d47a5a300aa23"
+  },
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/plugin-market-0.4.41.json"
+      ],
+      "testSourceCommit": "e59bcaa1513eb78e2f1e85b98ae59b31c9c71dc4",
+      "exitCode": 0,
+      "elapsedSeconds": 245.142,
+      "log": ".build/plugin-market/plugin-market-0.4.41.log",
+      "resultSha256": "84e183ea81e335c6eb2d14a35029d1ad8f5d6893af7b54a687c7ab830722f41c",
+      "logSha256": "f583e841e7e1c5d7d85b3a87cc5d01af3afa4fb2c2e1b08892baa2916701a39a",
+      "result": {
+        "fixture": "mh-market-9a14a42e82",
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "enabledReadyMs": 6924,
+        "enabledCatalog": {
+          "availability": "installation",
+          "enabled": true,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "firstPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795008236850,
+          "entries": [
+            {
+              "name": "mh-market-9a14a42e82",
+              "title": "Harmony market fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "2.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": ">=99.0.0"
+                  },
+                  "install": {
+                    "spec": "mh-market-9a14a42e82@2.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": false,
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    },
+                    "exempted": false
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.2.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-9a14a42e82@1.2.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.1.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-9a14a42e82@1.1.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-9a14a42e82@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.2.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": 1
+        },
+        "secondPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795008236850,
+          "entries": [
+            {
+              "name": "mh-market-9a14a42e82-dep",
+              "title": "Dependency metadata fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-9a14a42e82-dep@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.0.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": null
+        },
+        "indexSummaries": [
+          {
+            "url": "http://127.0.0.1:19742/market.json",
+            "title": "Owned test market"
+          },
+          {
+            "url": "http://127.0.0.1:19742/invalid.json",
+            "error": "http://127.0.0.1:19742/invalid.json: $.format must be 1"
+          }
+        ],
+        "firstInstall": {
+          "stage": "enable",
+          "target": "mh-market-9a14a42e82",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "registries": [
+            "http://127.0.0.1:19742/"
+          ],
+          "packageResult": {
+            "exitCode": 0,
+            "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2 -2\n++--\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 5, downloaded 1, added 0\nProgress: resolved 7, reused 5, downloaded 2, added 2, done\n\ndependencies:\n+ mh-market-9a14a42e82 1.0.0\n- mh-market-d86b2023ea 1.1.0\n\nDone in 8.8s using pnpm v11.28.5\n",
+            "truncated": false,
+            "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-FIAjdm/pnpm.log"
+          },
+          "bundle": "mh-market-9a14a42e82",
+          "version": "1.0.0",
+          "warnings": []
+        },
+        "marketAfterInstall": {
+          "status": "update-available",
+          "installedVersion": "1.0.0"
+        },
+        "registryVersionListing": {
+          "status": "listed",
+          "installed": "1.0.0",
+          "registry": "http://127.0.0.1:19742/",
+          "attempts": [
+            {
+              "registry": "http://127.0.0.1:19742/"
+            }
+          ],
+          "versions": [
+            {
+              "version": "2.0.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true,
+              "incompatible": {
+                "name": "mh-market-9a14a42e82",
+                "version": "2.0.0",
+                "runtimeVersion": "0.2.2-rc.4",
+                "requirements": {
+                  "engines.dsh": ">=99.0.0"
+                }
+              }
+            },
+            {
+              "version": "1.2.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true
+            },
+            {
+              "version": "1.1.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [
+                "latest"
+              ],
+              "prerelease": false,
+              "bundle": true
+            }
+          ],
+          "omitted": 0
+        },
+        "sessionId": "session-99be425d-0a82-46b2-a812-42b2328d67f9",
+        "firstPluginToolResult": {
+          "version": "1.0.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_FB704F1BAD7C4F18967830BCCF817B46"
+        },
+        "updates": {
+          "2.0.0": {
+            "from": "1.0.0",
+            "to": "2.0.0",
+            "step": "check",
+            "result": {
+              "changed": false,
+              "application": "failed",
+              "stage": "install",
+              "target": "mh-market-9a14a42e82",
+              "error": {
+                "code": "incompatible-version",
+                "incompatible": [
+                  {
+                    "name": "mh-market-9a14a42e82",
+                    "version": "2.0.0",
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "1.1.0": {
+            "from": "1.0.0",
+            "to": "1.1.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-9a14a42e82",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 1, added 1\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-9a14a42e82 1.1.0\n\nDone in 6.9s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-FealKH/pnpm.log"
+              },
+              "bundle": "mh-market-9a14a42e82",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          },
+          "1.2.0": {
+            "from": "1.1.0",
+            "to": "1.2.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-9a14a42e82",
+              "enabled": true,
+              "changed": true,
+              "application": "failed",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-9a14a42e82 1.2.0\n\nDone in 7.7s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-ALpidh/pnpm.log"
+              },
+              "bundle": "mh-market-9a14a42e82",
+              "version": "1.2.0",
+              "error": {
+                "code": "operation-error",
+                "diagnostic": "dsh: warning: 1 entry did not activate\nmh-market-9a14a42e82 (mh-market-9a14a42e82/candidate): Error: Owned fixture refused activation"
+              }
+            },
+            "restore": {
+              "stage": "enable",
+              "target": "mh-market-9a14a42e82",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 7, downloaded 0, added 2, done\n\ndependencies:\n+ mh-market-9a14a42e82 1.1.0\n\nDone in 8.3s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-hOgGaL/pnpm.log"
+              },
+              "bundle": "mh-market-9a14a42e82",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          }
+        },
+        "activationRestarts": {
+          "1.1.0": {
+            "reason": "module-comparison",
+            "readyMs": 8490
+          }
+        },
+        "registryOriginAfterRestart": {
+          "name": "mh-market-9a14a42e82",
+          "version": "1.1.0",
+          "registry": "http://127.0.0.1:19742/"
+        },
+        "updatedToolResult": {
+          "version": "1.1.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_4F7B91194EE4451DA6FDFE26E7C960F2"
+        },
+        "rollbackRestarts": {
+          "1.1.0": {
+            "reason": "module-comparison",
+            "readyMs": 6023
+          }
+        },
+        "toolAfterRollback": {
+          "version": "1.1.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_B0D74148E5664ABCB6D65DBF328457FE"
+        },
+        "testCredentialRemoved": true,
+        "realLifecycle": [
+          "start 1.0.0",
+          "stop 1.0.0",
+          "start 1.0.0",
+          "start 1.1.0",
+          "stop 1.1.0",
+          "start 1.2.0",
+          "start 1.1.0",
+          "start 1.1.0"
+        ],
+        "lifecycleScriptWasSuppressed": true,
+        "removedReadyMs": 5345,
+        "removedViaManager": true,
+        "disabledReadyMs": 4997,
+        "disabledCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "restoredReadyMs": 4954,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "fixtureRequestPaths": [
+          "/invalid.json",
+          "/market.json",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82-dep",
+          "/mh-market-9a14a42e82/-/mh-market-9a14a42e82-1.0.0.tgz",
+          "/mh-market-9a14a42e82-dep/-/mh-market-9a14a42e82-dep-1.0.0.tgz",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82/-/mh-market-9a14a42e82-1.1.0.tgz",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82",
+          "/mh-market-9a14a42e82/-/mh-market-9a14a42e82-1.2.0.tgz",
+          "/mh-market-9a14a42e82"
+        ]
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market-ui.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/plugin-market-ui-0.4.41.json"
+      ],
+      "testSourceCommit": "e59bcaa1513eb78e2f1e85b98ae59b31c9c71dc4",
+      "exitCode": 0,
+      "elapsedSeconds": 39.31,
+      "log": ".build/plugin-market/plugin-market-ui-0.4.41.log",
+      "resultSha256": "1e9c0c32e7ce99ed46ef56c1f6fd1a0f5f6b3313f62d64abd6e9d33c78e83a68",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "enabledReadyMs": 5505,
+        "discoverTab": {
+          "type": "tab",
+          "text": "发现",
+          "description": "",
+          "bounds": "[426,555][786,645]"
+        },
+        "listedEntry": {
+          "type": "button",
+          "text": "查看 Harmony market fixture",
+          "description": "",
+          "bounds": "[248,1038][713,1098]"
+        },
+        "installConfirmation": {
+          "type": "dialog",
+          "text": "安装「Harmony market fixture」？",
+          "description": "",
+          "bounds": "[72,542][1248,1723]"
+        },
+        "displayedRegistry": {
+          "type": "code",
+          "text": "http://127.0.0.1:19742/",
+          "description": "",
+          "bounds": "[756,1215][1170,1269]"
+        },
+        "cancelledBeforeDownloadOrInstall": true,
+        "disabledReadyMs": 5600,
+        "testCredentialRemoved": true,
+        "restoredReadyMs": 5542,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp-bundle.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/lsp-bundle-0.4.41.json"
+      ],
+      "testSourceCommit": "e59bcaa1513eb78e2f1e85b98ae59b31c9c71dc4",
+      "exitCode": 0,
+      "elapsedSeconds": 21.915,
+      "log": ".build/plugin-market/lsp-bundle-0.4.41.log",
+      "resultSha256": "2bb111bee4b7b51ef35874137db5e484a42377236c8aa87639f111b9686bc6ff",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "before": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "disable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": false,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "disabledRestartReadyMs": 5652,
+        "afterDisabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": false,
+          "version": "0.1.0"
+        },
+        "defaultMigrationDidNotReenable": true,
+        "enable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "enabledRestartReadyMs": 4974,
+        "afterEnabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "officialProviderActive": true,
+        "restoredReadyMs": 5251,
+        "configurationHashesRestored": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/recovery-0.4.41.json"
+      ],
+      "testSourceCommit": "e59bcaa1513eb78e2f1e85b98ae59b31c9c71dc4",
+      "exitCode": 0,
+      "elapsedSeconds": 30.176,
+      "log": ".build/plugin-market/recovery-0.4.41.log",
+      "resultSha256": "7c72573e4291f7483b471e01606d772222bb4ffd7b580e42951a61576495fd08",
+      "logSha256": "d0e9017c02ce155b410441b4fbcd42d0ef28d4e46ebfb9c2a2cf29dc81a163eb",
+      "result": {
+        "fixture": "mobile-harness-crash-a09b217c36",
+        "normalReadyMs": 116,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 5197,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 5551,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      }
+    }
+  ],
+  "failedAttempts": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/initial.json"
+      ],
+      "testSourceCommit": "a0ee7bb665c25091a6ad998715ee6f2911f65960",
+      "exitCode": 1,
+      "elapsedSeconds": 147.171,
+      "log": ".build/plugin-market/initial.log",
+      "resultSha256": "34941564ace083065c77c6361d032aac61a6c5c2a5f98821d9341673ec92b764",
+      "logSha256": "72458f907f466d031fce79f33acde7b5dbc0d2c729a26240c677b2d3f7ecbd35",
+      "result": {
+        "fixture": "mh-market-11156d282e",
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "enabledReadyMs": 6805,
+        "enabledCatalog": {
+          "availability": "installation",
+          "enabled": true,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "firstPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1794962747032,
+          "entries": [
+            {
+              "name": "mh-market-11156d282e",
+              "title": "Harmony market fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "2.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": ">=99.0.0"
+                  },
+                  "install": {
+                    "spec": "mh-market-11156d282e@2.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": false,
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    },
+                    "exempted": false
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.2.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-11156d282e@1.2.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.1.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-11156d282e@1.1.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-11156d282e@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.2.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": 1
+        },
+        "secondPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1794962747032,
+          "entries": [
+            {
+              "name": "mh-market-11156d282e-dep",
+              "title": "Dependency metadata fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-11156d282e-dep@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.0.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": null
+        },
+        "indexSummaries": [
+          {
+            "url": "http://127.0.0.1:19742/market.json",
+            "title": "Owned test market"
+          },
+          {
+            "url": "http://127.0.0.1:19742/invalid.json",
+            "error": "http://127.0.0.1:19742/invalid.json: $.format must be 1"
+          }
+        ],
+        "firstInstall": {
+          "stage": "enable",
+          "target": "mh-market-11156d282e",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "registries": [
+            "http://127.0.0.1:19742/"
+          ],
+          "packageResult": {
+            "exitCode": 0,
+            "output": "✓ Lockfile passes supply-chain policies (verified 5h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nProgress: resolved 7, reused 5, downloaded 0, added 0\nPackages: +2 -1\n++-\nProgress: resolved 7, reused 5, downloaded 2, added 0\nProgress: resolved 7, reused 5, downloaded 2, added 2, done\n\ndependencies:\n+ mh-market-11156d282e 1.0.0\n- mobile-harness-crash-d990fe2eb5\n\nDone in 5.3s using pnpm v11.28.5\n",
+            "truncated": false,
+            "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-AJNiBo/pnpm.log"
+          },
+          "bundle": "mh-market-11156d282e",
+          "version": "1.0.0",
+          "warnings": []
+        },
+        "marketAfterInstall": {
+          "status": "update-available",
+          "installedVersion": "1.0.0"
+        },
+        "registryVersionListing": {
+          "status": "listed",
+          "installed": "1.0.0",
+          "registry": "http://127.0.0.1:19742/",
+          "attempts": [
+            {
+              "registry": "http://127.0.0.1:19742/"
+            }
+          ],
+          "versions": [
+            {
+              "version": "2.0.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true,
+              "incompatible": {
+                "name": "mh-market-11156d282e",
+                "version": "2.0.0",
+                "runtimeVersion": "0.2.2-rc.4",
+                "requirements": {
+                  "engines.dsh": ">=99.0.0"
+                }
+              }
+            },
+            {
+              "version": "1.2.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true
+            },
+            {
+              "version": "1.1.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [
+                "latest"
+              ],
+              "prerelease": false,
+              "bundle": true
+            }
+          ],
+          "omitted": 0
+        },
+        "sessionId": "session-5ed60a87-b1d4-4ca9-a925-a373f4972eef",
+        "firstPluginToolResult": {
+          "version": "1.0.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED"
+        },
+        "updates": {
+          "2.0.0": {
+            "from": "1.0.0",
+            "to": "2.0.0",
+            "step": "check",
+            "result": {
+              "changed": false,
+              "application": "failed",
+              "stage": "install",
+              "target": "mh-market-11156d282e",
+              "error": {
+                "code": "incompatible-version",
+                "incompatible": [
+                  {
+                    "name": "mh-market-11156d282e",
+                    "version": "2.0.0",
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "1.1.0": {
+            "from": "1.0.0",
+            "to": "1.1.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-11156d282e",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 5h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 0, added 1\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-11156d282e 1.1.0\n\nDone in 7.2s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-ceAiHl/pnpm.log"
+              },
+              "bundle": "mh-market-11156d282e",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          }
+        },
+        "restoredReadyMs": 5962,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "fixtureRequestPaths": [
+          "/invalid.json",
+          "/market.json",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e-dep",
+          "/mh-market-11156d282e/-/mh-market-11156d282e-1.0.0.tgz",
+          "/mh-market-11156d282e-dep/-/mh-market-11156d282e-dep-1.0.0.tgz",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e",
+          "/mh-market-11156d282e/-/mh-market-11156d282e-1.1.0.tgz"
+        ]
+      },
+      "artifactVersion": "0.4.40",
+      "reason": "First update installed 1.1.0 and reported module-comparison/restart-required. The test mistakenly required hot activation."
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/forward-conflict.json"
+      ],
+      "testSourceCommit": "e50237acbe2d52e6ee035d161cb178ec0bcc8113",
+      "exitCode": 1,
+      "elapsedSeconds": 8.247,
+      "log": ".build/plugin-market/forward-conflict.log",
+      "resultSha256": "c82e4f9ca724deb4d5e9e7f461727a1e393d4da4c5b3bc4da1caee6760108cff",
+      "logSha256": "22f9d5487f5ad339ded7e39a89f56260bc605b3e51fae97d1e54b4fa0c9ca3e5",
+      "result": {
+        "fixture": "mh-market-11306b8803",
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "restoredReadyMs": 5937,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "fixtureRequestPaths": []
+      },
+      "artifactVersion": "0.4.40",
+      "reason": "HDC reverse cleanup used the wrong command, leaving the owned forward. Corrected to fport rm and verified removal."
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/origin-timeout.json"
+      ],
+      "testSourceCommit": "14ef5b1ebdc849ee634b77625a049f34803b350e",
+      "exitCode": 1,
+      "elapsedSeconds": 258.2,
+      "log": ".build/plugin-market/origin-timeout.log",
+      "resultSha256": "a8126ece1a5534856630b7c406da4ff05d7e650d6a2644e9136555cc0fcd5914",
+      "logSha256": "33d3b43b84c32ffccb7c5dffb01f296be5d06cc1b2e10b5d3077e006b53e9860",
+      "result": {
+        "fixture": "mh-market-eeb7880061",
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "enabledReadyMs": 5230,
+        "enabledCatalog": {
+          "availability": "installation",
+          "enabled": true,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "firstPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1794962969769,
+          "entries": [
+            {
+              "name": "mh-market-eeb7880061",
+              "title": "Harmony market fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "2.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": ">=99.0.0"
+                  },
+                  "install": {
+                    "spec": "mh-market-eeb7880061@2.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": false,
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    },
+                    "exempted": false
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.2.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-eeb7880061@1.2.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.1.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-eeb7880061@1.1.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-eeb7880061@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.2.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": 1
+        },
+        "secondPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1794962969769,
+          "entries": [
+            {
+              "name": "mh-market-eeb7880061-dep",
+              "title": "Dependency metadata fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-eeb7880061-dep@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.0.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": null
+        },
+        "indexSummaries": [
+          {
+            "url": "http://127.0.0.1:19742/market.json",
+            "title": "Owned test market"
+          },
+          {
+            "url": "http://127.0.0.1:19742/invalid.json",
+            "error": "http://127.0.0.1:19742/invalid.json: $.format must be 1"
+          }
+        ],
+        "firstInstall": {
+          "stage": "enable",
+          "target": "mh-market-eeb7880061",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "registries": [
+            "http://127.0.0.1:19742/"
+          ],
+          "packageResult": {
+            "exitCode": 0,
+            "output": "✓ Lockfile passes supply-chain policies (verified 5h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nProgress: resolved 7, reused 5, downloaded 0, added 0\nPackages: +2 -2\n++--\nProgress: resolved 7, reused 5, downloaded 1, added 0\nProgress: resolved 7, reused 5, downloaded 2, added 2, done\n\ndependencies:\n- mh-market-11156d282e 1.1.0\n+ mh-market-eeb7880061 1.0.0\n\nDone in 9.1s using pnpm v11.28.5\n",
+            "truncated": false,
+            "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-EPElab/pnpm.log"
+          },
+          "bundle": "mh-market-eeb7880061",
+          "version": "1.0.0",
+          "warnings": []
+        },
+        "marketAfterInstall": {
+          "status": "update-available",
+          "installedVersion": "1.0.0"
+        },
+        "registryVersionListing": {
+          "status": "listed",
+          "installed": "1.0.0",
+          "registry": "http://127.0.0.1:19742/",
+          "attempts": [
+            {
+              "registry": "http://127.0.0.1:19742/"
+            }
+          ],
+          "versions": [
+            {
+              "version": "2.0.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true,
+              "incompatible": {
+                "name": "mh-market-eeb7880061",
+                "version": "2.0.0",
+                "runtimeVersion": "0.2.2-rc.4",
+                "requirements": {
+                  "engines.dsh": ">=99.0.0"
+                }
+              }
+            },
+            {
+              "version": "1.2.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true
+            },
+            {
+              "version": "1.1.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [
+                "latest"
+              ],
+              "prerelease": false,
+              "bundle": true
+            }
+          ],
+          "omitted": 0
+        },
+        "sessionId": "session-5c2b7ec4-3dc8-4c28-89a6-8f71408c2e66",
+        "firstPluginToolResult": {
+          "version": "1.0.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED"
+        },
+        "updates": {
+          "2.0.0": {
+            "from": "1.0.0",
+            "to": "2.0.0",
+            "step": "check",
+            "result": {
+              "changed": false,
+              "application": "failed",
+              "stage": "install",
+              "target": "mh-market-eeb7880061",
+              "error": {
+                "code": "incompatible-version",
+                "incompatible": [
+                  {
+                    "name": "mh-market-eeb7880061",
+                    "version": "2.0.0",
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "1.1.0": {
+            "from": "1.0.0",
+            "to": "1.1.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-eeb7880061",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 5h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-eeb7880061 1.1.0\n\nDone in 6.3s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-djkGDG/pnpm.log"
+              },
+              "bundle": "mh-market-eeb7880061",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          }
+        },
+        "activationRestarts": {
+          "1.1.0": {
+            "reason": "module-comparison",
+            "readyMs": 5586
+          }
+        },
+        "updatedToolResult": {
+          "version": "1.1.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED"
+        },
+        "restoredReadyMs": 5309,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "fixtureRequestPaths": [
+          "/invalid.json",
+          "/market.json",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061-dep",
+          "/mh-market-eeb7880061/-/mh-market-eeb7880061-1.0.0.tgz",
+          "/mh-market-eeb7880061-dep/-/mh-market-eeb7880061-dep-1.0.0.tgz",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061/-/mh-market-eeb7880061-1.1.0.tgz",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061",
+          "/mh-market-eeb7880061/-/mh-market-eeb7880061-1.2.0.tgz"
+        ]
+      },
+      "artifactVersion": "0.4.40",
+      "reason": "1.1.0 loaded after restart. Failed 1.2.0 activation removed it, then rollback attempted public npm because the private origin was only in memory. Public npm returned 404 and the request timed out."
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/model-argument.json"
+      ],
+      "testSourceCommit": "338780ce0c1c3fbafbbe063fe2b085418818a4b4",
+      "exitCode": 1,
+      "elapsedSeconds": 66.988,
+      "log": ".build/plugin-market/model-argument.log",
+      "resultSha256": "bc8b97a29c4ff1114f9a24d867e6601c0086fe90a7cf2b1ca6a36968773aef50",
+      "logSha256": "f9756a7d700e6465e8b405326742d0d62b142d342abaf6bc587f50d8e2347b44",
+      "result": {
+        "fixture": "mh-market-5c0937e630",
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "enabledReadyMs": 7292,
+        "enabledCatalog": {
+          "availability": "installation",
+          "enabled": true,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "firstPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795007630634,
+          "entries": [
+            {
+              "name": "mh-market-5c0937e630",
+              "title": "Harmony market fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "2.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": ">=99.0.0"
+                  },
+                  "install": {
+                    "spec": "mh-market-5c0937e630@2.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": false,
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    },
+                    "exempted": false
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.2.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-5c0937e630@1.2.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.1.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-5c0937e630@1.1.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-5c0937e630@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.2.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": 1
+        },
+        "secondPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795007630634,
+          "entries": [
+            {
+              "name": "mh-market-5c0937e630-dep",
+              "title": "Dependency metadata fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-5c0937e630-dep@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.0.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": null
+        },
+        "indexSummaries": [
+          {
+            "url": "http://127.0.0.1:19742/market.json",
+            "title": "Owned test market"
+          },
+          {
+            "url": "http://127.0.0.1:19742/invalid.json",
+            "error": "http://127.0.0.1:19742/invalid.json: $.format must be 1"
+          }
+        ],
+        "firstInstall": {
+          "stage": "enable",
+          "target": "mh-market-5c0937e630",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "registries": [
+            "http://127.0.0.1:19742/"
+          ],
+          "packageResult": {
+            "exitCode": 0,
+            "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nProgress: resolved 7, reused 5, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 1, added 0\nProgress: resolved 7, reused 5, downloaded 2, added 2, done\n\ndependencies:\n+ mh-market-5c0937e630 1.0.0\n\nDone in 9.8s using pnpm v11.28.5\n",
+            "truncated": false,
+            "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-KMGPNA/pnpm.log"
+          },
+          "bundle": "mh-market-5c0937e630",
+          "version": "1.0.0",
+          "warnings": []
+        },
+        "marketAfterInstall": {
+          "status": "update-available",
+          "installedVersion": "1.0.0"
+        },
+        "registryVersionListing": {
+          "status": "listed",
+          "installed": "1.0.0",
+          "registry": "http://127.0.0.1:19742/",
+          "attempts": [
+            {
+              "registry": "http://127.0.0.1:19742/"
+            }
+          ],
+          "versions": [
+            {
+              "version": "2.0.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true,
+              "incompatible": {
+                "name": "mh-market-5c0937e630",
+                "version": "2.0.0",
+                "runtimeVersion": "0.2.2-rc.4",
+                "requirements": {
+                  "engines.dsh": ">=99.0.0"
+                }
+              }
+            },
+            {
+              "version": "1.2.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true
+            },
+            {
+              "version": "1.1.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [
+                "latest"
+              ],
+              "prerelease": false,
+              "bundle": true
+            }
+          ],
+          "omitted": 0
+        },
+        "sessionId": "session-eb9ad0b9-e0b2-47ae-91f0-acbe1cbc11c2",
+        "restoredReadyMs": 6427,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "fixtureRequestPaths": [
+          "/invalid.json",
+          "/market.json",
+          "/mh-market-5c0937e630",
+          "/mh-market-5c0937e630",
+          "/mh-market-5c0937e630-dep",
+          "/mh-market-5c0937e630-dep/-/mh-market-5c0937e630-dep-1.0.0.tgz",
+          "/mh-market-5c0937e630/-/mh-market-5c0937e630-1.0.0.tgz",
+          "/mh-market-5c0937e630",
+          "/mh-market-5c0937e630",
+          "/mh-market-5c0937e630",
+          "/mh-market-5c0937e630"
+        ]
+      },
+      "artifactVersion": "0.4.41",
+      "reason": "Model produced an arguments wrapper for an empty tool schema. Replaced fixture input with a typed required marker while preserving exact argument and output checks."
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-plugin-market.py",
+        "127.0.0.1:15557",
+        ".build/plugin-market/repeated-rollback.json"
+      ],
+      "testSourceCommit": "94ce582d7ba651e4513ea1d82483fb0eb39f6a0a",
+      "exitCode": 1,
+      "elapsedSeconds": 205.779,
+      "log": ".build/plugin-market/repeated-rollback.log",
+      "resultSha256": "8ac4fc14cdd8a06f173908634846d88521be8096d3e20afe218d4fb601b2f56c",
+      "logSha256": "eed276ba5b7456336c606c82edd68d5b233a71bbd9ec73f87b86bae391c6d563",
+      "result": {
+        "fixture": "mh-market-d86b2023ea",
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "enabledReadyMs": 5660,
+        "enabledCatalog": {
+          "availability": "installation",
+          "enabled": true,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.4"
+        },
+        "firstPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795007724121,
+          "entries": [
+            {
+              "name": "mh-market-d86b2023ea",
+              "title": "Harmony market fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "2.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": ">=99.0.0"
+                  },
+                  "install": {
+                    "spec": "mh-market-d86b2023ea@2.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": false,
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    },
+                    "exempted": false
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.2.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-d86b2023ea@1.2.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.1.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-d86b2023ea@1.1.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                },
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-d86b2023ea@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.2.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": 1
+        },
+        "secondPage": {
+          "url": "http://127.0.0.1:19742/market.json",
+          "title": "Owned test market",
+          "metadata": {
+            "categories": {},
+            "labels": {},
+            "sortKeys": {}
+          },
+          "fetchedAt": 1795007724121,
+          "entries": [
+            {
+              "name": "mh-market-d86b2023ea-dep",
+              "title": "Dependency metadata fixture",
+              "metadata": {
+                "keywords": [],
+                "labels": [],
+                "sortKeys": {}
+              },
+              "versions": [
+                {
+                  "version": "1.0.0",
+                  "publishTimestamp": 1704067200,
+                  "source": {
+                    "type": "npm",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "engines": {
+                    "dsh": "*"
+                  },
+                  "install": {
+                    "spec": "mh-market-d86b2023ea-dep@1.0.0",
+                    "registry": "http://127.0.0.1:19742/"
+                  },
+                  "compatibility": {
+                    "compatible": true
+                  },
+                  "update": false
+                }
+              ],
+              "defaultVersion": "1.0.0",
+              "installation": {
+                "status": "not-installed"
+              }
+            }
+          ],
+          "total": 2,
+          "nextOffset": null
+        },
+        "indexSummaries": [
+          {
+            "url": "http://127.0.0.1:19742/market.json",
+            "title": "Owned test market"
+          },
+          {
+            "url": "http://127.0.0.1:19742/invalid.json",
+            "error": "http://127.0.0.1:19742/invalid.json: $.format must be 1"
+          }
+        ],
+        "firstInstall": {
+          "stage": "enable",
+          "target": "mh-market-d86b2023ea",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "registries": [
+            "http://127.0.0.1:19742/"
+          ],
+          "packageResult": {
+            "exitCode": 0,
+            "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2 -2\n++--\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 5, downloaded 2, added 2, done\n\ndependencies:\n- mh-market-5c0937e630 1.0.0\n+ mh-market-d86b2023ea 1.0.0\n\nDone in 7.9s using pnpm v11.28.5\n",
+            "truncated": false,
+            "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-opLMAE/pnpm.log"
+          },
+          "bundle": "mh-market-d86b2023ea",
+          "version": "1.0.0",
+          "warnings": []
+        },
+        "marketAfterInstall": {
+          "status": "update-available",
+          "installedVersion": "1.0.0"
+        },
+        "registryVersionListing": {
+          "status": "listed",
+          "installed": "1.0.0",
+          "registry": "http://127.0.0.1:19742/",
+          "attempts": [
+            {
+              "registry": "http://127.0.0.1:19742/"
+            }
+          ],
+          "versions": [
+            {
+              "version": "2.0.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true,
+              "incompatible": {
+                "name": "mh-market-d86b2023ea",
+                "version": "2.0.0",
+                "runtimeVersion": "0.2.2-rc.4",
+                "requirements": {
+                  "engines.dsh": ">=99.0.0"
+                }
+              }
+            },
+            {
+              "version": "1.2.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [],
+              "prerelease": false,
+              "bundle": true
+            },
+            {
+              "version": "1.1.0",
+              "publishedAt": "2024-01-01T00:00:00.000Z",
+              "tags": [
+                "latest"
+              ],
+              "prerelease": false,
+              "bundle": true
+            }
+          ],
+          "omitted": 0
+        },
+        "sessionId": "session-0ec3abb7-dd32-461a-99b6-2c683bc40eaa",
+        "firstPluginToolResult": {
+          "version": "1.0.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_F2F3214223CC47ACA3650C2BA8A23178"
+        },
+        "updates": {
+          "2.0.0": {
+            "from": "1.0.0",
+            "to": "2.0.0",
+            "step": "check",
+            "result": {
+              "changed": false,
+              "application": "failed",
+              "stage": "install",
+              "target": "mh-market-d86b2023ea",
+              "error": {
+                "code": "incompatible-version",
+                "incompatible": [
+                  {
+                    "name": "mh-market-d86b2023ea",
+                    "version": "2.0.0",
+                    "runtimeVersion": "0.2.2-rc.4",
+                    "requirements": {
+                      "engines.dsh": ">=99.0.0"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "1.1.0": {
+            "from": "1.0.0",
+            "to": "1.1.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-d86b2023ea",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-d86b2023ea 1.1.0\n\nDone in 5.2s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-hmCnHF/pnpm.log"
+              },
+              "bundle": "mh-market-d86b2023ea",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          },
+          "1.2.0": {
+            "from": "1.1.0",
+            "to": "1.2.0",
+            "step": "install",
+            "result": {
+              "stage": "enable",
+              "target": "mh-market-d86b2023ea",
+              "enabled": true,
+              "changed": true,
+              "application": "failed",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 0, added 0\nProgress: resolved 7, reused 6, downloaded 1, added 2, done\n\ndependencies:\n+ mh-market-d86b2023ea 1.2.0\n\nDone in 8.7s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-FpLnlG/pnpm.log"
+              },
+              "bundle": "mh-market-d86b2023ea",
+              "version": "1.2.0",
+              "error": {
+                "code": "operation-error",
+                "diagnostic": "dsh: warning: 1 entry did not activate\nmh-market-d86b2023ea (mh-market-d86b2023ea/candidate): Error: Owned fixture refused activation"
+              }
+            },
+            "restore": {
+              "stage": "enable",
+              "target": "mh-market-d86b2023ea",
+              "enabled": true,
+              "changed": true,
+              "application": "restart-required",
+              "registries": [
+                "http://127.0.0.1:19742/"
+              ],
+              "packageResult": {
+                "exitCode": 0,
+                "output": "✓ Lockfile passes supply-chain policies (verified 18h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nProgress: resolved 7, reused 7, downloaded 0, added 2, done\n\ndependencies:\n+ mh-market-d86b2023ea 1.1.0\n\nDone in 7.4s using pnpm v11.28.5\n",
+                "truncated": false,
+                "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-jhdhAn/pnpm.log"
+              },
+              "bundle": "mh-market-d86b2023ea",
+              "version": "1.1.0",
+              "warnings": [],
+              "restartReason": "module-comparison"
+            }
+          }
+        },
+        "activationRestarts": {
+          "1.1.0": {
+            "reason": "module-comparison",
+            "readyMs": 5640
+          }
+        },
+        "registryOriginAfterRestart": {
+          "name": "mh-market-d86b2023ea",
+          "version": "1.1.0",
+          "registry": "http://127.0.0.1:19742/"
+        },
+        "updatedToolResult": {
+          "version": "1.1.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_61FFD0301E1B4CC5866B3CE2BA2E0BAF"
+        },
+        "rollbackRestarts": {
+          "1.1.0": {
+            "reason": "module-comparison",
+            "readyMs": 5610
+          }
+        },
+        "toolAfterRollback": {
+          "version": "1.1.0",
+          "dependency": "OWNED_DEPENDENCY_LOADED",
+          "marker": "MARKET_972411C69E3040E7AAF4419A46DE0399"
+        },
+        "testCredentialRemoved": true,
+        "realLifecycle": [
+          "start 1.0.0",
+          "stop 1.0.0",
+          "start 1.0.0",
+          "start 1.1.0",
+          "stop 1.1.0",
+          "start 1.2.0",
+          "start 1.1.0",
+          "start 1.1.0"
+        ],
+        "restoredReadyMs": 4956,
+        "restoredConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "fixtureRequestPaths": [
+          "/invalid.json",
+          "/market.json",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea-dep",
+          "/mh-market-d86b2023ea/-/mh-market-d86b2023ea-1.0.0.tgz",
+          "/mh-market-d86b2023ea-dep/-/mh-market-d86b2023ea-dep-1.0.0.tgz",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea/-/mh-market-d86b2023ea-1.1.0.tgz",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea",
+          "/mh-market-d86b2023ea/-/mh-market-d86b2023ea-1.2.0.tgz",
+          "/mh-market-d86b2023ea"
+        ]
+      },
+      "artifactVersion": "0.4.41",
+      "reason": "The release restored 1.1.0 and the tool worked. The assertion expected precisely one trailing 1.1.0 start; restarting initialized 1.1.0 again. The updated test requires the full version transition chain and precisely one failed candidate start."
+    }
+  ],
+  "rollbackDefaultRegistryLogSha256": "ceabafb59093164b936b2fdfbc8259a28c0b21e6746edad958115bbd57b88b38",
+  "rollbackDefaultRegistryLog": "✓ Lockfile passes supply-chain policies (verified 5h ago)\nProgress: resolved 0, reused 1, downloaded 0, added 0\n[ERR_PNPM_FETCH_404] GET https://registry.npmjs.org/mh-market-eeb7880061: Not Found - 404\n\nThis error happened while installing a direct dependency of /native-benchmark-home/profiles/web\n\nmh-market-eeb7880061 is not in the npm registry, or you have no permission to fetch it.\n\nNo authorization header was set for the request.\n",
+  "audit": {
+    "command": "python3 .build/plugin-market/audit.py",
+    "exitCode": 0,
+    "source": "import base64\nimport hashlib\nimport json\nfrom pathlib import Path\nimport runpy\n\nscript = runpy.run_path('tests/smoke/emulator-plugin-market.py')\nsupport = script['support']\nagent = script['agent']\nroot = Path('.build/plugin-market')\ne = support['Emulator']('127.0.0.1:15557', 19644)\nforward = ('tcp:19644', 'tcp:19592')\ne.hdc('fport', *forward)\ntry:\n    e.ready('normal')\n    audit = {'boot':e.state(), 'anonymousHttp':e.web_status(False), 'authenticatedHttp':e.web_status(True),\n             'defaultPermissionPreset':e.rpc('permissionPresets/catalog',{})['defaultPreset'],\n             'testCredentialAbsent':not e.rpc('credentials/describe',{'refs':['DEEPSEEK_API_KEY']})['DEEPSEEK_API_KEY']['configured']}\n    assert audit['boot'] == {'mode':'normal','pending':False}\n    assert (audit['anonymousHttp'],audit['authenticatedHttp']) == (401,200)\n    assert audit['defaultPermissionPreset'] == 'workspace-write' and audit['testCredentialAbsent']\n    assert e.app('test ! -e ' + 'alpine/native-benchmark-home/cordis.patch.yml' + ' && printf ABSENT') == 'ABSENT'\n    audit['homePatchAbsent'] = True\n    profile = script['PROFILE']\n    digests = {name:hashlib.sha256(agent['read_bytes'](e,profile+'/'+name)).hexdigest() for name in ['package.json','pnpm-lock.yaml']}\n    assert digests == {'package.json':'c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8',\n                       'pnpm-lock.yaml':'3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e'}\n    audit['profileHashes'] = digests\n    audit['catalogRestoredToDisabled'] = script['market'](e, False)\n    titles_badge = runpy.run_path('tests/smoke/emulator-titles-badge.py')\n    audit['priorTitleAndBadgeBundlesStillOfferedAndDisabled'] = titles_badge['catalog'](e, False)\n    titles_badge['assert_providers'](e, False)\n    prior_catalog = runpy.run_path('tests/smoke/emulator-worktree-restore.py')\n    audit['priorFourOptionalBundlesStillOfferedAndDisabled'] = prior_catalog['catalog_state'](e, set())\n    rows = support['events'](e,'session-ecf0df3c-47a9-4df4-b71e-6d4261d13419')\n    assert len(rows)==30\n    audit['oldRc3SessionEventCount'] = len(rows)\n    fixture = json.loads((root/'plugin-market-0.4.41.json').read_text())['fixture']\n    assert e.app('test ! -e alpine/workspace-native/'+fixture+' && printf ABSENT') == 'ABSENT'\n    assert script['catalog'](e, fixture) is None\n    assert e.app('test ! -e '+script['origin_path'](fixture)+' && printf ABSENT') == 'ABSENT'\n    assert 'tcp:19742 ' not in e.hdc('fport','ls')\n    audit['fixtureAbsent'] = True\n    digest = hashlib.sha256(agent['read_bytes'](e, profile+'/cordis.patch.yml')).hexdigest()\n    assert digest == '36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060'\n    audit['profilePatchSha256'] = digest\n    chat = runpy.run_path('tests/smoke/emulator-chat-import.py')\n    audit['priorChatImportStillOfferedAndDisabled'] = chat['bundle'](e, False)\n    recorded = json.loads((root/'artifact-0.4.41.json').read_text())\n    release = 'alpine/.dsh-0.2.2-rc.4'\n    manifest = json.loads(agent['read_bytes'](e,release+'/dsh/package.json'))\n    previous = json.loads((root/'artifact.json').read_text())\n    assert previous['layerSha256'] == recorded['layerSha256']\n    expected = previous['newCarrierDependencies']\n    assert expected.items() <= manifest['dependencies'].items()\n    audit['marketCarrierDependencies'] = expected\n    assert e.app('test -f '+release+'/.validated-unpack-v2-dsh-layer.zip-'+recorded['layerSha256']+' && printf PRESENT') == 'PRESENT'\n    audit['installedDshLayerSha256'] = recorded['layerSha256']\n    (root/'audit.json').write_text(json.dumps(audit,indent=2)+'\\n')\n    print(json.dumps(audit))\nfinally:\n    e.hdc('fport','rm',*forward)\n",
+    "result": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "defaultPermissionPreset": "workspace-write",
+      "testCredentialAbsent": true,
+      "homePatchAbsent": true,
+      "profileHashes": {
+        "package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      },
+      "catalogRestoredToDisabled": {
+        "availability": "installation",
+        "enabled": false,
+        "optional": true,
+        "official": true,
+        "version": "0.2.2-rc.4"
+      },
+      "priorTitleAndBadgeBundlesStillOfferedAndDisabled": {
+        "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.4"
+        },
+        "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.4"
+        }
+      },
+      "priorFourOptionalBundlesStillOfferedAndDisabled": {
+        "@deepseek-ai/dsh-experimental-ralph-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-session-search": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-tool-worktree": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-forge-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        }
+      },
+      "oldRc3SessionEventCount": 30,
+      "fixtureAbsent": true,
+      "profilePatchSha256": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+      "priorChatImportStillOfferedAndDisabled": {
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "enabled": false,
+        "version": "0.2.2-rc.4"
+      },
+      "marketCarrierDependencies": {
+        "@deepseek-ai/dsh-experimental-plugin-market-bundle": "0.2.2-rc.4"
+      },
+      "installedDshLayerSha256": "060a3ac039cc79aefc0024cb277f88210e3fad5e13c2d34bdee23ffa5e492b3e"
+    }
+  },
+  "limits": [
+    "Owned loopback HTTP index and npm registry; no public package was published.",
+    "Successful update honored upstream module-comparison restart and verified executable code afterward.",
+    "Actual ArkWeb Discover confirmation was canceled, and install/update behavior was exercised through official authenticated RPC.",
+    "Stored origin begins with successful install after upgrade. Existing unrecorded packages follow manager defaults.",
+    "Other Git upgrade paths, public markets, and physical deployment remain separate."
+  ]
+}

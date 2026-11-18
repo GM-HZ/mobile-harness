@@ -260,3 +260,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-chat-import-ui.py <loopback-target> .build/chat-import-ui.json
 ```
+
+## 插件市场与跨重启回滚
+
+在独立 Phone 模拟器安装 0.4.41。脚本用 HDC 反向映射自建索引与 npm 仓库，验证实际安装、依赖、升级、拒绝不兼容版本、激活失败后回滚与卸载。更新或回滚返回 `module-comparison` 时，按 DSH 要求重启并重新调用工具。第二个脚本点开 ArkWeb 安装确认并取消，验证未下载归档。均恢复原配置、锁文件和启动模式。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-plugin-market.py <loopback-target> .build/plugin-market.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-plugin-market-ui.py <loopback-target> .build/plugin-market-ui.json
+```
