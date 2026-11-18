@@ -1,0 +1,196 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "testSource": "7b64478ede4329366ac00a5dd9fba05002baee11",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "subprocessProvider": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-subprocess.py",
+      "127.0.0.1:15557",
+      ".build/batch-061/extensions-full.json",
+      "--extension-probes"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "ed3ddcfc3ce5859660be16fd3583b82994dcd330d1ba59f0d7666ea12ab50421",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "compiledAddonDigests": {
+        "harmony-runtime.node": "97e3d910bfca1584daf32d63ff8be4c309b0b3893e16b4551fddbb92e49a568d",
+        "linux-runtime.node": "de18c132d8641d046212129e8e3deb6d8ff08527b2a6a962b941f8befd8cbc2d"
+      },
+      "runtimes": {
+        "native": {
+          "platform": "openharmony",
+          "arch": "arm64",
+          "version": "v24.14.1",
+          "wasm": "undefined",
+          "addon": {
+            "code": "ERR_DLOPEN_FAILED",
+            "message": "Error loading shared library /data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/node_modules/mh-subprocess-0f66af8116/harmony-runtime.node: No error information"
+          },
+          "packagedSpeechAddon": true
+        },
+        "defaultGuest": {
+          "platform": "linux",
+          "arch": "arm64",
+          "version": "v24.14.1",
+          "wasm": null,
+          "addon": 42
+        },
+        "explicitGuestWasm": {
+          "platform": "linux",
+          "arch": "arm64",
+          "version": "v24.14.1",
+          "wasm": 42,
+          "addon": 42
+        },
+        "guestTypeScriptAndFetch": {
+          "defaultError": "ERR_WEBASSEMBLY_NOT_SUPPORTED",
+          "explicit": {
+            "typescript": 42,
+            "status": 200,
+            "body": "stock guest fetch",
+            "nodeOptions": ""
+          }
+        }
+      },
+      "subprocessContractCases": [
+        "executionWorldLookup",
+        "literalArgvNativeCwdStreamingAndEof",
+        "realNestedNodeProcess",
+        "upstreamAmbientScrubExplicitEnvAndTombstone",
+        "nonzeroExitBoundedTailFullSpill",
+        "abort",
+        "dispose"
+      ],
+      "allHelpersReaped": 16,
+      "manifestRestored": true,
+      "lockRestored": true,
+      "realPluginManagerRemoval": true,
+      "noInstallScriptExecution": true
+    }
+  },
+  "realNpmNativePlugin": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-plugin-public-graph.py",
+      "127.0.0.1:15557",
+      ".build/batch-061/npm-native.json",
+      "--native"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "6e1a57c1a2f9bf31880a1a57eb5dc86c89a041b4f0f376850ee01dcb969b03af",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "registry": "https://registry.npmjs.org/",
+      "lock": {
+        "directAndOptional": [
+          "string-width@7.2.0",
+          "number-is-nan@1.0.1",
+          "is-odd@3.0.1",
+          "@node-rs/crc32-linux-arm64-musl@1.10.6"
+        ],
+        "integrity": {
+          "string-width": "sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ==",
+          "number-is-nan": "sha512-4jbtZXNAsfZbAHiiqjLPBiCl16dES1zI4Hpzzxw61Tk+loF+sBDBKx1ICKKKwIqQ7M0mFn1TmkN7euSncWgHiQ==",
+          "@node-rs/crc32-linux-arm64-musl": "sha512-k8ra/bmg0hwRrIEE8JL1p32WfaN9gDlUUpQRWsbxd1WhjqvXea7kKO6K4DwVxyxlPhBS9Gkb5Urq7Y4mXANzaw=="
+        },
+        "singleBundledHostPeer": true,
+        "newPackageEntries": [
+          "'@node-rs/crc32-linux-arm64-musl@1.10.6'",
+          "ansi-regex@6.6.0",
+          "emoji-regex@10.6.0",
+          "get-east-asian-width@1.7.0",
+          "is-number@6.0.0",
+          "is-odd@3.0.1",
+          "mh-public-npm-5327f00330@file:../../../workspace-native/mh-public-npm-5327f00330",
+          "number-is-nan@1.0.1",
+          "string-width@7.2.0",
+          "strip-ansi@7.2.0"
+        ]
+      },
+      "actualTool": {
+        "width": 7,
+        "commonJsNaN": true,
+        "commonJsString": false,
+        "optionalOdd": true,
+        "nativeCrc32": 3421780262
+      },
+      "restoredHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+      },
+      "installation": "applied",
+      "removal": "restart-required",
+      "crc32Hex": "cbf43926"
+    }
+  },
+  "audit": {
+    "command": [
+      "python3",
+      ".build/batch-061/audit.py",
+      "post-regression"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "3df1a61fc680f41b5e85aa3ce4d45e73378645bcc5782b7dd3e638447a9224b4",
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "observed": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      }
+    }
+  },
+  "earlierFixtureFailures": [
+    {
+      "exitCode": 1,
+      "logSha256": "80a63c2b88175815b70bb1d6ccceeafaddbb4580b33b4d376b2821be383a68f2",
+      "finding": "The first Linux fixture inherited the OHOS libc headers. The verified freestanding Linux build uses Clang and Node API headers."
+    },
+    {
+      "exitCode": 1,
+      "logSha256": "e693241563b2c9665aa1e110dbbb71c32c87ca88b6ca50766755b232acdda35b",
+      "jsonSha256": "6bdf0db162a2fb7d269e1ef6330cd30a5b5a73bc3b5f76f25367542028d407d9",
+      "finding": "The public addon installed. The first tool call omitted the required graceMs field, which was provided in the verified run."
+    }
+  ],
+  "unverified": [
+    "Other native npm packages and general dynamic addon loading in the HarmonyOS Host.",
+    "Node JIT, WebAssembly and addon behavior on the offline physical Mate 60."
+  ]
+}

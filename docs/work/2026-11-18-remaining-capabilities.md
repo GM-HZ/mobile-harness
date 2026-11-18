@@ -19,7 +19,7 @@
 
 1. 长会话已通过受控 Messages HTTP 400 的两次自动压缩、重试及重启恢复。真实 DeepSeek Flash 已驱动同一 Goal 完成三轮文件操作，跨两次重启恢复，旧修订无法续跑。真实公网模型的上下文上限和长时压力仍待实测。
 2. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
-3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer，重启后经模型实际调用。含原生依赖的插件与用户指定的公网索引仍待验。DSH 官方市场接受自定义索引。
+3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。其他原生依赖组合与用户指定的公网索引待验。DSH 官方市场接受自定义索引。
 4. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。完整官方登录授权与其他提供者待验。
 5. 最新真机交付仍需验证签名 HAP、主流程、长运行、前后台、网络切换与性能。Mate 60 当前不在线。
 
@@ -48,3 +48,5 @@
 同一制品通过独立 LiveShare 查看者和三轮 Goal 跨重启续跑。Goal Gateway 对超轮次限制和旧修订均返回通用错误，状态保持一致，允许的修订可继续。 [本轮证据](../evidence/emulator-live-reader-goals-0.4.57.json)
 
 同一制品通过真实 ArkWeb 翻译、公网 npm 插件依赖图、模型调用和卸载。Host 复用包内 DSH peer，上游 profile 保留 `autoInstallPeers: false`。 [本轮证据](../evidence/emulator-public-plugin-translation-0.4.57.json)
+
+同一制品通过 Alpine N-API、WASM、TypeScript、原生 fetch 和公网 npm ARM64 musl addon。主 Host 保持 jitless，能加载 HAP 内的语音 addon，测试中的外部鸿蒙 addon 加载失败。真机 JIT 待复验。 [本轮证据](../evidence/emulator-node-extensions-0.4.57.json)

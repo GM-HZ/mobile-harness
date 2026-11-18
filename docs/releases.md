@@ -338,3 +338,7 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 ### 0.4.57 公网插件依赖与实际页面翻译补验
 
 同一 HAP 通过公网 npm 插件安装、依赖校验、重启后的实际工具调用和卸载。DSH 插件 API 来自包内同一实例。ArkWeb 用 DeepSeek Flash 翻译合成会话，重启时移除密钥仍可打开已保存的译文。此前未通过的匿名翻译端点仍保留在待验清单。 [补验记录](evidence/emulator-public-plugin-translation-0.4.57.json)
+
+### 0.4.57 Node 原生扩展与 WASM 补验
+
+同一 HAP 通过 Alpine 的自编译 N-API addon、公网 ARM64 musl CRC32 addon、显式启用的 WASM、TypeScript 文件和内置 fetch。DSH 工具通过标准 subprocess 接口调用，退出、取消、卸载及原配置恢复均核对通过。鸿蒙主 Host 能加载 HAP 内置的语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。 [补验记录](evidence/emulator-node-extensions-0.4.57.json)

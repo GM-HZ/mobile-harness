@@ -186,9 +186,15 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-worktree.py <loopback-target> .build/worktree.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-subprocess.py <loopback-target> .build/subprocess.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-subprocess.py <loopback-target> .build/subprocess-extensions.json --extension-probes
 ```
 
 后者用标准临时 bundle 验证真正的 provider，包括 stdin/stdout、特殊字符 argv、真实嵌套 Node、环境脱敏／覆盖／删除、非零退出、尾部限额与完整 spill、实际运行中的取消和 Context 销毁。PRoot 取消可能报告退出码1；脚本保留此事实并要求进程范围退出和 helper 回收。两者恢复原 manifest／锁文件并回读摘要，移除本次测试目录和凭据。设计和失败原因见 [Host 子进程](research/harmonyos-host-subprocess.md)。不要在同一模拟器并行运行修改 profile 的回归。
+
+扩展探针用 DevEco SDK 和锁定 Node 头文件分别编译鸿蒙和 Linux ARM64 addon。主 Host 能加载 HAP 内的语音 addon，本轮传入的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。Linux addon 通过官方 subprocess 服务在 Alpine 子进程中执行。
+
+在已验证可运行 JIT 的模拟器上，插件可让受管理的 Alpine Node 显式传入 `--no-jitless` 执行 WASM。直接运行 TypeScript 并使用 Node 自带的 fetch 时，可同时传入空的 `NODE_OPTIONS`。已有 Mate 60 记录存在 Linux Node 默认 JIT 启动失败，主 Host 和普通子进程的默认选项保持原样。
 
 ## LSP 模拟器回归
 
@@ -289,6 +295,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-plugin-public-graph.py <loopback-target> .build/plugin-public-graph.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-plugin-public-graph.py <loopback-target> .build/plugin-npm-native.json --native
 ```
 
 ## 思考内容翻译
