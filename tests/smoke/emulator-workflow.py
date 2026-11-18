@@ -1,5 +1,6 @@
 """Exercise the production DSH Workflow tool on an isolated HarmonyOS Phone emulator."""
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 from pathlib import Path
@@ -125,11 +126,70 @@ def verify_workflow(emulator, evidence):
     evidence["backgroundJob"] = {"started": True, "completed": True, "resultDelivered": True}
 
 
+def verify_concurrent_fanout(emulator, evidence):
+    previous_workers = {row["id"] for row in worker_trace(emulator)}
+    nonce = uuid.uuid4().hex[:12].upper()
+    case_names = ["alpha", "beta"]
+    markers = {case: [f"MH_FANOUT_{nonce}_{case.upper()}_{index}" for index in range(4)]
+               for case in case_names}
+
+    def launch(case):
+        prompts = ["Reply only with the exact marker " + marker + ". Do not call tools."
+                   for marker in markers[case]]
+        script = "return await parallel([" + ",".join(
+            "() => agent(" + json.dumps(prompt) + ")" for prompt in prompts) + "]);"
+        return start_workflow(emulator, script, "mh-fanout-" + case)
+
+    with ThreadPoolExecutor(max_workers=2) as threads:
+        sessions = dict(zip(case_names, threads.map(launch, case_names), strict=True))
+    spans = []
+    evidence["fanout"] = {}
+    for case, sid in sessions.items():
+        records = wait_for(emulator, sid, lambda rows: bool(of_type(rows, "tool-workflow/run-end")
+                                                           and of_type(rows, "tool/result")), timeout=90)
+        run_start, = of_type(records, "tool-workflow/run-start")
+        run_end, = of_type(records, "tool-workflow/run-end")
+        starts = of_type(records, "tool-workflow/agent-start")
+        ends = of_type(records, "tool-workflow/agent-end")
+        assert run_result(records, "completed"), run_end["data"]
+        assert len(starts) == len(ends) == 4 and all(row["data"]["outcome"] == "completed" for row in ends)
+        assert len({row["data"]["childId"] for row in starts}) == 4
+        active = set()
+        peak = 0
+        for row in records:
+            if row["type"] == "tool-workflow/agent-start":
+                active.add(row["data"]["seq"])
+                peak = max(peak, len(active))
+            if row["type"] == "tool-workflow/agent-end":
+                active.remove(row["data"]["seq"])
+        assert peak >= 2 and not active
+        text = json.dumps(of_type(records, "tool/result"))
+        assert all(marker in text for marker in markers[case])
+        assert all(marker not in text for other in case_names if other != case for marker in markers[other])
+        spans.append((run_start["time"], run_end["time"]))
+        evidence["fanout"][case] = {"children": 4, "peakConcurrentChildren": peak, "allMarkersReturned": True,
+                                     "isolatedResults": True, "runMs": run_end["time"] - run_start["time"]}
+    overlap = min(end for _, end in spans) - max(start for start, _ in spans)
+    assert overlap > 0, spans
+    evidence["overlappingParentRunsMs"] = overlap
+    deadline = time.monotonic() + 8
+    while time.monotonic() < deadline:
+        trace = worker_trace(emulator)
+        running = {row["id"] for row in trace if row["event"] == "workflow-worker-running"} - previous_workers
+        reaped = {row["id"] for row in trace if row["event"] == "workflow-worker-reaped"} - previous_workers
+        if len(running) >= 2 and running <= reaped:
+            evidence["workersReaped"] = len(running)
+            return
+        time.sleep(.1)
+    raise AssertionError("Concurrent Workflow helpers did not all exit")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("target")
     parser.add_argument("output", type=Path)
     parser.add_argument("--host-port", type=int, default=19641)
+    parser.add_argument("--fanout-only", action="store_true", help="Exercise two parent Workflows with four concurrent children each")
     options = parser.parse_args()
     if not os.environ.get("MH_TEST_DEEPSEEK_API_KEY"):
         raise SystemExit("MH_TEST_DEEPSEEK_API_KEY is required for real subagent verification")
@@ -142,11 +202,16 @@ def main():
         assert emulator.web_status(False) == 401
         with model_key(emulator):
             try:
-                verify_workflow(emulator, evidence)
+                if options.fanout_only:
+                    verify_concurrent_fanout(emulator, evidence)
+                else:
+                    verify_workflow(emulator, evidence)
             finally:
                 # Cancel only this fixture's root Sessions before removing their temporary key.
                 for sid in STARTED.values():
                     emulator.rpc("session/cancel", {"request": {"sessionId": sid}})
+                    if options.fanout_only:
+                        emulator.rpc("workspace/archiveSession", {"request": {"sessionId": sid}})
                 evidence["sessions"] = dict(STARTED)
         evidence["temporaryModelCredentialRemoved"] = True
     finally:
