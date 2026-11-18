@@ -202,7 +202,15 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
             selector=card_selector(kind)
             button(run,selector+' button',['撤销','Undo'])
         removed=wait_for(lambda:decisions(emulator,sid,call_id,{'removed'}),'generated page removal',50)
+        if removed['data'].get('application')=='restart-required':
+            with flow['browser'](emulator) as run:
+                selector=card(emulator,run,title,kind)
+                flow['wait'](run,f'''[...document.querySelectorAll({json.dumps(selector+' [role=status]')})].some(
+                    status=>/重启 DSH|Restart DSH/.test(status.textContent))''','saved removal restart notice')
+            flow['restart'](emulator)
+            assert decisions(emulator,sid,call_id,{'removed'})==removed
         assert market['catalog'](emulator,bundle) is None
+        evidence['creatorRemoval']=removed
         with flow['browser'](emulator) as run:
             selector=card(emulator,run,title,kind)
             button(run,selector+' button',['恢复','Restore'])

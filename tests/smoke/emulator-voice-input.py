@@ -1,12 +1,16 @@
 """Verify the official voice provider, WAV validation, and ArkWeb draft input."""
 import argparse
 import base64
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
 import json
 from pathlib import Path
 import runpy
+import shutil
+import threading
 import time
 import urllib.request
+from urllib.parse import urlsplit
 import uuid
 import wave
 
@@ -44,6 +48,37 @@ def cache_models(emulator, model_root, remote):
         assert 'FileTransfer finish' in emulator.hdc('file','send',str(path),scratch)
         copied=emulator.app(f'cp {scratch} {MODEL_ROOT}/{relative}{name} && rm -f {scratch} && printf COPIED')
         assert copied=='COPIED',copied
+
+
+class ModelMirror(BaseHTTPRequestHandler):
+    def log_message(self, *_):
+        pass
+
+    def do_GET(self):
+        path=self.server.assets.get(urlsplit(self.path).path)
+        if path is None:
+            self.send_error(404)
+            return
+        self.send_response(200)
+        self.send_header('Content-Type','application/octet-stream')
+        self.send_header('Content-Length',str(path.stat().st_size))
+        self.end_headers()
+        with path.open('rb') as model:
+            shutil.copyfileobj(model,self.wfile)
+        self.server.completed.append(path.name)
+
+
+def model_mirror(root):
+    lock=Path('vendor/repos/dsh/packages/experimental/speech-to-text-sensevoice/runtime/assets.json')
+    assets=json.loads(lock.read_text())
+    selected=[assets['models']['int8'],assets['tokens'],assets['vad']]
+    files={urlsplit(asset['url']).path:root/asset['name'] for asset in selected}
+    assert all(files[urlsplit(asset['url']).path].stat().st_size==asset['bytes'] for asset in selected)
+    server=ThreadingHTTPServer(('127.0.0.1',0),ModelMirror)
+    server.assets=files
+    server.completed=[]
+    threading.Thread(target=server.serve_forever,daemon=True).start()
+    return server
 
 
 def readiness(emulator, timeout=40):
@@ -168,6 +203,8 @@ def run(emulator,args):
     remote='/data/local/tmp/'+run_name
     originals, evidence = {}, {}
     models_created=False
+    mirror=None
+    reverse=None
     flags=[PROFILE+'/'+f for f in ['package.json','pnpm-lock.yaml','cordis.patch.yml']]+['mobile-harness-boot.json']
     audio=canonical_wave(args.audio)
     try:
@@ -176,11 +213,29 @@ def run(emulator,args):
         evidence['defaultCatalog']=flow['has_bundle'](emulator,VOICE,False)
         assert emulator.app(f'test ! -e {MODEL_ROOT} && printf ABSENT')=='ABSENT', 'Dedicated emulator already has voice cache'
         models_created=True
-        cache_models(emulator,args.model_root,remote)
+        if not args.download:
+            cache_models(emulator,args.model_root,remote)
         browser['switch'](emulator,VOICE,True)
         browser['switch'](emulator,INSPECTOR,True)
+        if args.download:
+            mirror=model_mirror(args.model_root)
+            candidate=('tcp:19758',f'tcp:{mirror.server_port}')
+            assert 'Forwardport result:OK' in emulator.hdc('rport',*candidate)
+            reverse=candidate
+            patch=PROFILE+'/cordis.patch.yml'
+            overlay=b'\n- id: speech-to-text-sensevoice\n  config:\n    modelOrigin: "http://127.0.0.1:19758"\n'
+            lsp['restore_bytes'](emulator,patch,originals[patch].rstrip()+overlay,remote+'-mirror-overlay')
         browser['restart'](emulator)
-        evidence['cachePreparation']=readiness(emulator)
+        if args.download:
+            rows=emulator.rpc('speech/catalog',{})['providers']
+            row=next(item for item in rows if item['id']==PROVIDER)
+            assert row['preparation']['phase']=='unprepared',row
+            emulator.rpc('speech/prepare',{'providerId':PROVIDER})
+            evidence['downloadPreparation']=readiness(emulator,timeout=100)
+            evidence['downloadedAssets']=sorted(mirror.completed)
+            assert evidence['downloadedAssets']==['model.int8.onnx','silero_vad.onnx','tokens.txt']
+        else:
+            evidence['cachePreparation']=readiness(emulator)
         payload={'audioBase64':base64.b64encode(audio).decode(),'language':'auto','providerId':PROVIDER}
         evidence['firstTranscript']=transcribe(emulator,payload)
         assert evidence['firstTranscript']['text']==EXPECTED, evidence['firstTranscript']
@@ -219,7 +274,14 @@ def run(emulator,args):
                 assert all(agent['read_bytes'](emulator,path)==data for path,data in originals.items())
                 evidence['originalConfigurationRestored']=True
         finally:
-            args.output.write_text(json.dumps(evidence,indent=2,ensure_ascii=False)+'\n')
+            try:
+                if reverse:
+                    emulator.hdc('rport','rm',*reverse)
+            finally:
+                if mirror:
+                    mirror.shutdown()
+                    mirror.server_close()
+                args.output.write_text(json.dumps(evidence,indent=2,ensure_ascii=False)+'\n')
 
 
 if __name__=='__main__':
@@ -229,6 +291,7 @@ if __name__=='__main__':
     parser.add_argument('--model-root',type=Path,required=True)
     parser.add_argument('--audio',type=Path,required=True)
     parser.add_argument('--arkweb',action='store_true')
+    parser.add_argument('--download',action='store_true',help='Prepare the pinned models via an isolated mirror')
     args=parser.parse_args()
     emulator=support['Emulator'](args.target,19643)
     forward=('tcp:19643','tcp:19592')
