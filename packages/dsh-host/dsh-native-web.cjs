@@ -399,6 +399,7 @@ async function main() {
   const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
   const workspaceDependenciesUrl = paths('dsh-tool-workspace-dependencies/lib/index.js');
+  const terminalBashUrl = paths('dsh-terminal-bash/lib/index.js');
   const proxyUrl = paths('dsh-http-proxy/lib/index.js');
   const undiciUrl = pathToFileURL(path.join(dsh, 'undici/index.js')).href;
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
@@ -509,6 +510,16 @@ async function main() {
       if (url === workspaceDependenciesUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         return { ...result, source: patchWorkspaceDependencies(source) };
+      }
+      if (url === terminalBashUrl && !safeMode) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        globalThis.__harmonyBashPipe = (ctx, type, TerminalError) =>
+          require(path.join(root, 'dsh-harmony-bash-pipe.cjs')).registerBashPipe(ctx, type, root, TerminalError);
+        const registration = 'ctx.terminals.registerBackend(new BashTerminalBackend(ctx, resolved));';
+        return { ...result, source: replacePinned(source, registration,
+          'if (resolved.backendType === "shell" && resolved.shellDialect === "bash" && !config.shellPath && !config.shellArgs?.length) {\n' +
+          '  return globalThis.__harmonyBashPipe(ctx, resolved.backendType, TerminalError);\n' +
+          '}\n' + registration) };
       }
       if (url === liveshareUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
@@ -649,6 +660,7 @@ async function main() {
   fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n' +
     (safeMode ? '' : '- id: workspace-dependencies\n  disabled: false\n  config:\n    source: ' + JSON.stringify(root) +
       '\n    root: !!js undefined\n- id: skill-office\n  config:\n    pythonEnvironment: workspace-dependencies\n' +
+      '- id: preset-minimal\n  disabled: false\n' +
       '- id: subprocess\n  disabled: true\n- id: fs-sandbox\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
       JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n    - id: harmony-fs\n      name: ' +
       JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n'), { mode: 0o600 });

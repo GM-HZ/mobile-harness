@@ -2,8 +2,8 @@
   "app": {
     "bundleName": "org.sayact.nodepoc",
     "vendor": "HarmonyPoC",
-    "versionCode": 68,
-    "versionName": "0.4.61",
+    "versionCode": 69,
+    "versionName": "0.4.62",
     "icon": "$media:dsh_mh_whale",
     "label": "$string:app_name"
   }
