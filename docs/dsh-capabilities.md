@@ -1,10 +1,12 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.57，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.58，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
 ## 当前验收
+
+0.4.58 修复溢出恢复时当前用户输入进入摘要的情况。模拟器直连公网 DeepSeek Flash，实际收到 HTTP 400 后只压缩先前历史，在同一回合返回准确结果。原历史保持完整，重启后仍可续接。重复溢出、手动及阈值压缩一起通过回归。 [实测记录](evidence/emulator-live-overflow-0.4.58.json)
 
 0.4.57 后续使用已有 HAP 完成默认公网语音准备、三份资源 SHA-256 校验、ArkWeb 合成录音与回填。两张本地生成的随机色块图经正式附件接口提交，真实 DeepSeek Flash 逐一正确识别颜色，重启后附件一致。 [补验记录](evidence/emulator-public-voice-vision-0.4.57.json)
 
@@ -88,7 +90,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权及其他模型提供者待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
-- **剩余能力清点**：Ralph、会话搜索和工作树的限定场景已通过；压缩核心与可控自动压力已补验；真实API overflow、反复压缩／长目标压力及其他可选 bundle 尚未全部端到端回归。LSP 已由本工程补充装配，当前验收为 TypeScript；Forge 的工作树恢复、取消与重启已验，托管平台联动和 UI 继续验收。公共 provider 不提供额外控制 fd，进程范围沿用上游 fallback 的观测限制。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
+- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时长任务压力与剩余可选 bundle 待验。LSP 当前验收为 TypeScript。Forge 的工作树与隔离服务链路已验，公网账号及托管仓库操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。

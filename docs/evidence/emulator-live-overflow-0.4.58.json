@@ -1,0 +1,257 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "testSource": "d3c989435cfdb13095b5a5fa91e6175cd87f2eb8",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.58-unsigned.hap",
+    "version": "0.4.58",
+    "versionCode": 65,
+    "sha256": "37fa495563b212e1e46ad918cf27040872a7b3660fefadf27214c5295fb4d458",
+    "bytes": 720520028,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "977b8a83106e68bc88811109bd998e2affcd5985",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "654ded9961dcc0b99b788f511c08d3ddc11decf8fc122d8b95936f7642e1fcbe",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "signedArtifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.58-signed.hap",
+    "sha256": "8c825f80a959ea493ba4ab380d011a80e1227b648884fff7b974a65ec86daa6d",
+    "bytes": 724194042,
+    "payloadEntriesMatched": 201,
+    "signatureVerified": true,
+    "profileVerified": true
+  },
+  "build": {
+    "command": [
+      "./build.sh",
+      "--package"
+    ],
+    "exitCode": 0,
+    "logSha256": "dae3108df305da11b971d5f7ffa9961971343403aee3dc0308b6abd4cddbecef"
+  },
+  "install": {
+    "exitCode": 0,
+    "logSha256": "3cba2f488d0f71b18507a9bb96f73c51ed835809f9e3b34145896ba1fddb1762",
+    "installedVersion": "0.4.58",
+    "installedVersionCode": 65,
+    "deviceMetadataSha256": "26deb743762f93829d56b2cffbaf9252bce639d8308f0014f0a3bf5ef42dc6fd"
+  },
+  "beforeRepair": {
+    "version": "0.4.57",
+    "exitCode": 1,
+    "jsonSha256": "9683a40d204b1bcb605124d62ab978b416493ec0386297d0808275b7f2a14c97",
+    "logSha256": "f1df5aa294f61fdf580ea1e2d1addafcba1df618c825451ce3fc7b4a1e456ba4",
+    "initialPublicOverflow": {
+      "status": 400,
+      "code": "CONTEXT_WINDOW_EXCEEDED",
+      "limitTokens": 1048576,
+      "requestedTokens": 1336107,
+      "requestIdPresent": false
+    },
+    "compactionFailure": "This model's maximum context length is 1048576 tokens. However, you requested 1145968 tokens (1080432 in the messages, 65536 in the completion). Please reduce the length of the messages or completion."
+  },
+  "live": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-compaction-live-overflow.py",
+      "127.0.0.1:15557",
+      ".build/batch-065/live-overflow-0.4.58.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "18f5a3decb5d1ed55fb3200d2d352d207374a589db631232cee5226bcbd197d4",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "archiveRepeats": 340000,
+      "promptRepeats": 195000,
+      "archiveBytes": 681398,
+      "fixtureSessionId": "2f56b16f-8432-44ad-b380-7a98f8b689b5",
+      "liveTurnMs": 19170,
+      "turnEventTypes": [
+        "agent/inbox/spliced",
+        "turn/start",
+        "agent/inbox/spliced",
+        "step/start",
+        "system/message",
+        "user/message",
+        "user/message",
+        "user/message",
+        "user/message",
+        "request/header",
+        "request/context",
+        "assistant/attempt",
+        "compaction/start",
+        "compaction/summary",
+        "user/message",
+        "compaction/end",
+        "request/header",
+        "assistant/message",
+        "step/end",
+        "turn/end"
+      ],
+      "publicOverflow": {
+        "status": 400,
+        "code": "CONTEXT_WINDOW_EXCEEDED",
+        "limitTokens": 1048576,
+        "requestedTokens": 1336113,
+        "requestIdPresent": false
+      },
+      "compactionErrors": [],
+      "summaryInputTokens": 688454,
+      "summaryOutputTokens": 382,
+      "shadowedOnlyPriorTurn": true,
+      "turnReason": {
+        "kind": "completed"
+      },
+      "sameTurnExactReply": true,
+      "originalArchiveHistoryPreserved": true,
+      "restartReadyMs": 7562,
+      "exactRecallAfterRestart": true,
+      "testCredentialRemoved": true,
+      "restoredProfileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+      }
+    }
+  },
+  "replay": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-compaction-overflow.py",
+      "127.0.0.1:15557",
+      ".build/batch-065/overflow-replay.json",
+      "--provider-error-report",
+      ".build/batch-064/context-stream.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "ce8ba91f9cfc446ac83cc0f54a5e0ef266836498de8f603f998b8b0f59ff89a3",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "recoveries": [
+        {
+          "overflow": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 3,
+            "historyBytes": 19758,
+            "staleArchivePresent": true,
+            "action": "overflow",
+            "step": 1,
+            "status": 400
+          },
+          "retry": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 1,
+            "historyBytes": 1897,
+            "staleArchivePresent": false,
+            "action": "retry",
+            "step": 1,
+            "status": 200,
+            "checkpointPresent": true
+          },
+          "compactionEvents": [
+            "compaction/start",
+            "compaction/summary",
+            "compaction/end"
+          ],
+          "oldJournalUnchanged": true
+        },
+        {
+          "overflow": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 5,
+            "historyBytes": 20197,
+            "staleArchivePresent": true,
+            "action": "overflow",
+            "step": 2,
+            "status": 400
+          },
+          "retry": {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 1,
+            "historyBytes": 1897,
+            "staleArchivePresent": false,
+            "action": "retry",
+            "step": 2,
+            "status": 200,
+            "checkpointPresent": true
+          },
+          "compactionEvents": [
+            "compaction/start",
+            "compaction/summary",
+            "compaction/end"
+          ],
+          "oldJournalUnchanged": true
+        }
+      ],
+      "reopenedAtLatestCheckpoint": true,
+      "fixtureConfigRemoved": true
+    }
+  },
+  "manual": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-compaction.py",
+      "127.0.0.1:15557",
+      ".build/batch-065/compaction-manual.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "480b55d7c0a6a013487530ee2c8549e9e16255bfb09140bc0b5c7f25b9dd5d6f",
+    "logSha256": "83b89d1fc8366fb4e5d6b036c991cb1ef5a2474b5eb12900218424071b62edf4",
+    "observed": {
+      "sameSessionCheckpointAndFactsAfterRestart": true,
+      "temporaryModelCredentialRemoved": true,
+      "ownedFilesRemoved": true
+    }
+  },
+  "automatic": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-compaction-auto.py",
+      "127.0.0.1:15557",
+      ".build/batch-065/compaction-auto.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "6ea9c077ae31b5ac257b7dd51f2f35a26eebe69b5f707c2ab80db981deee44cf",
+    "logSha256": "9a7101c59eac0caee108549a6f0ea9271f45e1815506fa4fe6548fedcea6f9d1",
+    "observed": {
+      "originalPresetsAndDefaultRestored": true,
+      "temporaryModelCredentialRemoved": true
+    }
+  },
+  "audit": {
+    "exitCode": 0,
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "jsonSha256": "4d9104607ea6f9f46b478de376bf2fa7f61a60c3eee4f906816993314fb5ab94",
+    "observed": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "permission": "workspace-write",
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      }
+    }
+  },
+  "unverified": [
+    "Physical Mate 60 installation and regression. Device was offline.",
+    "Multihour stress and an already oversized active turn with no prior history to compact."
+  ]
+}

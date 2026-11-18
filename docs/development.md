@@ -238,6 +238,13 @@ python3 tests/smoke/emulator-compaction-overflow.py <loopback-target> .build/ove
   --provider-error-report .build/context-limit.json
 ```
 
+0.4.58 另有完整公网回归。使用正式导入接口创建合成历史和独立会话，DSH 自己向公网发请求。脚本校验持久化的 HTTP 400、摘要排除当前回合、原回合精确回复、重启恢复、旧历史和配置清理。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-compaction-live-overflow.py <loopback-target> .build/live-overflow.json
+```
+
 以下三个脚本要求已经安装普通0.4.35包。手动脚本验证真实摘要、事实回忆和同会话重启；故障脚本临时安装一个标准 bundle，在收到真实模型文本后才取消或注入流错误；自动脚本复制完整standard到独立临时预设，仅降低压缩阈值／保留预算，保留全部工具，不修改正式默认配置。结束后恢复原预设、profile、锁文件、凭据和普通模式。
 
 ```sh
