@@ -68,7 +68,7 @@ def transcribe(emulator,payload):
         'payload':{'args':{'request':payload}},
     }).encode()
     request=urllib.request.Request(emulator.url+'/api/speech/transcribe',body,headers={
-        'Content-Type':'application/json','Host':support['HOST_HEADER'],'Cookie':emulator.cookie(),
+        'Content-Type':'application/json','Host':'127.0.0.1:19592','Cookie':emulator.cookie(),
     })
     with emulator.opener.open(request,timeout=55) as response:
         result=json.load(response)['result']
