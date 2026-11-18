@@ -41,6 +41,19 @@ function replacePinned(source, point, replacement) {
   if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
   return source.replace(point, replacement);
 }
+function patchTranslation(source, proxyUrl, undiciUrl) {
+  const adapter = `
+import { proxyRouteFor as harmonyProxyRouteFor } from ${JSON.stringify(proxyUrl)};
+async function harmonyTranslationFetch(url, init) {
+  const route = harmonyProxyRouteFor(url);
+  if (!route.proxied) return fetch(url, init);
+  const { fetch: routedFetch } = await import(${JSON.stringify(undiciUrl)});
+  return routedFetch(url, { ...init, dispatcher: route.dispatcher });
+}
+`;
+  return adapter + replacePinned(source, 'const response = await fetch(url, {',
+    'const response = await harmonyTranslationFetch(url, {');
+}
 function patchWorkflow(source) {
   const start = '\t\t\tif (this.runtime.sandboxMode === void 0 && this.policy.mode';
   const end = '\t\t\tthis.terminal = true;';
@@ -368,6 +381,9 @@ async function main() {
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
   const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
+  const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
+  const proxyUrl = paths('dsh-http-proxy/lib/index.js');
+  const undiciUrl = pathToFileURL(path.join(dsh, 'undici/index.js')).href;
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
   const speechUrl = paths('dsh-experimental-speech-to-text-sensevoice/lib/index.js');
   const speechEntry = path.join(dsh, '@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/worker.js');
@@ -468,6 +484,10 @@ async function main() {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         return { ...result, source: replacePinned(source, 'import { execa } from "execa";',
           'const execa = globalThis.__harmonyGh;') };
+      }
+      if (url === translatorUrl) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        return { ...result, source: patchTranslation(source, proxyUrl, undiciUrl) };
       }
       if (url === liveshareUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
