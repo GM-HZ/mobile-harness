@@ -124,9 +124,46 @@ function patchPtc(source) {
       runnerFailureRules: [],
     };
 `;
-  return replacePinned(source.slice(0, index) + replacement + source.slice(stop),
+  const patched = replacePinned(source.slice(0, index) + replacement + source.slice(stop),
     'import { stripTypeScriptTypes } from "node:module";',
     'const stripTypeScriptTypes = globalThis.__harmonyPtc.strip;');
+  return replacePinned(patched, 'get sandboxMode() {\n\t\treturn this.ctx.sandboxPolicy.defaultMode;',
+    'get sandboxMode() {\n\t\tglobalThis.__harmonySharedPtc.trustRuntime(this);\n\t\treturn this.ctx.sandboxPolicy.defaultMode;');
+}
+function patchSharedPtcExecutor(source) {
+  let patched = replacePinned(source, 'let policy = standingPolicy;', `const shareGrant = globalThis.__harmonySharedPtc.take(exec.token);
+    let policy = shareGrant === undefined ? standingPolicy
+      : await globalThis.__harmonySharedPtc.restrict(runtime, standingPolicy, shareGrant, args, callSignal);`);
+  return replacePinned(patched, '...exec.agent === void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },',
+    '...exec.agent === void 0 || shareGrant !== void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },');
+}
+function patchLivesharePolicies(source) {
+  let patched = replacePinned(source, 'noteViewerTurn(String(agent.session.id), turn, requests.length > 0);',
+    `noteViewerTurn(String(agent.session.id), turn, requests.length > 0);
+    globalThis.__harmonySharedPtc.observeTurn(agent.session, turn, requests.length === 0 ? undefined : permission =>
+      requests.every(origin => externalTargetAllowed(agent.session.id, origin) &&
+        (permission === "read" || relay.drivableModeOf(origin.shareId) === "write")));`);
+  patched = replacePinned(patched, 'if (execution.name === "run_code") return void 0;', `if (execution.name === "run_code") {
+    globalThis.__harmonySharedPtc.capture(execution.token, async () => {
+      await target.refreshAuthorization?.();
+      const permission = globalThis.__harmonySharedPtc.permissions(execution.agent?.session);
+      return { ...permission, root: fs.processPath(target.grantedRoot), fork: false };
+    });
+    return void 0;
+  }`);
+  patched = replacePinned(patched, 'verdictSource: async (execution) => {\n\t\t\tconst { token } = execution;',
+    `verdictSource: async (execution) => {
+      const { token } = execution;
+      if (execution.name === "run_code") globalThis.__harmonySharedPtc.capture(token, async () => {
+        await target.refreshAuthorized?.();
+        return { root: fs.processPath(target.grantedRoot), fork: true,
+          admitted: target.authorized?.("run_code") === true,
+          writable: target.write === true && target.authorized?.("write") === true };
+      });`);
+  const gate = 'if (!gate.mayWrite())';
+  if (patched.split(gate).length !== 5) throw new Error('Unexpected pinned LiveShare write checks');
+  return patched.replaceAll(gate,
+    'if (!gate.mayWrite() || !globalThis.__harmonySharedPtc.canSourceWrite(exec.agent?.session))');
 }
 function patchCompaction(source) {
   // A failed request can end with runtime-context or time-context messages.
@@ -413,6 +450,7 @@ async function main() {
   const workflowUrl = paths('dsh-workflow-ptc/lib/index.js');
   const compactionUrl = paths('dsh-compaction-basic/lib/index.js');
   const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
+  const ptcExecutorUrl = paths('dsh-tool-executor-ptc/lib/index.js');
   const officeUrl = paths('dsh-office-kit/lib/index.js');
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
@@ -433,6 +471,8 @@ async function main() {
   globalThis.__harmonyLlhttp = imports => require(path.join(root, 'dsh-harmony-llhttp.cjs'))(imports);
   const officeAdapter = pathToFileURL(path.join(root, 'dsh-harmony-office-entry.mjs')).href;
   const ptcEnabled = !safeMode && fs.readFileSync(path.join(root, 'dsh-harmony-ptc-enabled'), 'utf8') === '1';
+  const liveshareMobile = safeMode ? undefined : require(path.join(root, 'dsh-harmony-liveshare.cjs'));
+  if (liveshareMobile) globalThis.__harmonySharedPtc = liveshareMobile.createSharedPtcPolicy(mark);
   if (ptcEnabled) {
     globalThis.__harmonyPtc = require(path.join(root, 'dsh-harmony-ptc.cjs')).bindPtc(addon('libdshworkflow.so'), mark);
   }
@@ -541,10 +581,13 @@ async function main() {
       if (url === liveshareUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         const entry = path.join(dsh, '@deepseek-ai/dsh-experimental-liveshare/lib/owner-gateway/cli.js');
-        globalThis.__harmonyLiveshareSpawn = require(path.join(root, 'dsh-harmony-liveshare.cjs'))
-          .createTunnelLauncher(entry, mark);
-        return { ...result, source: replacePinned(source, 'import { spawn } from "node:child_process";',
+        globalThis.__harmonyLiveshareSpawn = liveshareMobile.createTunnelLauncher(entry, mark);
+        return { ...result, source: replacePinned(patchLivesharePolicies(source), 'import { spawn } from "node:child_process";',
           'const spawn = globalThis.__harmonyLiveshareSpawn;') };
+      }
+      if (url === ptcExecutorUrl && !safeMode) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        return { ...result, source: patchSharedPtcExecutor(source) };
       }
       if (url === speechUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();

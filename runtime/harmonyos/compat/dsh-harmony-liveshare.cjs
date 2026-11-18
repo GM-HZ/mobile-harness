@@ -1,7 +1,84 @@
 'use strict';
 const { EventEmitter } = require('node:events');
+const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { isMainThread, parentPort, Worker, workerData } = require('node:worker_threads');
+
+function createSharedPtcPolicy(mark) {
+  const turns = new WeakMap();
+  const grants = new WeakMap();
+  const nativeRuntimes = new WeakSet();
+  const within = (root, candidate) => {
+    const relative = path.relative(root, candidate);
+    return relative !== '..' && !relative.startsWith('../') && !path.isAbsolute(relative);
+  };
+  const physicalDirectory = value => {
+    if (typeof value !== 'string' || !path.isAbsolute(value) || path.normalize(value) !== value || value === '/') {
+      throw new Error('Shared PTC requires a specific physical workspace');
+    }
+    return value;
+  };
+  function permissions(session) {
+    const checks = turns.get(session)?.checks ?? [];
+    return {
+      admitted: checks.length > 0 && checks.every(check => check('read')),
+      writable: checks.length > 0 && checks.every(check => check('write')),
+    };
+  }
+  return {
+    observeTurn(session, turn, check) {
+      let state = turns.get(session);
+      if (state?.turn !== turn) {
+        state = { turn, checks: [] };
+        turns.set(session, state);
+      }
+      if (check) {
+        const admittedToWrite = check('write');
+        state.checks.push(permission => (permission === 'read' || admittedToWrite) && check(permission));
+      }
+    },
+    canSourceWrite(session) {
+      const { admitted, writable } = permissions(session);
+      return admitted && writable;
+    },
+    capture(token, grant) {
+      if (typeof token !== 'symbol') throw new Error('Shared PTC requires a runtime execution token');
+      grants.set(token, grant);
+    },
+    trustRuntime(runtime) {
+      nativeRuntimes.add(runtime);
+    },
+    take(token) {
+      const grant = grants.get(token);
+      if (grant) grants.delete(token);
+      return grant;
+    },
+    async restrict(runtime, standing, sourceGrant, args, signal) {
+      if (!nativeRuntimes.has(runtime) || !standing ||
+          !['read-only', 'workspace-write', 'danger-full-access'].includes(standing.mode)) {
+        throw new Error('Shared PTC requires the HarmonyOS file supervisor');
+      }
+      if (args.sandbox_permissions !== undefined || args.justification !== undefined) {
+        throw new Error('A shared program cannot request wider sandbox permissions');
+      }
+      signal.throwIfAborted();
+      const grant = await sourceGrant();
+      signal.throwIfAborted();
+      if (!grant.admitted) throw new Error('The shared program no longer has an active grant');
+      const sharedRoot = physicalDirectory(grant.root);
+      let workspaceRoot = sharedRoot;
+      if (standing.mode !== 'danger-full-access') {
+        const standingRoot = physicalDirectory(standing.workspaceRoot);
+        if (within(sharedRoot, standingRoot)) workspaceRoot = standingRoot;
+        else if (!within(standingRoot, sharedRoot)) throw new Error('Shared PTC workspace does not intersect the standing policy');
+      }
+      const mode = grant.writable && standing.mode !== 'read-only' ? 'workspace-write' : 'read-only';
+      mark('liveshare-ptc-policy', { mode, fork: grant.fork });
+      return { mode, workspaceRoot, sessionId: standing.sessionId };
+    },
+    permissions,
+  };
+}
 
 function createTunnelLauncher(entry, mark) {
   return (_executable, args, { env, stdio }) => {
@@ -48,7 +125,7 @@ function createTunnelLauncher(entry, mark) {
 }
 
 if (isMainThread) {
-  module.exports = { createTunnelLauncher };
+  module.exports = { createTunnelLauncher, createSharedPtcPolicy };
 } else {
   // Keep the packaged gateway's IPC message contract on an isolated Node thread.
   process.send = message => {
