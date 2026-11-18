@@ -136,6 +136,8 @@ def run(emulator,args):
         cache_models(emulator,args.model_root,remote)
         browser['switch'](emulator,VOICE,True)
         browser['switch'](emulator,INSPECTOR,True)
+        if args.arkweb:
+            browser['switch'](emulator,browser['flow']['BUNDLE'],True)
         browser['restart'](emulator)
         evidence['cachePreparation']=readiness(emulator)
         payload={'audioBase64':base64.b64encode(audio).decode(),'language':'auto','providerId':PROVIDER}
@@ -157,9 +159,12 @@ def run(emulator,args):
             assert registration['created'],registration
             workspace=registration['workspace']['workspaceId']
             title='Voice draft '+run_name
-            sid=emulator.rpc('session/create',{'request':{'workspaceId':workspace}})['sessionId']
-            sessions.append(sid)
-            emulator.rpc('session/rename',{'request':{'sessionId':sid,'title':title}})
+            archive=browser['flow']
+            data=archive['archive_bytes'](run_name,archive['SOURCE_PNG'].read_bytes(),text_title=title)
+            status,lines=archive['upload'](emulator,workspace,data)
+            assert status==200 and lines[-1]['outcome']['ok'],(status,lines)
+            sessions.extend(lines[-1]['outcome']['value']['sessionIds'])
+            sid=sessions[0]
             before=support['events'](emulator,sid)
             verify_arkweb(emulator,title,audio,evidence)
             assert before==support['events'](emulator,sid), 'Dictation submitted the draft'
