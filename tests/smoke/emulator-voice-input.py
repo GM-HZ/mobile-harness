@@ -81,7 +81,7 @@ def model_mirror(root):
     return server
 
 
-def readiness(emulator, timeout=40):
+def readiness(emulator, timeout=40, phases=('ready','standby')):
     deadline=time.monotonic()+timeout
     while time.monotonic()<deadline:
         rows=emulator.rpc('speech/catalog',{})['providers']
@@ -90,11 +90,11 @@ def readiness(emulator, timeout=40):
             state=row['preparation']
             if state['phase']=='failed':
                 raise AssertionError(state)
-            if state['phase'] in ['ready','standby']:
+            if state['phase'] in phases:
                 assert row['location']=='host-local'
                 return state
         time.sleep(.25)
-    raise AssertionError('SenseVoice never became ready')
+    raise AssertionError(f'SenseVoice never entered {phases}')
 
 
 def transcribe(emulator,payload):
@@ -223,13 +223,13 @@ def run(emulator,args):
             assert 'Forwardport result:OK' in emulator.hdc('rport',*candidate)
             reverse=candidate
             patch=PROFILE+'/cordis.patch.yml'
-            overlay=b'\n- id: speech-to-text-sensevoice\n  config:\n    modelOrigin: "http://127.0.0.1:19758"\n'
+            overlay=(b'\n- id: speech-to-text-sensevoice\n  config:\n'
+                     b"    dataRoot: !!js dshHomePath('speech-to-text', 'sensevoice')\n"
+                     b'    modelOrigin: "http://127.0.0.1:19758"\n')
             lsp['restore_bytes'](emulator,patch,originals[patch].rstrip()+overlay,remote+'-mirror-overlay')
         browser['restart'](emulator)
         if args.download:
-            rows=emulator.rpc('speech/catalog',{})['providers']
-            row=next(item for item in rows if item['id']==PROVIDER)
-            assert row['preparation']['phase']=='unprepared',row
+            evidence['downloadInitialState']=readiness(emulator,phases=('unprepared',))
             emulator.rpc('speech/prepare',{'providerId':PROVIDER})
             evidence['downloadPreparation']=readiness(emulator,timeout=100)
             evidence['downloadedAssets']=sorted(mirror.completed)
