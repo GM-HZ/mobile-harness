@@ -91,22 +91,27 @@ def verify_arkweb(emulator,audio,evidence):
         # capture, audio conversion, the Remote request and the composer update.
         script='''(() => {
           const samples=atob(AUDIO);
+          globalThis.__mhVoiceTest={phase:'waiting', recorder:typeof MediaRecorder,
+            audioContext:typeof AudioContext, destination:typeof AudioContext==='function'?
+              typeof AudioContext.prototype.createMediaStreamDestination:'unavailable'};
           Object.defineProperty(navigator.mediaDevices,'getUserMedia',{ configurable:true,value:async () => {
             const context=new AudioContext();
+            Object.assign(globalThis.__mhVoiceTest,{phase:'resume',context});
             await context.resume();
+            globalThis.__mhVoiceTest.phase='decode';
             const bytes=Uint8Array.from(samples,char=>char.charCodeAt(0));
             const clip=await context.decodeAudioData(bytes.buffer);
             const destination=context.createMediaStreamDestination();
             const input=context.createBufferSource();
             input.buffer=clip; input.connect(destination); input.start(context.currentTime+.25);
-            globalThis.__mhVoiceTest={context,duration:clip.duration};
+            Object.assign(globalThis.__mhVoiceTest,{phase:'playing',duration:clip.duration});
             return destination.stream;
           } });
           return true;
         })()'''.replace('AUDIO',json.dumps(base64.b64encode(audio).decode()))
         assert run(script)
         try:
-            flow['button'](lambda expression:run({'expression':expression,'userGesture':True}),'button',['开始录音','Start recording'])
+            sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'开始录音','Start recording'},'button'))
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'official recorder running')
             duration=run('globalThis.__mhVoiceTest.duration')
             time.sleep(duration+.5)
@@ -114,11 +119,18 @@ def verify_arkweb(emulator,audio,evidence):
             browser['wait'](run,f'''[...document.querySelectorAll('textarea,[contenteditable=true]')].some(
               node=>(node.value||node.textContent||'').includes({json.dumps(EXPECTED)}))''','transcript inserted into composer draft')
             evidence['arkWebSyntheticDraft']=True
-            flow['button'](lambda expression:run({'expression':expression,'userGesture':True}),'button',['开始录音','Start recording'])
+            sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'开始录音','Start recording'},'button'))
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'second recording running')
             flow['button'](run,'[data-voice-activity] button',['取消','Cancel'])
             browser['wait'](run, '''!document.querySelector('[data-voice-activity]')''','recorder releases cancelled recording')
             evidence['arkWebRecordingCancelled']=True
+        except AssertionError:
+            evidence['arkWebRecorderDiagnostic']=run('''(() => {
+              const {phase,recorder,audioContext,destination,context}=globalThis.__mhVoiceTest||{};
+              const row=document.querySelector('[data-voice-activity]');
+              return {phase, recorder, audioContext, destination, state:context?.state, ui:row?.textContent};
+            })()''')
+            raise
         finally:
             run('void globalThis.__mhVoiceTest?.context.close(); delete navigator.mediaDevices.getUserMedia; delete globalThis.__mhVoiceTest; true')
 
