@@ -333,6 +333,11 @@ async function main() {
   const officeUrl = paths('dsh-office-kit/lib/index.js');
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
+  const speechUrl = paths('dsh-experimental-speech-to-text-sensevoice/lib/index.js');
+  const speechEntry = path.join(dsh, '@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/worker.js');
+  globalThis.__harmonySpeechLaunch = safeMode
+    ? () => { throw new Error('Speech workers are disabled in HarmonyOS recovery mode'); }
+    : require(path.join(root, 'dsh-harmony-speech.cjs')).speechLauncher(root, speechEntry, mark);
   const httpParserUrl = pathToFileURL(path.join(dsh, 'undici/lib/dispatcher/client-h1.js')).href;
   const { patchClientH1 } = require(path.join(root, 'dsh-harmony-http.cjs'));
   globalThis.__harmonyLlhttp = imports => require(path.join(root, 'dsh-harmony-llhttp.cjs'))(imports);
@@ -419,6 +424,20 @@ async function main() {
         patched = replacePinned(patched, 'console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);',
           'console.log("dsh inspector: /inspector/devtools/");');
         return { ...result, source: patched };
+      }
+      if (url === speechUrl) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        const supported = replacePinned(source, '"darwin-arm64",', '"openharmony-arm64", "darwin-arm64",');
+        const point = 'const handle = this.ctx.subprocess.spawn({';
+        const start = supported.indexOf(point);
+        const end = supported.indexOf('\n\t\t\ttry {', start);
+        if (start < 0 || end < 0 || supported.indexOf(point, start + point.length) >= 0 ||
+            !supported.slice(start, end).includes('DSH_SPEECH_TOKEN: token')) {
+          throw new Error('Unexpected pinned SenseVoice worker launch');
+        }
+        return { ...result, source: supported.slice(0, start) +
+          'const handle = globalThis.__harmonySpeechLaunch(runtime.worker, Object.assign({}, this.config, runtime), token, this.config.maxLogBytes);' +
+          supported.slice(end) };
       }
       if (url === creatorUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();

@@ -33,6 +33,7 @@ OPTIONAL_BUNDLES = (
     "@deepseek-ai/dsh-experimental-session-search",
     "@deepseek-ai/dsh-experimental-session-titles-bundle",
     "@deepseek-ai/dsh-experimental-tool-worktree",
+    "@deepseek-ai/dsh-experimental-voice-input-bundle",
     "@deepseek-ai/dsh-personalized-recommendations",
 )
 

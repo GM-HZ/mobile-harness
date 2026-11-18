@@ -13,6 +13,7 @@ from harmonyos_dsh import stage_dsh
 from harmonyos_guest_extras import stage_guest_extras
 from harmonyos_ptc import PORTABLE_ASSETS, portable_assets
 from harmonyos_http import stage_http
+from harmonyos_speech import stage_speech
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
@@ -137,6 +138,7 @@ def main():
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
     stage_assets(inputs)
+    stage_speech(ROOT, STAGE, RAW)
     subprocess.run(
         ["bash", str(RUNTIME / "packaging/build-native-shell.sh")],
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True

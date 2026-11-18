@@ -1,9 +1,10 @@
-import { common } from '@kit.AbilityKit';
+import { abilityAccessCtrl, common } from '@kit.AbilityKit';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, dshEngine } from '../runtime/DshEngine';
 
-const RECOVERY_URL = 'http://127.0.0.1:19592/.mobile-harness/recovery';
+const LOCAL_ORIGIN = 'http://127.0.0.1:19592';
+const RECOVERY_URL = LOCAL_ORIGIN + '/.mobile-harness/recovery';
 
 @Entry
 @Component
@@ -52,6 +53,34 @@ struct Index {
   aboutToDisappear(): void {
     this.detachEngine?.();
     this.detachEngine = undefined;
+  }
+
+  private async requestMicrophone(request: PermissionRequest): Promise<void> {
+    const origin = request.getOrigin();
+    const resources = request.getAccessibleResource();
+    const session = this.launchUrl;
+    if ((origin !== LOCAL_ORIGIN && origin !== LOCAL_ORIGIN + '/') ||
+        resources.length !== 1 || resources[0] !== ProtectedResourceType.AUDIO_CAPTURE ||
+        !session || this.safe || this.recoveryOpen || this.loginVisible || this.webFailed) {
+      request.deny();
+      return;
+    }
+
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    const permission = 'ohos.permission.MICROPHONE';
+    let granted = false;
+    try {
+      const result = await abilityAccessCtrl.createAtManager().requestPermissionsFromUser(context, [permission]);
+      granted = result.authResults.length === 1 && result.authResults[0] === 0;
+    } catch (e) {
+      hilog.warn(0xD005, 'DSHClient', 'microphone permission request failed');
+    }
+    if (granted && this.detachEngine && this.launchUrl === session &&
+        !this.safe && !this.recoveryOpen && !this.loginVisible && !this.webFailed) {
+      request.grant(resources);
+    } else {
+      request.deny();
+    }
   }
 
   private loginHost(url: string): string {
@@ -191,6 +220,9 @@ struct Index {
           .multiWindowAccess(true)
           .allowWindowOpenMethod(true)
           .onWindowNew((event) => this.openLogin(event))
+          .onPermissionRequest((event: OnPermissionRequestEvent) => {
+            void this.requestMicrophone(event.request);
+          })
           .onLoadIntercept((event) => {
             if (!event || !event.data.isMainFrame()) return false;
             const url = event.data.getRequestUrl();
@@ -198,7 +230,7 @@ struct Index {
               this.recoveryOpen = true;
               return true;
             }
-            return !url.startsWith('http://127.0.0.1:19592/') && url !== 'about:blank';
+            return !url.startsWith(LOCAL_ORIGIN + '/') && url !== 'about:blank';
           })
           .onPageEnd(() => {
             setTimeout(() => {
