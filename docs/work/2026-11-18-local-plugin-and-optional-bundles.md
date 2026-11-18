@@ -1,0 +1,9 @@
+# 鸿蒙本地插件与可选 bundle 回归
+
+基线为 0.4.46、DSH RC.5。把本地 Creator 安装修复、Auto review、LiveShare 和已随包的 Forge 纳入同一轮构建与验收。
+
+Creator 按绝对目录安装，pnpm 尝试创建符号链接并被系统拒绝。0.4.46 复现同一类目录用 file: 成功复制。适配仅针对 pnpm add 的裸绝对目录。验收包括真实 Creator 生成、安装、页面控件、撤销与从保留副本恢复，以及原有安装兼容性。
+
+Auto review 和 LiveShare 使用锁定的上游 bundle，默认关闭。Auto review 验收当前会话选择、允许、拒绝、故障、取消、重启和关闭行为，默认工作区权限和普通审批沿用当前配置。LiveShare 使用独立合成会话，验收启停、连接及访问撤销，避免共享用户现有会话。Forge 验收现有工作树接口与 ArkWeb 呈现，真实外部的写入和合并使用明确授权。
+
+语音并行验证两项依赖。ArkWeb 需要本机录音授权与请求来源校验。SenseVoice 上游识别器拒绝 OpenHarmony 平台，需要验证官方 Linux ARM64 推理二进制与 Alpine 运行时后才随包登记。保留底层失败记录。真机、系统 PTY 和 Phone Use 按现有计划。

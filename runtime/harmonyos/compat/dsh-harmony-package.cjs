@@ -36,12 +36,19 @@ function createPackageRunner(root, home, launch) {
     const prefix = command === 'pnpm' ? [
       '/bin/node', '--require', '/dsh-harmony-pnpm-fetch.cjs', '/pnpm-harmony-v2/bin/pnpm.mjs',
     ] : ['/usr/bin/git'];
-    const remapped = args.map(arg => {
+    const actionIndex = args.findIndex(arg => !arg.startsWith('-'));
+    const packageAction = args[actionIndex];
+    const remapped = args.map((arg, index) => {
       const match = /^(file:|link:)?(\/.*)$/.exec(arg);
       if (!match) return arg;
-      return (match[1] || '') + guestPath(fs.realpathSync(match[2]));
+      const local = fs.realpathSync(match[2]);
+      const guest = guestPath(local);
+      // pnpm links bare directory dependencies even with the hoisted linker.
+      // HarmonyOS prohibits that symlink. file: copies the local package.
+      const copyDirectory = command === 'pnpm' && packageAction === 'add' &&
+        index === actionIndex + 1 && !match[1] && fs.statSync(local).isDirectory();
+      return (copyDirectory ? 'file:' : match[1] || '') + guest;
     });
-    const packageAction = args.find(arg => !arg.startsWith('-'));
     if (command === 'pnpm' && ['add', 'install', 'remove', 'update'].includes(packageAction)) {
       remapped.push('--config.node-linker=hoisted', '--config.package-import-method=copy',
         '--store-dir=' + profileHome + '/package-store', '--config.ignore-scripts=true');
