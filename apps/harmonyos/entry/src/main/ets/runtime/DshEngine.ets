@@ -147,12 +147,13 @@ class DshEngine {
       hilog.info(0xD005, 'DSHClient', 'system child-process support native=%{public}s ark=%{public}s',
         String(childProcessManager.isNativeChildProcessSupported()), String(childProcessManager.isArkChildProcessSupported()));
     }
+    const nativeStarted = Date.now();
     poc.startNative(root, mode === 'safe');
     let ready = false;
     this.nativePoll = setInterval(() => {
       try {
         const status = poc.nativeStatus();
-        if (status < 0 || (!ready && Date.now() - started > 60000)) {
+        if (status < 0) {
           this.stopPolling();
           this.publish('本机 DSH 未运行。可在恢复选项中选择安全模式。');
           hilog.error(0xD005, 'DSHClient', 'native Host unavailable status=%{public}d', status);
@@ -167,6 +168,10 @@ class DshEngine {
           this.publish('', session);
           hilog.info(0xD005, 'DSHClient', 'native loopback ready ms=%{public}d mode=%{public}s',
             Date.now() - started, mode);
+        } else if (!ready && Date.now() - nativeStarted > 60000) {
+          this.stopPolling();
+          this.publish('本机 DSH 启动超时。可在恢复选项中选择安全模式。');
+          hilog.error(0xD005, 'DSHClient', 'native Host startup timed out status=%{public}d', status);
         }
       } catch (e) {
         this.stopPolling();
@@ -253,7 +258,7 @@ class DshEngine {
       }
       if (!/^[a-f0-9]{64}$/.test(runtimeId)) throw new Error('Invalid packaged DSH runtime identity');
       const unpackedDsh = await this.unpack(context, 'dsh-layer.zip', dshRelease, runtimeId);
-      hilog.info(0xD005, 'DSHClient', 'startup archive dsh-layer.zip extracted=%{public}s ms=%{public}s',
+      hilog.info(0xD005, 'DSHClient', 'startup archive dsh-layer.zip extracted=%{public}s ms=%{public}d',
         String(unpackedDsh), Date.now() - dshUnpackStarted);
       const settingsClient = dshRelease + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
       this.copyGuest(context, 'dsh-settings-client.js', settingsClient + '.tmp');
