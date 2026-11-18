@@ -15,11 +15,12 @@ function appendBounded(target, value) {
 }
 
 class BashPipeSession {
-  constructor(handle, marker, authorized, TerminalError) {
+  constructor(handle, marker, authorized, onClose, TerminalError) {
     this.handle = handle;
     this.motd = '';
     this.marker = marker;
     this.authorized = authorized;
+    this.onClose = onClose;
     this.TerminalError = TerminalError;
     this.buffer = '';
     this.retained = { text: '', truncated: false };
@@ -139,14 +140,15 @@ class BashPipeSession {
   close() {
     this.closing ??= (async () => {
       this.handle.terminate();
-      await this.handle.waitForExit();
+      if (!await this.handle.waitForExit()) throw new Error('Persistent Bash process range did not exit');
       await this.handle.done;
+      this.onClose();
     })();
     return this.closing;
   }
 }
 
-function registerBashPipe(ctx, type, root, TerminalError) {
+function registerBashPipe(ctx, type, root, TerminalError, mark) {
   ctx.terminals.registerBackend({
     type,
     async spawn(spec) {
@@ -188,7 +190,10 @@ function registerBashPipe(ctx, type, root, TerminalError) {
         await handle.waitForExit();
         throw new TerminalError('Persistent Bash did not receive its required pipes', 'INIT_REJECTED');
       }
-      return new BashPipeSession(handle, marker, () => policy() === 'danger-full-access', TerminalError);
+      const fields = { id: spec.sessionId };
+      mark('persistent-bash-started', fields);
+      return new BashPipeSession(handle, marker, () => policy() === 'danger-full-access',
+        () => mark('persistent-bash-reaped', fields), TerminalError);
     },
   });
 }

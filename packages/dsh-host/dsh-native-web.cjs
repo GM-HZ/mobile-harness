@@ -514,7 +514,7 @@ async function main() {
       if (url === terminalBashUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         globalThis.__harmonyBashPipe = (ctx, type, TerminalError) =>
-          require(path.join(root, 'dsh-harmony-bash-pipe.cjs')).registerBashPipe(ctx, type, root, TerminalError);
+          require(path.join(root, 'dsh-harmony-bash-pipe.cjs')).registerBashPipe(ctx, type, root, TerminalError, mark);
         const registration = 'ctx.terminals.registerBackend(new BashTerminalBackend(ctx, resolved));';
         return { ...result, source: replacePinned(source, registration,
           'if (resolved.backendType === "shell" && resolved.shellDialect === "bash" && !config.shellPath && !config.shellArgs?.length) {\n' +
