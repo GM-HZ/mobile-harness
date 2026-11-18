@@ -1,6 +1,6 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.64，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.65，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
@@ -76,6 +76,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | LiveShare 访客程序 | 0.4.64 将具体链接和派生会话的权限传入鸿蒙 PTC 文件代理。普通会话继续使用其原权限；访客程序使用独立 worker，保留限制内的读写和内置工具。文件代理仍报告 `partial`。 [实测证据](evidence/emulator-liveshare-ptc-0.4.64.json) |
 | 麦克风与语音输入 | 0.4.62 从 DSH 录音按钮触发鸿蒙模拟器的系统授权，ArkWeb 音轨进入 live，取消后进入 ended。合成普通话回填及语音 worker 回收同包通过。真机说话转写待验。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
 | Forge 托管仓库 | 0.4.62 经包内 gh 和只读桌面认证代理读取公开 PR 文件与提交，文件逐字相同，提交及其父提交和官网 REST 结果一致。写操作经隔离服务验证。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
+| Forge 设备账号 | 0.4.65 设置页复用随包 GitHub CLI 的设备流程。公开 GitHub 签发一次性代码并验证取消。隔离服务通过原生登录、重启恢复、Forge 使用同一设备账号读取及退出。真实账号授权待验。 [实测证据](evidence/emulator-forge-account-0.4.65.json) |
 | 思考内容翻译 | 0.4.59 通过应用私有 `HTTPS_PROXY` 访问 Bing 和 Google 的官方默认地址，真实译文和记录可跨重启回读。ArkWeb 的 DeepSeek Flash、切换原译文、拒绝后保留原文和停用取消均通过。模拟器直连仍有 Bing 400 和 Google 超时。 [公网与 ArkWeb 证据](evidence/emulator-translation-proxy-0.4.59.json) |
 | 插件及恢复 | 标准 bundle 安装、注入真实崩溃、自动安全模式及旧会话回读通过；实际点击设置恢复入口、原生正常模式按钮后恢复通过 |
 | 插件管理补验 | 本版经实际 API 安装、启用、禁用和卸载自建 bundle，pnpm remove 退出0；postinstall 没有执行。恢复测试安装前备份原配置，结束后回普通模式且 manifest／lock 摘要一致；任意插件升级与安装脚本仍不据此承诺 |
@@ -98,7 +99,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权和 DeepSeek 之外的供应商端点待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
-- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的设备直接登录及托管仓库写操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
+- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的真实 GitHub 账号授权及托管仓库写操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。

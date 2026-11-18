@@ -398,3 +398,9 @@ Minimal 预设通过官方持久 Bash 工具复用一个受管 Alpine Shell。�
 访客用实际链接和派生会话的授权运行 PTC，文件范围取共享目录与会话现有权限的交集。每个程序使用独立 worker。模拟器实测并存链接的只读与可写权限、内置写工具限制、派生重放与撤销、拒绝扩大权限及主人执行。ArkWeb 登录与真模型对话通过回归。
 
 调试签名 HAP SHA-256 `cec88d56f79f8fc004e10d2c7423fa334504105473446475c004aa0fc5bfa393`，离线验签及 209 个 payload 条目比对通过。当前验收使用回环 Relay，Mate 60 和公网 Relay 待验。 [制品与实测](evidence/emulator-liveshare-ptc-0.4.64.json)
+
+## 0.4.65 Forge GitHub 设备登录
+
+「设置 → 通用设置 → Forge GitHub 账号」使用包内 GitHub CLI 申请设备码，通过系统浏览器完成授权。CLI 保存设备账号供 Forge 读取。模拟器通过真实 GitHub 公网设备码签发与取消。隔离 TLS 服务通过原生授权、重启后读回账号、Forge 使用设备凭据读取仓库及退出登录。
+
+调试签名 HAP SHA-256 `b8c88cee23beedcd36c3b6ed768d8c14b2eeffaa7c556fc750d819c00eb973a0`，离线验签及 209 个 payload 条目比对通过。仍待真实账号完成授权以及在 Mate 60 复验。 [制品与实测](evidence/emulator-forge-account-0.4.65.json)

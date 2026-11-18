@@ -1,0 +1,113 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15563",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "testSource": "2ce31cd28887d782ad0200fe30e3331098b1846b",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "packagedGitHubCli": "2.72.0-r6",
+  "artifact": {
+    "sourceCommit": "8fe45d368a9664abd4197a3b1f1316ee77b61406",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.65-unsigned.hap",
+    "version": "0.4.65",
+    "versionCode": 72,
+    "bytes": 768577096,
+    "sha256": "503bff41c36b8012a89cce73cafeaae79ca889b1acc7669e182b446400b215e6",
+    "layerSha256": "2f357f696054b33b3390111843a802116a4e622503909dec5e4fe47aef89fe77",
+    "pyrightVersion": "1.1.414",
+    "pyrightEntrySha256": "f200762078eb9880faf421a5b30f9ef3055b1d85c6f10780d75db4da8d8499f1",
+    "signedArtifact": {
+      "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.65-signed.hap",
+      "bytes": 772245882,
+      "sha256": "b8c88cee23beedcd36c3b6ed768d8c14b2eeffaa7c556fc750d819c00eb973a0",
+      "profileVerified": true,
+      "signatureVerified": true,
+      "matchingPayloadEntries": 209
+    }
+  },
+  "build": {
+    "command": [
+      "./build.sh",
+      "--package"
+    ],
+    "exitCode": 0,
+    "logSha256": "f4c8dc4c0a5c7405315d3195914011f8caf059c2305652628ffe28e61dbcef7e"
+  },
+  "install": {
+    "from": "0.4.65 development build",
+    "to": "0.4.65",
+    "exitCode": 0,
+    "logSha256": "f337348c78cab5cc4879d0238a5e0e84bad471b9ac3eda6032b3d917d254bdd5",
+    "baselineVersion": "0.4.64"
+  },
+  "publicDeviceCodeAndCancel": {
+    "command": [
+      "python3",
+      ".build/batch-075/probe-public.py"
+    ],
+    "exitCode": 0,
+    "logSha256": "6f70bd10ea61088e6fb4744e185c54edd160ae880517863c6d4e533661dad28d",
+    "jsonSha256": "83a465c0641116addad3f1f0c967c3358c1254662dae4fda76f29fd6a0b8a71c",
+    "observed": {
+      "initial": "signed-out",
+      "publicStage": "authorize",
+      "issuedCode": true,
+      "canceled": true,
+      "noCredentialStored": true
+    },
+    "sourceSha256": "26ba93e5e32e039a50c76a0cbadff1d7ad976528314f70f38315e1b16914b9ad"
+  },
+  "nativeAccountLifecycle": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-forge-account.py",
+      "127.0.0.1:15563",
+      ".build/batch-075/account.json",
+      "--port",
+      "19652"
+    ],
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "f6ee9b012fcb1e6e87eb3434346c34650d872f50679093517848ff0eb9d95636",
+    "observed": {
+      "nativeLoginCanCancelBeforeConsent": true,
+      "nativeLoginAndCliStorage": true,
+      "accountRestoredAfterRestart": true,
+      "forgeUsesDeviceCredential": true,
+      "nativeLogout": true,
+      "profileAndTLSRestored": true,
+      "fixtureOperations": [
+        "issue",
+        "issue",
+        "exchange",
+        "viewer",
+        "viewer",
+        "forge-read"
+      ]
+    }
+  },
+  "earlierFixtureAttempts": [
+    {
+      "logSha256": "7390c14fa0d45b0160689025ee7b8cbaa965a58d708d3a06da89eafc35b0ac4b",
+      "cause": "The application staging command copies tracked files. The component was added to the index and the HAP rebuilt."
+    },
+    {
+      "logSha256": "57dff9d7120312f3a91f43f1f5fc6147c153f1ed49e739cebb478d1eda31e6c5",
+      "cause": "The emulator onboarding dialog appeared after the first readiness check. The fixture waits for and dismisses the modal before using the account menu."
+    },
+    {
+      "logSha256": "4a5f48d5d97fbebadd5d2d4c4c1e34f532f6a8828c71d9a06644eb59bada86fc",
+      "cause": "A transient empty UI layout response interrupted the sign-out lookup. The fixture now retries invalid layout data."
+    },
+    {
+      "logSha256": "420c15f087f55c8941dfda242b9d07a63d1115c1ac5172a02fcad245ee98bdff",
+      "cause": "A file read-back raced consumption of the cancel request. The fixture now confirms the consumed action through its settled status."
+    }
+  ],
+  "scope": {
+    "public": "GitHub device-code issuance and cancel; no public account consent",
+    "successfulAuthorization": "isolated TLS fixture and the actual packaged GitHub CLI",
+    "Mate60": "HDC USB offline"
+  }
+}
