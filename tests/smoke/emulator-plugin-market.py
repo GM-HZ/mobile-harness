@@ -213,6 +213,10 @@ def snapshot(emulator, folder, installed_name):
     return raw.splitlines()
 
 
+def origin_path(name):
+    return PROFILE + '/.plugin-manager/registry-origins/' + hashlib.sha256(name.encode()).hexdigest() + '.json'
+
+
 def activate_version(emulator, result, version, evidence):
     assert result['version'] == version and result['enabled'], result
     if result['application'] == 'applied':
@@ -244,9 +248,12 @@ def verify(emulator, server, name, folder, evidence):
     assert [item['version'] for item in listing['versions']] == ['2.0.0','1.2.0','1.1.0'], listing
     assert listing['versions'][0]['incompatible'], listing
 
-    def update(version):
+    def update(version, explicit_registry=True):
+        options = {'requestId': str(uuid.uuid4())}
+        if explicit_registry:
+            options['registry'] = target['registry']
         value = emulator.rpc('pluginManager/updateBundle', {'name': name, 'version': version,
-            'options': {'registry': target['registry'], 'requestId': str(uuid.uuid4())}}, timeout=125)
+            'options': options}, timeout=125)
         evidence.setdefault('updates', {})[version] = value
         return value
 
@@ -265,13 +272,17 @@ def verify(emulator, server, name, folder, evidence):
         evidence['activationRestarts'] = {}
         activate_version(emulator, accepted['result'], '1.1.0', evidence['activationRestarts'])
         installed(emulator, name, '1.1.0')
+        origin = json.loads(agent['read_bytes'](emulator, origin_path(name)))
+        assert origin == {'name': name, 'version': '1.1.0', 'registry': target['registry']}, origin
+        evidence['registryOriginAfterRestart'] = origin
         evidence['updatedToolResult'] = assert_tool(emulator, session, '1.1.0')
         print('Verified the upgraded tool after honoring restart-required', flush=True)
-        rollback = update('1.2.0')
+        rollback = update('1.2.0', explicit_registry=False)
         assert rollback['result']['application'] == 'failed' and rollback['result']['stage'] == 'enable', rollback
         candidate = snapshot(emulator, folder, name)
         assert candidate.count('start 1.2.0') == 1
-        activate_version(emulator, rollback['restore'], '1.1.0', evidence['activationRestarts'])
+        evidence['rollbackRestarts'] = {}
+        activate_version(emulator, rollback['restore'], '1.1.0', evidence['rollbackRestarts'])
         installed(emulator, name, '1.1.0')
         evidence['toolAfterRollback'] = assert_tool(emulator, session, '1.1.0')
     evidence['testCredentialRemoved'] = True
@@ -283,6 +294,7 @@ def verify(emulator, server, name, folder, evidence):
     removed = emulator.rpc('pluginManager/removeBundle', {'name': name}, timeout=100)
     assert removed['application'] in ['applied', 'restart-required'] and removed['packageResult']['exitCode'] == 0, removed
     assert catalog(emulator, name) is None
+    assert emulator.app(f'test ! -e {origin_path(name)} && printf ABSENT') == 'ABSENT'
     if removed['application'] == 'restart-required':
         assert removed['restartReason'] == 'module-comparison', removed
         emulator.stop()
@@ -333,6 +345,7 @@ def run(emulator, output):
                 # Keep recovery independent of any failure in the package manager.
                 emulator.stop()
                 emulator.app(f'rm -rf {folder} {PROFILE}/node_modules/{name} {PROFILE}/node_modules/{name}-dep')
+                emulator.app('rm -f ' + origin_path(name))
                 for i, (path, body) in enumerate(originals.items()):
                     if body is None:
                         emulator.app('rm -f ' + path)
