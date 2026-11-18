@@ -291,6 +291,6 @@ Inspector 和故障恢复两组回归通过，原配置、权限、旧会话摘�
 
 鸿蒙包管理器将 pnpm add 的裸绝对目录转换为 `file:` 安装以复制包，其他来源与显式前缀沿用原行为。最小夹具的裸目录安装和 Creator 生成包的正式安装通过。第一次 Creator 测试停在页签查找。第二次生成返回 `ready:false`，子会话确认上游仍引用 RC.5 已移除的 `cordis-plugin-development` 技能。页面操作、撤销和恢复仍待验。
 
-Auto review 与 LiveShare 默认关闭。Auto review 的显式会话选择、实际只读工具、重启保持和默认权限通过。LiveShare 通过本机 Owner 接口，暂未发布 Relay 共享。Forge 面板和真实工作树恢复、Inspector 与故障恢复通过。原配置、权限、鉴权和旧会话摘要已复核。
+Auto review 与 LiveShare 默认关闭。Auto review 的显式会话选择、实际只读工具、重启保持和默认权限通过。受控审查补验畸形响应、拒绝、取消都阻止真实文件写入。LiveShare 通过本机 Owner 接口，暂未发布 Relay 共享。Forge 面板和真实工作树恢复、Inspector 与故障恢复通过。原配置、权限、鉴权和旧会话摘要已复核。
 
 未签名 HAP 662,478,181 字节，SHA-256 `6730145ac50ba15723d56dc8fdbf912cb43173b96dc6f637128060caecefd4e2`，生产源 `8cbf4d96d3942231776d49e8dcb2c92a42084663`。本版为模拟器验证。 [准确制品和完整结果](evidence/emulator-optional-batch-0.4.47.json)

@@ -8,4 +8,4 @@ Auto review 和 LiveShare 使用锁定的上游 bundle，默认关闭。Auto rev
 
 语音并行验证两项依赖。ArkWeb 需要本机录音授权与请求来源校验。SenseVoice 上游识别器拒绝 OpenHarmony 平台，需要验证官方 Linux ARM64 推理二进制与 Alpine 运行时后才随包登记。保留底层失败记录。真机、系统 PTY 和 Phone Use 按现有计划。
 
-0.4.47 已验证最小本地包和真实 Creator 安装、Auto review 只读调用和恢复、LiveShare 本机 Owner、Forge 工作树和真实 ArkWeb、Inspector 与故障恢复。Creator 的第二次生成失败使用了已移除技能，保留该子会话证据。远端共享、自动审批的拒绝／中断、Forge 托管平台以及真机继续。 [证据](../evidence/emulator-optional-batch-0.4.47.json)
+0.4.47 已验证最小本地包和真实 Creator 安装、Auto review 只读调用和恢复、LiveShare 本机 Owner、Forge 工作树和真实 ArkWeb、Inspector 与故障恢复。Creator 的第二次生成失败使用了已移除技能，保留该子会话证据。补测的确定性审查证明畸形结果、拒绝和取消均阻止真实写入，回归后恢复既有权限。远端共享、Forge 托管平台以及真机继续。 [证据](../evidence/emulator-optional-batch-0.4.47.json)

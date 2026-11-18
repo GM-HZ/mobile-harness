@@ -6,7 +6,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 
 ## 当前验收
 
-0.4.47 修复裸绝对目录安装。最小夹具和 Creator 生成包均通过正式 PluginManager 安装。Auto review 通过明确选择的会话只读工具、重启保持和停用，LiveShare 通过默认关闭和本机 Owner 接口，Forge 通过 ArkWeb 面板和本地工作树恢复。Creator 页签、公开共享和托管平台仍待完整验收。 [0.4.47 证据](evidence/emulator-optional-batch-0.4.47.json)
+0.4.47 修复裸绝对目录安装。最小夹具和 Creator 生成包均通过正式 PluginManager 安装。Auto review 通过明确选择的会话只读工具、重启保持和停用，受控测试通过畸形审查、拒绝和取消阻止写入，LiveShare 通过默认关闭和本机 Owner 接口，Forge 通过 ArkWeb 面板和本地工作树恢复。Creator 页签、公开共享和托管平台仍待完整验收。 [0.4.47 证据](evidence/emulator-optional-batch-0.4.47.json)
 
 0.4.46 提供默认关闭的官方个性化推荐。实际模型和 ArkWeb 通过内置插件启用、页面位置选择、暂不创建和决定持久化。Creator 已生成页面包，安装被系统拒绝创建符号链接，页面操作、撤销和恢复仍待验。 [0.4.46 证据](evidence/emulator-personalized-recommendations-0.4.46.json)
 

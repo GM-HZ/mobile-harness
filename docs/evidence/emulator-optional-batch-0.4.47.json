@@ -357,6 +357,143 @@
       },
       "resultSha256": "16b04699c65e6fba5b5c053809f3299b080d2ede2d0038a66474b1fbfc9cfed1",
       "logSha256": "826ef2df90372077dfdab611fffcda8f19b80d41333a3dcefe830c899712efa4"
+    },
+    {
+      "case": "auto-review-controlled",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-auto-review-liveshare.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/auto-scripted-0.4.47.json",
+        "--scripted-review"
+      ],
+      "exitCode": 1,
+      "testSourceCommit": "1adbca7",
+      "result": {
+        "defaultCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "enabledCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": true,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": true,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "defaultPolicyUnchanged": "workspace-write",
+        "shareOwnerHasNoRelayOrShares": true,
+        "selectedAuto": {
+          "commandId": "cmd-620acb33-1",
+          "result": {
+            "kind": "success",
+            "text": "preset auto"
+          }
+        },
+        "autoAllowedRead": true,
+        "restoredReadyMs": 6710,
+        "originalConfigurationRestored": true
+      },
+      "resultSha256": "17162898e69576dc921b48521821eb68c63d0e5c9fe41dd4434e5f3b835c6385",
+      "logSha256": "9f0d4fbc7a61b36f8ffe5c780032a36701b09c90b61bcfc1e271f54377815117",
+      "diagnostic": "The tool denied the write, but the fixture expected a private error code in the public tool message."
+    },
+    {
+      "case": "auto-review-controlled",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-auto-review-liveshare.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/auto-scripted-retry-0.4.47.json",
+        "--scripted-review"
+      ],
+      "exitCode": 0,
+      "testSourceCommit": "cc7de2e",
+      "result": {
+        "defaultCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "enabledCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": true,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": true,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "defaultPolicyUnchanged": "workspace-write",
+        "shareOwnerHasNoRelayOrShares": true,
+        "selectedAuto": {
+          "commandId": "cmd-49663b29-1",
+          "result": {
+            "kind": "success",
+            "text": "preset auto"
+          }
+        },
+        "autoAllowedRead": true,
+        "invalidReviewDeniedBeforeWrite": true,
+        "rejectedAfterReviewerDenial": true,
+        "cancelledAfterReviewerDenial": true,
+        "selectionAfterRestart": {
+          "commandId": "cmd-78579ad3-1",
+          "result": {
+            "kind": "success",
+            "text": "current preset auto (available: read-only, workspace-write, danger-full-access, auto)"
+          }
+        },
+        "disabledCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "restoredReadyMs": 5048,
+        "originalConfigurationRestored": true
+      },
+      "resultSha256": "fc5d353640f7649d606460d260bfe4018a8726f2f0dbbed5c24a3d6ca3083017",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
   "audit": {
@@ -475,7 +612,7 @@
     ]
   },
   "limits": [
-    "Auto review passed a read-only tool, restart persistence and restoration of workspace-write. Denial, cancellation, failure and richer policy tests remain.",
+    "Auto review used a real DeepSeek model for the allowed read. Explicit rejection, cancellation and malformed review were exercised using deterministic reviewer replies and real tool execution.",
     "LiveShare was verified only on the authenticated owner surface without a configured relay or published share.",
     "Forge passed the real ArkWeb panel and the local worktree lifecycle. Hosted forge provider operations were not exercised.",
     "This is an unsigned emulator HAP. Physical-device and signed-HAP regression remain open.",
