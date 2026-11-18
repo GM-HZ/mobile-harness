@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
 import { readFile, rm } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 const packages = __MH_DSH_PACKAGES__;
 const root = __MH_ROOT__;
 const cwd = __MH_WORKSPACE__;
@@ -9,6 +10,56 @@ const { defineTool } = await import(packages + 'dsh-tools/lib/index.js');
 const { default: Provider } = await import('file://' + root + '/dsh-harmony-subprocess.mjs');
 export const name = 'mh-subprocess-provider-fixture';
 export const inject = ['tools'];
+
+async function extensions(node, spawn, settle) {
+  const wasm = '0061736d010000000105016000017f0302010007070103666f6f00000a06010400412a0b';
+  const probe = `
+    const runtime = { platform: process.platform, arch: process.arch, version: process.version };
+    if (typeof WebAssembly === 'object') {
+      runtime.wasm = new WebAssembly.Instance(new WebAssembly.Module(Buffer.from('${wasm}', 'hex'))).exports.foo();
+    } else {
+      runtime.wasm = null;
+    }
+    try { runtime.addon = require('./linux-runtime.node').value; }
+    catch (error) { runtime.addon = { code: error.code, message: error.message }; }
+    console.log(JSON.stringify(runtime));
+  `;
+  const require = createRequire(import.meta.url);
+  const native = { platform: process.platform, arch: process.arch, version: process.version, wasm: typeof WebAssembly };
+  try { native.addon = require('./harmony-runtime.node').value; }
+  catch (error) { native.addon = { code: error.code, message: error.message }; }
+  const signed = { exports: {} };
+  process.dlopen(signed, 'libdshspeech.so');
+  assert.equal(typeof signed.exports.open, 'function');
+  native.signedSpeechAddon = true;
+  assert.equal(native.wasm, 'undefined');
+  const cases = { native };
+  for (const [name, flags] of [['defaultGuest', []], ['explicitGuestWasm', ['--no-jitless']]]) {
+    const child = spawn([node, ...flags, '-e', probe]);
+    const outcome = await settle(child);
+    assert.deepEqual(outcome, { exitCode: 0, signal: null }, child.collected.stderr.readFrom(0).text);
+    cases[name] = JSON.parse(child.collected.stdout.readFrom(0).text);
+    assert.equal(cases[name].platform, 'linux');
+    assert.equal(cases[name].arch, 'arm64');
+  }
+  assert.equal(cases.defaultGuest.wasm, null);
+  assert.equal(cases.explicitGuestWasm.wasm, 42);
+  for (const runtime of Object.values(cases)) {
+    if (typeof runtime.addon === 'number') assert.equal(runtime.addon, 42);
+    else assert.equal(runtime.addon?.code, 'ERR_DLOPEN_FAILED', JSON.stringify(runtime));
+  }
+  const script = './subprocess-runtime.ts';
+  const limited = spawn([node, script]);
+  assert.notEqual((await settle(limited)).exitCode, 0);
+  assert.match(limited.collected.stderr.readFrom(0).text, /ERR_WEBASSEMBLY_NOT_SUPPORTED/);
+  const enabled = spawn([node, '--no-jitless', script], undefined, { env: { NODE_OPTIONS: '' } });
+  const outcome = await settle(enabled);
+  assert.deepEqual(outcome, { exitCode: 0, signal: null }, enabled.collected.stderr.readFrom(0).text);
+  const actual = JSON.parse(enabled.collected.stdout.readFrom(0).text);
+  assert.deepEqual(actual, { typescript: 42, status: 200, body: 'stock guest fetch', nodeOptions: '' });
+  cases.guestTypeScriptAndFetch = { defaultError: 'ERR_WEBASSEMBLY_NOT_SUPPORTED', explicit: actual };
+  return cases;
+}
 
 async function run() {
   const owner = new Context();
@@ -44,6 +95,7 @@ async function run() {
     assert.equal((await settle(nested)).exitCode, 0);
     const nestedResult = JSON.parse(nested.collected.stdout.readFrom(0).text);
     assert.equal(nestedResult.child, cwd); result.realNestedNodeProcess = nestedResult;
+    if (__MH_EXTENSION_PROBES__) result.extensions = await extensions(node, spawn, settle);
     // Only fake ambient values are installed; real credentials are never read.
     const fake = { MH_PARENT_SECRET: 'ambient-fake-secret', DSH_FAKE_IDENTITY: 'ambient-fake-id', MH_AMBIENT: 'remove-me' };
     const saved = Object.fromEntries(Object.keys(fake).map(key => [key, process.env[key]]));

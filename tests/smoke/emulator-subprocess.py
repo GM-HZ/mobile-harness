@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import runpy
+import subprocess
 import tarfile
 import tempfile
 import uuid
@@ -16,24 +17,57 @@ worktree = runpy.run_path(str(Path(__file__).with_name('emulator-worktree.py')))
 PROFILE = 'alpine/native-benchmark-home/profiles/web'
 
 
-def archive_fixture(destination, name):
+def build_addons(directory):
+    repo = Path(__file__).resolve().parents[2]
+    sdk = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents')) / 'sdk/default/openharmony/native'
+    compiler = sdk / 'llvm/bin/clang'
+    resource = Path(subprocess.check_output([str(compiler), '-print-resource-dir'], text=True).strip())
+    src = Path(__file__).with_name('fixtures') / 'runtime-addon.c'
+    base = [str(compiler), '-O2', '-Wall', '-Wextra', '-Werror', '-fPIC', '-shared',
+            '--sysroot=' + str(sdk / 'sysroot'), '-I', str(repo / 'vendor/repos/node/src'), str(src)]
+    flavors = {
+        'harmony-runtime.node': ['--target=aarch64-linux-ohos', '-DMH_HARMONY_NODE', '-ldl', '-Wl,-z,defs'],
+        'linux-runtime.node': ['--target=aarch64-linux-musl', '-fuse-ld=lld', '-nostdlib',
+                               '-ffreestanding', '-nostdinc', '-isystem', str(resource / 'include')],
+    }
+    outputs = {}
+    for name, flags in flavors.items():
+        output = directory / name
+        subprocess.run([*base, *flags, '-o', str(output)], check=True)
+        binary = output.read_bytes()
+        assert binary.startswith(b'\x7fELF\x02\x01')
+        assert int.from_bytes(binary[18:20], 'little') == 183
+        outputs[name] = binary
+    return outputs
+
+
+def archive_fixture(destination, name, extension_probes):
     root = support['WORKSPACE'].rsplit('/', 1)[0]
     source = Path(__file__).with_name('fixtures').joinpath('subprocess-provider.mjs').read_text()
     source = source.replace('__MH_DSH_PACKAGES__', json.dumps('file://' + root + '/.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/'))
     source = source.replace('__MH_ROOT__', json.dumps(root)).replace('__MH_WORKSPACE__', json.dumps(support['WORKSPACE'] + '/' + name))
+    source = source.replace('__MH_EXTENSION_PROBES__', json.dumps(extension_probes))
+    addons = build_addons(destination.parent) if extension_probes else {}
+    scripts = {}
+    if extension_probes:
+        fixture = Path(__file__).with_name('fixtures') / 'subprocess-runtime.ts'
+        scripts[fixture.name] = fixture.read_bytes()
     files = {
         'package.json': json.dumps({'name': name, 'version': '1.0.0', 'type': 'module', 'main': 'index.js',
              'scripts': {'postinstall': 'node -e "require(\'node:fs\').writeFileSync(\'/workspace-native/' + name + '/INSTALL_SCRIPT_SHOULD_NOT_RUN\',\'bad\')"'},
-             'files': ['index.js', 'cordis.patch.yml'], 'dsh': {'bundle': {'patch': './cordis.patch.yml'}}}).encode(),
+             'files': ['index.js', 'cordis.patch.yml', *addons, *scripts], 'dsh': {'bundle': {'patch': './cordis.patch.yml'}}}).encode(),
         'cordis.patch.yml': f'- insert:\n    - id: {name}\n      name: {name}\n'.encode(),
         'index.js': source.encode(),
+        **addons,
+        **scripts,
     }
     with tarfile.open(destination, 'w:gz', format=tarfile.USTAR_FORMAT) as archive:
         for filename, data in files.items():
             entry = tarfile.TarInfo(filename); entry.size = len(data); archive.addfile(entry, io.BytesIO(data))
+    return {name: hashlib.sha256(content).hexdigest() for name, content in addons.items()}
 
 
-def run(emulator, output):
+def run(emulator, output, extension_probes=False):
     name = 'mh-subprocess-' + uuid.uuid4().hex[:10]
     remote = '/data/local/tmp/' + name
     backup = f'{PROFILE}/package.json.{name}'; lock_backup = f'{PROFILE}/pnpm-lock.yaml.{name}'
@@ -49,7 +83,10 @@ def run(emulator, output):
         if had_lock: emulator.app(f'cp {PROFILE}/pnpm-lock.yaml {lock_backup}')
         evidence['lockBeforeSha256'] = hashlib.sha256(agent['read_bytes'](emulator, PROFILE + '/pnpm-lock.yaml')).hexdigest() if had_lock else None
         with tempfile.TemporaryDirectory() as temporary:
-            folder = Path(temporary); archive = folder / 'fixture.tgz'; archive_fixture(archive, name)
+            folder = Path(temporary)
+            archive = folder / 'fixture.tgz'
+            if addon_digests := archive_fixture(archive, name, extension_probes):
+                evidence['compiledAddonDigests'] = addon_digests
             assert 'FileTransfer finish' in emulator.hdc('file', 'send', str(archive), remote + '.tgz')
             assert emulator.app(f'mkdir alpine/workspace-native/{name} && tar -xzf {remote}.tgz -C alpine/workspace-native/{name} && printf READY') == 'READY'
             installed = emulator.rpc('pluginManager/installBundle', {'spec': f'file:{support["WORKSPACE"]}/{name}', 'options': {'enabled': False}}, timeout=90)
@@ -65,7 +102,7 @@ def run(emulator, output):
             evidence['sessionId'] = sid
             result, _ = agent['tool'](emulator, sid, 'mh_subprocess_contract', {})
             evidence['contract'] = json.loads(toolkit['texts']([result]))
-            assert len(evidence['contract']) == 7, evidence['contract']
+            assert len(evidence['contract']) == 7 + int(extension_probes), evidence['contract']
             evidence['allHelpersReaped'] = worktree['helpers_reaped'](emulator)
             # tool() already required this exact turn to finish. A later App
             # restart does not prepare that completed session for cancel RPC.
@@ -103,9 +140,12 @@ def run(emulator, output):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('target'); parser.add_argument('output', type=Path); options = parser.parse_args()
+    parser.add_argument('target')
+    parser.add_argument('output', type=Path)
+    parser.add_argument('--extension-probes', action='store_true', help='Exercise ARM64 add-ons and WebAssembly in both runtimes')
+    options = parser.parse_args()
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'): parser.error('MH_TEST_DEEPSEEK_API_KEY is required')
     emulator = support['Emulator'](options.target, 19643); forward = ('tcp:19643', 'tcp:19592')
     emulator.hdc('fport', *forward)
-    try: run(emulator, options.output)
+    try: run(emulator, options.output, options.extension_probes)
     finally: emulator.hdc('fport', 'rm', *forward)
