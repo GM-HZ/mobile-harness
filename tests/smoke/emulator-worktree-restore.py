@@ -102,6 +102,7 @@ def check_restore(emulator, folder, repo, evidence, sessions):
     agent['tool'](emulator, initializer, 'write', {'file_path': 'tracked.txt', 'content': 'BASE'})
     base = bash(emulator, initializer, 'git init -q && git add tracked.txt && ' + commit_template + 'base && git rev-parse HEAD')
     assert re.fullmatch('[a-f0-9]{40}', base), base
+    sessions.remove(initializer)
 
     session = folder_session(emulator, repo)
     sessions.append(session)
@@ -148,13 +149,16 @@ def check_restore(emulator, folder, repo, evidence, sessions):
     assert evidence['forgeActions'] == [
         'request', 'restoring', 'restored', 'restoring', 'restoring', 'restored',
     ], evidence
+    sessions.remove(session)
     emulator.stop()
     emulator.start()
     evidence['restartReadyMs'] = emulator.ready('normal')
+    sessions.append(session)
     result, _ = agent['tool'](emulator, session, 'working_directory', {})
     assert toolkit['texts']([result]).strip() == created['path']
     assert agent['read_bytes'](emulator, checkout + '/tracked.txt') == b'BASE'
     evidence['restoredSessionRetainedAcrossRestart'] = True
+    sessions.remove(session)
     print('Verified cancellation, recreation at base, and restart', flush=True)
 
 
@@ -228,9 +232,13 @@ def run(emulator, output, use_catalog):
         with support['model_key'](emulator):
             try:
                 check_restore(emulator, folder, repo, evidence, sessions)
-            finally:
+            except Exception:
                 for session in sessions:
-                    emulator.rpc('session/cancel', {'request': {'sessionId': session}})
+                    try:
+                        emulator.rpc('session/cancel', {'request': {'sessionId': session}})
+                    except RuntimeError as error:
+                        evidence.setdefault('failureCleanupErrors', []).append(str(error))
+                raise
         evidence['testCredentialRemoved'] = True
     finally:
         try:
