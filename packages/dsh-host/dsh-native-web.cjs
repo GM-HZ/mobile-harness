@@ -332,6 +332,7 @@ async function main() {
   const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
   const officeUrl = paths('dsh-office-kit/lib/index.js');
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
+  const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
   const httpParserUrl = pathToFileURL(path.join(dsh, 'undici/lib/dispatcher/client-h1.js')).href;
   const { patchClientH1 } = require(path.join(root, 'dsh-harmony-http.cjs'));
   globalThis.__harmonyLlhttp = imports => require(path.join(root, 'dsh-harmony-llhttp.cjs'))(imports);
@@ -418,6 +419,15 @@ async function main() {
         patched = replacePinned(patched, 'console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);',
           'console.log("dsh inspector: /inspector/devtools/");');
         return { ...result, source: patched };
+      }
+      if (url === creatorUrl) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        // RC.5 retired cordis-plugin-development while the shipped Creator still asks for it.
+        const patched = replacePinned(source, 'Read and use the cordis-plugin-development skill.',
+          'Load the dsh-doc skill with the skill tool. Follow references/plugin-development.md and references/ui-plugin.md for the installed version.');
+        return { ...result, source: replacePinned(patched,
+          'they supplement the cordis-plugin-development skill.',
+          'they supplement the dsh-doc skill and its plugin references.') };
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
           url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl &&
