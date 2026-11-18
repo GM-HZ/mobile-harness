@@ -66,7 +66,8 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 工作目录与 fork 续接 | 独立 cwd、相对文件、fork 继承、list／send／wait 与消息续接通过；强停重开后同一子会话仍保留 token 和目录。新增事件与字节结果分别核对，见 [续接补验](evidence/emulator-agent-continuation-0.4.33.json) |
 | 公共子进程与可选工作树 | 真正 Git／Node、流式管道、字面 argv、嵌套 Node、环境脱敏、输出限额／spill、实际取消和销毁通过；官方 create_worktree 默认拒绝、明确选择完整权限后创建，目录／分支／提交／文件独立性、重启续接、脏工作树保留和干净工作树归档清理通过 |
 | 自动目标续跑 | 初始轮只创建目标；实际自动轮通过 read／write／get_goal／update_goal 完成任务，隐藏输入／输出均为精确43字节，目标已清理；非长期压力或系统唤醒保证 |
-| Workflow／子代理 | 两个真实并行子任务、同步超时、运行中取消、活跃子任务取消、后台结果投递通过 |
+| Workflow／子代理 | 同步超时、两类运行中取消、后台结果投递通过。0.4.58 两条 Workflow 同时运行，各完成四个真实子任务，单条峰值并发为二，结果隔离和 helper 回收已验。 [并发证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
+| 自定义模型提供者 | 0.4.58 经标准设置热添加 pi-ai 路由，在 DeepSeek 公网验证 Chat Completions 和 Responses 的模型发现、文件读取工具往返与重启续接。 [模型路由证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
 | 定时任务 | 持久化后强停重开已验。0.4.57 模拟器进入后台约 81 秒，三次任务投递并由真实模型回复，返回前台保留同一个 Host 与会话 |
 | 插件及恢复 | 标准 bundle 安装、注入真实崩溃、自动安全模式及旧会话回读通过；实际点击设置恢复入口、原生正常模式按钮后恢复通过 |
@@ -88,7 +89,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **JIT／WASM**：主 Host 保持 jitless，Office 使用独立进程执行官方 WASM，PTC 使用同版本 Amaro 的 JS 产物处理 TypeScript。0.4.57 已在模拟器的 Alpine 子进程中验证默认设置下无 WASM，显式启用后可执行 WASM、TypeScript 文件并用 Node 自带的 fetch 取得 HTTP 200。真机 JIT 能力待复验。
 - **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包和公网 CPython 3.12 ARM64 musllinux `xxhash`。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。其他 wheel、addon、APK 和安装脚本需按具体包验收。 [Node 补验](evidence/emulator-node-extensions-0.4.57.json) · [Python 补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
-- **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权及其他模型提供者待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
+- **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权和 DeepSeek 之外的供应商端点待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
 - **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时长任务压力与剩余可选 bundle 待验。LSP 当前验收为 TypeScript。Forge 的工作树与隔离服务链路已验，公网账号及托管仓库操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。

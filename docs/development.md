@@ -72,6 +72,17 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-workflow.py <loopback-target> .build/emulator-workflow.json
 ```
 
+加 `--fanout-only` 验证两个独立会话中的 Workflow。每条提交四个子任务，记录实际峰值并发、双 Workflow 重叠时间、结果归属和 helper 回收。
+
+## pi-ai 真实模型路由回归
+
+在独立模拟器上按标准设置暂存两条 pi-ai 路由，使用同一个 DeepSeek 公网端点验证模型发现、文件读取工具往返和重启续接。测试结束移除临时凭据并恢复原 profile。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-pi-ai-protocols.py <loopback-target> .build/emulator-pi-ai.json
+```
+
 ## 通用 PTC 回归
 
 0.4.31 起普通构建默认包含通用 PTC。构建机将锁定 Node 子模块中的 Amaro 用固定 Binaryen 132.0.0 转为纯 JavaScript，校验下载包与两个生成文件的摘要并缓存到 `.build/portable-amaro/`；手机无需 WASM 或编译器。恢复模式跳过 PTC。`HARMONY_PTC_AMARO_DIR` 仍可提供相同摘要的预生成文件。安装普通包并通过 HDC 启动后，冒烟测试经真实 DSH 会话触发 `run_code`，检查工作区文件授权、嵌套工具和取消，退出时清除临时文件与凭据。

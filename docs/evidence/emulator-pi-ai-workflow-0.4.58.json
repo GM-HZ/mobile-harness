@@ -1,0 +1,268 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "testSource": "1b408774fea963d37e418cd1a38f94d6ed086448",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.58-unsigned.hap",
+    "version": "0.4.58",
+    "versionCode": 65,
+    "sha256": "37fa495563b212e1e46ad918cf27040872a7b3660fefadf27214c5295fb4d458",
+    "bytes": 720520028,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "977b8a83106e68bc88811109bd998e2affcd5985",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "654ded9961dcc0b99b788f511c08d3ddc11decf8fc122d8b95936f7642e1fcbe",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "install": {
+    "exitCode": 0,
+    "logSha256": "3cba2f488d0f71b18507a9bb96f73c51ed835809f9e3b34145896ba1fddb1762",
+    "installedVersion": "0.4.58",
+    "installedVersionCode": 65,
+    "deviceMetadataSha256": "26deb743762f93829d56b2cffbaf9252bce639d8308f0014f0a3bf5ef42dc6fd"
+  },
+  "piAi": {
+    "publicEndpoint": "https://api.deepseek.com",
+    "credentialEnv": "MH_TEST_DEEPSEEK_API_KEY",
+    "command": [
+      "python3",
+      "tests/smoke/emulator-pi-ai-protocols.py",
+      "127.0.0.1:15557",
+      ".build/batch-066/pi-ai.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "d62ae7f25adf92ab4a0d6812764be742192fb9a617e4728a0e5aa5ce261ebc0e",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "protocols": {
+        "openai-completions": {
+          "session": "session-c36d8c75-56c9-4ca3-a7eb-79695578ca2f",
+          "modelDiscovery": {
+            "id": "deepseek-flash",
+            "name": "DeepSeek-V4.1-Flash",
+            "contextWindow": 1048576,
+            "maxTokens": 393216
+          },
+          "exactToolRoundTrip": true,
+          "durableRoute": "mh-pi-b77868b422-openai-completions",
+          "recallAfterRestart": true
+        },
+        "openai-responses": {
+          "session": "session-3735f7ab-77fb-4295-85eb-aaef31fb759b",
+          "modelDiscovery": {
+            "id": "deepseek-flash",
+            "name": "DeepSeek-V4.1-Flash",
+            "contextWindow": 1048576,
+            "maxTokens": 393216
+          },
+          "exactToolRoundTrip": true,
+          "durableRoute": "mh-pi-b77868b422-openai-responses",
+          "recallAfterRestart": true
+        }
+      },
+      "registeredAndUsedWithoutRestart": true,
+      "restartReadyMs": 5868,
+      "testCredentialRemoved": true,
+      "profileRestored": true
+    }
+  },
+  "workflowFanout": {
+    "credentialEnv": "MH_TEST_DEEPSEEK_API_KEY",
+    "command": [
+      "python3",
+      "tests/smoke/emulator-workflow.py",
+      "127.0.0.1:15557",
+      ".build/batch-066/fanout.json",
+      "--fanout-only"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "63789ce19e63fde6cae52cd443907c0a8a3cd49ad350765fb87fbe774298bb6f",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "startupMs": 102,
+      "fanout": {
+        "alpha": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 3070
+        },
+        "beta": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 2215
+        }
+      },
+      "overlappingParentRunsMs": 2191,
+      "workersReaped": 2,
+      "sessions": {
+        "mh-fanout-beta": "session-e84b13d8-1dc4-456a-afe6-2f8665cdf6d9",
+        "mh-fanout-alpha": "session-0d5387dc-d875-491c-b23a-6ee834070ab3"
+      },
+      "temporaryModelCredentialRemoved": true
+    }
+  },
+  "profileAndSessionAudit": {
+    "command": [
+      "python3",
+      ".build/batch-066/audit.py",
+      "post-regression"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "63adc13b67d5236baf5228a99569c7f8388de442a7161a99063d07a6077122f1",
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "observed": {
+      "target": "127.0.0.1:15557",
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "readyMs": 66,
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      },
+      "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "titlesAndBadgeDefaultOff": {
+        "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.5"
+        },
+        "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.5"
+        }
+      },
+      "fourOptionalBundlesDefaultOff": {
+        "@deepseek-ai/dsh-experimental-ralph-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-session-search": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-tool-worktree": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-forge-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        }
+      },
+      "chatImportDefaultOff": {
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "inspectorDefaultOff": true,
+      "translationDefaultOff": true,
+      "recommendationsDefaultOff": {
+        "name": "@deepseek-ai/dsh-personalized-recommendations",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "badgeDefaultOff": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "batchDefaultOff": [
+        {
+          "name": "@deepseek-ai/dsh-experimental-auto-review",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        {
+          "name": "@deepseek-ai/dsh-experimental-liveshare",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        }
+      ],
+      "voiceDefaultOff": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "temporaryVoiceCacheRemoved": true
+    }
+  },
+  "initialFixtureFailures": [
+    {
+      "fixture": "pi-ai",
+      "result": "settings/rejected",
+      "cause": "A reasoning model requires at least one level besides off.",
+      "logSha256": "06dfe29e576ed30291294f4acf3e5ce644e95f7da4b16a00421afe5d976c7c21"
+    },
+    {
+      "fixture": "pi-ai",
+      "result": "llm/model-discovery-rejected",
+      "cause": "The discovery draft omitted the endpoint base URL.",
+      "logSha256": "c334ab7d779a4447dc513d9113926fc194949e8d8f730cb9f5814a1e3fb54078"
+    },
+    {
+      "fixture": "workflow",
+      "result": "AssertionError",
+      "cause": "The fixture expected all four children to start at once. The default emulator scheduler admitted two concurrently and ran all four.",
+      "logSha256": "bbe619ffa1c138274779f37f21805bcb1626855bd2df85861b2cdbd0e17b119f"
+    }
+  ]
+}
