@@ -1,6 +1,6 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.62，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.63，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
@@ -71,7 +71,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | Workflow／子代理 | 同步超时、两类运行中取消、后台结果投递通过。0.4.62 启动两小时重复验收，首轮两条并行 Workflow 各完成四个真实子任务，峰值并发各为二，结果隔离和 helper 回收已验。 [首轮证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
 | 自定义模型提供者 | 0.4.58 经标准设置热添加 pi-ai 路由，在 DeepSeek 公网验证 Chat Completions 和 Responses 的模型发现、文件读取工具往返与重启续接。 [模型路由证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
-| 定时任务 | 0.4.58 长测在第 106 秒强停重启，保留旧会话与待执行任务。跨过一小时后第六次真实模型投递通过，两小时长测尚在运行。 [检查点](evidence/emulator-workspace-dependencies-0.4.61.json) |
+| 定时任务 | 0.4.58 在模拟器跨两小时完成七次真实模型投递，第 106 秒强停重启保留已有会话和四个待执行任务。回前台精确回忆首轮，清理通过。 [两小时实测](evidence/emulator-schedule-soak-0.4.58.json) |
 | LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。公网 Relay 及真实身份提供方待验。 [实测证据](evidence/emulator-liveshare-owner-0.4.60.json) |
 | 麦克风与语音输入 | 0.4.62 从 DSH 录音按钮触发鸿蒙模拟器的系统授权，ArkWeb 音轨进入 live，取消后进入 ended。合成普通话回填及语音 worker 回收同包通过。真机说话转写待验。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
 | Forge 托管仓库 | 0.4.62 经包内 gh 和只读桌面认证代理读取公开 PR 文件与提交，文件逐字相同，提交及其父提交和官网 REST 结果一致。写操作经隔离服务验证。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
@@ -80,7 +80,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 插件管理补验 | 本版经实际 API 安装、启用、禁用和卸载自建 bundle，pnpm remove 退出0；postinstall 没有执行。恢复测试安装前备份原配置，结束后回普通模式且 manifest／lock 摘要一致；任意插件升级与安装脚本仍不据此承诺 |
 | 官方插件市场 | 受控索引发现、分页缓存、仓库安装与纯 JS 依赖、拒绝不兼容版本、升级后重启、激活失败后跨重启回滚、卸载和 ArkWeb 确认／取消已验。公共索引与 Git 来源升级另行验收 |
 | 会话压缩 | 官方 /compact 的真实摘要、命令／日志来源、完整工具配对、精确事实回忆与重启恢复通过；真实输出后 HTTP取消、忙碌拒绝、流故障及重试通过。完整standard临时预设的低阈值自动压力通过；原配置恢复。见 [补验证据](evidence/emulator-compaction-0.4.35.json)，非默认满容量或真实远端overflow压力保证 |
-| LSP | 官方三插件与真实 TypeScript server；四种语义查询、精确位置／标准库、UTF-16、新内容、无结果、越界源拒绝、复用与进程组崩溃重建通过。自带 bundle 启停及重启保留通过，真实语义响应暂扣场景中的取消、provider 销毁及重试通过，非所有语言服务器保证。见 [实现](research/harmonyos-lsp.md) |
+| LSP | 0.4.63 经官方插件加入 Pyright，实测 Python 源码、类型存根和标准库的定义、引用及类型提示，进程按需创建并复用。TypeScript 四种语义查询、UTF-16、权限边界和进程崩溃重建通过复验。 [本轮证据](evidence/emulator-python-lsp-0.4.63.json) |
 | Office | Office skill、DOCX／PPTX PDF、页面附件、Excel 公式重算、缓存、损坏文档拒绝和实际取消已通过；原生 worker 正常操作约 2–3 秒。销毁、超时、故障后新请求恢复及所有 helper 回收均已验证。见[实现与证据](research/harmonyos-native-office.md) |
 | 目标、待办、团队任务与交付 | todo、内置 dsh-doc、present、目标创建／暂停／旧 revision 拒绝，以及团队依赖、认领、完成通过；目标和任务强停后保留，测试目标已清除、团队模式恢复关闭 |
 | 提问、计划与插件发现 | 实际 Remote Events 的回答、取消、同会话继续，计划拒绝保持 active／批准退出，以及绑定本次工具的单次插件列表审批均通过。此项不等于 ArkWeb 视觉布局完整验收 |
@@ -97,7 +97,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权和 DeepSeek 之外的供应商端点待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
-- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时长任务压力与剩余可选 bundle 待验。LSP 当前验收为 TypeScript。Forge 的设备直接登录及托管仓库写操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
+- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的设备直接登录及托管仓库写操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。

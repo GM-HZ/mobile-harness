@@ -30,6 +30,13 @@ DSH 层解包标记绑定实际 ZIP 的 SHA-256，修复“同一 DSH RC 增加�
 
 生命周期夹具只在独立测试 bundle 内使用透明 stdio relay：真实服务器先返回 hover，relay 保存实际响应后暂扣这一帧，再触发取消或插件销毁。它不生成 initialize 能力或语义结果；该故障场景专门检查取消升级、进程回收、路由注销和新请求恢复，不能替代正常服务器的四种语义测试。夹具的 shutdown／kill grace 均为250毫秒，实测取消431毫秒、销毁131毫秒；这不是默认配置（上游分别为5秒／2秒）的延迟保证。
 
-LSP 是受信任配置启动的读源码服务，PRoot 不是操作系统隔离。工作区外查询的入口拒绝不代表服务器无法读取其解析所需的标准库或依赖。默认提供 JS／TS 路由，其他语言服务器须另外声明依赖、配置并实测；不承诺所有语言、项目规模或原生工具自动兼容。系统 PTY 和 Phone Use 仍沿用已确认的暂缓范围。
+LSP 是受信任配置启动的读源码服务，PRoot 不是操作系统隔离。工作区外查询的入口拒绝不代表服务器无法读取其解析所需的标准库或依赖。JS／TS 继续使用 TypeScript language server。0.4.63 在同一 bundle 添加需用时启动的 Pyright `1.1.414`，路由 `.py` 与 `.pyi`。源码使用官方标签的 Git 子模块，安装字节使用官方 npm 锁定摘要。其他语言服务器须另外声明依赖、配置并实测。系统 PTY 和 Phone Use 仍沿用已确认的暂缓范围。
 
 [准确制品、11组命令、失败批次与最终审计](../evidence/emulator-lsp-0.4.35.json)。本节点生产源为 `684d101e97a61a8b929e2628d2cd43022dab48d8`；后续测试修正与生产源码分别绑定。
+
+0.4.63 在 Host 的私有 JavaScript 环境中为两类语言服务器提供固定运行时根目录。该值来自应用自己的安装目录。模拟器验收用普通 DSH 会话分别查询 Python 源文件、类型存根和标准库，另跑原有 TypeScript 语义与故障重建。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-lsp.py <loopback-target> .build/lsp-python.json --python
+```

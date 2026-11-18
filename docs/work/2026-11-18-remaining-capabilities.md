@@ -1,6 +1,6 @@
 # DSH 剩余工作清点
 
-截至 0.4.62，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.63，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
 - 28 类工具包中 25 类已有实际调用证据。3 类为当前不适用或暂缓项（pwsh、pwsh-persistent、terminal）。
 - 16 个官方可选 bundle 中，11 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector、auto-review、personalized-recommendations、cot-translation），2 个暂缓（cua、terminal），3 个待完成。Forge 已通过本地工作树场景。
@@ -20,7 +20,7 @@
 2. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
 3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。其他原生依赖组合与用户指定的公网索引待验。DSH 官方市场接受自定义索引。
 4. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。0.4.57 已从 ArkWeb 打开 DeepSeek 官方登录页，隔离回环服务通过授权回调、重启保留与登出撤销。0.4.58 经标准设置添加 pi-ai 路由，使用 DeepSeek 公网通过 Chat Completions 和 Responses 两种协议的模型发现、工具往返与重启续接。真实账号授权与其他供应商端点待验。
-5. 0.4.61 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。0.4.58 模拟器两小时测试已跨过一小时并完成第 6 次后台投递，此前在第 106 秒强停后保留了会话及排队任务。最终结果待记录。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
+5. 0.4.58 两小时模拟器后台长测已完成 7 次真实模型投递。第 106 秒强停后会话和四个未投递任务保留，回前台准确回忆，测试凭据已移除。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。 [两小时实测](../evidence/emulator-schedule-soak-0.4.58.json)
 
 系统 PTY、Phone／Computer Use 和 Windows 专用工具按既有范围单列。语言服务器、原生 wheel、WASM 与原生 addon 组合按具体需要验收。
 
@@ -71,3 +71,5 @@ Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提�
 0.4.62 补齐 Minimal 预设的持久 Bash，支持跨轮目录、环境变量和函数、后台任务、退出码与两条会话隔离。默认权限下在启动前拒绝，已明确选择完整文件权限的会话可用。验证用户取消后回收进程、下轮重建、显式退出和配置恢复。 [本轮证据](../evidence/emulator-persistent-bash-0.4.62.json)
 
 同一制品完成模拟器原生麦克风、真实 GitHub PR 只读及两小时 Workflow 首轮。包内 gh 在隔离服务的写操作复验通过。 [本轮证据](../evidence/emulator-voice-forge-workflow-0.4.62.json)
+
+0.4.63 补齐 Python 源码和类型存根导航，修复了公共语言服务器运行时路径及原生 Host 启动计时。在独立模拟器全新安装和重启均加载 ArkWeb，复验 TypeScript 和安全恢复。 [本轮证据](../evidence/emulator-python-lsp-0.4.63.json)

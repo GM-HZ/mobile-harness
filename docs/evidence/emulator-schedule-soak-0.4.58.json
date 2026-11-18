@@ -1,0 +1,155 @@
+{
+  "testSource": "8986ff38bc3501094e313b62dd6896fd039f1589",
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.58-unsigned.hap",
+    "version": "0.4.58",
+    "versionCode": 65,
+    "sha256": "37fa495563b212e1e46ad918cf27040872a7b3660fefadf27214c5295fb4d458",
+    "bytes": 720520028,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "977b8a83106e68bc88811109bd998e2affcd5985",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "654ded9961dcc0b99b788f511c08d3ddc11decf8fc122d8b95936f7642e1fcbe",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "command": [
+    "caffeinate",
+    "-i",
+    "python3",
+    "tests/smoke/emulator-background-schedule.py",
+    "127.0.0.1:15557",
+    ".build/batch-067/schedule-soak.json",
+    "--soak"
+  ],
+  "exitCode": 0,
+  "jsonSha256": "3b80c00664d4361dbda4931edb4786b112cb8af4ccf7317df2b8546d941ecf9c",
+  "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "observed": {
+    "deliveries": [
+      {
+        "afterSeconds": 16,
+        "finishedTurn": 2,
+        "exactReply": true,
+        "source": "schedule",
+        "receipt": {
+          "scheduledAt": "2026-11-18T19:12:39.773Z",
+          "deliveredAt": "2026-11-18T19:12:39.811Z",
+          "messageId": "57a3673c-9547-49db-96e7-09a0ce5f3abd",
+          "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+        },
+        "observedAtMs": 16876
+      },
+      {
+        "afterSeconds": 48,
+        "finishedTurn": 3,
+        "exactReply": true,
+        "source": "schedule",
+        "receipt": {
+          "scheduledAt": "2026-11-18T19:13:11.818Z",
+          "deliveredAt": "2026-11-18T19:13:11.843Z",
+          "messageId": "688c6723-36c9-457a-ba0c-48fd21c6660c",
+          "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+        },
+        "observedAtMs": 49645
+      },
+      {
+        "afterSeconds": 80,
+        "finishedTurn": 4,
+        "exactReply": true,
+        "source": "schedule",
+        "receipt": {
+          "scheduledAt": "2026-11-18T19:13:43.860Z",
+          "deliveredAt": "2026-11-18T19:13:43.889Z",
+          "messageId": "51adf218-7706-4bee-8c65-0c6a8304ce59",
+          "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+        },
+        "observedAtMs": 81869
+      },
+      {
+        "afterSeconds": 160,
+        "finishedTurn": 5,
+        "exactReply": true,
+        "source": "schedule",
+        "receipt": {
+          "scheduledAt": "2026-11-18T19:15:03.901Z",
+          "deliveredAt": "2026-11-18T19:15:04.013Z",
+          "messageId": "0168fc81-d81d-4ec7-be28-7dababa3297d",
+          "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+        },
+        "observedAtMs": 161448
+      },
+      {
+        "afterSeconds": 1800,
+        "finishedTurn": 6,
+        "exactReply": true,
+        "source": "schedule",
+        "receipt": {
+          "scheduledAt": "2026-11-18T19:42:23.939Z",
+          "deliveredAt": "2026-11-18T19:42:24.060Z",
+          "messageId": "aea9f860-8aa6-4951-86de-35e1dda08904",
+          "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+        },
+        "observedAtMs": 1813297
+      },
+      {
+        "afterSeconds": 3600,
+        "finishedTurn": 7,
+        "exactReply": true,
+        "source": "schedule",
+        "receipt": {
+          "scheduledAt": "2026-11-18T20:12:23.979Z",
+          "deliveredAt": "2026-11-18T20:12:24.136Z",
+          "messageId": "c9d27aad-c820-457f-9909-78ca0d8840dc",
+          "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+        },
+        "observedAtMs": 3609957
+      },
+      {
+        "afterSeconds": 7200,
+        "finishedTurn": 8,
+        "exactReply": true,
+        "source": "schedule",
+        "receipt": {
+          "scheduledAt": "2026-11-18T21:12:24.017Z",
+          "deliveredAt": "2026-11-18T21:12:24.393Z",
+          "messageId": "cc922558-8e60-436e-a900-c65e2150906b",
+          "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+        },
+        "observedAtMs": 7210717
+      }
+    ],
+    "delaysSeconds": [
+      16,
+      48,
+      80,
+      160,
+      1800,
+      3600,
+      7200
+    ],
+    "restartAtSeconds": 105,
+    "finished": true,
+    "restart": {
+      "atMs": 106412,
+      "readyMs": 5689,
+      "priorJournalPreserved": true,
+      "undeliveredTasksPreserved": 4
+    },
+    "backgroundDurationMs": 7210756,
+    "backgroundStateSamples": 560,
+    "hostLaunchIdentityUnchanged": false,
+    "hostIdentityStableOutsidePlannedRestart": true,
+    "journalPreservedWhileBackgrounded": true,
+    "foregroundExactRecall": true,
+    "testCredentialRemoved": true
+  }
+}

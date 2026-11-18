@@ -1,0 +1,397 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15563",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone",
+    "freshInstall": true
+  },
+  "dshRegistryNext": "0.2.2-rc.5",
+  "testSource": "dc40fdafb4d1c3f2d50f74eeebc981dff5015ea9",
+  "artifact": {
+    "sourceCommit": "b241c6544f23041affbbb7d2ef519f1b8c14e7ca",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.63-unsigned.hap",
+    "version": "0.4.63",
+    "versionCode": 70,
+    "bytes": 768536406,
+    "sha256": "2de37fa8b16f8034e8ef2e513d3eb2d1a2b099a43992dbdd2c9e142cf4610e0c",
+    "layerSha256": "2f357f696054b33b3390111843a802116a4e622503909dec5e4fe47aef89fe77",
+    "pyrightVersion": "1.1.414",
+    "pyrightEntrySha256": "f200762078eb9880faf421a5b30f9ef3055b1d85c6f10780d75db4da8d8499f1",
+    "signedArtifact": {
+      "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.63-signed.hap",
+      "bytes": 772207023,
+      "sha256": "803a08d5c679eb85ad1141d9d26de3e134bf656bfe9cf2227ab61b9d81aedf66",
+      "profileVerified": true,
+      "signatureVerified": true,
+      "matchingPayloadEntries": 209
+    }
+  },
+  "build": {
+    "command": [
+      "./build.sh",
+      "--package"
+    ],
+    "exitCode": 0,
+    "logSha256": "877de29ce06b47587f61369c6801fd583f22535b637ce427d8bc9393e9746233"
+  },
+  "install": {
+    "exitCode": 0,
+    "logSha256": "f809bbf1c53ef1a4eac9cb02bd27c014897c36b3c318e1d666e119929196fce9"
+  },
+  "firstStartup": {
+    "command": [
+      "tests/bench/measure-emulator-start.sh",
+      "127.0.0.1:15563",
+      "restart",
+      "120"
+    ],
+    "exitCode": 0,
+    "logSha256": "088ca626616c80d828b11f8781640e155e9aaf8185a2f2f044994c205e923f53",
+    "runtimeExtracted": true,
+    "runtimeExtractionMs": 18024,
+    "loopbackReadyMs": 25239,
+    "arkWebCompleteMs": 28341
+  },
+  "warmRestart": {
+    "command": [
+      "tests/bench/measure-emulator-start.sh",
+      "127.0.0.1:15563",
+      "restart"
+    ],
+    "exitCode": 0,
+    "logSha256": "beba4b79a0af9554de9777532e7b72fd85353bba964078a1c27f9393c4b72756",
+    "runtimeExtracted": false,
+    "runtimeExtractionMs": 0,
+    "loopbackReadyMs": 4843,
+    "arkWebCompleteMs": 7431
+  },
+  "previousBuildPythonBaseline": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-lsp.py",
+      "127.0.0.1:15559",
+      ".build/batch-073/python-baseline.json",
+      "--expect-python-absent",
+      "--port",
+      "19652"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "281f004b86ba2af92a5094c93b9adc92c2f2e53295ea2b7dfcb213eccf4759c6",
+    "logSha256": "86ed63804bb37a7ba35b39df144a7f0539ad906420da4926ce2fd94c79ae5784",
+    "observed": {
+      "noServerBeforeFirstQuery": true,
+      "sessionId": "session-3c4eb75e-fe9a-4107-80d2-6cefaa89e7fb",
+      "definition": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.py",
+          "line": 4,
+          "character": 9
+        },
+        "text": "Error: no LSP provider handles \"consumer.py\"",
+        "elapsedMs": 2176,
+        "isError": true
+      },
+      "temporaryModelCredentialRemoved": true,
+      "finalNormalReadyMs": 8091
+    }
+  },
+  "python": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-lsp.py",
+      "127.0.0.1:15563",
+      ".build/batch-073/python.json",
+      "--python",
+      "--port",
+      "19652"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "523b43046df8b588b93b712068bec680663b248d3083f0998410ddc2bf31df0d",
+    "logSha256": "9d0d1a9348cd1c0fc71702ffc0dd19853595312b8bfb60c2a1ec409c774f0763",
+    "observed": {
+      "version": "1.1.414",
+      "noServerBeforeFirstQuery": true,
+      "sessionId": "session-70450505-3eb6-4e2e-a28e-b5df49b0629d",
+      "definition": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.py",
+          "line": 4,
+          "character": 9
+        },
+        "text": "shapes.py:1:5",
+        "elapsedMs": 8612,
+        "isError": false
+      },
+      "stub": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.py",
+          "line": 5,
+          "character": 10
+        },
+        "text": "numeric.pyi:1:5",
+        "elapsedMs": 2215,
+        "isError": false
+      },
+      "stubHover": {
+        "args": {
+          "operation": "hover",
+          "file_path": "numeric.pyi",
+          "line": 1,
+          "character": 6
+        },
+        "text": "```python\n(function) def product(value: int) -> int\n```",
+        "elapsedMs": 2300,
+        "isError": false
+      },
+      "hover": {
+        "args": {
+          "operation": "hover",
+          "file_path": "consumer.py",
+          "line": 4,
+          "character": 9
+        },
+        "text": "```python\n(function) def diameter(radius: float) -> float\n```",
+        "elapsedMs": 2357,
+        "isError": false
+      },
+      "references": {
+        "args": {
+          "operation": "findReferences",
+          "file_path": "shapes.py",
+          "line": 1,
+          "character": 6
+        },
+        "text": "consumer.py:1:20\nconsumer.py:4:8\nshapes.py:1:5",
+        "elapsedMs": 2377,
+        "isError": false
+      },
+      "stdlib": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.py",
+          "line": 6,
+          "character": 14
+        },
+        "text": "/data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.5/dsh/node_modules/pyright/dist/typeshed-fallback/stdlib/math/__init__.pyi:144:5",
+        "elapsedMs": 2108,
+        "isError": false
+      },
+      "sameServerReusedAcrossQueries": true,
+      "temporaryModelCredentialRemoved": true,
+      "finalNormalReadyMs": 4655
+    }
+  },
+  "typescript": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-lsp.py",
+      "127.0.0.1:15563",
+      ".build/batch-073/typescript.json",
+      "--port",
+      "19652"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "7256a18c38501dd0b2fd96fba761f313f9a6cf0383c29ac9472deb7d8dac540f",
+    "logSha256": "c27f38b66f1c8e34076323536bfdf6e7c4237e3b2e748437a0475f5f9e256e51",
+    "observed": {
+      "fixture": "mh-lsp-7b49c0a5c0",
+      "installedVersions": {
+        "@deepseek-ai/dsh-lsp": "0.2.2-rc.5",
+        "@deepseek-ai/dsh-lsp-stdio": "0.2.2-rc.5",
+        "@deepseek-ai/dsh-tool-lsp": "0.2.2-rc.5",
+        "typescript": "6.0.3",
+        "typescript-language-server": "5.0.0"
+      },
+      "noServerBeforeFirstQuery": true,
+      "sessionId": "session-1c7c3393-bd07-4b50-90df-caf4884dd81e",
+      "definition": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.ts",
+          "line": 2,
+          "character": 24
+        },
+        "text": "shapes.ts:10:17",
+        "elapsedMs": 11986,
+        "isError": false
+      },
+      "pooledServerPid": 6084,
+      "references": {
+        "args": {
+          "operation": "findReferences",
+          "file_path": "shapes.ts",
+          "line": 10,
+          "character": 18
+        },
+        "text": "shapes.ts:10:17\nconsumer.ts:1:18\nconsumer.ts:2:23\nconsumer.ts:4:45",
+        "elapsedMs": 2128,
+        "isError": false
+      },
+      "implementation": {
+        "args": {
+          "operation": "goToImplementation",
+          "file_path": "shapes.ts",
+          "line": 1,
+          "character": 19
+        },
+        "text": "shapes.ts:5:14",
+        "elapsedMs": 1677,
+        "isError": false
+      },
+      "hover": {
+        "args": {
+          "operation": "hover",
+          "file_path": "consumer.ts",
+          "line": 2,
+          "character": 37
+        },
+        "text": "\n```typescript\n(alias) new Circle(r: number): Circle\nimport Circle\n```\n",
+        "elapsedMs": 1825,
+        "isError": false
+      },
+      "utf16AfterAstralCharacter": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.ts",
+          "line": 4,
+          "character": 46
+        },
+        "text": "shapes.ts:10:17",
+        "elapsedMs": 2404,
+        "isError": false
+      },
+      "standardLibrary": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "consumer.ts",
+          "line": 3,
+          "character": 31
+        },
+        "text": "/data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.5/toolchains/lsp/node_modules/typescript/lib/lib.es5.d.ts:670:14",
+        "elapsedMs": 1884,
+        "isError": false
+      },
+      "freshSource": {
+        "args": {
+          "operation": "hover",
+          "file_path": "consumer.ts",
+          "line": 5,
+          "character": 15
+        },
+        "text": "\n```typescript\nconst rewritten: boolean\n```\n",
+        "elapsedMs": 2278,
+        "isError": false
+      },
+      "noResult": {
+        "args": {
+          "operation": "goToDefinition",
+          "file_path": "empty.ts",
+          "line": 1,
+          "character": 1
+        },
+        "text": "No results.",
+        "elapsedMs": 2143,
+        "isError": false
+      },
+      "outsideWorkspace": {
+        "args": {
+          "operation": "hover",
+          "file_path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-lsp-7b49c0a5c0-outside.ts",
+          "line": 1,
+          "character": 1
+        },
+        "text": "Error: source \"/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-lsp-7b49c0a5c0-outside.ts\" resolves outside the workspace",
+        "elapsedMs": 1817,
+        "isError": true
+      },
+      "sameServerReusedAcrossQueries": true,
+      "ownedCrashCommandResult": "KILLED",
+      "afterServerCrash": {
+        "args": {
+          "operation": "hover",
+          "file_path": "consumer.ts",
+          "line": 5,
+          "character": 15
+        },
+        "text": "\n```typescript\nconst rewritten: boolean\n```\n",
+        "elapsedMs": 10362,
+        "isError": false
+      },
+      "crashedServerReplacedAndReaped": true,
+      "temporaryModelCredentialRemoved": true,
+      "finalNormalReadyMs": 4779
+    }
+  },
+  "recovery": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-recovery.py",
+      "127.0.0.1:15563",
+      ".build/batch-073/recovery.json",
+      "--port",
+      "19652"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "10f2de922e63ca3064f4745dcc3684c7d00a1d27636a662a9030e9da6e172882",
+    "logSha256": "6e57c36537d9dad403f6cadbb95a6e85e71d6e8045cf2489ded1c3b4013d0a59",
+    "observed": {
+      "fixture": "mobile-harness-crash-4570bd10f6",
+      "normalReadyMs": 60,
+      "anonymousHttp": 401,
+      "manifestBeforeSha256": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+      "lockBeforeSha256": null,
+      "pluginInstalledDisabled": true,
+      "actualPluginCrash": true,
+      "interruptedNormalBoot": {
+        "mode": "normal",
+        "pending": true
+      },
+      "safeReadyMs": 4345,
+      "safeAuthenticatedHttp": 200,
+      "pluginNotLoadedAgain": true,
+      "sameSessionInSafeMode": true,
+      "normalProfileRestored": true,
+      "returnNormalReadyMs": 4387,
+      "manifestAfterSha256": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+      "lockAfterSha256": null
+    }
+  },
+  "earlierAttempts": [
+    {
+      "artifact": {
+        "sourceCommit": "0e8420aaf034c1e0662cd1c7cc22f58de8021d9c",
+        "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.63-unsigned.hap",
+        "version": "0.4.63",
+        "versionCode": 70,
+        "bytes": 768535866,
+        "sha256": "fab6993259b546166a04311961fd339dfa4cfdedc2cacd25d25b1a4f817cc791",
+        "layerSha256": "fe21e4d599dc39af180e14dc8e5c0b7c915358cab1d0ae35d900ee7791430ac3",
+        "pyrightVersion": "1.1.414",
+        "pyrightEntrySha256": "f200762078eb9880faf421a5b30f9ef3055b1d85c6f10780d75db4da8d8499f1",
+        "signedArtifact": {
+          "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.63-signed.hap",
+          "bytes": 772207366,
+          "sha256": "cd95167f5ce782bd7712c63876ef1fe87c162ce269f3a19670a1cc51c0b37a85",
+          "profileVerified": true,
+          "signatureVerified": true,
+          "matchingPayloadEntries": 209
+        }
+      },
+      "startupAppLogSha256": "e8343a064c33bbe1ba3ce0d7f63e62b9ef3959cde747a3c1173dd6ed29024f11",
+      "timelineSha256": "5f5a14327974fc9e83b8d0b6621ae8a78ee90a6e3f73e69ca2b6dce4eea880ae",
+      "smokeLogSha256": "c51655440b0a84e881e28726cea9f3b1d0c40887d87c0bfb2ec9ead296735341",
+      "observed": "The watch expired at 60 seconds while the native Host was still running. Native loopback was ready about 81 seconds after startup."
+    },
+    {
+      "logSha256": "cb1b5c7d6f8ed18845079c165f94aa1d6f69a14d2de169e491184d1995c4858b",
+      "observed": "The provider was registered, but the language server path was relative to an undefined runtime root. The final Host supplies its actual private path."
+    }
+  ],
+  "scope": {
+    "hardware": "Mate 60 offline",
+    "startupStress": "The final artifact was measured from a clean emulator with the independent Workflow soak also active. The original three-emulator load was not repeated."
+  }
+}
