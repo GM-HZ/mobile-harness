@@ -169,7 +169,7 @@ def catalog_state(emulator, enabled):
         row, = [row for row in catalog if row['name'] == name]
         assert row['availability'] == 'installation' and row['optional'] and row['official'], row
         assert not row['installed'] and not row['removable'] and not row.get('error'), row
-        assert row['version'] == '0.2.2-rc.4' and row['enabled'] == (name in enabled), row
+        assert row['version'] == '0.2.2-rc.5' and row['enabled'] == (name in enabled), row
         keys = ['availability', 'optional', 'official', 'installed', 'removable', 'version', 'enabled']
         rows[name] = {key: row[key] for key in keys}
     return rows

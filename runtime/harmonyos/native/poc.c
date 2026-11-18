@@ -366,7 +366,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             closedir(contents);
         }
         if (dsh_test) {
-            snprintf(dsh_binding, sizeof(dsh_binding), "%s/.dsh-0.2.2-rc.4/dsh:/dsh", root);
+            snprintf(dsh_binding, sizeof(dsh_binding), "%s/.dsh-0.2.2-rc.5/dsh:/dsh", root);
             bound_guest[bound_count++] = "-b";
             bound_guest[bound_count++] = dsh_binding;
         }

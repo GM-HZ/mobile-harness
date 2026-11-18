@@ -103,7 +103,7 @@ def stage_ptc_worker():
         path = "dsh/node_modules/@deepseek-ai/dsh-ptc-runtime-node/lib/process.js"
         bundled = layer.read(path)
     if hashlib.sha256(bundled).hexdigest() != "c01308c52fc52d5f13edd2b65008f3bbcf67bd753eb17af5e4bc023216eca6b4":
-        raise SystemExit("Expected the pinned RC.4 PTC bootstrap")
+        raise SystemExit("Expected the locked DSH PTC bootstrap")
     entry = "runNodeMain(openInheritedControlChannel(), Number(process.argv[2]), process);"
     if bundled.decode("utf8").count(entry) != 1:
         raise SystemExit("Unexpected pinned PTC bootstrap entry")

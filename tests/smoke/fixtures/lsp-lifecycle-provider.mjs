@@ -26,10 +26,10 @@ async function run(action) {
     await owner.plugin(FileSystem, { cwd });
     await owner.plugin(Subprocess);
     const fiber = await owner.plugin(LspStdio, { servers: { typescript: {
-      command: 'node', args: [cwd + '/relay.cjs', root + '/.dsh-0.2.2-rc.4/dsh/node_modules/typescript-language-server/lib/cli.mjs', marker],
+      command: 'node', args: [cwd + '/relay.cjs', root + '/.dsh-0.2.2-rc.5/dsh/node_modules/typescript-language-server/lib/cli.mjs', marker],
       extensionToLanguage: { '.ts': 'typescript' }, shutdownTimeoutMs: 250, killGraceMs: 250,
       initializationOptions: { disableAutomaticTypingAcquisition: true, maxTsServerMemory: 384,
-        tsserver: { path: root + '/.dsh-0.2.2-rc.4/toolchains/lsp/node_modules/typescript/lib/tsserver.js', useSyntaxServer: 'never' } },
+        tsserver: { path: root + '/.dsh-0.2.2-rc.5/toolchains/lsp/node_modules/typescript/lib/tsserver.js', useSyntaxServer: 'never' } },
     } } });
     const pending = owner.lsp.query(query, controller.signal).then(value => ({ value }), error => ({ error }));
     const deadline = Date.now() + 30000;

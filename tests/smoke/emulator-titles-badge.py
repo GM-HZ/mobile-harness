@@ -17,7 +17,7 @@ TITLE_PROVIDER = 'session-title-all-prompts-llm'
 DEFAULT_PROVIDER = 'session-title-first-prompt-llm'
 BADGE_MODULE = '@deepseek-ai/dsh-skill-badge'
 ASSET_SOURCE = Path('vendor/repos/dsh/packages/experimental/skill-badge/assets')
-ASSET_DEVICE = 'alpine/.dsh-0.2.2-rc.4/dsh/node_modules/' + BADGE_MODULE + '/assets'
+ASSET_DEVICE = 'alpine/.dsh-0.2.2-rc.5/dsh/node_modules/' + BADGE_MODULE + '/assets'
 MARKDOWN = '# Badge acceptance\n\n[![](https://img.shields.io/badge/powered_by-dsh-4D6BFE?style=flat-square&logo=deepseek&logoColor=white)](https://github.com/deepseek-ai/deepseek-harness)'
 
 
@@ -28,7 +28,7 @@ def catalog(emulator, enabled):
     for name in [TITLE_BUNDLE, BADGE_BUNDLE]:
         row, = [row for row in rows if row['name'] == name]
         assert row['availability'] == 'installation' and row['official'] and row['optional'], row
-        assert row['version'] == '0.2.2-rc.4' and not row['removable'] and not row.get('error'), row
+        assert row['version'] == '0.2.2-rc.5' and not row['removable'] and not row.get('error'), row
         assert row['enabled'] == enabled, row
         status[name] = {key: row[key] for key in keys}
     return status

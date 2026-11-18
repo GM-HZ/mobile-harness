@@ -29,7 +29,7 @@ def restore_bytes(emulator, path, body, remote):
 def archive_fixture(destination, name):
     root = support['WORKSPACE'].rsplit('/', 1)[0]
     source = Path(__file__).with_name('fixtures').joinpath('lsp-lifecycle-provider.mjs').read_text()
-    source = source.replace('__MH_DSH_PACKAGES__', json.dumps('file://' + root + '/.dsh-0.2.2-rc.4/dsh/node_modules/@deepseek-ai/'))
+    source = source.replace('__MH_DSH_PACKAGES__', json.dumps('file://' + root + '/.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/'))
     source = source.replace('__MH_ROOT__', json.dumps(root)).replace('__MH_WORKSPACE__', json.dumps(support['WORKSPACE'] + '/' + name))
     files = {
         'package.json': json.dumps({'name': name, 'version': '1.0.0', 'type': 'module', 'main': 'index.js',

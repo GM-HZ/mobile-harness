@@ -66,9 +66,9 @@ def run(emulator, output):
         root = support['WORKSPACE'].rsplit('/', 1)[0]
         evidence['installedVersions'] = {}
         for package in ['@deepseek-ai/dsh-lsp', '@deepseek-ai/dsh-lsp-stdio', '@deepseek-ai/dsh-tool-lsp', 'typescript', 'typescript-language-server']:
-            data = json.loads(emulator.app('cat alpine/.dsh-0.2.2-rc.4/dsh/node_modules/' + package + '/package.json'))
+            data = json.loads(emulator.app('cat alpine/.dsh-0.2.2-rc.5/dsh/node_modules/' + package + '/package.json'))
             evidence['installedVersions'][package] = data['version']
-        assert evidence['installedVersions'] == {'@deepseek-ai/dsh-lsp': '0.2.2-rc.4', '@deepseek-ai/dsh-lsp-stdio': '0.2.2-rc.4', '@deepseek-ai/dsh-tool-lsp': '0.2.2-rc.4', 'typescript': '6.0.3', 'typescript-language-server': '5.0.0'}
+        assert evidence['installedVersions'] == {'@deepseek-ai/dsh-lsp': '0.2.2-rc.5', '@deepseek-ai/dsh-lsp-stdio': '0.2.2-rc.5', '@deepseek-ai/dsh-tool-lsp': '0.2.2-rc.5', 'typescript': '6.0.3', 'typescript-language-server': '5.0.0'}
         evidence['noServerBeforeFirstQuery'] = not live_helpers(emulator)
         assert evidence['noServerBeforeFirstQuery']
         emulator.app('mkdir -p ' + app); created = True
@@ -96,7 +96,7 @@ def run(emulator, output):
             text = query(emulator, sid, at('goToDefinition', 'consumer.ts', CONSUMER, 4, 'describe'), evidence, 'utf16AfterAstralCharacter')
             assert text == 'shapes.ts:10:17', text
             text = query(emulator, sid, at('goToDefinition', 'consumer.ts', CONSUMER, 3, 'PI'), evidence, 'standardLibrary')
-            assert root + '/.dsh-0.2.2-rc.4/toolchains/lsp/node_modules/typescript/lib/lib.es5.d.ts:' in text, text
+            assert root + '/.dsh-0.2.2-rc.5/toolchains/lsp/node_modules/typescript/lib/lib.es5.d.ts:' in text, text
             for line in text.splitlines():
                 file, number, column = line.rsplit(':', 2)
                 assert file.startswith(root + '/'), line

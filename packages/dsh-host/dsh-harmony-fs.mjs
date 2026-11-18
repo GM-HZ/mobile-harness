@@ -4,7 +4,7 @@
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = path.dirname(fileURLToPath(import.meta.url));
-const entry = path.join(root, '.dsh-0.2.2-rc.4/dsh/node_modules/@deepseek-ai/dsh-fs-sandbox/lib/index.js');
+const entry = path.join(root, '.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/dsh-fs-sandbox/lib/index.js');
 const { SandboxedFileSystem } = await import(pathToFileURL(entry).href);
 
 export default class HarmonyFileSystem extends SandboxedFileSystem {

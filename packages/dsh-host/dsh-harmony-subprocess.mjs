@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 const root = path.dirname(fileURLToPath(import.meta.url));
 const signedPrograms = new Set(JSON.parse(fs.readFileSync(path.join(root, 'dsh-harmony-signed-programs.json'), 'utf8')));
-const packages = path.join(root, '.dsh-0.2.2-rc.4/dsh/node_modules/@deepseek-ai');
+const packages = path.join(root, '.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai');
 const { LocalSubprocessRuntime } = await import(pathToFileURL(path.join(packages, 'dsh-subprocess-local/lib/index.js')).href);
 const { SubprocessExecutableNotFoundError, SubprocessError } = await import(pathToFileURL(path.join(packages, 'dsh-subprocess/lib/index.js')).href);
 

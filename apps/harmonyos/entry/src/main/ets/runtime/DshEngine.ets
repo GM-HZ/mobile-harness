@@ -226,7 +226,7 @@ class DshEngine {
           archive, String(extracted), Date.now() - phase);
       }
       this.prepareTimezone(root);
-      const dshRelease = root + '/.dsh-0.2.2-rc.4';
+      const dshRelease = root + '/.dsh-0.2.2-rc.5';
       if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
       const dshUnpackStarted = Date.now();
       let runtimeId = '';

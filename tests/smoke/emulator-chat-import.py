@@ -146,7 +146,7 @@ def unfinished_upload(emulator, workspace, evidence):
 def bundle(emulator, enabled):
     row, = [row for row in emulator.rpc('pluginManager/listBundles', {}) if row['name'] == BUNDLE]
     assert row['availability'] == 'installation' and row['official'] and row['optional'], row
-    assert not row['removable'] and not row.get('error') and row['version'] == '0.2.2-rc.4', row
+    assert not row['removable'] and not row.get('error') and row['version'] == '0.2.2-rc.5', row
     assert row['enabled'] == enabled, row
     return {key: row[key] for key in ['availability', 'official', 'optional', 'enabled', 'version']}
 

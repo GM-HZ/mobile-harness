@@ -28,7 +28,7 @@ def configured_preset(emulator, name, evidence):
     # Copy every official standard tool, expression and service. Only the
     # compaction policy differs; moving YAML must retain its package resolver.
     root = support['WORKSPACE'].rsplit('/', 1)[0]
-    carrier = json.dumps('file://' + root + '/.dsh-0.2.2-rc.4/dsh/package.json')
+    carrier = json.dumps('file://' + root + '/.dsh-0.2.2-rc.5/dsh/package.json')
     copied = source.replace('createRequire(baseUrl)', 'createRequire(' + carrier + ')')
     pattern = r"(?m)^(\s*)name: '@deepseek-ai/dsh-compaction-basic'$"
     def policy_row(match):

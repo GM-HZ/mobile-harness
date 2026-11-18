@@ -104,7 +104,7 @@ def populate(server, name, root, workspace):
     dep = register_release(server, settings, {'index.mjs': 'export const token = "OWNED_DEPENDENCY_LOADED";\n'})
     server.responses['/'+dependency] = json_body(registry_record(dependency, {'1.0.0': dep}, '1.0.0'))
 
-    module_path = 'file://' + root + '/.dsh-0.2.2-rc.4/dsh/node_modules/@deepseek-ai/dsh-tools/lib/index.js'
+    module_path = 'file://' + root + '/.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/dsh-tools/lib/index.js'
     built = {}
     for version in VERSIONS:
         manifest = {'name': name, 'version': version, 'type': 'module', 'main': './index.mjs',
