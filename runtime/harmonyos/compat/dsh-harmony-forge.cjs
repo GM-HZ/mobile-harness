@@ -14,7 +14,6 @@ function createGhRunner(launch, quote) {
     const environment = [
       'HOME=/native-benchmark-home', 'GH_CONFIG_DIR=/native-benchmark-home/.config/gh',
       'GH_PROMPT_DISABLED=1', 'GH_NO_UPDATE_NOTIFIER=1', 'GH_PAGER=', 'NO_COLOR=1', 'CLICOLOR=0',
-      ...(options.deviceLogin ? ['GH_BROWSER=/bin/true'] : []),
       ...['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY', 'http_proxy', 'https_proxy', 'no_proxy']
         .filter(name => typeof options.env[name] === 'string').map(name => name + '=' + options.env[name]),
     ];
@@ -81,12 +80,13 @@ function startForgeAccountBridge(root, runGh, mark) {
   for (const file of [request, consumed, status, status + '.new']) fs.rmSync(file, { force: true });
   let active;
   let last;
+  let activeAccount;
 
   function publish(id, phase, fields = {}) {
     try {
       fs.writeFileSync(status + '.new', JSON.stringify({ id, phase, ...fields }), { mode: 0o600 });
       fs.renameSync(status + '.new', status);
-      last = { id, phase };
+      last = id;
     } catch {
       mark('forge-account-status-unavailable');
     }
@@ -95,16 +95,17 @@ function startForgeAccountBridge(root, runGh, mark) {
   async function execute(id, action, controller) {
     const signIn = action === 'login';
     const args = signIn ? ['auth', 'login', '--web', '--git-protocol', 'https', '--skip-ssh-key']
-      : action === 'logout' ? ['auth', 'logout'] : ['auth', 'status'];
+      : action === 'logout' ? ['auth', 'logout'] : ['auth', 'status', '--active'];
     args.push('--hostname', 'github.com');
+    if (action === 'logout' && activeAccount) args.push('--user', activeAccount);
     let output = '';
     let presented = false;
     publish(id, 'working');
     mark('forge-account-started', { action });
     try {
-      const result = await runGh('gh', args, {
+      const options = {
         env: process.env, input: undefined, cancelSignal: controller.signal,
-        timeout: signIn ? 900000 : 15000, maxBuffer: 32768, deviceLogin: signIn,
+        timeout: signIn ? 900000 : 15000, maxBuffer: 32768,
         onOutput: signIn ? chunk => {
           if (presented || controller.signal.aborted) return;
           output += chunk.toString();
@@ -113,17 +114,22 @@ function startForgeAccountBridge(root, runGh, mark) {
           presented = true;
           publish(id, 'authorize', { code: code.toUpperCase() });
         } : undefined,
-      });
+      };
+      let result = await runGh('gh', args, options);
+      if (action === 'logout' && result.exitCode === 0 && !controller.signal.aborted) {
+        result = await runGh('gh', ['auth', 'status', '--active', '--hostname', 'github.com'], options);
+      }
       let phase = 'failed';
       let account;
       if (controller.signal.aborted) phase = 'canceled';
       else if (result.exitCode === 0) {
-        phase = action === 'logout' ? 'signed-out' : 'signed-in';
+        phase = 'signed-in';
         account = /(?:Logged in as |Logged in to github\.com account )([a-z0-9-]{1,39})\b/i
           .exec(result.stderr + '\n' + result.stdout)?.[1];
-      } else if (action === 'status' && /not logged (?:into|in to)/i.test(result.stderr + '\n' + result.stdout)) {
+      } else if (!signIn && /not logged (?:into|in to)/i.test(result.stderr + '\n' + result.stdout)) {
         phase = 'signed-out';
       }
+      if (phase === 'signed-in' || phase === 'signed-out') activeAccount = account;
       publish(id, phase, account ? { account } : {});
       mark('forge-account-finished', { action, phase });
     } finally {
@@ -142,9 +148,11 @@ function startForgeAccountBridge(root, runGh, mark) {
     try {
       const file = fs.openSync(consumed, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW | fs.constants.O_NONBLOCK);
       try {
-        const stat = fs.fstatSync(file);
-        if (!stat.isFile() || stat.size > 512) return;
-        command = JSON.parse(fs.readFileSync(file, 'utf8'));
+        if (!fs.fstatSync(file).isFile()) return;
+        const buffer = Buffer.alloc(513);
+        const length = fs.readSync(file, buffer);
+        if (length > 512) return;
+        command = JSON.parse(buffer.subarray(0, length).toString());
       } finally { fs.closeSync(file); }
     } catch {
       return;
@@ -153,7 +161,7 @@ function startForgeAccountBridge(root, runGh, mark) {
     const { id, action } = command;
     if (action === 'cancel') {
       if (active?.id === id) active.controller.abort();
-      else if (!active && last?.id !== id) publish(id, 'canceled');
+      else if (!active && last !== id) publish(id, 'canceled');
       return;
     }
     if (active || !['status', 'login', 'logout'].includes(action)) return;
