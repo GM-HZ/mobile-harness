@@ -288,3 +288,12 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-flash.json --live deepseek-official
 ```
+
+## 个性化推荐
+
+覆盖安装对应 HAP 后，按顺序在独立 Phone 模拟器运行两条命令。两个测试会临时启用同一 profile 的个性化推荐和 Inspector，退出时恢复原配置。第二条会批准 Creator 生成仅含计数器的本地页面，0.4.46 的已知结果是安装失败。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-personalized-recommendations.py <loopback-target> .build/recommendation-cards.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-personalized-recommendations.py <loopback-target> .build/recommendation-creator.json --create
+```

@@ -1,6 +1,6 @@
 # DSH 剩余工作清点
 
-截至 0.4.45，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.46，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
 - 28类工具包：23类已有实际调用证据，覆盖深度不同；5类为当前不适用／暂缓项（pwsh、pwsh-persistent、bash-persistent、terminal、workspace-dependencies）。
 - 16 个官方可选 bundle 中，8 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector），2 个暂缓（cua、terminal），6 个待完成。Forge 已通过本地工作树场景。
@@ -10,7 +10,7 @@
 
 | 工作项 | 当前状态 |
 | --- | --- |
-| personalized-recommendations | 未完成端到端验收 |
+| personalized-recommendations | 模型建议、插件启用、页面位置、暂不创建及跨重启保留均通过。Creator 生成包后安装遇到系统拒绝创建符号链接，安装、呈现、撤销及恢复待验 |
 | voice-input | 未完成音频／提供者实际验收 |
 | cot-translation | 正式 ArkWeb 界面、受控 Bing／Google、真实 DeepSeek Flash、重启复用和停用取消已验。两个公开匿名端点仍待验收 |
 | auto-review | 未完成实际审批策略与生命周期验收 |
