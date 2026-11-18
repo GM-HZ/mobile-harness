@@ -136,9 +136,11 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-toolkit.py <loopback-target> .build/emulator-toolkit.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-python-wheel.py <loopback-target> .build/emulator-python-wheel.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-python-wheel.py <loopback-target> .build/emulator-python-native.json --native-suite
 ```
 
-原生 Python 回归通过正式 Bash 单次审批，在隔离 venv 从公网 PyPI 下载固定 CPython 3.12 ARM64 musllinux wheel，验证 SHA-256 并实际导入扩展。网络与符号链接诊断保留在工具输出。
+原生 Python 回归通过正式 Bash 单次审批，在隔离 venv 从公网 PyPI 下载固定 CPython 3.12 ARM64 musllinux wheel，验证 SHA-256 并实际导入扩展。两个场景都用 `venv --copies`。 `--native-suite` 在一次明确批准的后台 Bash 作业中组合 NumPy、随 wheel 提供的 OpenBLAS 与 orjson。验收等待同一作业退出，再核对线性方程解和 UTF-8 JSON 往返。网络与符号链接诊断保留在工具输出。
 
 ## 账号登录回归
 
@@ -361,14 +363,18 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-plugin-market-ui.py <loopback-target> .build/plugin-market-ui.json
 ```
 
-官方 DSH profile 的 `autoInstallPeers: false` 让插件复用包内依赖。插件可将 DSH Host 提供的 API 声明为 peer。若插件还需要 Host 和 profile 均未提供的 npm 库，可将其列入自己的 `dependencies`；只有具备缺省处理的库才适合列为 `optionalDependencies`。官方插件市场由用户添加索引来源。
+官方 DSH profile 的 `autoInstallPeers: false` 让插件复用包内依赖。插件可将 DSH Host 提供的 API 声明为 peer。若插件还需要 Host 和 profile 均未提供的 npm 库，可将其列入自己的 `dependencies`；只有具备缺省处理的库才适合列为 `optionalDependencies`。官方插件市场由用户添加索引来源。HarmonyOS profile 使用 pnpm 的普通可执行脚本写入 `node_modules/.bin`，安装期间仍禁用依赖生命周期脚本。
 
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-plugin-public-graph.py <loopback-target> .build/plugin-public-graph.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-plugin-public-graph.py <loopback-target> .build/plugin-npm-native.json --native
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-plugin-public-graph.py <loopback-target> .build/plugin-npm-wrappers.json --native-wrapper
 ```
+
+标准包入口测试依赖 `@node-rs/crc32` 和 `@parcel/watcher`，由包自身选择 Alpine ARM64 musl 二进制。在 DSH 管理的 Alpine Node 子进程中实际计算 CRC32、订阅文件创建、执行 `detect-libc` 命令和回收订阅。
 
 ## 思考内容翻译
 

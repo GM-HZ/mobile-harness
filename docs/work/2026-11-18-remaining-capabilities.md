@@ -1,6 +1,6 @@
 # DSH 剩余工作清点
 
-截至 0.4.67，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.68，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
 - 28 类工具包中 25 类已有实际调用证据。3 类为当前不适用或暂缓项（pwsh、pwsh-persistent、terminal）。
 - 16 个官方可选 bundle 中，11 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector、auto-review、personalized-recommendations、cot-translation），2 个暂缓（cua、terminal），3 个待完成。Forge 已通过本地工作树场景。
@@ -17,7 +17,7 @@
 ## 4 组补充验收
 
 1. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
-2. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。0.4.66 通过 DSH 配置的 HTTPS 代理加载公开社区索引，实测 6,112 条目、搜索、分页缓存和重启恢复。模拟器无代理直连超时。其他原生依赖组合待验。
+2. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。0.4.66 通过 DSH 配置的 HTTPS 代理加载公开社区索引，实测 6,112 条目、搜索、分页缓存和重启恢复。模拟器无代理直连超时。0.4.68 补验常见包自动选择 Alpine ARM64 musl addon、命令入口和 NumPy/OpenBLAS、orjson。外部鸿蒙 addon 在主 Host 的加载与其他平台组合待验。
 3. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。0.4.57 已从 ArkWeb 打开 DeepSeek 官方登录页，隔离回环服务通过授权回调、重启保留与登出撤销。0.4.58 经标准设置添加 pi-ai 路由，使用 DeepSeek 公网通过 Chat Completions 和 Responses 两种协议的模型发现、工具往返与重启续接。真实账号授权与其他供应商端点待验。
 4. 0.4.58 两小时模拟器后台长测已完成 7 次真实模型投递。第 106 秒强停后会话和四个未投递任务保留，回前台准确回忆，测试凭据已移除。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。 [两小时实测](../evidence/emulator-schedule-soak-0.4.58.json)
 
@@ -82,3 +82,5 @@ Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提�
 0.4.67 访客页面改用标准按会话授权的上传接口。验证真实模型处理上传附件，并复验主人图片通过旧接入读取和跨重启保持。 [本轮证据](../evidence/emulator-liveshare-guest-uploads-0.4.67.json)
 
 0.4.58 通过 DSH 直连公网的完整溢出恢复。请求收到真实 HTTP 400 后，摘要只覆盖早前历史，原回合准确重试，重启后仍可回忆。两次受控重复溢出、普通阈值与手动压缩通过。同一 Goal 的三轮操作与重启通过。 0.4.62 的两小时 Workflow 通过全部 5 个检查点，完成 10 条主 Workflow、40 个子任务和 10 个 helper 回收。0.4.67 复验两条并发 Workflow。 [长测证据](../evidence/emulator-workflow-soak-0.4.62.json)
+
+0.4.68 修复带命令入口的 npm 插件安装，验证公开 npm 原生依赖组合、PyPI 原生 wheel、插件启用与升级回滚。同一制品复验了公网插件索引、Forge 公共 PR 读取、PTC 附加目录、Node／Python MCP、LiveShare 访客附件和 ArkWeb 重启。 [本轮证据](../evidence/emulator-native-package-compat-0.4.68.json)

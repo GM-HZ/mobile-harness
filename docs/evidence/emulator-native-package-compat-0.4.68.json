@@ -1,0 +1,335 @@
+{
+  "artifact": {
+    "sourceCommit": "ac2e5f2c3238d95efdff2fae97c7dc21287fc8f9",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.68-unsigned.hap",
+    "version": "0.4.68",
+    "versionCode": 75,
+    "bytes": 768585141,
+    "sha256": "5a49375f6330484c699fca1a952a6bc8ce3aed2513651d590493536f7e1f8251",
+    "layerSha256": "2f357f696054b33b3390111843a802116a4e622503909dec5e4fe47aef89fe77",
+    "pyrightVersion": "1.1.414",
+    "pyrightEntrySha256": "f200762078eb9880faf421a5b30f9ef3055b1d85c6f10780d75db4da8d8499f1",
+    "signedArtifact": {
+      "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.68-signed.hap",
+      "bytes": 772254075,
+      "sha256": "18b71203f687736f6f24d49d077cbc56d1af013818190255789c112a632e2ce3",
+      "profileVerified": true,
+      "signatureVerified": true,
+      "matchingPayloadEntries": 209
+    }
+  },
+  "dshRegistryNext": "0.2.2-rc.5",
+  "testSource": "db4a83d25ae1ac2cfa0487848ecf0ddd4e791dea",
+  "targets": [
+    {
+      "connection": "127.0.0.1:15563",
+      "kind": "DevEco API 26 ARM64 Phone",
+      "from": "0.4.67"
+    },
+    {
+      "connection": "127.0.0.1:15561",
+      "kind": "DevEco API 26 ARM64 Phone",
+      "from": "0.4.67"
+    }
+  ],
+  "reproducedBeforeUpgrade": {
+    "appVersion": "0.4.67",
+    "installExitCode": 243,
+    "failure": "EACCES creating node_modules/.bin/detect-libc symlink",
+    "afterUpgrade": "The package manager produces a regular executable script using its supported bin-shim option."
+  },
+  "nativeNpm": {
+    "packageGraph": {
+      "directAndOptional": [
+        "string-width@7.2.0",
+        "number-is-nan@1.0.1",
+        "is-odd@3.0.1",
+        "@node-rs/crc32@1.10.6",
+        "@parcel/watcher@2.5.1",
+        "@node-rs/crc32-linux-arm64-musl@1.10.6",
+        "@parcel/watcher-linux-arm64-musl@2.5.1"
+      ],
+      "integrity": {
+        "string-width": "sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ==",
+        "number-is-nan": "sha512-4jbtZXNAsfZbAHiiqjLPBiCl16dES1zI4Hpzzxw61Tk+loF+sBDBKx1ICKKKwIqQ7M0mFn1TmkN7euSncWgHiQ==",
+        "@node-rs/crc32": "sha512-+llXfqt+UzgoDzT9of5vPQPGqTAVCohU74I9zIBkNo5TH6s2P31DFJOGsJQKN207f0GHnYv5pV3wh3BCY/un/A==",
+        "@node-rs/crc32-linux-arm64-musl": "sha512-k8ra/bmg0hwRrIEE8JL1p32WfaN9gDlUUpQRWsbxd1WhjqvXea7kKO6K4DwVxyxlPhBS9Gkb5Urq7Y4mXANzaw==",
+        "@parcel/watcher": "sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==",
+        "@parcel/watcher-linux-arm64-musl": "sha512-cFOjABi92pMYRXS7AcQv9/M1YuKRw8SZniCDw0ssQb/noPkRzA+HBDkwmyOJYp5wXcsTrhxO0zq1U11cK9jsFg=="
+      },
+      "singleBundledHostPeer": true,
+      "newPackageEntries": [
+        "'@emnapi/core@1.11.3'",
+        "'@emnapi/runtime@1.11.3'",
+        "'@emnapi/wasi-threads@1.2.3'",
+        "'@napi-rs/wasm-runtime@0.2.12'",
+        "'@node-rs/crc32-android-arm-eabi@1.10.6'",
+        "'@node-rs/crc32-android-arm64@1.10.6'",
+        "'@node-rs/crc32-darwin-arm64@1.10.6'",
+        "'@node-rs/crc32-darwin-x64@1.10.6'",
+        "'@node-rs/crc32-freebsd-x64@1.10.6'",
+        "'@node-rs/crc32-linux-arm-gnueabihf@1.10.6'",
+        "'@node-rs/crc32-linux-arm64-gnu@1.10.6'",
+        "'@node-rs/crc32-linux-arm64-musl@1.10.6'",
+        "'@node-rs/crc32-linux-x64-gnu@1.10.6'",
+        "'@node-rs/crc32-linux-x64-musl@1.10.6'",
+        "'@node-rs/crc32-wasm32-wasi@1.10.6'",
+        "'@node-rs/crc32-win32-arm64-msvc@1.10.6'",
+        "'@node-rs/crc32-win32-ia32-msvc@1.10.6'",
+        "'@node-rs/crc32-win32-x64-msvc@1.10.6'",
+        "'@node-rs/crc32@1.10.6'",
+        "'@parcel/watcher-android-arm64@2.5.1'",
+        "'@parcel/watcher-darwin-arm64@2.5.1'",
+        "'@parcel/watcher-darwin-x64@2.5.1'",
+        "'@parcel/watcher-freebsd-x64@2.5.1'",
+        "'@parcel/watcher-linux-arm-glibc@2.5.1'",
+        "'@parcel/watcher-linux-arm-musl@2.5.1'",
+        "'@parcel/watcher-linux-arm64-glibc@2.5.1'",
+        "'@parcel/watcher-linux-arm64-musl@2.5.1'",
+        "'@parcel/watcher-linux-x64-glibc@2.5.1'",
+        "'@parcel/watcher-linux-x64-musl@2.5.1'",
+        "'@parcel/watcher-win32-arm64@2.5.1'",
+        "'@parcel/watcher-win32-ia32@2.5.1'",
+        "'@parcel/watcher-win32-x64@2.5.1'",
+        "'@parcel/watcher@2.5.1'",
+        "'@tybys/wasm-util@0.10.5'",
+        "ansi-regex@6.6.0",
+        "braces@3.0.3",
+        "detect-libc@1.0.3",
+        "emoji-regex@10.6.0",
+        "fill-range@7.1.1",
+        "get-east-asian-width@1.7.0",
+        "is-extglob@2.1.1",
+        "is-glob@4.0.3",
+        "is-number@6.0.0",
+        "is-number@7.0.0",
+        "is-odd@3.0.1",
+        "mh-public-npm-ccf70a321b@file:../../../workspace-native/mh-public-npm-ccf70a321b",
+        "micromatch@4.0.8",
+        "node-addon-api@7.1.1",
+        "number-is-nan@1.0.1",
+        "picomatch@2.3.2",
+        "string-width@7.2.0",
+        "strip-ansi@7.2.0",
+        "to-regex-range@5.0.1",
+        "tslib@2.9.1"
+      ]
+    },
+    "toolResult": {
+      "width": 7,
+      "commonJsNaN": true,
+      "commonJsString": false,
+      "optionalOdd": true,
+      "native": {
+        "platform": "linux",
+        "arch": "arm64",
+        "crc32": 3421780262,
+        "event": "create",
+        "bindings": [
+          "@node-rs/crc32-linux-arm64-musl/crc32.linux-arm64-musl.node",
+          "@parcel/watcher-linux-arm64-musl/watcher.node"
+        ],
+        "shimLibc": "musl"
+      }
+    },
+    "directPackagedAddonRegression": 3421780262,
+    "directRetestReason": "The model serialized the test argument twice on the first run. The retry changed the displayed Unicode escaping and kept the exact argument assertion.",
+    "removedViaManager": "restart-required",
+    "originalProfileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "352adb98096d5478b9237b6e35a30415299d9cfb48b33805be24ef044b540d46",
+      "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+    }
+  },
+  "nativePython": {
+    "toolOutput": "started background job bash-98b2f3611b874d8e",
+    "backgroundJob": {
+      "jobId": "bash-98b2f3611b874d8e",
+      "status": "completed",
+      "detail": "exit code: 0",
+      "durationMs": 233748
+    },
+    "wheelProbe": {
+      "wheels": {
+        "numpy": {
+          "filename": "numpy-2.2.6-cp312-cp312-musllinux_1_2_aarch64.whl",
+          "sha256": "37c0ca431f82cd5fa716eca9506aefcabc247fb27ba69c5062a6d3ade8cf8f49",
+          "version": "2.2.6"
+        },
+        "orjson": {
+          "filename": "orjson-3.11.4-cp312-cp312-musllinux_1_2_aarch64.whl",
+          "sha256": "149d95d5e018bdd822e3f38c103b1a7c91f88d38a88aada5c4e9b3a73a244241",
+          "version": "3.11.4"
+        }
+      },
+      "artifacts": [
+        "_multiarray_umath.cpython-312-aarch64-linux-musl.so",
+        "_umath_linalg.cpython-312-aarch64-linux-musl.so",
+        "orjson.cpython-312-aarch64-linux-musl.so"
+      ],
+      "libraries": [
+        "libgcc_s-69c45f16.so.1",
+        "libgcc_s-c8ae3477-f55fbc78.so.1",
+        "libgfortran-1de24c3c-7d80b6d9.so.5.0.0",
+        "libscipy_openblas64_-65ec5a33.so",
+        "libstdc++-1f1a71be.so.6.0.33"
+      ],
+      "isolated": true,
+      "arch": "aarch64",
+      "solution": [
+        2.0,
+        3.0
+      ],
+      "nativeJson": "{\"label\":\"鸿蒙\",\"solution\":[2.0,3.0]}"
+    },
+    "exactBashApproval": true,
+    "testCredentialRemoved": true,
+    "fixtureCorrection": [
+      "The first foreground trial went beyond its tool response deadline and continued as a background job.",
+      "The next trial waited for the entire model turn, during which job_output waited on that job.",
+      "The final fixture captures its exact approved Bash tool result, then waits for that job to settle."
+    ],
+    "earlierFixtureCleanup": {
+      "jobId": "bash-982e26ab08484385",
+      "observedTerminalStatus": "completed",
+      "archiveAndDeletionConfirmed": true
+    },
+    "xxhashRegression": {
+      "wheel": "xxhash-3.6.0-cp312-cp312-musllinux_1_2_aarch64.whl",
+      "sha256": "bd17fede52a17a4f9a7bc4472a5867cb0b160deeb431795c0e4abe158bc784e9",
+      "distribution": "3.6.0",
+      "binary": "_xxhash.cpython-312-aarch64-linux-musl.so",
+      "digest": "ef46db3751d8e999",
+      "isolated": true
+    }
+  },
+  "pluginLifecycle": {
+    "versionsExecuted": [
+      "1.0.0",
+      "1.1.0",
+      "1.1.0"
+    ],
+    "lifecycleScriptWasSuppressed": true,
+    "cancelledInstall": {
+      "status": "cancelled"
+    },
+    "uninstalled": true
+  },
+  "publicPluginIndex": {
+    "source": "https://cdn.jsdelivr.net/npm/dsh-plugin-catalog/index.json",
+    "total": 6112,
+    "fetchMs": 4637,
+    "connects": [
+      {
+        "authority": "cdn.jsdelivr.net:443",
+        "connectStatus": 200
+      },
+      {
+        "authority": "cdn.jsdelivr.net:443",
+        "connectStatus": 200
+      }
+    ],
+    "sourceRemoved": true,
+    "persistedAfterRestart": true
+  },
+  "forgePublicRead": {
+    "pullRequest": "https://github.com/GM-HZ/omnix/pull/9",
+    "headSha": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+    "path": "codex-rs/codex-api/src/chat_completions/types.rs",
+    "contentSha256": "e0cf3690bf168f227a106a51bf8beda7e8e38cc8fafb4b5b14a7461bd169a3f9",
+    "commits": [
+      {
+        "sha": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+        "parent": "66279c6a1be5d4fb2f6f1a3d2a2560215f6b146d",
+        "title": "feat(omnix-sdk): add structured DeepSeek runs",
+        "author": "MengGong92",
+        "authoredAt": "2026-07-15T02:02:02Z"
+      }
+    ],
+    "authorization": "Authenticated host gh; disposable fixture credential on the emulator"
+  },
+  "ptcAdditionalRoots": {
+    "readyMs": 6028,
+    "additionalRootsReadWriteMatched": true,
+    "crossRootRenameMatched": true,
+    "nestedGrantMatched": true,
+    "extraRootWorkingDirectoryMatched": true,
+    "unauthorizedSiblingDenied": true,
+    "relativeCrossRootReadWriteMatched": true,
+    "relativeCrossRootMetadataAndRenameMatched": true,
+    "discardedComponentsValidated": true,
+    "temporaryModelCredentialRemoved": true,
+    "temporaryProfilePatchRemoved": true
+  },
+  "mcpStdio": {
+    "node": {
+      "probe": {
+        "ok": true,
+        "serverInfo": {
+          "name": "node-stdio-fixture",
+          "version": "1"
+        },
+        "toolNames": [
+          "stdio_fixture_echo"
+        ],
+        "truncated": false,
+        "durationMs": 3921,
+        "closeConfirmed": true
+      },
+      "toolResultReturnedToSession": true,
+      "fixtureRemoved": true
+    },
+    "python3": {
+      "probe": {
+        "ok": true,
+        "serverInfo": {
+          "name": "python-stdio-fixture",
+          "version": "1"
+        },
+        "toolNames": [
+          "stdio_fixture_echo"
+        ],
+        "truncated": false,
+        "durationMs": 834,
+        "closeConfirmed": true
+      },
+      "toolResultReturnedToSession": true,
+      "fixtureRemoved": true
+    }
+  },
+  "liveShareViewerAttachment": {
+    "fileName": "guest-note.txt",
+    "fileBytes": 49,
+    "expectedColors": [
+      "red",
+      "blue",
+      "yellow",
+      "green"
+    ],
+    "modelReply": "red blue yellow green",
+    "endReason": "completed",
+    "visitorPrincipal": {
+      "kind": "share-viewer",
+      "shareId": "s305a2954Rn4",
+      "actor": {
+        "providerId": "fixture",
+        "tenantId": "local",
+        "subjectId": "reader"
+      }
+    },
+    "imageCount": 2,
+    "outsideUploadsRefused": [
+      "remote-access/denied",
+      "remote-access/denied"
+    ],
+    "allReceiptsConsumedByPrompt": true,
+    "servedHookAndPackagedCarrier": true,
+    "cancelledBeforeTransfer": true,
+    "maxConcurrentRelayUploads": 1
+  },
+  "warmRestart": [
+    "11-19 07:13:59.829 16315 16315 I A0D005/org.sayact.nodepoc/DSHClient: native loopback ready ms=5195 mode=normal",
+    "11-19 07:14:02.733 16315 16315 I A0D005/org.sayact.nodepoc/DSHClient: ArkWeb loaded \"{\\\"title\\\":\\\"DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":139}\""
+  ]
+}
