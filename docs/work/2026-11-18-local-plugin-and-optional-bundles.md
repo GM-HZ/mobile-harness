@@ -11,3 +11,12 @@ Auto review 和 LiveShare 使用锁定的上游 bundle，默认关闭。Auto rev
 0.4.47 已验证最小本地包和真实 Creator 安装、Auto review 只读调用和恢复、LiveShare 本机 Owner、Forge 工作树和真实 ArkWeb、Inspector 与故障恢复。Creator 的第二次生成失败使用了已移除技能，保留该子会话证据。补测的确定性审查证明畸形结果、拒绝和取消均阻止真实写入，回归后恢复既有权限。远端共享、Forge 托管平台以及真机继续。 [证据](../evidence/emulator-optional-batch-0.4.47.json)
 
 后续 Creator 兼容变更只更新 RC.5 自带实现中的提示引用。子会话使用 `dsh-doc` 及随包的插件、Web UI 参考。保持原用户确认、工作区权限、生成目录校验和安装流程。对源包中的两条旧引用与三份新资料执行了构建前检查。新的 HAP 仍需验证模型实际使用技能及创建、撤销和恢复。
+
+## 语音原生推理探针
+
+同版本 Sherpa ONNX 1.13.8 提供官方鸿蒙 ARM64 C API 和 ONNX Runtime。下载包 SHA-256 为 `7473e1f6138c2d33a26adda01dd94f4d618089370957ed374f8cc0d50b8cdfa7`。模型使用 DSH RC.5 已锁定的 239,233,841 字节 int8 权重，SHA-256 为 `c71f0ce00bec95b07744e116345e33d8cbbe08cef896382cf907bf4b51a2cd51`。模型仅传入测试机私有目录。[官方 Sherpa 1.13.8 制品](https://github.com/k2-fsa/sherpa-onnx/releases/tag/v1.13.8)
+
+- 桌面合成 16 kHz 单声道 PCM，通过真实鸿蒙 HAP 内嵌的 Node 执行。第一版探针加载时调用到 ArkTS 的同名 `napi_create_string_utf8` 并触发 SIGBUS。第二版从已加载的 `libnode.so` 解析对应符号，避免混用两个运行时。
+- 第二版同一 HAP 的 SHA-256 为 `2b53a651cb372bc422a37ef0f1bd10575778eea34188b4ed0b614bf42bfa9822`。英文样本输出“Testing a F voice transcription.”，将 “offline” 误识。普通话样本精确识别“今天我们测试语音输入。”，载入 C API 后初始化及识别耗时 1,371 ms，脚本退出 0。
+- 同版 ArkWeb 在回环页面报告安全上下文及 `getUserMedia` 支持。麦克风权限桥接已在隔离工程中编译，尚未验证实际录音授权、上传 PCM、VAD、停止与草稿回填。完整语音输入仍待验。
+- 本次为临时探针。每次测试均覆盖恢复到准确的 0.4.47 HAP 和原配置。中间制品及输出位于本地 `.build/voice-native/`。
