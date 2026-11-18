@@ -3,9 +3,11 @@ import { url } from '@kit.ArkTS';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, dshEngine } from '../runtime/DshEngine';
+import { ForgeAccount } from './ForgeAccount';
 
 const LOCAL_ORIGIN = 'http://127.0.0.1:19592';
 const RECOVERY_URL = LOCAL_ORIGIN + '/.mobile-harness/recovery';
+const GITHUB_URL = LOCAL_ORIGIN + '/.mobile-harness/github';
 type LoginFlow = 'unbound' | 'deepseek' | 'liveshare';
 
 @Entry
@@ -14,6 +16,7 @@ struct Index {
   @State status: string = '正在准备本机 DSH…';
   @State launchUrl: string = '';
   @State recoveryOpen: boolean = false;
+  @State forgeAccountOpen: boolean = false;
   @State safe: boolean = false;
   @State webFailed: boolean = false;
   @State restartError: string = '';
@@ -35,6 +38,7 @@ struct Index {
       if (!session) {
         this.launchUrl = '';
         this.webFailed = false;
+        this.forgeAccountOpen = false;
         this.closeLogin();
       } else if (!this.launchUrl) {
         try {
@@ -266,7 +270,8 @@ struct Index {
         Web({ src: this.launchUrl, controller: this.controller })
           .layoutWeight(1)
           .width('100%')
-          .visibility(this.loginVisible || this.recoveryOpen || this.webFailed ? Visibility.None : Visibility.Visible)
+          .visibility(this.loginVisible || this.recoveryOpen || this.forgeAccountOpen || this.webFailed
+            ? Visibility.None : Visibility.Visible)
           .javaScriptAccess(true)
           .domStorageAccess(true)
           .fileAccess(false)
@@ -283,6 +288,10 @@ struct Index {
               this.recoveryOpen = true;
               return true;
             }
+            if (url === GITHUB_URL) {
+              if (!this.safe) this.forgeAccountOpen = true;
+              return true;
+            }
             return !url.startsWith(LOCAL_ORIGIN + '/') && url !== 'about:blank';
           })
           .onPageEnd(() => {
@@ -296,7 +305,7 @@ struct Index {
           })
           .onErrorReceive((event) => {
             if (event?.request.isMainFrame() && event.error.getErrorCode() !== -3 &&
-                event.request.getRequestUrl() !== RECOVERY_URL) {
+                event.request.getRequestUrl() !== RECOVERY_URL && event.request.getRequestUrl() !== GITHUB_URL) {
               this.webFailed = true;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb main error %{public}d', event.error.getErrorCode());
             }
@@ -310,6 +319,8 @@ struct Index {
           .onRenderExited(() => { this.webFailed = true; })
         if (this.webFailed || this.recoveryOpen) {
           this.recoveryPage()
+        } else if (this.forgeAccountOpen) {
+          ForgeAccount({ onClose: () => { this.forgeAccountOpen = false; } })
         } else if (this.loginVisible) {
           this.loginPage()
         }

@@ -485,6 +485,9 @@ async function main() {
   globalThis.__harmonyGh = safeMode
     ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
     : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(launchGuest, quoteShellArgument);
+  if (!safeMode) {
+    require(path.join(root, 'dsh-harmony-forge.cjs')).startForgeAccountBridge(root, globalThis.__harmonyGh, mark);
+  }
   globalThis.__harmonyOffice = safeMode ? {
     createConverter() { throw Object.assign(new Error('Office workers are disabled in HarmonyOS recovery mode'), { code: 'unavailable' }); },
   } : require(path.join(root, 'dsh-harmony-office.cjs')).createOfficeFactory(root,
