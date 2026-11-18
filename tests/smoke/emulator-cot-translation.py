@@ -119,7 +119,7 @@ def click(selector):
         button.click(); return true;}})()'''
 
 
-def open_reasoning(emulator, run, title, marker):
+def open_session(emulator, run, title):
     ui['open_sidebar'](emulator)
     wait(run, f'''(() => {{
         const field=document.querySelector('[data-sidebar-workspace-header] input[type=text]');
@@ -135,6 +135,10 @@ def open_reasoning(emulator, run, title, marker):
         if (item) {{ item.click(); return true; }}
         return false;
     }})()''', 'the fixture session')
+
+
+def open_reasoning(emulator, run, title, marker):
+    open_session(emulator, run, title)
     wait(run, f'document.body.innerText.includes({json.dumps("The archive verification code is "+marker)})', 'the fixture conversation')
     wait(run, f'''(() => {{
         const row=document.querySelector({json.dumps(DISCLOSURE)});
