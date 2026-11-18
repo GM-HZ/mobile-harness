@@ -8,7 +8,7 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 
 鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.4，源码子模块同步锁定官方 RC.4 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。普通包默认带通用 PTC；Office 与 HTTP/1 适配沿用已有实现。
 
-0.4.36 修复鸿蒙拒绝硬链接导致的独占文件创建失败，保留原子防覆盖和权限策略。模拟器九组检查通过，新增真实 Cordis Host／ArkWeb 查询、替代编辑与多文件补丁，回归工具链、PTC、LSP、Office、工作树和恢复。此前会话压缩及 LSP 证据继续保留。诊断 Inspector 实测缺少 Worker 中的鸿蒙绑定；其余适用可选能力、满容量压力及本版真机仍继续验收，范围见[能力矩阵](docs/dsh-capabilities.md)、[本轮证据](docs/evidence/emulator-inspection-editing-0.4.36.json)和[文件发布适配](docs/research/harmonyos-file-publication.md)。云端执行、远端控制与安卓属于后续阶段。
+0.4.37 将随包 Forge、Ralph、会话搜索及独立工作树登记到官方插件管理目录，可按上游方式启停。模拟器通过 Forge 本地工作树恢复、取消及重启续接，LSP 开关和插件故障恢复也通过。诊断 Inspector 仍缺少 Worker 中的鸿蒙绑定，其他适用可选扩展、长会话压力和真机结果继续验收。[能力矩阵](docs/dsh-capabilities.md) · [工作树与目录证据](docs/evidence/emulator-worktree-catalog-0.4.37.json)
 
 ## 文档
 

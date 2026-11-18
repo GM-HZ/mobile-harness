@@ -238,3 +238,9 @@ DSH 保持最新官方 RC.4，随包331个 DSH 组件版本一致。补充官方
 最终制品源 `3ff6db7f33b985e08eabb564c9af9b506fb13213`，未签名HAP 662,457,444字节，SHA-256 `3108593b6f797a73fda41c93f904edb9babc6d8632a16438ef87273259d30e82`；九组测试源为 `65da1909e3acbc38f20bfe12f4d2e0308c146eb0`。首次候选包漏复制、模型参数偏差、Cordis结果截断误判和原生摘要比较误判均保留。最终审计恢复普通模式、配置与锁文件原字节，默认workspace-write、匿名401／鉴权200、临时Key清除及旧会话30事件保留。
 
 可选诊断Inspector单独失败：Worker profile-resolution bootstrap 缺少 require-builtin 鸿蒙绑定；其余诊断插件活跃，不影响主聊天。没有把Cordis查询或页面存在当完整CDP验收。DSH仍为最新官方RC.4；其余适用能力与真机继续，尚未桌面全功能等价。[准确命令、原失败及审计](evidence/emulator-inspection-editing-0.4.36.json) · [文件发布适配](research/harmonyos-file-publication.md)。
+
+## 0.4.37 随包可选目录与工作树恢复
+
+安装清单登记官方 Forge、Ralph、会话搜索和独立工作树。四个随包组件保持 RC.4 并默认关闭，使用上游插件管理分类。真实启停、跨重启状态和锁文件无变动均通过。
+
+通过 Forge 正式 RPC 恢复原分支最新提交，缺失分支则从记录的基准重建。实际 worktree add 后暂停夹具的最终 reset，HTTP 断开回收子进程并保留部分检出及分支，重试和会话跨重启验证通过。LSP 管理与故障恢复也通过。同版共三组模拟器检查，真机及 Forge 托管平台联动尚待验收。[准确制品、命令与原失败](evidence/emulator-worktree-catalog-0.4.37.json)

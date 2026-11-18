@@ -1,10 +1,12 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.36，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.4`。331 个随包 DSH 组件均固定为 RC.4，生产依赖由锁文件装配。Linux 工具仍按需进入 Alpine／PRoot，Host 不运行于 PRoot。
+当前应用 0.4.37，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.4`。331 个随包 DSH 组件均固定为 RC.4，生产依赖由锁文件装配。Linux 工具按需通过 Alpine／PRoot 执行。
 
 官方现已发布 RC.4 源码标签，Git 子模块固定 `3f321d32bfe382212a8ed8785c1d47a5a300aa23`，与 npm 精确版本配套。0.4.31 最初升级时的公开源码延迟保留在历史证据中。发布包前端内嵌的短提交是构建标识，源码 pin 使用官方发布标签的完整提交。
 
 ## 当前验收
+
+0.4.37 通过官方插件管理接口启停随包扩展，并验证实际 Forge 工作树恢复、取消、重试与应用重启。LSP 开关及故障恢复回归同时通过。[0.4.37 证据](evidence/emulator-worktree-catalog-0.4.37.json)
 
 [0.4.36 证据](evidence/emulator-inspection-editing-0.4.36.json)绑定原子不覆盖发布适配、真实 Cordis 查询、替代编辑及六组受影响回归，共九组检查通过。插件诊断 Inspector 单独测试失败：Worker 的 profile-resolution bootstrap 无法选择鸿蒙 require-builtin 绑定；不计入通过。测试与原配置已恢复；未把前版11／18组冒充本版重跑。
 
@@ -53,7 +55,7 @@
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：没有随包 Chromium／Playwright；手机 ArkWeb 不等于可供 Agent 使用的浏览器。完整官方账号授权、每一种模型提供者和每个实验插件尚未逐一回归。
 - **后台**：定时任务跨 App 重启已测，不代表 App 被系统终止时仍会唤醒执行。运行中 Bash 的 OS 进程、PTC 的内存变量不能据此承诺跨进程存活。
-- **剩余能力清点**：Ralph、会话搜索和工作树的限定场景已通过；压缩核心与可控自动压力已补验；真实API overflow、反复压缩／长目标压力及其他可选 bundle 尚未全部端到端回归。LSP 已由本工程补充装配，当前验收为 TypeScript；工作树的 restore 与专门取消场景仍未全量验收。公共 provider 不提供额外控制 fd，进程范围沿用上游 fallback 的观测限制。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
+- **剩余能力清点**：Ralph、会话搜索和工作树的限定场景已通过；压缩核心与可控自动压力已补验；真实API overflow、反复压缩／长目标压力及其他可选 bundle 尚未全部端到端回归。LSP 已由本工程补充装配，当前验收为 TypeScript；Forge 的工作树恢复、取消与重启已验，托管平台联动和 UI 继续验收。公共 provider 不提供额外控制 fd，进程范围沿用上游 fallback 的观测限制。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。

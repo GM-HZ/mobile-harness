@@ -1,0 +1,471 @@
+{
+  "recordedAt": "2026-11-18T00:20:49.909312+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "baselineCommit": "98b4fc421ed619135f8cc382e7b63f25019d50e6",
+  "productionHap": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.37-unsigned.hap",
+    "sourceCommit": "12eedadb8857cd8881aaf85fcecbda934767d9d0",
+    "version": "0.4.37",
+    "versionCode": 44,
+    "unsigned": true,
+    "bytes": 662457501,
+    "sha256": "042ef9f5afffcd4d53c529a4ff69254a71743bf53487670394e2c3cc1167baf0",
+    "layerSha256": "84a3672abf039a21fc6e99b9b4b0d30d77887a843e66e07fe464dfcfb8f909e7",
+    "sameLayerMemberNames": 94345,
+    "layerMemberSizeOrCrcDifferences": [
+      "dsh/package.json"
+    ],
+    "newCarrierDependencies": {
+      "@deepseek-ai/dsh-experimental-forge-bundle": "0.2.2-rc.4",
+      "@deepseek-ai/dsh-experimental-ralph-bundle": "0.2.2-rc.4",
+      "@deepseek-ai/dsh-experimental-session-search": "0.2.2-rc.4",
+      "@deepseek-ai/dsh-experimental-tool-worktree": "0.2.2-rc.4"
+    }
+  },
+  "build": {
+    "command": "HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pin directory> ./build.sh --package",
+    "exitCode": 0,
+    "hvigorElapsedMs": 7837,
+    "logSha256": "ea8d79fe9302719e25e4e79e5d0ecd863efcc0dba71de297a1818f9564c93b07"
+  },
+  "installation": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.37-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "c87367d436f11d591c7e170839a238ac513a89a15bada7d993bdfd0274cb11dc"
+  },
+  "latestNpmNext": {
+    "checkedAt": "2026-11-18T00:15:22.927768+00:00",
+    "url": "https://registry.npmjs.org/@deepseek-ai%2fdsh/next",
+    "version": "0.2.2-rc.4"
+  },
+  "officialSourceTag": {
+    "tag": "dsh-v0.2.2-rc.4",
+    "commit": "3f321d32bfe382212a8ed8785c1d47a5a300aa23"
+  },
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-worktree-restore.py",
+        "127.0.0.1:15557",
+        ".build/worktree-restore/worktree-restore-0.4.37.json",
+        "--catalog"
+      ],
+      "testSourceCommit": "b95c213dd3ca634defb9e4df9cadcff3163b8cc3",
+      "exitCode": 0,
+      "elapsedSeconds": 146.874,
+      "log": ".build/worktree-restore/worktree-restore-0.4.37.log",
+      "resultSha256": "b0614c59a27d25a57985955601982092ac6c8114cd0fa81ff1a62c06985b0fc3",
+      "logSha256": "863ad2a82dba940826723cc33c0a83f79925a74d8c85b34ed29f7a45c56bbfe7",
+      "result": {
+        "fixture": "mh-worktree-restore-88d514e5d2",
+        "forgeReadyMs": 5585,
+        "catalog": {
+          "default": {
+            "@deepseek-ai/dsh-experimental-ralph-bundle": {
+              "availability": "installation",
+              "optional": true,
+              "official": true,
+              "installed": false,
+              "removable": false,
+              "version": "0.2.2-rc.4",
+              "enabled": false
+            },
+            "@deepseek-ai/dsh-experimental-session-search": {
+              "availability": "installation",
+              "optional": true,
+              "official": true,
+              "installed": false,
+              "removable": false,
+              "version": "0.2.2-rc.4",
+              "enabled": false
+            },
+            "@deepseek-ai/dsh-experimental-tool-worktree": {
+              "availability": "installation",
+              "optional": true,
+              "official": true,
+              "installed": false,
+              "removable": false,
+              "version": "0.2.2-rc.4",
+              "enabled": false
+            },
+            "@deepseek-ai/dsh-experimental-forge-bundle": {
+              "availability": "installation",
+              "optional": true,
+              "official": true,
+              "installed": false,
+              "removable": false,
+              "version": "0.2.2-rc.4",
+              "enabled": false
+            }
+          },
+          "switches": [
+            {
+              "bundle": "@deepseek-ai/dsh-experimental-ralph-bundle",
+              "enabled": true,
+              "module": "@deepseek-ai/dsh-tool-ralph",
+              "moduleActive": true,
+              "readyMs": 5518,
+              "application": "applied"
+            },
+            {
+              "bundle": "@deepseek-ai/dsh-experimental-ralph-bundle",
+              "enabled": false,
+              "module": "@deepseek-ai/dsh-tool-ralph",
+              "moduleActive": false,
+              "readyMs": 5248,
+              "application": "applied"
+            },
+            {
+              "bundle": "@deepseek-ai/dsh-experimental-session-search",
+              "enabled": true,
+              "module": "@deepseek-ai/dsh-tool-session-query",
+              "moduleActive": true,
+              "readyMs": 5234,
+              "application": "applied"
+            },
+            {
+              "bundle": "@deepseek-ai/dsh-experimental-session-search",
+              "enabled": false,
+              "module": "@deepseek-ai/dsh-tool-session-query",
+              "moduleActive": false,
+              "readyMs": 5214,
+              "application": "applied"
+            },
+            {
+              "bundle": "@deepseek-ai/dsh-experimental-tool-worktree",
+              "enabled": true,
+              "module": "@deepseek-ai/dsh-experimental-worktree",
+              "moduleActive": true,
+              "readyMs": 5899,
+              "application": "applied"
+            },
+            {
+              "bundle": "@deepseek-ai/dsh-experimental-tool-worktree",
+              "enabled": false,
+              "module": "@deepseek-ai/dsh-experimental-worktree",
+              "moduleActive": false,
+              "readyMs": 5205,
+              "application": "applied"
+            },
+            {
+              "bundle": "@deepseek-ai/dsh-experimental-forge-bundle",
+              "enabled": true,
+              "module": "@deepseek-ai/dsh-experimental-client-ui-forge",
+              "moduleActive": true,
+              "readyMs": 5807,
+              "application": "applied"
+            }
+          ]
+        },
+        "catalogTogglesDidNotChangeLock": true,
+        "sessionId": "session-05410236-16e1-44c5-ad49-e248e747ac53",
+        "created": {
+          "path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-88d514e5d2/.agents/worktrees/dsh-05410236-937e",
+          "branch": "dsh-05410236-937e",
+          "baseCommit": "f08577a43c2236a992cdd27b4c5ae4514547da31",
+          "repositoryRoot": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-88d514e5d2"
+        },
+        "committedTip": "edbf6eda64a9361fc37ed0849022d2c8ef336ee3",
+        "existingBranchRestoredAtCommittedTip": true,
+        "gatedCheckoutActivePids": [
+          7999
+        ],
+        "cancelToReapedMs": 325,
+        "cancelledSessionLoggedRestoringWithoutRestored": true,
+        "cancelPreservedBranchAndReportedPartialCheckout": true,
+        "missingBranchRecreatedAtBaseAfterCancellation": true,
+        "forgeActions": [
+          "request",
+          "restoring",
+          "restored",
+          "restoring",
+          "restoring",
+          "restored"
+        ],
+        "restartReadyMs": 6241,
+        "restoredSessionRetainedAcrossRestart": true,
+        "testCredentialRemoved": true,
+        "restoredReadyMs": 4966,
+        "originalConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        },
+        "fixtureRemoved": true
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp-bundle.py",
+        "127.0.0.1:15557",
+        ".build/worktree-restore/lsp-bundle-0.4.37.json"
+      ],
+      "testSourceCommit": "b95c213dd3ca634defb9e4df9cadcff3163b8cc3",
+      "exitCode": 0,
+      "elapsedSeconds": 21.129,
+      "log": ".build/worktree-restore/lsp-bundle-0.4.37.log",
+      "resultSha256": "adf353c971ca761bfdf310b124064d93b488c6937b7b99afa87afab09300e123",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "before": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "disable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": false,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "disabledRestartReadyMs": 4979,
+        "afterDisabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": false,
+          "version": "0.1.0"
+        },
+        "defaultMigrationDidNotReenable": true,
+        "enable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "enabledRestartReadyMs": 5212,
+        "afterEnabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "officialProviderActive": true,
+        "restoredReadyMs": 5377,
+        "configurationHashesRestored": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/worktree-restore/recovery-0.4.37.json"
+      ],
+      "testSourceCommit": "b95c213dd3ca634defb9e4df9cadcff3163b8cc3",
+      "exitCode": 0,
+      "elapsedSeconds": 29.115,
+      "log": ".build/worktree-restore/recovery-0.4.37.log",
+      "resultSha256": "c27c0f1a2a75e6bc4c2e1eb627fd024606499a11201e6e50e4367ec09b8a62c2",
+      "logSha256": "9bb1481421d078d7e5d8cf517d5f0582898c18a8838be9b6be6cebad608bc35e",
+      "result": {
+        "fixture": "mobile-harness-crash-bb4554323f",
+        "normalReadyMs": 78,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 5571,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 4929,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      }
+    }
+  ],
+  "previous035And036Proof": "Previous evidence remains separately bound. This record counts only three suites on 0.4.37.",
+  "failedBaselineRuns": {
+    "artifactSha256": "3108593b6f797a73fda41c93f904edb9babc6d8632a16438ef87273259d30e82",
+    "version": "0.4.36",
+    "commands": [
+      {
+        "command": [
+          "python3",
+          "tests/smoke/emulator-worktree-restore.py",
+          "127.0.0.1:15557",
+          ".build/worktree-restore/initial.json"
+        ],
+        "testSourceCommit": "6f7e2d10093d8b6ad4cac5e4ddb6ffe8f00b53a7",
+        "log": ".build/worktree-restore/initial.log",
+        "exitCode": 1,
+        "reason": "Script omitted retry restoring event from expected sequence. Real restore/cancellation/retry passed preceding assertions.",
+        "resultSha256": "83745824f0f05db4f068cdc8d2d23f2a482dd7494c77c3907f85e748801b6d58",
+        "logSha256": "ec68806a865651d46b0173faaa8d15d8e857ada07c0c692f62cdee108a394a2d",
+        "result": {
+          "fixture": "mh-worktree-restore-eac33cb55d",
+          "forgeReadyMs": 7698,
+          "sessionId": "session-a7695e9c-290f-40f4-b68d-6bd9437161b8",
+          "created": {
+            "path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-eac33cb55d/.agents/worktrees/dsh-a7695e9c-c7b8",
+            "branch": "dsh-a7695e9c-c7b8",
+            "baseCommit": "62d679f06e3bd85ad6092a7683f431b38d19c3cc",
+            "repositoryRoot": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-eac33cb55d"
+          },
+          "committedTip": "d6b5f6d589999e19d95dc4342d9d52835c7ccc2a",
+          "existingBranchRestoredAtCommittedTip": true,
+          "gatedCheckoutActivePids": [
+            28107
+          ],
+          "cancelToReapedMs": 46,
+          "cancelledSessionLoggedRestoringWithoutRestored": true,
+          "cancelPreservedBranchAndReportedPartialCheckout": true,
+          "missingBranchRecreatedAtBaseAfterCancellation": true,
+          "forgeActions": [
+            "request",
+            "restoring",
+            "restored",
+            "restoring",
+            "restoring",
+            "restored"
+          ],
+          "restoredReadyMs": 6956,
+          "originalConfigurationHashes": {
+            "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+            "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+            "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+          },
+          "fixtureRemoved": true
+        }
+      },
+      {
+        "command": [
+          "python3",
+          "tests/smoke/emulator-worktree-restore.py",
+          "127.0.0.1:15557",
+          ".build/worktree-restore/final.json"
+        ],
+        "testSourceCommit": "d9f18724baa7334a4f6896f86b57b518d95bc5d4",
+        "log": ".build/worktree-restore/final.log",
+        "exitCode": 1,
+        "reason": "Functional assertions including restart passed. Cleanup attempted to cancel a completed initializer with no resident Agent after restart; session/not-found failed the suite. Completion tracking fixed this.",
+        "resultSha256": "9f60c1de9608db1561603eaab36271ceb998b6f1e545a670f48d2544d1bbd6c0",
+        "logSha256": "1673b7ae3a81c251117bb37adc96dc34b54a97145068beac1edb70723599d24a",
+        "result": {
+          "fixture": "mh-worktree-restore-1851e5173f",
+          "forgeReadyMs": 6412,
+          "sessionId": "session-4a40f451-ec68-49e1-8ea5-c6361d6e7cd6",
+          "created": {
+            "path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-1851e5173f/.agents/worktrees/dsh-4a40f451-1b55",
+            "branch": "dsh-4a40f451-1b55",
+            "baseCommit": "fa0870750b0ed5463c71eb8dd0078509ea7801d0",
+            "repositoryRoot": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-1851e5173f"
+          },
+          "committedTip": "0f684ce179be5ab8e13153eae506fa11fe270d50",
+          "existingBranchRestoredAtCommittedTip": true,
+          "gatedCheckoutActivePids": [
+            31845
+          ],
+          "cancelToReapedMs": 39,
+          "cancelledSessionLoggedRestoringWithoutRestored": true,
+          "cancelPreservedBranchAndReportedPartialCheckout": true,
+          "missingBranchRecreatedAtBaseAfterCancellation": true,
+          "forgeActions": [
+            "request",
+            "restoring",
+            "restored",
+            "restoring",
+            "restoring",
+            "restored"
+          ],
+          "restartReadyMs": 11183,
+          "restoredSessionRetainedAcrossRestart": true,
+          "restoredReadyMs": 5549,
+          "originalConfigurationHashes": {
+            "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+            "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+            "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+          },
+          "fixtureRemoved": true
+        }
+      }
+    ]
+  },
+  "audit": {
+    "command": "python3 .build/worktree-restore/audit.py",
+    "exitCode": 0,
+    "source": "import hashlib\nimport json\nfrom pathlib import Path\nimport runpy\n\nscript = runpy.run_path('tests/smoke/emulator-worktree-restore.py')\nsupport = script['support']\nagent = script['agent']\nroot = Path('.build/worktree-restore')\ne = support['Emulator']('127.0.0.1:15557', 19644)\nforward = ('tcp:19644', 'tcp:19592')\ne.hdc('fport', *forward)\ntry:\n    e.ready('normal')\n    audit = {'boot':e.state(), 'anonymousHttp':e.web_status(False), 'authenticatedHttp':e.web_status(True),\n             'defaultPermissionPreset':e.rpc('permissionPresets/catalog',{})['defaultPreset'],\n             'testCredentialAbsent':not e.rpc('credentials/describe',{'refs':['DEEPSEEK_API_KEY']})['DEEPSEEK_API_KEY']['configured']}\n    assert audit['boot'] == {'mode':'normal','pending':False}\n    assert (audit['anonymousHttp'],audit['authenticatedHttp']) == (401,200)\n    assert audit['defaultPermissionPreset'] == 'workspace-write' and audit['testCredentialAbsent']\n    assert e.app('test ! -e ' + script['PATCH'] + ' && printf ABSENT') == 'ABSENT'\n    audit['homePatchAbsent'] = True\n    profile = script['PROFILE']\n    digests = {name:hashlib.sha256(agent['read_bytes'](e,profile+'/'+name)).hexdigest() for name in ['package.json','pnpm-lock.yaml']}\n    assert digests == {'package.json':'c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8',\n                       'pnpm-lock.yaml':'3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e'}\n    audit['profileHashes'] = digests\n    audit['catalogRestoredToDisabled'] = script['catalog_state'](e,set())\n    plugins = e.rpc('pluginManager/listPlugins',{})\n    assert not any(row.get('enabled') and row['moduleName'] in script['CATALOG'].values() for row in plugins)\n    audit['noOptionalModulesActive'] = True\n    rows = support['events'](e,'session-ecf0df3c-47a9-4df4-b71e-6d4261d13419')\n    assert len(rows)==30\n    audit['oldRc3SessionEventCount'] = len(rows)\n    recorded = json.loads((root/'artifact.json').read_text())\n    release = 'alpine/.dsh-0.2.2-rc.4'\n    manifest = json.loads(agent['read_bytes'](e,release+'/dsh/package.json'))\n    assert recorded['newCarrierDependencies'].items() <= manifest['dependencies'].items()\n    assert e.app('test -f '+release+'/.validated-unpack-v2-dsh-layer.zip-'+recorded['layerSha256']+' && printf PRESENT') == 'PRESENT'\n    audit['installedDshLayerSha256'] = recorded['layerSha256']\n    (root/'audit.json').write_text(json.dumps(audit,indent=2)+'\\n')\n    print(json.dumps(audit))\nfinally:\n    e.hdc('fport','rm',*forward)\n",
+    "result": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "defaultPermissionPreset": "workspace-write",
+      "testCredentialAbsent": true,
+      "homePatchAbsent": true,
+      "profileHashes": {
+        "package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      },
+      "catalogRestoredToDisabled": {
+        "@deepseek-ai/dsh-experimental-ralph-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-session-search": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-tool-worktree": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-forge-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.4",
+          "enabled": false
+        }
+      },
+      "noOptionalModulesActive": true,
+      "oldRc3SessionEventCount": 30,
+      "installedDshLayerSha256": "84a3672abf039a21fc6e99b9b4b0d30d77887a843e66e07fe464dfcfb8f909e7"
+    }
+  },
+  "limits": [
+    "No Mate 60 result or signed HAP in this phase.",
+    "Forge local worktree RPC verified. GitHub login, PR workflows and Forge visual UI require separate checks.",
+    "Cancellation used a targeted test gate before final reset, after real worktree add. The test does not claim stock Git reset was itself paused.",
+    "Optional bundles retain upstream visibility metadata and are disabled by default. Remaining optional bundles are not registered by this change."
+  ]
+}

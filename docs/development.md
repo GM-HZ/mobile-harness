@@ -231,3 +231,12 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```
 
 独立的 `emulator-inspector-availability.py` 只探测诊断 Worker，要求设备测试 Key 槽为空，临时通过官方 profile bundle 启用，结束恢复原字节。它不验证完整 CDP；当前0.4.36实际失败于 Worker 的 require-builtin 鸿蒙绑定，不属于通过的三组检查。
+
+## 工作树恢复和随包目录
+
+在独立 Phone 模拟器安装 0.4.37 后执行下列命令。使用正式 PluginManager 启停并验证跨重启选择，再经 Forge RPC 还原真实 Git 工作树。测试仅暂停夹具的最终检出阶段，用实际受管进程验证 HTTP 取消。原 profile、锁文件和启动配置在结束后按字节恢复。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-worktree-restore.py <loopback-target> .build/worktree-restore.json --catalog
+```

@@ -114,3 +114,7 @@ Word、Excel、PPT、实际页面附件、缓存、无效文档、会话取消�
 ## 0.4.36 模拟器文件发布与查询
 
 九组实际退出0，均在同一准确最终HAP执行：字符串编辑／补丁、实际ctx.fs竞争与取消、Host／真实ArkWeb Cordis、工具链、PTC、LSP、原生Office、工作树、恢复。原权限和原配置恢复、旧会话30事件保留。诊断Inspector的三次探测失败单列，最新实际错误为Worker缺少鸿蒙require-builtin绑定；不计入通过。此前11／18组不据此视为全量重跑，本版真机未验。[制品、源码与原失败](evidence/emulator-inspection-editing-0.4.36.json)。
+
+## 0.4.37 模拟器目录及恢复回归
+
+通过官方接口启停四个包内扩展。工作树现有分支与缺失分支恢复、检出阶段取消、重试及重启续接通过。同一制品通过 LSP 开关和插件故障恢复。原配置、默认权限、匿名 401、鉴权 200 和旧会话保留均已核对。[本轮证据](evidence/emulator-worktree-catalog-0.4.37.json)
