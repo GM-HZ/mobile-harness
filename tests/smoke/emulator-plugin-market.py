@@ -86,12 +86,12 @@ export function apply(ctx) {{
   ctx.tools.register(defineTool({{
     name: 'mh_market_probe',
     description: 'Return the owned plugin version and its installed dependency fingerprint.',
-    parameters: {{}},
+    parameters: {{ marker: {{ type: 'string', required: true, description: 'Exact probe marker to return.' }} }},
     output: {{
       schema: {{ type: 'object', additionalProperties: true, properties: {{}} }},
       render(_args, value) {{ return [{{ type: 'text', text: JSON.stringify(value) }}]; }},
     }},
-    execute() {{ return {{ version: {json.dumps(version)}, dependency: token }}; }},
+    execute(args) {{ return {{ version: {json.dumps(version)}, dependency: token, marker: args.marker }}; }},
   }}));
 }}
 '''
@@ -196,9 +196,10 @@ def configure_indexes(emulator, server, evidence):
 
 
 def assert_tool(emulator, session, version):
-    result, _ = agent['tool'](emulator, session, 'mh_market_probe', {})
+    marker = 'MARKET_' + uuid.uuid4().hex.upper()
+    result, _ = agent['tool'](emulator, session, 'mh_market_probe', {'marker': marker})
     value = json.loads(agent['toolkit']['texts']([result]))
-    assert value == {'version': version, 'dependency': 'OWNED_DEPENDENCY_LOADED'}, value
+    assert value == {'version': version, 'dependency': 'OWNED_DEPENDENCY_LOADED', 'marker': marker}, value
     return value
 
 
