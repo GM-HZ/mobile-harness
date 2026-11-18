@@ -426,6 +426,8 @@ python3 tests/smoke/emulator-forge-account.py <loopback-target> .build/forge-acc
 
 加 `--owner-login` 可以通过实际 ArkWeb 的分享对话框打开授权，点击测试 Relay 的同意按钮并检查 PKCE 交换与身份显示。测试 Relay 使用本机回环和临时身份，生产 Relay 的部署与真实身份提供方单独验证。
 
+加 `--guest-uploads` 会运行共享页面随包提供的上传脚本及官方 viewer carrier。测试经实际 Host 和回环 Relay 上传一个文本文件和两张图片，把返回的票据提交给 DeepSeek Flash，并核对会话范围、真实访客身份及取消。可在同一次添加多个文件，访客页面依次发送每个文件。单个文件上限 16 MiB，Host 和 Relay 仍可配置更小的限制。加 `--attachments` 另外验证主人提交的图片在 Host 重启后仍能由访客读取。
+
 加 `--program-policy` 使用 PTC 预设，在同一会话同时开设只读和可写链接。真实模型调用 `run_code`，检查原生 worker 获准的模式、作用域、单次生命周期和派生会话的撤销。测试另核对主人直接执行、访客申请扩大权限时的拒绝及程序调用内置写工具的权限。需要测试模型凭据。与 `--owner-login` 分开运行。
 
 ```sh
@@ -438,6 +440,17 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-program.json \
   --program-policy
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-visitors.json \
+  --guest-uploads --attachments
+```
+
+桌面装有 Chrome 和 Playwright CLI 时，可以打开实际分享页面，从对话框选择文件并发送。下列测试通过回环 Relay 转发真实页面资源，按 Viewer 身份核对模型回合。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-liveshare-browser.py <loopback-target> .build/liveshare-browser.json \
+  --playwright-cli <cli-or-wrapper-path>
 ```
 
 ## Goal 跨重启续跑

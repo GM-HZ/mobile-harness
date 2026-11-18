@@ -1,0 +1,162 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15561",
+    "kind": "DevEco ARM64 Phone"
+  },
+  "artifact": {
+    "version": "0.4.62",
+    "versionCode": 69,
+    "sourceCommit": "1257fcfe461c02c7b80fdba776a3282f689a4883",
+    "sha256": "3dde2be1c6efa8f6c26d41262a2e1f9e67d85e3c20c529b33c6a8997d7101ae5",
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4"
+  },
+  "dsh": "0.2.2-rc.5",
+  "testSource": "3f8b7e021d4db744d9c8f8274f5bb65200de3ef7",
+  "command": "python3 tests/smoke/emulator-workflow.py 127.0.0.1:15561 .build/batch-072/workflow-soak.json --soak --host-port 19650",
+  "complete": true,
+  "remainingFixtureSessions": 0,
+  "temporaryModelCredentialRemoved": true,
+  "successfulParentWorkflows": 10,
+  "successfulChildRuns": 40,
+  "reapedHelpers": 10,
+  "rounds": [
+    {
+      "scheduledSeconds": 0,
+      "startedSeconds": 0.029,
+      "fanout": {
+        "alpha": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 2501
+        },
+        "beta": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 2069
+        }
+      },
+      "overlappingParentRunsMs": 984,
+      "workersReaped": 2,
+      "completed": true
+    },
+    {
+      "scheduledSeconds": 600,
+      "startedSeconds": 600.036,
+      "fanout": {
+        "alpha": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 1839
+        },
+        "beta": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 2005
+        }
+      },
+      "overlappingParentRunsMs": 1572,
+      "workersReaped": 2,
+      "completed": true
+    },
+    {
+      "scheduledSeconds": 1800,
+      "startedSeconds": 1800.032,
+      "fanout": {
+        "alpha": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 1865
+        },
+        "beta": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 1994
+        }
+      },
+      "overlappingParentRunsMs": 1634,
+      "workersReaped": 2,
+      "completed": true
+    },
+    {
+      "scheduledSeconds": 3600,
+      "startedSeconds": 3600.038,
+      "fanout": {
+        "alpha": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 2223
+        },
+        "beta": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 1813
+        }
+      },
+      "overlappingParentRunsMs": 1813,
+      "workersReaped": 2,
+      "completed": true
+    },
+    {
+      "scheduledSeconds": 7200,
+      "startedSeconds": 7200.033,
+      "fanout": {
+        "alpha": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 1933
+        },
+        "beta": {
+          "children": 4,
+          "peakConcurrentChildren": 2,
+          "allMarkersReturned": true,
+          "isolatedResults": true,
+          "runMs": 2265
+        }
+      },
+      "overlappingParentRunsMs": 1254,
+      "workersReaped": 2,
+      "completed": true
+    }
+  ],
+  "currentArtifactFanoutRegression": {
+    "emulator": "127.0.0.1:15563",
+    "version": "0.4.67",
+    "sha256": "716f29d11005f1a21561df14338ab8a2ea39a14318a7f69669e66e59bf316078",
+    "fanout": {
+      "alpha": {
+        "children": 4,
+        "peakConcurrentChildren": 2,
+        "allMarkersReturned": true,
+        "isolatedResults": true,
+        "runMs": 2020
+      },
+      "beta": {
+        "children": 4,
+        "peakConcurrentChildren": 2,
+        "allMarkersReturned": true,
+        "isolatedResults": true,
+        "runMs": 2119
+      }
+    },
+    "helpersReaped": 2,
+    "temporaryModelCredentialRemoved": true
+  }
+}

@@ -1,6 +1,6 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.66，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.67，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
@@ -68,11 +68,11 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 工作目录与 fork 续接 | 独立 cwd、相对文件、fork 继承、list／send／wait 与消息续接通过；强停重开后同一子会话仍保留 token 和目录。新增事件与字节结果分别核对，见 [续接补验](evidence/emulator-agent-continuation-0.4.33.json) |
 | 公共子进程与可选工作树 | 真正 Git／Node、流式管道、字面 argv、嵌套 Node、环境脱敏、输出限额／spill、实际取消和销毁通过；官方 create_worktree 默认拒绝、明确选择完整权限后创建，目录／分支／提交／文件独立性、重启续接、脏工作树保留和干净工作树归档清理通过 |
 | 自动目标续跑 | 初始轮只创建目标；实际自动轮通过 read／write／get_goal／update_goal 完成任务，隐藏输入／输出均为精确43字节，目标已清理；非长期压力或系统唤醒保证 |
-| Workflow／子代理 | 同步超时、两类运行中取消、后台结果投递通过。0.4.62 启动两小时重复验收，首轮两条并行 Workflow 各完成四个真实子任务，峰值并发各为二，结果隔离和 helper 回收已验。 [首轮证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
+| Workflow／子代理 | 同步超时、两类运行中取消、后台结果投递通过。0.4.62 完成两小时重复验收，5 轮合计完成 10 条主 Workflow、40 个真实子任务及 10 个 helper 回收，结果保持在所属会话。0.4.67 同包复验两条并行 Workflow。 [长测证据](evidence/emulator-workflow-soak-0.4.62.json) |
 | 自定义模型提供者 | 0.4.58 经标准设置热添加 pi-ai 路由，在 DeepSeek 公网验证 Chat Completions 和 Responses 的模型发现、文件读取工具往返与重启续接。 [模型路由证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
 | 定时任务 | 0.4.58 在模拟器跨两小时完成七次真实模型投递，第 106 秒强停重启保留已有会话和四个待执行任务。回前台精确回忆首轮，清理通过。 [两小时实测](evidence/emulator-schedule-soak-0.4.58.json) |
-| LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。0.4.66 验证真实模型处理两张图片后，访客可读共享图片且重启后字节一致。访客上传、公网 Relay 及真实身份提供方待验。 [附件证据](evidence/emulator-market-liveshare-0.4.66.json) |
+| LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。0.4.66 验证真实模型处理两张图片后，访客可读共享图片且重启后字节一致。0.4.67 补齐访客附件接入，在隔离 Relay 通过文本和图片上传、模型回合、取消和未共享会话拒绝。公网 Relay 及真实身份提供方待验。 [访客上传证据](evidence/emulator-liveshare-guest-uploads-0.4.67.json) |
 | LiveShare 访客程序 | 0.4.64 将具体链接和派生会话的权限传入鸿蒙 PTC 文件代理。普通会话继续使用其原权限；访客程序使用独立 worker，保留限制内的读写和内置工具。文件代理仍报告 `partial`。 [实测证据](evidence/emulator-liveshare-ptc-0.4.64.json) |
 | 麦克风与语音输入 | 0.4.62 从 DSH 录音按钮触发鸿蒙模拟器的系统授权，ArkWeb 音轨进入 live，取消后进入 ended。合成普通话回填及语音 worker 回收同包通过。真机说话转写待验。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
 | Forge 托管仓库 | 0.4.62 经包内 gh 和只读桌面认证代理读取公开 PR 文件与提交，文件逐字相同，提交及其父提交和官网 REST 结果一致。写操作经隔离服务验证。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |

@@ -1,0 +1,255 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15563",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "dshRegistryNext": "0.2.2-rc.5",
+  "testSource": "5084961968687359d4e1d19ffce0bf907bf19c03",
+  "artifact": {
+    "sourceCommit": "4b87122199db654a5581ef7414529abf0f663f50",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.67-unsigned.hap",
+    "version": "0.4.67",
+    "versionCode": 74,
+    "bytes": 768585005,
+    "sha256": "716f29d11005f1a21561df14338ab8a2ea39a14318a7f69669e66e59bf316078",
+    "layerSha256": "2f357f696054b33b3390111843a802116a4e622503909dec5e4fe47aef89fe77",
+    "pyrightVersion": "1.1.414",
+    "pyrightEntrySha256": "f200762078eb9880faf421a5b30f9ef3055b1d85c6f10780d75db4da8d8499f1",
+    "signedArtifact": {
+      "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.67-signed.hap",
+      "bytes": 772254102,
+      "sha256": "e4627a2127227847579103bb753ee1d9e4e837467d16b391f812b6b5086b5d81",
+      "profileVerified": true,
+      "signatureVerified": true,
+      "matchingPayloadEntries": 209
+    }
+  },
+  "packagedIntegrationModulesMatchedSource": [
+    "packages/dsh-host/dsh-native-web.cjs",
+    "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs"
+  ],
+  "oldArtifactApiBaseline": {
+    "version": "0.4.66",
+    "inlineImageCount": 2,
+    "ordinaryFileReceiptConsumed": true
+  },
+  "preReleaseIssue": {
+    "sha256": "5366aaa3fa7119d803355db36c0d080f98e1c9fa869f3e22d8daa715a1465a72",
+    "problem": "A simultaneous image upload from Chrome timed out at the test Relay with HTTP 504.",
+    "change": "The viewer hook serializes attachment calls. The actual composer still accepts multiple files at once.",
+    "testRelayUploadDeadlineMs": 25000,
+    "browserCarrierDeadlineMs": 28000,
+    "requiredUploadLatencyBelowMs": 20000
+  },
+  "chromeProductionComposerWithLoopbackRelay": [
+    {
+      "requestId": "c40d1f9c-a80a-4776-9f44-6bf026a1d3be",
+      "uploads": [
+        {
+          "agentId": "session-81a1f353-5543-474a-81f4-b5cd08565abf",
+          "name": "first.png",
+          "mediaType": "image/png",
+          "elapsedMs": 5063,
+          "status": 200,
+          "ok": true
+        },
+        {
+          "agentId": "session-81a1f353-5543-474a-81f4-b5cd08565abf",
+          "name": "second.png",
+          "mediaType": "image/png",
+          "elapsedMs": 5081,
+          "status": 200,
+          "ok": true
+        },
+        {
+          "agentId": "session-81a1f353-5543-474a-81f4-b5cd08565abf",
+          "name": "visitor.txt",
+          "mediaType": null,
+          "elapsedMs": 32,
+          "status": 200,
+          "ok": true
+        }
+      ],
+      "modelReply": "yellow green blue red",
+      "turnEndReason": "completed",
+      "visitorPrincipal": {
+        "kind": "share-viewer",
+        "shareId": "AEBhKf6puHwd",
+        "actor": {
+          "providerId": "fixture",
+          "tenantId": "local",
+          "subjectId": "reader"
+        }
+      }
+    },
+    {
+      "requestId": "a789fb85-51e4-45d8-8a12-7b6e70480640",
+      "uploads": [
+        {
+          "agentId": "session-829ec01c-aceb-4b30-9864-4ee401da8d2f",
+          "name": "first.png",
+          "mediaType": "image/png",
+          "elapsedMs": 5306,
+          "status": 200,
+          "ok": true
+        },
+        {
+          "agentId": "session-829ec01c-aceb-4b30-9864-4ee401da8d2f",
+          "name": "second.png",
+          "mediaType": "image/png",
+          "elapsedMs": 5520,
+          "status": 200,
+          "ok": true
+        },
+        {
+          "agentId": "session-829ec01c-aceb-4b30-9864-4ee401da8d2f",
+          "name": "visitor.txt",
+          "mediaType": null,
+          "elapsedMs": 26,
+          "status": 200,
+          "ok": true
+        }
+      ],
+      "modelReply": "yellow green blue red",
+      "turnEndReason": "completed",
+      "visitorPrincipal": {
+        "kind": "share-viewer",
+        "shareId": "jIT8l1lJfXVr",
+        "actor": {
+          "providerId": "fixture",
+          "tenantId": "local",
+          "subjectId": "reader"
+        }
+      }
+    }
+  ],
+  "normalRestart": [
+    "11-19 06:50:51.408 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: startup archive node-layer.zip extracted=false ms=0",
+    "11-19 06:50:51.408 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: startup archive shell-tools-layer.zip extracted=false ms=0",
+    "11-19 06:50:51.408 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: startup archive shell-extras-v3.zip extracted=false ms=0",
+    "11-19 06:50:51.408 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: startup archive pnpm-layer-v2.zip extracted=false ms=0",
+    "11-19 06:50:51.409 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: startup archive workspace-python-v1.zip extracted=false ms=1",
+    "11-19 06:50:51.409 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: startup archive dsh-layer.zip extracted=false ms=0",
+    "11-19 06:50:51.475 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: starting native Web ms=75",
+    "11-19 06:50:55.764 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: native loopback ready ms=4364 mode=normal",
+    "11-19 06:50:58.204 22188 22188 I A0D005/org.sayact.nodepoc/DSHClient: ArkWeb loaded \"{\\\"title\\\":\\\"DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":139}\""
+  ],
+  "servedCarrierAndAttachmentPolicy": {
+    "fileName": "guest-note.txt",
+    "fileBytes": 49,
+    "expectedColors": [
+      "red",
+      "blue",
+      "green",
+      "yellow"
+    ],
+    "modelReply": "Red Blue Green Yellow",
+    "endReason": "completed",
+    "visitorPrincipal": {
+      "kind": "share-viewer",
+      "shareId": "U4KcUsTIKbHE",
+      "actor": {
+        "providerId": "fixture",
+        "tenantId": "local",
+        "subjectId": "reader"
+      }
+    },
+    "imageCount": 2,
+    "outsideUploadsRefused": [
+      "remote-access/denied",
+      "remote-access/denied"
+    ],
+    "allReceiptsConsumedByPrompt": true,
+    "servedHookAndPackagedCarrier": true,
+    "cancelledBeforeTransfer": true,
+    "maxConcurrentRelayUploads": 1
+  },
+  "ownerBinaryPathAndRestart": {
+    "count": 2,
+    "modelReply": "Green Blue Red Yellow",
+    "turnEndReason": "completed",
+    "attachmentIds": [
+      "sha256:cfe9bea87b8b9eac8066094ace3d5457f2b8f9ee44637e7e84b2131a2d17efea",
+      "sha256:84ff521a93509d00b021aca2b50534e2bc13dd9891bce746aa34613ef7c59711"
+    ],
+    "viewerBytesMatchedOwner": true,
+    "viewerBytesRestoredAfterRestart": true,
+    "sha256": [
+      "cfe9bea87b8b9eac8066094ace3d5457f2b8f9ee44637e7e84b2131a2d17efea",
+      "84ff521a93509d00b021aca2b50534e2bc13dd9891bce746aa34613ef7c59711"
+    ]
+  },
+  "ptcAndRevocation": {
+    "viewRemainsReadOnlyAlongsideWriteShare": true,
+    "nestedWriteDeniedAcrossViewerTiers": true,
+    "escalationDeniedBeforeWorkerLaunch": true,
+    "boundedWriteCompleted": true,
+    "readOnlyForkAndReplay": true,
+    "childSessionId": "session-c18bfcb6-63b1-47a9-882f-fb23c6e06f2c",
+    "ownerPolicyUnaffected": true,
+    "forkRefusedAfterRevocation": true
+  },
+  "simultaneousWorkflowRegression": {
+    "fanout": {
+      "alpha": {
+        "children": 4,
+        "peakConcurrentChildren": 2,
+        "allMarkersReturned": true,
+        "isolatedResults": true,
+        "runMs": 2020
+      },
+      "beta": {
+        "children": 4,
+        "peakConcurrentChildren": 2,
+        "allMarkersReturned": true,
+        "isolatedResults": true,
+        "runMs": 2119
+      }
+    },
+    "overlappingParentRunsMs": 1757,
+    "workersReaped": 2,
+    "temporaryModelCredentialRemoved": true
+  },
+  "mcpStdioRegression": {
+    "node": {
+      "probe": {
+        "ok": true,
+        "serverInfo": {
+          "name": "node-stdio-fixture",
+          "version": "1"
+        },
+        "toolNames": [
+          "stdio_fixture_echo"
+        ],
+        "truncated": false,
+        "durationMs": 4851,
+        "closeConfirmed": true
+      },
+      "toolResultReturnedToSession": true,
+      "fixtureRemoved": true
+    },
+    "python3": {
+      "probe": {
+        "ok": true,
+        "serverInfo": {
+          "name": "python-stdio-fixture",
+          "version": "1"
+        },
+        "toolNames": [
+          "stdio_fixture_echo"
+        ],
+        "truncated": false,
+        "durationMs": 559,
+        "closeConfirmed": true
+      },
+      "toolResultReturnedToSession": true,
+      "fixtureRemoved": true
+    }
+  },
+  "testModelKeysRemovedAndProfilesRestored": true,
+  "unverified": [
+    "LiveShare on a public Relay and with a real identity provider",
+    "Mate 60 physical-device installation and microphone"
+  ]
+}
