@@ -21,6 +21,7 @@ VOICE = '@deepseek-ai/dsh-experimental-voice-input-bundle'
 PROVIDER = 'sensevoice-local'
 EXPECTED = '今天我们测试语音输入。'
 MODEL_ROOT = 'alpine/native-benchmark-home/speech-to-text/sensevoice'
+LOCK = Path(__file__).resolve().parents[2]/'vendor/repos/dsh/packages/experimental/speech-to-text-sensevoice/runtime/assets.json'
 
 
 def canonical_wave(source):
@@ -78,8 +79,7 @@ class ModelMirror(BaseHTTPRequestHandler):
 
 
 def model_mirror(root):
-    lock=Path('vendor/repos/dsh/packages/experimental/speech-to-text-sensevoice/runtime/assets.json')
-    assets=json.loads(lock.read_text())
+    assets=json.loads(LOCK.read_text())
     selected=[assets['models']['int8'],assets['tokens'],assets['vad']]
     files={urlsplit(asset['url']).path:root/asset['name'] for asset in selected}
     assert all(files[urlsplit(asset['url']).path].stat().st_size==asset['bytes'] for asset in selected)
@@ -224,7 +224,7 @@ def run(emulator,args):
         evidence['defaultCatalog']=flow['has_bundle'](emulator,VOICE,False)
         assert emulator.app(f'test ! -e {MODEL_ROOT} && printf ABSENT')=='ABSENT', 'Dedicated emulator already has voice cache'
         models_created=True
-        if not args.download:
+        if not (args.download or args.public_download):
             cache_models(emulator,args.model_root,remote)
         browser['switch'](emulator,VOICE,True)
         browser['switch'](emulator,INSPECTOR,True)
@@ -246,6 +246,26 @@ def run(emulator,args):
             evidence['downloadPreparation']=readiness(emulator,timeout=100)
             evidence['downloadedAssets']=sorted(mirror.completed)
             assert evidence['downloadedAssets']==['model.int8.onnx','silero_vad.onnx','tokens.txt']
+        elif args.public_download:
+            evidence['downloadInitialState']=readiness(emulator,phases=('unprepared',))
+            evidence['publicOrigin']=args.public_download
+            request={'providerId':PROVIDER}
+            if args.public_download!='auto':
+                request['options']={'downloadSource':args.public_download}
+            emulator.rpc('speech/prepare',request)
+            try:
+                evidence['downloadPreparation']=readiness(emulator,timeout=240)
+            except AssertionError as error:
+                evidence['publicPreparationFailure']=error.args[0]
+                raise
+            lock=json.loads(LOCK.read_text())
+            verified={}
+            for folder,asset in [('sensevoice-onnx',lock['models']['int8']),('sensevoice-onnx',lock['tokens']),('silero',lock['vad'])]:
+                target=f"{MODEL_ROOT}/models/{folder}/{asset['name']}"
+                checksum=emulator.app('sha256sum '+target).split()[0]
+                assert checksum==asset['sha256'], (asset['name'],checksum)
+                verified[asset['name']]=checksum
+            evidence['publicAssetSha256']=verified
         else:
             evidence['cachePreparation']=readiness(emulator)
         payload={'audioBase64':base64.b64encode(audio).decode(),'language':'auto','providerId':PROVIDER}
@@ -262,6 +282,8 @@ def run(emulator,args):
         else:
             raise AssertionError('Invalid audio reached the provider')
         if args.arkweb:
+            emulator.hdc('shell','power-shell','wakeup')
+            emulator.start()
             verify_arkweb(emulator,audio,evidence)
         browser['switch'](emulator,VOICE,False)
         rows=[json.loads(line) for line in emulator.app('cat alpine/tmp/dsh-native-timeline.log').splitlines()]
@@ -303,11 +325,16 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
-    parser.add_argument('--model-root',type=Path,required=True)
+    parser.add_argument('--model-root',type=Path)
     parser.add_argument('--audio',type=Path,required=True)
     parser.add_argument('--arkweb',action='store_true')
-    parser.add_argument('--download',action='store_true',help='Prepare the pinned models via an isolated mirror')
+    source=parser.add_mutually_exclusive_group()
+    source.add_argument('--download',action='store_true',help='Prepare the pinned models via an isolated mirror')
+    source.add_argument('--public-download',choices=['auto','https://huggingface.co','https://hf-mirror.com'],
+                        help='Prepare an empty cache through one shipped public source')
     args=parser.parse_args()
+    if not args.public_download and args.model_root is None:
+        parser.error('--model-root is required for local fixtures')
     emulator=support['Emulator'](args.target,19643)
     forward=('tcp:19643','tcp:19592')
     assert 'Forwardport result:OK' in emulator.hdc('fport',*forward)
