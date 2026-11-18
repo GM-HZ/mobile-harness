@@ -56,8 +56,7 @@ def stage_workspace_dependencies(root, raw):
                     with package.open(member) as contents, archive.open(output, "w") as destination:
                         shutil.copyfileobj(contents, destination)
 
-    with layer.open("rb") as stream:
-        digest = hashlib.file_digest(stream, "sha256").hexdigest()
+    digest = hashlib.sha256(layer.read_bytes()).hexdigest()
     (raw / "workspace-python-id.txt").write_text(digest)
     # site.py resolves a .pth entry relative to the distro site-packages directory.
     (raw / "workspace-python.pth").write_text("../../../../" + site.rstrip("/") + "\n")
