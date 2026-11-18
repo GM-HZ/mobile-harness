@@ -1,0 +1,478 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15561",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "testSource": "3f8b7e021d4db744d9c8f8274f5bb65200de3ef7",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.62-unsigned.hap",
+    "version": "0.4.62",
+    "versionCode": 69,
+    "sha256": "3dde2be1c6efa8f6c26d41262a2e1f9e67d85e3c20c529b33c6a8997d7101ae5",
+    "bytes": 761946180,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "1257fcfe461c02c7b80fdba776a3282f689a4883",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "3fdda913c73e4809d93680d7792a9f90d8f5cc4abbffa37a30d56ec673e19a16",
+      "packages/dsh-host/dsh-harmony-bash-pipe.mjs": "538f21257a6651e53b15ae10bc46d5542ce46d373c28e717a3cba8e5419829f7",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "nativeMicrophoneAndVoice": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-voice-input.py",
+      "127.0.0.1:15561",
+      ".build/batch-072/voice.json",
+      "--model-root",
+      ".build/voice-native/models",
+      "--audio",
+      ".build/voice-native/mandarin-sample.wav",
+      "--arkweb",
+      "--native-mic",
+      "--port",
+      "19650"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "6fcefd2d2938908ca331ef15a9e78b3604ab3c09fbf4292fbbb09a07d01148d7",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "defaultCatalog": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "cachePreparation": {
+        "phase": "standby",
+        "steps": [
+          {
+            "kind": "check",
+            "status": "complete"
+          },
+          {
+            "kind": "model",
+            "status": "complete"
+          },
+          {
+            "kind": "vad",
+            "status": "complete"
+          },
+          {
+            "kind": "verify",
+            "status": "complete"
+          },
+          {
+            "kind": "load",
+            "status": "pending"
+          }
+        ]
+      },
+      "firstTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06832891599999948
+      },
+      "repeatTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06973262500000055
+      },
+      "invalidAudioRejected": true,
+      "arkWebStartControl": [
+        {
+          "disabled": false,
+          "visible": true,
+          "ariaDisabled": null
+        }
+      ],
+      "arkWebStartHit": {
+        "dom": {
+          "hit": true,
+          "hitLabel": "开始录音",
+          "x": 339,
+          "y": 408.5,
+          "width": 28,
+          "height": 28,
+          "dpr": 3,
+          "viewport": [
+            440,
+            677
+          ]
+        },
+        "nativeBounds": "[1017,1342][1101,1427]"
+      },
+      "arkWebSyntheticDraft": true,
+      "arkWebRecordingCancelled": true,
+      "nativeMicrophone": {
+        "nativePermissionDialog": true,
+        "liveAudioTrack": {
+          "kind": "audio",
+          "state": "live",
+          "muted": false
+        },
+        "trackEndedOnCancel": true,
+        "permissionRestored": true
+      },
+      "workerReusedAndStopped": true,
+      "restoreReadyMs": 4389,
+      "originalConfigurationRestored": true
+    }
+  },
+  "nativeCaptureProbe": {
+    "observed": {
+      "state": "granted",
+      "trusted": true,
+      "tracks": [
+        {
+          "kind": "audio",
+          "enabled": true,
+          "readyState": "live",
+          "muted": false
+        }
+      ],
+      "bytes": 17684,
+      "afterStop": [
+        "ended"
+      ]
+    },
+    "sourceSha256": "c4b71d27f96fb6c6e1b7b1e6e9cee15c40274d1c4aa032d46b51917d8c0083dc",
+    "recordingContentRetained": false,
+    "jsonSha256": "59ea553a1fa8656668600c19c7e1d1a9cd93320731f7825aebd31d1cdde2b071"
+  },
+  "forgePublicRead": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-forge-github.py",
+      "127.0.0.1:15561",
+      ".build/batch-072/forge-public.json",
+      "--public-read",
+      "--port",
+      "19650"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "915cbac89e571db6f931579be43661a69d63a0686a431c564f20f4ce079c0e01",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "publicRead": {
+        "pullRequest": "https://github.com/GM-HZ/omnix/pull/9",
+        "headSha": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+        "path": "codex-rs/codex-api/src/chat_completions/types.rs",
+        "contentSha256": "e0cf3690bf168f227a106a51bf8beda7e8e38cc8fafb4b5b14a7461bd169a3f9",
+        "commits": [
+          {
+            "sha": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+            "parent": "66279c6a1be5d4fb2f6f1a3d2a2560215f6b146d",
+            "title": "feat(omnix-sdk): add structured DeepSeek runs",
+            "author": "MengGong92",
+            "authoredAt": "2026-07-15T02:02:02Z"
+          }
+        ],
+        "authorization": "Authenticated host gh; disposable fixture credential on the emulator"
+      },
+      "restoredReadyMs": 4438,
+      "configAndCABytesRestored": true,
+      "requests": [
+        {
+          "operation": "contents",
+          "status": 200,
+          "sha256": "e0cf3690bf168f227a106a51bf8beda7e8e38cc8fafb4b5b14a7461bd169a3f9"
+        },
+        {
+          "operation": "commits",
+          "status": 200
+        }
+      ]
+    }
+  },
+  "forgeIsolatedWriteRegression": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-forge-github.py",
+      "127.0.0.1:15561",
+      ".build/batch-072/forge-writes.json",
+      "--writes",
+      "--port",
+      "19650"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "14dbfdd24694c6e50eea264cf60377f03bf120f4f6b25fbe8bb51108a53c23ac",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "rawFileAtCommit": true,
+      "paginatedCommitGraph": {
+        "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "commits": [
+          {
+            "sha": "cccccccccccccccccccccccccccccccccccccccc",
+            "parent": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "title": "First commit",
+            "author": "Fixture",
+            "authoredAt": "2026-01-01T00:00:00Z"
+          },
+          {
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "parent": "cccccccccccccccccccccccccccccccccccccccc",
+            "title": "Second commit",
+            "author": "Fixture",
+            "authoredAt": "2026-01-01T00:00:00Z"
+          }
+        ],
+        "truncated": false
+      },
+      "writes": {
+        "reviewStaleDeniedBeforeWrite": "stale",
+        "review403Denied": "failed",
+        "reviewReceipt": {
+          "ok": true,
+          "url": "https://forge-fixture.test/fixture/mobile/pull/7#pullrequestreview-1"
+        },
+        "review503UnknownWithoutRetry": "unknown",
+        "reviewPayload": {
+          "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "event": "COMMENT",
+          "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+          "comments": [
+            {
+              "path": "fixture.txt",
+              "side": "RIGHT",
+              "start_side": "RIGHT",
+              "start_line": 2,
+              "line": 3,
+              "body": "Check lines 2–3."
+            }
+          ]
+        },
+        "reviewerRequest": {
+          "input": {
+            "pullRequestId": "PR_fixture",
+            "union": true,
+            "userIds": [
+              "U_fixture"
+            ]
+          }
+        },
+        "staleMergeDenied": true,
+        "mergeRequests": [
+          {
+            "merge_method": "squash",
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "merge_method": "squash",
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "mergedAfterRestartReadyMs": 4411
+      },
+      "restoredReadyMs": 4395,
+      "configAndCABytesRestored": true,
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/contents/fixture.txt",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": "next"
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/reviews",
+          "authenticated": true,
+          "body": {
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "event": "COMMENT",
+            "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+            "comments": [
+              {
+                "path": "fixture.txt",
+                "side": "RIGHT",
+                "line": 3,
+                "body": "Check lines 2–3.",
+                "start_line": 2,
+                "start_side": "RIGHT"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/reviews",
+          "authenticated": true,
+          "body": {
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "event": "COMMENT",
+            "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+            "comments": [
+              {
+                "path": "fixture.txt",
+                "side": "RIGHT",
+                "line": 3,
+                "body": "Check lines 2–3.",
+                "start_line": 2,
+                "start_side": "RIGHT"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/reviews",
+          "authenticated": true,
+          "body": {
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "event": "COMMENT",
+            "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+            "comments": [
+              {
+                "path": "fixture.txt",
+                "side": "RIGHT",
+                "line": 3,
+                "body": "Check lines 2–3.",
+                "start_line": 2,
+                "start_side": "RIGHT"
+              }
+            ]
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/merge",
+          "authenticated": true,
+          "body": {
+            "merge_method": "squash",
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/merge",
+          "authenticated": true,
+          "body": {
+            "merge_method": "squash",
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        }
+      ]
+    }
+  },
+  "workflowSoakCheckpoint": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-workflow.py",
+      "127.0.0.1:15561",
+      ".build/batch-072/workflow-soak.json",
+      "--soak",
+      "--host-port",
+      "19650"
+    ],
+    "exitCode": null,
+    "jsonSha256": "a528d88e1d205c4595fa0d0fd84d1b073658684ec49ae23c9179c9f6951c598c",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "startupMs": 75,
+      "soakDelaysSeconds": [
+        0,
+        600,
+        1800,
+        3600,
+        7200
+      ],
+      "rounds": [
+        {
+          "scheduledSeconds": 0,
+          "startedSeconds": 0.029,
+          "fanout": {
+            "alpha": {
+              "children": 4,
+              "peakConcurrentChildren": 2,
+              "allMarkersReturned": true,
+              "isolatedResults": true,
+              "runMs": 2501
+            },
+            "beta": {
+              "children": 4,
+              "peakConcurrentChildren": 2,
+              "allMarkersReturned": true,
+              "isolatedResults": true,
+              "runMs": 2069
+            }
+          },
+          "overlappingParentRunsMs": 984,
+          "workersReaped": 2,
+          "completed": true
+        }
+      ],
+      "coverageComplete": false
+    }
+  },
+  "earlierForgeFailures": [
+    {
+      "logSha256": "37946ee3b7343f89ead9cce6ca442561e51e24fd1066ad07e456544ab3eb7dd2",
+      "cause": "The default port was occupied by a separate live schedule soak. The fixture now accepts a configured port."
+    },
+    {
+      "logSha256": "235555dc17cf7cd6bd73295032d2346eba9f426ba0efd1d16c62d1c433f2f220",
+      "cause": "The test profile had no pnpm lock file. The current test preserves the missing-file state."
+    }
+  ],
+  "pending": [
+    "Physical microphone and spoken-audio recognition",
+    "Direct GitHub authentication on the device",
+    "Hosted repository writes",
+    "Final Workflow and schedule soak checkpoints",
+    "Mate 60 offline"
+  ]
+}
