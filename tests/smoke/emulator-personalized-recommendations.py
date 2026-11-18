@@ -170,7 +170,9 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
     title=('Creator ' if create else 'Page recommendation ')+name
     sid=session(emulator,workspace,title,sessions)
     kind='create_personalized_page'
-    args={'action':kind,'title':'Local Counter','brief':'Name the counter tab Local Counter. Display Count: 0 initially, with Increment and Reset buttons. No network, files or other data.',
+    args={'action':kind,'title':'Local Counter','brief':('Name the session tab Local Counter. Render the visible literal text '
+          'Count: 0 in one element and update its number on click. Label the two visible buttons Increment and Reset. '
+          'Use plain JavaScript and keep the count only in page memory. No network, files or other data.'),
           'details':{'slot':'sidebar-right'}}
     call_id,turns=proposal(emulator,sid,'personalized-pages',args,
                          'Please propose a small local interface for a counter that starts at 0, increments, and resets. It needs no data source.')
@@ -198,8 +200,14 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
         ]
         if status['data'].get('application')=='restart-required':
             flow['restart'](emulator)
-        verify_counter(emulator,title,evidence,bundle)
-        evidence['creatorCounterControls']=[0,1,0]
+        before_undo = None
+        try:
+            verify_counter(emulator,title,evidence,bundle)
+            evidence['creatorCounterControls']=[0,1,0]
+        except AssertionError as error:
+            # Still verify removal and restore even if this model output did not render as requested.
+            evidence['creatorCounterError']=str(error)
+            before_undo = error
         print('Verified real Creator installed its own plugin',flush=True)
         with flow['browser'](emulator) as run:
             open_view(run,['聊天','对话','Chat'])
@@ -222,8 +230,14 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
         assert market['catalog'](emulator,bundle)['installed']
         if restored['data'].get('application')=='restart-required':
             flow['restart'](emulator)
-        verify_counter(emulator,title,evidence,bundle)
         evidence['creatorLifecycle']={'installed':status,'removed':removed,'restored':restored}
+        restored_starts=sum(row['type']=='turn/start' for row in support['events'](emulator,sid))
+        assert restored_starts==turns, 'Restoring a retained page must not start a new model turn'
+        evidence['restoreStartedNoTurn']=True
+        verify_counter(emulator,title,evidence,bundle)
+        evidence['restoredCounterControls']=[0,1,0]
+        if before_undo:
+            raise before_undo
     else:
         result=wait_for(lambda:decisions(emulator,sid,call_id,{'dismissed'}),'page dismissal')
         assert sum(row['type']=='turn/start' for row in support['events'](emulator,sid))==turns
