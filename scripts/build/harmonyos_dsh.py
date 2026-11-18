@@ -24,6 +24,7 @@ OPTIONAL_BUNDLES = (
     "@deepseek-ai/dsh-deepseek-chat-import",
     "@deepseek-ai/dsh-experimental-badge-skill-bundle",
     "@deepseek-ai/dsh-experimental-forge-bundle",
+    "@deepseek-ai/dsh-experimental-inspector-profile",
     "@deepseek-ai/dsh-experimental-plugin-market-bundle",
     "@deepseek-ai/dsh-experimental-ralph-bundle",
     "@deepseek-ai/dsh-experimental-session-search",

@@ -331,6 +331,7 @@ async function main() {
   const workflowUrl = paths('dsh-workflow-ptc/lib/index.js');
   const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
   const officeUrl = paths('dsh-office-kit/lib/index.js');
+  const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
   const httpParserUrl = pathToFileURL(path.join(dsh, 'undici/lib/dispatcher/client-h1.js')).href;
   const { patchClientH1 } = require(path.join(root, 'dsh-harmony-http.cjs'));
   globalThis.__harmonyLlhttp = imports => require(path.join(root, 'dsh-harmony-llhttp.cjs'))(imports);
@@ -404,6 +405,17 @@ async function main() {
         return { ...result, source: replacePinned(source,
           '...loadOptionalPatches(binName, join(context.home, "cordis.patch.yml")) ?? [],',
           '...[],') };
+      }
+      if (url === inspectorUrl) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        const workerArgs = ['--expose-internals', '--require', path.join(root, 'dsh-harmony-inspector-worker.cjs')];
+        let patched = replacePinned(source, 'execArgv: []', 'execArgv: ' + JSON.stringify(workerArgs));
+        patched = replacePinned(patched, 'for (const [key, value] of Object.entries(req.headers)) if (key.startsWith("sec-websocket-")',
+          'upstream.write("X-DSH-Inspector-Token: " + handle.endpoint.client.protocol + "\\r\\n");\n' +
+          'for (const [key, value] of Object.entries(req.headers)) if (key.startsWith("sec-websocket-")');
+        patched = replacePinned(patched, 'console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);',
+          'console.log("dsh inspector: /inspector/devtools/");');
+        return { ...result, source: patched };
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
           url !== attachmentUrl && url !== searchUrl && url !== ripgrepUrl && url !== packageUrl &&
