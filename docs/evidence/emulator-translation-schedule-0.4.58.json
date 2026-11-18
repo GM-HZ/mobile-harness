@@ -1,0 +1,357 @@
+{
+  "snapshotUtc": "2026-11-18T19:25:40+00:00",
+  "testSource": "8986ff38bc3501094e313b62dd6896fd039f1589",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.58-unsigned.hap",
+    "version": "0.4.58",
+    "versionCode": 65,
+    "sha256": "37fa495563b212e1e46ad918cf27040872a7b3660fefadf27214c5295fb4d458",
+    "bytes": 720520028,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "977b8a83106e68bc88811109bd998e2affcd5985",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "654ded9961dcc0b99b788f511c08d3ddc11decf8fc122d8b95936f7642e1fcbe",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "dshRegistryNext": "0.2.2-rc.5",
+  "publicTranslations": {
+    "target": "127.0.0.1:15559",
+    "api": 26,
+    "emulator": "MH_RC5_Translation_Run",
+    "installLogSha256": "3cba2f488d0f71b18507a9bb96f73c51ed835809f9e3b34145896ba1fddb1762",
+    "transport": "Fixed fixture only through an existing Mac loopback CONNECT proxy.",
+    "proxy": {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-cot-translation.py",
+        "127.0.0.1:15559",
+        ".build/batch-067/translations-public.json",
+        "--live",
+        "public-proxy",
+        "--host-port",
+        "19648"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "jsonSha256": "898b2a2c59e089c4264061b6ccec12caa4c6c500fb10d299cbce66c423db32fd",
+      "observed": {
+        "defaultCatalog": {
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "availableProviders": [
+          "bing",
+          "google",
+          "deepseek-official"
+        ],
+        "publicTranslations": {
+          "bing": "只搜索归档的导出上下文。",
+          "google": "仅搜索存档的导出上下文。"
+        },
+        "publicRequests": [
+          {
+            "provider": "bing",
+            "target": "zh-Hans",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false,
+            "upstreamStatus": 200
+          },
+          {
+            "provider": "google",
+            "target": "zh-CN",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false,
+            "upstreamStatus": 200
+          }
+        ],
+        "publicTranslationRecordsRestored": true,
+        "restoredReadyMs": 4431,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "ef189a8c27db6d63930aa3046a3040482e952eafcb7487c644d508e8d461f027",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    "arkwebControl": {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-cot-translation.py",
+        "127.0.0.1:15559",
+        ".build/batch-067/translations-control.json",
+        "--host-port",
+        "19648"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "jsonSha256": "80d4a86a47975e3013d64dcc6af1c68e244a11943d301dd7bcbfacb472a075a2",
+      "observed": {
+        "defaultCatalog": {
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "availableProviders": [
+          "bing",
+          "google",
+          "deepseek-official"
+        ],
+        "originalAndTranslatedViews": true,
+        "appendedEventTypes": [
+          "session/end-seed",
+          "plugin:translator/request",
+          "plugin:translator/result",
+          "session/end-seed",
+          "plugin:translator/request",
+          "plugin:translator/request",
+          "plugin:translator/result",
+          "plugin:translator/request"
+        ],
+        "providerCalls": [
+          {
+            "provider": "bing",
+            "target": "zh-Hans",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          },
+          {
+            "provider": "google",
+            "target": "ja",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          },
+          {
+            "provider": "google",
+            "target": "ja",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          },
+          {
+            "provider": "google",
+            "target": "de",
+            "text": "Search only the archived export context.",
+            "requestShape": true,
+            "authorization": false,
+            "cookie": false
+          }
+        ],
+        "persistedAcrossRestart": true,
+        "failureRetainedOriginal": true,
+        "pendingRequestCancelledOnDisable": true,
+        "originalConversationUnchanged": true,
+        "restoredReadyMs": 5032,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "ef189a8c27db6d63930aa3046a3040482e952eafcb7487c644d508e8d461f027",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    "cleanupAudit": {
+      "credentialRemoved": true,
+      "bundleDefaultOff": true,
+      "profileUnchanged": true,
+      "reversePortRemoved": true,
+      "unauthenticatedStatus": 401
+    },
+    "directComparison": {
+      "observed": [
+        {
+          "environment": "mac-direct",
+          "provider": "bing",
+          "sourceLanguage": "auto",
+          "elapsedMs": 380,
+          "httpStatus": 400,
+          "mime": "text/plain; charset=utf-8",
+          "chineseTranslation": false,
+          "failure": "Client Browser Version not supported"
+        },
+        {
+          "environment": "mac-direct",
+          "provider": "bing",
+          "sourceLanguage": "explicit",
+          "elapsedMs": 394,
+          "httpStatus": 400,
+          "mime": "text/plain; charset=utf-8",
+          "chineseTranslation": false,
+          "failure": "Client Browser Version not supported"
+        },
+        {
+          "environment": "mac-direct",
+          "provider": "google",
+          "sourceLanguage": "auto",
+          "elapsedMs": 24037,
+          "errorType": "URLError",
+          "diagnostic": "<urlopen error timed out>"
+        },
+        {
+          "environment": "mac-direct",
+          "provider": "google",
+          "sourceLanguage": "explicit",
+          "elapsedMs": 24035,
+          "errorType": "URLError",
+          "diagnostic": "<urlopen error timed out>"
+        },
+        {
+          "environment": "harmony-shell-tls",
+          "provider": "bing",
+          "sourceLanguage": "auto",
+          "elapsedMs": 437,
+          "httpStatus": 400,
+          "mime": "text/plain; charset=utf-8",
+          "chineseTranslation": false,
+          "failure": "Client Browser Version not supported"
+        },
+        {
+          "environment": "harmony-shell-tls",
+          "provider": "bing",
+          "sourceLanguage": "explicit",
+          "elapsedMs": 438,
+          "httpStatus": 400,
+          "mime": "text/plain; charset=utf-8",
+          "chineseTranslation": false,
+          "failure": "Client Browser Version not supported"
+        },
+        {
+          "environment": "harmony-shell-tls",
+          "provider": "google",
+          "sourceLanguage": "auto",
+          "elapsedMs": 14009,
+          "errorType": "TimeoutExpired",
+          "diagnostic": "outer deadline"
+        },
+        {
+          "environment": "harmony-shell-tls",
+          "provider": "google",
+          "sourceLanguage": "explicit",
+          "elapsedMs": 14008,
+          "errorType": "TimeoutExpired",
+          "diagnostic": "outer deadline"
+        }
+      ],
+      "jsonSha256": "260d3ebb342550af3307a1e22e1a10ba361e2a18fb5c689a7f3c9fcba574c134",
+      "probe": "Native OpenSSL HTTPS on HarmonyOS shell with hostname/CA verification. Direct macOS urllib without a proxy."
+    },
+    "initialFixtureFailures": [
+      {
+        "logSha256": "76ec63c48bc109187cfa3b05860b314bea5032c138ef519b2bb017542cc71b40",
+        "exitCode": 1,
+        "cause": "New profiles lack pnpm-lock.yaml before the first profile mutation."
+      },
+      {
+        "logSha256": "e39d4ab511d7590274e0e8eb01f79a24b642673c9b74aabcf32a690ef15116f5",
+        "exitCode": 1,
+        "cause": "Appending a block entry to the fresh empty-array patch produced invalid YAML and prevented the patched Host boot."
+      },
+      {
+        "logSha256": "cfe1023386336d1d3fdad65ffa16a1735b0dc50e8f516ab6de07734e418759b5",
+        "exitCode": 1,
+        "cause": "The fresh ArkWeb profile still showed the official preview notice before the chat controls."
+      }
+    ]
+  },
+  "backgroundScheduleCheckpoint": {
+    "command": [
+      "caffeinate",
+      "-i",
+      "python3",
+      "tests/smoke/emulator-background-schedule.py",
+      "127.0.0.1:15557",
+      ".build/batch-067/schedule-soak.json",
+      "--soak"
+    ],
+    "state": "running",
+    "observed": {
+      "deliveries": [
+        {
+          "afterSeconds": 16,
+          "finishedTurn": 2,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:12:39.773Z",
+            "deliveredAt": "2026-11-18T19:12:39.811Z",
+            "messageId": "57a3673c-9547-49db-96e7-09a0ce5f3abd",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 16876
+        },
+        {
+          "afterSeconds": 48,
+          "finishedTurn": 3,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:13:11.818Z",
+            "deliveredAt": "2026-11-18T19:13:11.843Z",
+            "messageId": "688c6723-36c9-457a-ba0c-48fd21c6660c",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 49645
+        },
+        {
+          "afterSeconds": 80,
+          "finishedTurn": 4,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:13:43.860Z",
+            "deliveredAt": "2026-11-18T19:13:43.889Z",
+            "messageId": "51adf218-7706-4bee-8c65-0c6a8304ce59",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 81869
+        },
+        {
+          "afterSeconds": 160,
+          "finishedTurn": 5,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:15:03.901Z",
+            "deliveredAt": "2026-11-18T19:15:04.013Z",
+            "messageId": "0168fc81-d81d-4ec7-be28-7dababa3297d",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 161448
+        }
+      ],
+      "delaysSeconds": [
+        16,
+        48,
+        80,
+        160,
+        1800,
+        3600,
+        7200
+      ],
+      "restartAtSeconds": 105,
+      "finished": false,
+      "restart": {
+        "atMs": 106412,
+        "readyMs": 5689,
+        "priorJournalPreserved": true,
+        "undeliveredTasksPreserved": 4
+      }
+    },
+    "jsonSha256": "fc1e10437e614cd23faf14b0bbabf13fbde444993940636371b5c70d49810c07",
+    "note": "The checkpoint does not represent the two-hour test outcome."
+  }
+}
