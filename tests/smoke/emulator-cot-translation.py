@@ -119,7 +119,7 @@ def click(selector):
         button.click(); return true;}})()'''
 
 
-def open_reasoning(emulator, run, title):
+def open_reasoning(emulator, run, title, marker):
     ui['open_sidebar'](emulator)
     wait(run, f'''(() => {{
         const field=document.querySelector('[data-sidebar-workspace-header] input[type=text]');
@@ -130,11 +130,12 @@ def open_reasoning(emulator, run, title):
           Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(field, {json.dumps(title)});
           field.dispatchEvent(new Event('input',{{bubbles:true}}));
         }}
-        const item=[...document.querySelectorAll('[role=treeitem]')].find(el =>
+        const item=[...document.querySelectorAll('[data-sidebar-list-area] [role=treeitem]')].find(el =>
           el.getClientRects().length && el.textContent.includes({json.dumps(title)}));
         if (item) {{ item.click(); return true; }}
         return false;
     }})()''', 'the fixture session')
+    wait(run, f'document.body.innerText.includes({json.dumps("The archive verification code is "+marker)})', 'the fixture conversation')
     wait(run, f'''(() => {{
         const row=document.querySelector({json.dumps(DISCLOSURE)});
         if (row?.getClientRects().length) return true;
@@ -174,11 +175,11 @@ def restart(emulator):
     return emulator.ready('normal')
 
 
-def verify_fixture(emulator, server, title, session, evidence):
+def verify_fixture(emulator, server, title, marker, session, evidence):
     original = support['events'](emulator, session)
     with browser(emulator) as run:
         assert not server.calls
-        open_reasoning(emulator, run, title)
+        open_reasoning(emulator, run, title, marker)
         check_body(run, 'ready', FIXTURE_TRANSLATIONS['bing', 'zh-Hans'], 'translated')
         wait(run, click(BODY+' button'), 'show original')
         check_body(run, 'ready', SOURCE, 'original')
@@ -188,7 +189,7 @@ def verify_fixture(emulator, server, title, session, evidence):
     evidence['originalAndTranslatedViews'] = True
     restart(emulator)
     with browser(emulator) as run:
-        open_reasoning(emulator, run, title)
+        open_reasoning(emulator, run, title, marker)
         check_body(run, 'ready', FIXTURE_TRANSLATIONS['bing', 'zh-Hans'], 'translated')
         assert len(server.calls) == 1, server.calls
         server.fail = True
@@ -256,11 +257,13 @@ def run(emulator, output, live):
             item = emulator.rpc('workspace/create',{'request':{'path':support['WORKSPACE']+'/'+fixture}})
             assert item['created'], item
             workspace = item['workspace']['workspaceId']
-            archive = flow['archive_bytes'](fixture,flow['SOURCE_PNG'].read_bytes(),text_title=fixture)
+            title = 'Translation sample '+fixture
+            archive = flow['archive_bytes'](fixture,flow['SOURCE_PNG'].read_bytes(),text_title=title)
             status, lines = flow['upload'](emulator, workspace, archive)
             assert status == 200 and lines[-1]['outcome']['ok'], (status,lines)
             sessions.extend(lines[-1]['outcome']['value']['sessionIds'])
             session = sessions[0]
+            emulator.rpc('session/selectModel', {'request': {'sessionId':session, **flow['MODEL']}})
             limits = emulator.rpc('cotTranslation/limits',{})
             assert limits['preferences']=={'provider':'bing','targetLanguage':'auto'}, limits
             evidence['availableProviders'] = limits['availableProviders']
@@ -270,9 +273,15 @@ def run(emulator, output, live):
                 for provider in ['bing', 'deepseek-official']:
                     assert provider in limits['availableProviders'], limits
                     setting(emulator,provider,'zh')
-                    translation = emulator.rpc('cotTranslation/translate',{
-                        'request':{'text':SOURCE,'sessionId':session,'provider':provider,'targetLanguage':'zh'},
-                    },timeout=70)
+                    evidence['selectedLiveProvider'] = provider
+                    try:
+                        translation = emulator.rpc('cotTranslation/translate',{
+                            'request':{'text':SOURCE,'sessionId':session,'provider':provider,'targetLanguage':'zh'},
+                        },timeout=70)
+                    except RuntimeError:
+                        evidence['recordsAfterFailure'] = [row['type'] for row in support['events'](emulator,session)
+                                                           if row['type'].startswith('plugin:translator/')]
+                        raise
                     assert translation != SOURCE and any('\u4e00' <= char <= '\u9fff' for char in translation), translation
                     evidence['liveTranslations'][provider] = translation
                 paid, = [row['data']['metadata']['modelRequest'] for row in support['events'](emulator,session)
@@ -282,7 +291,7 @@ def run(emulator, output, live):
                 evidence['isolatedFlashRequest'] = {'model':'deepseek-flash','reasoningEffort':'off','messages':1}
             else:
                 restart(emulator)
-                verify_fixture(emulator,server,fixture,session,evidence)
+                verify_fixture(emulator,server,title,fixture,session,evidence)
     finally:
         try:
             for session in sessions:
