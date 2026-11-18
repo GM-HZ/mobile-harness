@@ -216,3 +216,18 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-compaction-auto.py <loopback-target> .build/compaction-auto.json
 ```
+
+## Cordis 与替代编辑回归
+
+0.4.36 修复独占创建发布后，以下检查使用真实模型和正式插件。Cordis 要求真实 ArkWeb 客户端已连接；超出 inline 上限时验证正式保留文件和实际 read。编辑测试仅临时启用官方字符串编辑器与 apply_patch；权限、完整字节、多文件预检及部分提交报告均保留检查。文件发布检查通过标准测试 bundle 验证实际 ctx.fs，包含真实暂存后的竞争创建和取消。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-cordis-inspect.py <loopback-target> .build/cordis.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-alternative-editing.py <loopback-target> .build/alternative-editing.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-fs-publication.py <loopback-target> .build/fs-publication.json
+```
+
+独立的 `emulator-inspector-availability.py` 只探测诊断 Worker，要求设备测试 Key 槽为空，临时通过官方 profile bundle 启用，结束恢复原字节。它不验证完整 CDP；当前0.4.36实际失败于 Worker 的 require-builtin 鸿蒙绑定，不属于通过的三组检查。

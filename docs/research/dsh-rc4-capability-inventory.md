@@ -12,11 +12,11 @@
 | office | 是 | 三个工具、附件、公式、缓存、异常、取消与生命周期已验 |
 | present | 是 | 真实工具及持久交付事件已验，测试文件随后按夹具清理 |
 | pwsh | 是 | Windows 选择项；鸿蒙未启用，不承诺 PowerShell |
-| cordis | 是 | 可选 inspector 能力；未逐项端到端回归 |
+| cordis | 是 | 0.4.36 真实模型查询 Host 四类和 ArkWeb 五类 provider，准确 schema、分页、完整 retention、拒绝与重启通过；与独立诊断 Inspector 区分，后者 Worker 鸿蒙绑定错误仍待修复 |
 | bash-persistent | 是 | 可选终端能力；系统 PTY 暂缓，未承诺完整持久终端 |
 | pwsh-persistent | 是 | Windows／可选终端，不在鸿蒙验收范围 |
-| str-replace-editor | 是 | 其他 preset 的编辑入口；当前标准使用 fs edit，未单测此替代入口 |
-| fs | 是 | read／write／edit 既有完整工具链回归；apply_patch 仍遵循上游默认开关 |
+| str-replace-editor | 是 | 0.4.36 修复原子创建后，创建／查看／替换／歧义／插入／删除及工作区、只读拒绝通过；仍由 preset 选择 |
+| fs | 是 | read／write／edit 既有回归；临时开启 apply_patch 的创建／移动／删除、预检零修改、部分提交报告和权限通过，正式默认开关不变 |
 | fs-search | 是 | glob／grep 及范围检查既有回归 |
 | terminal | 是 | 可选系统 PTY 终端；按先前要求暂缓 |
 | goal | 是 | 创建、暂停、旧 revision 拒绝及重启后恢复已验；自动一轮真实读写与完成通过，长期压力仍待验 |

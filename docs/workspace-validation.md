@@ -110,3 +110,7 @@ Word、Excel、PPT、实际页面附件、缓存、无效文档、会话取消�
 ## 0.4.35 模拟器 LSP 与必要回归
 
 三组 LSP 检查及八组现有能力回归通过，均绑定同一实际 HAP；官方 TypeScript server 返回精确语义位置，编译器目录隔离解决原60秒超时。bundle 禁用／启用跨重启保留，真正服务器的取消／销毁与崩溃重建通过。工具链、MCP、PTC、Workflow、Office、子进程、工作树及恢复继续可用。原失败和测试口径修正单列；旧会话、默认权限、鉴权和配置恢复已审计。未将所有语言／可选插件或真机算通过。见 [0.4.35 完整证据](evidence/emulator-lsp-0.4.35.json)。
+
+## 0.4.36 模拟器文件发布与查询
+
+九组实际退出0，均在同一准确最终HAP执行：字符串编辑／补丁、实际ctx.fs竞争与取消、Host／真实ArkWeb Cordis、工具链、PTC、LSP、原生Office、工作树、恢复。原权限和原配置恢复、旧会话30事件保留。诊断Inspector的三次探测失败单列，最新实际错误为Worker缺少鸿蒙require-builtin绑定；不计入通过。此前11／18组不据此视为全量重跑，本版真机未验。[制品、源码与原失败](evidence/emulator-inspection-editing-0.4.36.json)。

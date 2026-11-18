@@ -1,10 +1,12 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.35，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.4`。331 个随包 DSH 组件均固定为 RC.4，生产依赖由锁文件装配。Linux 工具仍按需进入 Alpine／PRoot，Host 不运行于 PRoot。
+当前应用 0.4.36，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.4`。331 个随包 DSH 组件均固定为 RC.4，生产依赖由锁文件装配。Linux 工具仍按需进入 Alpine／PRoot，Host 不运行于 PRoot。
 
 官方现已发布 RC.4 源码标签，Git 子模块固定 `3f321d32bfe382212a8ed8785c1d47a5a300aa23`，与 npm 精确版本配套。0.4.31 最初升级时的公开源码延迟保留在历史证据中。发布包前端内嵌的短提交是构建标识，源码 pin 使用官方发布标签的完整提交。
 
 ## 当前验收
+
+[0.4.36 证据](evidence/emulator-inspection-editing-0.4.36.json)绑定原子不覆盖发布适配、真实 Cordis 查询、替代编辑及六组受影响回归，共九组检查通过。插件诊断 Inspector 单独测试失败：Worker 的 profile-resolution bootstrap 无法选择鸿蒙 require-builtin 绑定；不计入通过。测试与原配置已恢复；未把前版11／18组冒充本版重跑。
 
 [0.4.35 证据](evidence/emulator-lsp-0.4.35.json)绑定官方 LSP、准确编译器工具链及八组必要回归，共11组检查通过；原失败和测试修正全部单列，不把此前18／10组冒充本版全部重跑。默认权限和鉴权保留，旧 RC.3 会话30事件保留，测试凭据及临时配置清理，恢复普通模式。
 
@@ -17,6 +19,8 @@
 | 覆盖升级与会话持久化 | 保留 RC.3 会话，实际运行 RC.4，鉴权请求 200、匿名请求 401 |
 | 模型与工具调用 | 实际 DeepSeek API Key 模型调用，测试凭据退出时清除 |
 | 工作区文件工具 | 通用 PTC 内嵌工具及标准 write／edit／grep／glob／read 均通过 |
+| 原子创建与替代编辑 | 0.4.36 修复 hard-link EACCES，真实 ctx.fs 的竞争发布、取消与清理通过；官方字符串编辑、临时启用的 apply_patch、多文件预检及部分提交报告、越界和只读拒绝通过，保留默认开关。见 [适配](research/harmonyos-file-publication.md) |
+| Cordis 查询与诊断 Inspector | Cordis 预设实际查询 Host Service／Event／Config／Tool 与真实 ArkWeb Service／Event／Builtin／Slots／Theme；分页、准确 schema、完整结果 retention、非法查询拒绝及重启通过。独立诊断 Inspector 启动失败，未提供 CDP 保证 |
 | Bash、Git、Python、pip、venv | 默认无系统沙箱则拒绝；精确命令单次审批后，两套 pip target／venv、Git、Node fetch、curl、SQLite 和时区夹具通过 |
 | 通用 PTC | 普通包默认提供 TypeScript 擦除、工作区文件读写、目录操作、元数据与跨目录相对路径 |
 | PTC 执行模式 | 默认模式、REPL、无持久化 Script、持久化 Script 均通过 |

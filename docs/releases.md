@@ -228,3 +228,13 @@ DSH 保持最新官方 RC.4，随包331个 DSH 组件版本一致。补充官方
 ### 0.4.35 会话压缩补验
 
 沿用同一准确HAP，未修改生产代码或重命名制品。三组新增实测退出0：默认 /compact 的真实摘要、工具配对、精确事实与重启恢复；真实模型输出后的 HTTP取消／忙碌拒绝／流错误和真实重试；完整standard临时预设的低阈值自动压力，未调用手动命令。原配置、锁文件、预设与默认权限恢复，测试凭据及插件清理，旧RC.3会话30事件保留。本补验不表示此前11组重新执行，也不代表默认满容量、真实API overflow或真机已验。[证据与源码](evidence/emulator-compaction-0.4.35.json)。
+
+## 0.4.36 原子创建、Cordis 与替代编辑
+
+修复 HarmonyOS 拒绝 hard-link 导致的 createIfAbsent 失败。通过上游公开 I/O 边界复用已有原生 no-replace rename，保留暂存、同步、版本及权限。正式模块与启动资源复制清单同步；恢复模式继续原 provider。默认工具开关不变。
+
+九组模拟器检查退出0：替代编辑／apply_patch、实际文件发布竞争与取消、Cordis Host及真实ArkWeb查询，加工具链、PTC、LSP、原生Office、工作树和故障恢复。包含精确UTF-8字节、已有目标不覆盖、歧义／越界／只读拒绝、多文件预检零修改、提交阶段失败的准确部分报告、准确schema／分页／retention及重启。
+
+最终制品源 `3ff6db7f33b985e08eabb564c9af9b506fb13213`，未签名HAP 662,457,444字节，SHA-256 `3108593b6f797a73fda41c93f904edb9babc6d8632a16438ef87273259d30e82`；九组测试源为 `65da1909e3acbc38f20bfe12f4d2e0308c146eb0`。首次候选包漏复制、模型参数偏差、Cordis结果截断误判和原生摘要比较误判均保留。最终审计恢复普通模式、配置与锁文件原字节，默认workspace-write、匿名401／鉴权200、临时Key清除及旧会话30事件保留。
+
+可选诊断Inspector单独失败：Worker profile-resolution bootstrap 缺少 require-builtin 鸿蒙绑定；其余诊断插件活跃，不影响主聊天。没有把Cordis查询或页面存在当完整CDP验收。DSH仍为最新官方RC.4；其余适用能力与真机继续，尚未桌面全功能等价。[准确命令、原失败及审计](evidence/emulator-inspection-editing-0.4.36.json) · [文件发布适配](research/harmonyos-file-publication.md)。
