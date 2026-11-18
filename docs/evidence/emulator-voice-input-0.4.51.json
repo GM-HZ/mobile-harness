@@ -1,0 +1,750 @@
+{
+  "recordedAt": "2026-11-18T16:06:03.910331+00:00",
+  "baselineCommit": "ba2e9b407aef688ad88dbc8729fdfd16d54f1c20",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "dsh": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.51-unsigned.hap",
+    "version": "0.4.51",
+    "versionCode": 58,
+    "sha256": "0fe5d79036dc5beafbf1518ebb6fea518b2baf0009fcb37ec3ade15d94297538",
+    "bytes": 679565360,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "2df29ff57c57bf950dfba5f3933884f44722c28e",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "f0f561d829f5c8ecc7aa86e78cc552b5d1e8a37263deb91ddd1ebba571d41d61",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "build": {
+    "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pinned input directory> ./build.sh --package",
+    "exitCode": 0,
+    "logSha256": "602c4e502b0e5923ad44784f7b55e1a75de52db6092a50ad851e9db0b00fa262"
+  },
+  "install": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.51-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "c470303a86449599ca099cf53721c275e6e5a4ac35ea4ee29a17ae824009e7ac"
+  },
+  "changedHapMembersSince0.4.50": [
+    "module.json",
+    "resources/rawfile/LICENSE.onnxruntime.txt",
+    "resources/rawfile/NOTICE.onnxruntime.txt",
+    "pack.info"
+  ],
+  "voiceAttempts": [
+    {
+      "version": "0.4.48",
+      "diagnostic": "The packaged worker script was missing from startup extraction.",
+      "logSha256": "0f219e92ca9ace5ba5efd39ddc0068f78a18a1d18dcb2872ab2e1950a00aa0dd"
+    },
+    {
+      "version": "0.4.49",
+      "diagnostic": "The cached provider started, and its loopback request rejected canonical PCM.",
+      "logSha256": "c05a5c00e01a11cba40174e62d13d3dcb6fddee60810f9c09aa8f75f60f1c870",
+      "result": {
+        "defaultCatalog": {
+          "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "cachePreparation": {
+          "phase": "standby",
+          "steps": [
+            {
+              "kind": "check",
+              "status": "complete"
+            },
+            {
+              "kind": "model",
+              "status": "complete"
+            },
+            {
+              "kind": "vad",
+              "status": "complete"
+            },
+            {
+              "kind": "verify",
+              "status": "complete"
+            },
+            {
+              "kind": "load",
+              "status": "pending"
+            }
+          ]
+        },
+        "workerTimelineOnFailure": [
+          {
+            "event": "speech-worker-started",
+            "ms": 5894
+          }
+        ],
+        "restoreReadyMs": 5203,
+        "originalConfigurationRestored": true
+      },
+      "resultSha256": "b3664cb7f024caaa1a6abcba4a929c029dda03ee66a0e1674b5e7f6f9cc50357"
+    },
+    {
+      "version": "0.4.50",
+      "diagnostic": "Both native transcripts succeeded. ArkWeb did not find the blank fixture session.",
+      "logSha256": "abe8fc89063fa2bd20b07acfb5e6e81b2adb6028ba0ccf256f35d59b4a492983",
+      "result": {
+        "defaultCatalog": {
+          "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "cachePreparation": {
+          "phase": "standby",
+          "steps": [
+            {
+              "kind": "check",
+              "status": "complete"
+            },
+            {
+              "kind": "model",
+              "status": "complete"
+            },
+            {
+              "kind": "vad",
+              "status": "complete"
+            },
+            {
+              "kind": "verify",
+              "status": "complete"
+            },
+            {
+              "kind": "load",
+              "status": "pending"
+            }
+          ]
+        },
+        "firstTranscript": {
+          "text": "今天我们测试语音输入。",
+          "audioSeconds": 2.3916875,
+          "inferenceSeconds": 0.07353650000000016
+        },
+        "repeatTranscript": {
+          "text": "今天我们测试语音输入。",
+          "audioSeconds": 2.3916875,
+          "inferenceSeconds": 0.09032183299999998
+        },
+        "invalidAudioRejected": true,
+        "workerTimelineOnFailure": [
+          {
+            "event": "speech-worker-started",
+            "ms": 6520
+          }
+        ],
+        "restoreReadyMs": 7337,
+        "originalConfigurationRestored": true
+      },
+      "resultSha256": "f96f9a72ebaaaaaf583f1670dddb1d7b9495a6fbbf1a9a1a9d7d305b6ad26503"
+    },
+    {
+      "version": "0.4.51",
+      "diagnostic": "Both native transcripts succeeded. ArkWeb did not find the imported fixture session.",
+      "logSha256": "4207e71954041bba6450e17a57c7c3a9af7b5eebdfa6ad7276bb45a3962118ff",
+      "result": {
+        "defaultCatalog": {
+          "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "cachePreparation": {
+          "phase": "standby",
+          "steps": [
+            {
+              "kind": "check",
+              "status": "complete"
+            },
+            {
+              "kind": "model",
+              "status": "complete"
+            },
+            {
+              "kind": "vad",
+              "status": "complete"
+            },
+            {
+              "kind": "verify",
+              "status": "complete"
+            },
+            {
+              "kind": "load",
+              "status": "pending"
+            }
+          ]
+        },
+        "firstTranscript": {
+          "text": "今天我们测试语音输入。",
+          "audioSeconds": 2.3916875,
+          "inferenceSeconds": 0.07682308300000114
+        },
+        "repeatTranscript": {
+          "text": "今天我们测试语音输入。",
+          "audioSeconds": 2.3916875,
+          "inferenceSeconds": 0.20188554199999997
+        },
+        "invalidAudioRejected": true,
+        "workerTimelineOnFailure": [
+          {
+            "event": "speech-worker-started",
+            "ms": 8118
+          }
+        ],
+        "restoreReadyMs": 7928,
+        "originalConfigurationRestored": true
+      },
+      "resultSha256": "2b4938799ddc672d8776fb1d2d38e334e9723b3d451c0a2fe09ca3fdd9c62875"
+    }
+  ],
+  "creatorChild": {
+    "ownedCreatorSession": "07f21803-0379-4bf7-a548-8c80b18622d5",
+    "events": [
+      [
+        "skill",
+        {
+          "name": "dsh-doc"
+        }
+      ],
+      [
+        "bash",
+        "Error: sandbox mode \"workspace-write\" is requested but no sandbox backend is usable on this host; refusing to run the command unconfined. Install bubblewrap or run a Landlock-enforcing kernel (Linux), ensure sandbox-exec is usable"
+      ],
+      [
+        "bash",
+        "Error: sandbox mode \"workspace-write\" is requested but no sandbox backend is usable on this host; refusing to run the command unconfined. Install bubblewrap or run a Landlock-enforcing kernel (Linux), ensure sandbox-exec is usable"
+      ],
+      [
+        "cordis_inspect_query",
+        "Error: Slots.listSubTree: Client inspect query Slots.listSubTree timed out after 10000ms. Open or reconnect the Harness page, then retry."
+      ],
+      [
+        "cordis_inspect_query",
+        "Error: Service.listService: Client inspect query Service.listService timed out after 10000ms. Open or reconnect the Harness page, then retry."
+      ],
+      [
+        "cordis_inspect_query",
+        "Error: Service.listService: Client inspect query Service.listService timed out after 10000ms. Open or reconnect the Harness page, then retry."
+      ],
+      [
+        "cordis_inspect_query",
+        "Error: Slots.listSubTree: Client inspect query Slots.listSubTree timed out after 10000ms. Open or reconnect the Harness page, then retry."
+      ],
+      [
+        "cordis_inspect_query",
+        "Error: Theme.listTokens: Client inspect query Theme.listTokens timed out after 10000ms. Open or reconnect the Harness page, then retry."
+      ],
+      [
+        "bash",
+        "Error: sandbox mode \"workspace-write\" is requested but no sandbox backend is usable on this host; refusing to run the command unconfined. Install bubblewrap or run a Landlock-enforcing kernel (Linux), ensure sandbox-exec is usable"
+      ],
+      [
+        "structured_output",
+        {
+          "ready": false
+        }
+      ]
+    ],
+    "files": [
+      [
+        "write",
+        "package.json"
+      ],
+      [
+        "write",
+        "cordis.patch.yml"
+      ],
+      [
+        "write",
+        "index.js"
+      ],
+      [
+        "write",
+        "client.js"
+      ],
+      [
+        "write",
+        "en.json"
+      ],
+      [
+        "write",
+        "zh.json"
+      ],
+      [
+        "write",
+        "icon.svg"
+      ],
+      [
+        "write",
+        "README.md"
+      ],
+      [
+        "write",
+        "preview.svg"
+      ],
+      [
+        "write",
+        "DETAIL.md"
+      ],
+      [
+        "write",
+        "en.json"
+      ],
+      [
+        "write",
+        "zh.json"
+      ],
+      [
+        "edit",
+        "package.json"
+      ],
+      [
+        "write",
+        "index.js"
+      ]
+    ]
+  },
+  "nearbyArtifactRegressions": [
+    {
+      "case": "creator",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-personalized-recommendations.py",
+        "127.0.0.1:15557",
+        ".build/voice-integration/creator-0.4.50.json",
+        "--create"
+      ],
+      "elapsedSeconds": 147.229,
+      "exitCode": 1,
+      "testSourceCommit": "d9d510346662fdbade97b3cb80421248e28f455d",
+      "log": ".build/voice-integration/creator-0.4.50.log",
+      "result": {
+        "defaultCatalog": {
+          "name": "@deepseek-ai/dsh-personalized-recommendations",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "activeUpstreamRows": {
+          "action-cards": "active",
+          "client-ui-action-cards": "active",
+          "creation-recommendations": "active",
+          "client-ui-creation-recommendations": "active",
+          "plugin-recommendations": "active",
+          "client-ui-plugin-recommendations": "active"
+        },
+        "creatorDecision": {
+          "callId": "call_00_jEMmXGFsWq5PZEBw0qUp1539",
+          "action": "create_personalized_page",
+          "phase": "failed",
+          "data": {
+            "slot": "page",
+            "bundleName": "@dsh-local/view-2df8f0eb-5b63-4c24-968f-4a86d92fb828"
+          }
+        },
+        "restoredReadyMs": 6203,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "resultSha256": "ff63cc91566afe50343aa89f72cf0abb4837ce6a480be976cf7d38d1530cc76d",
+      "logSha256": "d258b63c8b0c53032ed876693d9669e9b7b17e8d829b8322fb7b3b7b23f215f6"
+    },
+    {
+      "case": "inspector",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-inspector.py",
+        "127.0.0.1:15557",
+        ".build/voice-integration/inspector-0.4.50.json",
+        "--panel"
+      ],
+      "elapsedSeconds": 17.911,
+      "exitCode": 0,
+      "testSourceCommit": "d9d510346662fdbade97b3cb80421248e28f455d",
+      "log": ".build/voice-integration/inspector-0.4.50.log",
+      "result": {
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "enable": "applied",
+        "cdp": {
+          "workerPort": 9230,
+          "anonymousDiscoveryStatus": 403,
+          "targetCount": 1,
+          "devtoolsAssetSha256": "371c96a262a80fcbf7f6bbd8122a06168b7c3de2acfc34bd4a3dd0afce5cb1e1",
+          "anonymousProxyStatus": 401,
+          "directCdpStatus": 403,
+          "hostEvaluation": 42,
+          "arkWeb": {
+            "origin": "http://127.0.0.1:19592",
+            "document": 9
+          },
+          "panel": {
+            "visible": true,
+            "path": "/inspector/devtools/devtools_app.html",
+            "ready": true
+          }
+        },
+        "disable": "applied",
+        "workerReleasedOnDisable": true,
+        "restoredReadyMs": 5849,
+        "restoredConfiguration": true
+      },
+      "resultSha256": "68b1fcefcb945d4765e2b90175ffc4bfadfea72d28261fa13529259e333cfe8b",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "recovery",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/voice-integration/recovery-0.4.50.json"
+      ],
+      "elapsedSeconds": 29.222,
+      "exitCode": 0,
+      "testSourceCommit": "d9d510346662fdbade97b3cb80421248e28f455d",
+      "log": ".build/voice-integration/recovery-0.4.50.log",
+      "result": {
+        "fixture": "mobile-harness-crash-ce1cfe05a3",
+        "normalReadyMs": 77,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 5190,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 5207,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      },
+      "resultSha256": "9a430bd63ef626f547d8c5f0e9fbc623df2c57847d96865793b034c881746b77",
+      "logSha256": "44f94ebc33495484f9eb434d995e8f8acc03fd9192f38cefae4883430c0bd252"
+    }
+  ],
+  "audit": {
+    "target": "127.0.0.1:15557",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "readyMs": 66,
+    "profileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+    },
+    "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+    "legacySessionEvents": 30,
+    "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "permission": "workspace-write",
+    "testCredentialAbsent": true,
+    "installedRuntime": "0.2.2-rc.5",
+    "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "titlesAndBadgeDefaultOff": {
+      "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      }
+    },
+    "fourOptionalBundlesDefaultOff": {
+      "@deepseek-ai/dsh-experimental-ralph-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-session-search": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-tool-worktree": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-forge-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      }
+    },
+    "chatImportDefaultOff": {
+      "availability": "installation",
+      "official": true,
+      "optional": true,
+      "enabled": false,
+      "version": "0.2.2-rc.5"
+    },
+    "inspectorDefaultOff": true,
+    "translationDefaultOff": true,
+    "recommendationsDefaultOff": {
+      "name": "@deepseek-ai/dsh-personalized-recommendations",
+      "enabled": false,
+      "version": "0.2.2-rc.5",
+      "availability": "installation"
+    },
+    "badgeDefaultOff": {
+      "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+      "enabled": false,
+      "version": "0.2.2-rc.5",
+      "availability": "installation"
+    },
+    "batchDefaultOff": [
+      {
+        "name": "@deepseek-ai/dsh-experimental-auto-review",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      {
+        "name": "@deepseek-ai/dsh-experimental-liveshare",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      }
+    ],
+    "voiceDefaultOff": {
+      "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+      "enabled": false,
+      "version": "0.2.2-rc.5",
+      "availability": "installation"
+    },
+    "temporaryVoiceCacheRemoved": true
+  },
+  "voiceNewConversation": {
+    "result": {
+      "defaultCatalog": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "cachePreparation": {
+        "phase": "standby",
+        "steps": [
+          {
+            "kind": "check",
+            "status": "complete"
+          },
+          {
+            "kind": "model",
+            "status": "complete"
+          },
+          {
+            "kind": "vad",
+            "status": "complete"
+          },
+          {
+            "kind": "verify",
+            "status": "complete"
+          },
+          {
+            "kind": "load",
+            "status": "pending"
+          }
+        ]
+      },
+      "firstTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06761708400000134
+      },
+      "repeatTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.0704395829999994
+      },
+      "invalidAudioRejected": true,
+      "workerTimelineOnFailure": [
+        {
+          "event": "speech-worker-started",
+          "ms": 6893
+        }
+      ],
+      "restoreReadyMs": 5644,
+      "originalConfigurationRestored": true
+    },
+    "resultSha256": "13a16dc0da851146d87614eb3acfd60f341bf593f6d2592ebe4a965e8f942fb9",
+    "logSha256": "26efb1468acc049458c26b3da2a86b4abd94206ce3e33ba183b5792649b9eff8"
+  },
+  "voiceApiPassed": {
+    "testSourceCommit": "f484f2d",
+    "exitCode": 0,
+    "command": "python3 tests/smoke/emulator-voice-input.py 127.0.0.1:15557 .build/voice-integration/voice-api-0.4.51.json --model-root .build/voice-native/models --audio .build/voice-native/mandarin-sample.wav",
+    "result": {
+      "defaultCatalog": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "cachePreparation": {
+        "phase": "standby",
+        "steps": [
+          {
+            "kind": "check",
+            "status": "complete"
+          },
+          {
+            "kind": "model",
+            "status": "complete"
+          },
+          {
+            "kind": "vad",
+            "status": "complete"
+          },
+          {
+            "kind": "verify",
+            "status": "complete"
+          },
+          {
+            "kind": "load",
+            "status": "pending"
+          }
+        ]
+      },
+      "firstTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.0691241659999996
+      },
+      "repeatTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06334262500000022
+      },
+      "invalidAudioRejected": true,
+      "workerReusedAndStopped": true,
+      "restoreReadyMs": 4935,
+      "originalConfigurationRestored": true
+    },
+    "resultSha256": "2e655d6f688ca5905af764664bd4f01898a2744a35259f66197f9eac394d730b",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "voiceNativeGesture": {
+    "exitCode": 1,
+    "result": {
+      "defaultCatalog": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "cachePreparation": {
+        "phase": "standby",
+        "steps": [
+          {
+            "kind": "check",
+            "status": "complete"
+          },
+          {
+            "kind": "model",
+            "status": "complete"
+          },
+          {
+            "kind": "vad",
+            "status": "complete"
+          },
+          {
+            "kind": "verify",
+            "status": "complete"
+          },
+          {
+            "kind": "load",
+            "status": "pending"
+          }
+        ]
+      },
+      "firstTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06764604099999906
+      },
+      "repeatTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06903129199999966
+      },
+      "invalidAudioRejected": true,
+      "arkWebRecorderDiagnostic": {
+        "phase": "waiting",
+        "recorder": "function",
+        "audioContext": "function",
+        "destination": "function"
+      },
+      "workerTimelineOnFailure": [
+        {
+          "event": "speech-worker-started",
+          "ms": 6044
+        }
+      ],
+      "restoreReadyMs": 5681,
+      "originalConfigurationRestored": true
+    },
+    "diagnostic": "The native gesture attempt found the recording control and APIs, but did not acquire its synthetic input or enter recording. Cleanup also tried to close the missing context.",
+    "logSha256": "8b73f6b5e64f334801370d067141b126a7c4daf7b9f4aa146c8988b57bdfc42f"
+  },
+  "limits": [
+    "The official Speech API passed with cached, checksum-verified models and synthetic 16 kHz mono input.",
+    "Physical microphone permission, capture and draft insertion remain unverified.",
+    "The Creator loaded dsh-doc, then reported ready:false. It hit the default Bash sandbox refusal and remote inspector timeouts.",
+    "Inspector and recovery smoke ran on 0.4.50. The 0.4.51 HAP adds license notices and application version metadata, with identical runtime entries.",
+    "This HAP is unsigned and was not deployed to the Mate 60."
+  ]
+}

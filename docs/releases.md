@@ -294,3 +294,11 @@ Inspector 和故障恢复两组回归通过，原配置、权限、旧会话摘�
 Auto review 与 LiveShare 默认关闭。Auto review 的显式会话选择、实际只读工具、重启保持和默认权限通过。受控审查补验畸形响应、拒绝、取消都阻止真实文件写入。LiveShare 通过本机 Owner 接口，暂未发布 Relay 共享。Forge 面板和真实工作树恢复、Inspector 与故障恢复通过。原配置、权限、鉴权和旧会话摘要已复核。
 
 未签名 HAP 662,478,181 字节，SHA-256 `6730145ac50ba15723d56dc8fdbf912cb43173b96dc6f637128060caecefd4e2`，生产源 `8cbf4d96d3942231776d49e8dcb2c92a42084663`。本版为模拟器验证。 [准确制品和完整结果](evidence/emulator-optional-batch-0.4.47.json)
+
+## 0.4.51 鸿蒙原生语音输入
+
+登记默认关闭的 DSH 官方语音输入。随包提供官方鸿蒙 ARM64 Sherpa ONNX 1.13.8 库、ONNX Runtime 1.16.3 和随附许可。权重继续使用官方准备流程按需下载。鸿蒙 Node 在线程中处理音频，复用 DSH 语音接口、模型校验、超时、取消和工作进程回收。留存 0.4.48 启动资源漏拷贝，以及 0.4.49 至私有 HTTP 识别端的 WAV 拒绝。0.4.50 改用 worker 通道传递 PCM 后恢复。
+
+0.4.51 通过校验后缓存准备、正式 Remote 自动与中文识别、畸形音频拒绝、连续复用和停用回收。未签名 HAP 679,565,360 字节，SHA-256 `0fe5d79036dc5beafbf1518ebb6fea518b2baf0009fcb37ec3ade15d94297538`，生产源 `2df29ff57c57bf950dfba5f3933884f44722c28e`。模拟器保留原有权限、配置、旧会话与正常启动模式。真实麦克风、ArkWeb 草稿回填与此版真机仍待验。
+
+Creator 已使用 `dsh-doc`，子会话仍因需要 Bash 验证和客户端查询超时返回未完成。Bash 默认限制保持。0.4.50 的 Inspector 和故障恢复通过。0.4.51 的 HAP 相比 0.4.50 仅增加两个许可证文件并更新两项包版本元数据。 [准确制品、结果和失败记录](evidence/emulator-voice-input-0.4.51.json)

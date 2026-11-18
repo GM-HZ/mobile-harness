@@ -20,3 +20,9 @@ Auto review 和 LiveShare 使用锁定的上游 bundle，默认关闭。Auto rev
 - 第二版同一 HAP 的 SHA-256 为 `2b53a651cb372bc422a37ef0f1bd10575778eea34188b4ed0b614bf42bfa9822`。英文样本输出“Testing a F voice transcription.”，将 “offline” 误识。普通话样本精确识别“今天我们测试语音输入。”，载入 C API 后初始化及识别耗时 1,371 ms，脚本退出 0。
 - 同版 ArkWeb 在回环页面报告安全上下文及 `getUserMedia` 支持。麦克风权限桥接已在隔离工程中编译，尚未验证实际录音授权、上传 PCM、VAD、停止与草稿回填。完整语音输入仍待验。
 - 本次为临时探针。每次测试均覆盖恢复到准确的 0.4.47 HAP 和原配置。中间制品及输出位于本地 `.build/voice-native/`。
+
+## 0.4.51 语音接入
+
+同一个官方语音 bundle 使用鸿蒙 ARM64 Sherpa C API，模型与 Silero VAD 在专属 Node worker 初始化。原 HTTP 语音请求出现合法 WAV 进入识别前被拒绝，改为以私有线程消息传递 PCM。应用仅向回环主页面授予通过鸿蒙系统确认的麦克风请求，登录内嵌页无此入口。默认关闭语音及其他既有可选插件。
+
+0.4.51 已完成标准 API 的双次转写、畸形数据拒绝和停用回收。合成输入的 ArkWeb 录音测试仍未获取流，真机麦克风与草稿回填待验。Creator 实际加载了 `dsh-doc`，仍未完成生成验证。 [本轮证据](../evidence/emulator-voice-input-0.4.51.json)

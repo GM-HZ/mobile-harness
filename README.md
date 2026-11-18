@@ -8,7 +8,7 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 
 鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.5，源码子模块同步锁定官方 RC.5 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。普通包默认带通用 PTC；Office 与 HTTP/1 适配沿用已有实现。
 
-0.4.47 修复本地插件目录安装，随包登记默认关闭的 Auto review 和 LiveShare。模拟器通过 Creator 生成和安装、Auto review 只读调用、LiveShare 本机管理以及 Forge 界面和本地工作树。Creator 页面完整生命周期、公开共享和托管平台联动继续验收。 [本轮证据](docs/evidence/emulator-optional-batch-0.4.47.json)
+0.4.51 随包提供默认关闭的语音输入。官方语音接口已在鸿蒙模拟器通过普通话转写、坏音频拒绝和识别 worker 回收。ArkWeb 录音与草稿回填、最新真机仍待验。 [能力矩阵](docs/dsh-capabilities.md) · [本轮证据](docs/evidence/emulator-voice-input-0.4.51.json)
 
 ## 文档
 
