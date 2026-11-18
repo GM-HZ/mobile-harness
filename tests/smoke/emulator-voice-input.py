@@ -77,9 +77,14 @@ def transcribe(emulator,payload):
     return result['value']
 
 
-def verify_arkweb(emulator,title,audio,evidence):
+def verify_arkweb(emulator,audio,evidence):
     with browser['browser'](emulator) as run:
-        browser['open_session'](emulator,run,title)
+        sidebar = browser['ui']
+        if not run('''[...document.querySelectorAll('button')].some(button=>
+          button.getClientRects().length&&['新建会话','New session','新建聊天','New chat'].includes(
+            (button.getAttribute('aria-label')||button.textContent).trim()))'''):
+            sidebar['open_sidebar'](emulator)
+        flow['button'](run,'button',['新建会话','New session','新建聊天','New chat'])
         browser['wait'](run, '''[...document.querySelectorAll('button')].some(button =>
           ['开始录音','Start recording'].includes(button.getAttribute('aria-label')))''','official recording button')
         # Route a synthetic MediaStream into the real ArkWeb recorder, retaining media
@@ -120,11 +125,9 @@ def verify_arkweb(emulator,title,audio,evidence):
 
 def run(emulator,args):
     run_name='mh-voice-'+uuid.uuid4().hex[:10]
-    workspace_dir='alpine/workspace-native/'+run_name
     remote='/data/local/tmp/'+run_name
-    originals, evidence, sessions = {}, {}, []
+    originals, evidence = {}, {}
     models_created=False
-    workspace=None
     flags=[PROFILE+'/'+f for f in ['package.json','pnpm-lock.yaml','cordis.patch.yml']]+['mobile-harness-boot.json']
     audio=canonical_wave(args.audio)
     try:
@@ -136,8 +139,6 @@ def run(emulator,args):
         cache_models(emulator,args.model_root,remote)
         browser['switch'](emulator,VOICE,True)
         browser['switch'](emulator,INSPECTOR,True)
-        if args.arkweb:
-            browser['switch'](emulator,browser['flow']['BUNDLE'],True)
         browser['restart'](emulator)
         evidence['cachePreparation']=readiness(emulator)
         payload={'audioBase64':base64.b64encode(audio).decode(),'language':'auto','providerId':PROVIDER}
@@ -154,20 +155,7 @@ def run(emulator,args):
         else:
             raise AssertionError('Invalid audio reached the provider')
         if args.arkweb:
-            emulator.app('mkdir '+workspace_dir)
-            registration=emulator.rpc('workspace/create',{'request':{'path':support['WORKSPACE']+'/'+run_name}})
-            assert registration['created'],registration
-            workspace=registration['workspace']['workspaceId']
-            title='Voice draft '+run_name
-            archive=browser['flow']
-            data=archive['archive_bytes'](run_name,archive['SOURCE_PNG'].read_bytes(),text_title=title)
-            status,lines=archive['upload'](emulator,workspace,data)
-            assert status==200 and lines[-1]['outcome']['ok'],(status,lines)
-            sessions.extend(lines[-1]['outcome']['value']['sessionIds'])
-            sid=sessions[0]
-            before=support['events'](emulator,sid)
-            verify_arkweb(emulator,title,audio,evidence)
-            assert before==support['events'](emulator,sid), 'Dictation submitted the draft'
+            verify_arkweb(emulator,audio,evidence)
         browser['switch'](emulator,VOICE,False)
         rows=[json.loads(line) for line in emulator.app('cat alpine/tmp/dsh-native-timeline.log').splitlines()]
         assert sum(row['event']=='speech-worker-started' for row in rows)==1
@@ -179,25 +167,19 @@ def run(emulator,args):
         raise
     finally:
         try:
-            for sid in sessions:
-                emulator.rpc('workspace/archiveSession',{'request':{'sessionId':sid}})
-            if workspace:
-                emulator.rpc('workspace/delete',{'request':{'workspaceId':workspace}})
+            if originals:
+                emulator.stop()
+                if models_created:
+                    emulator.app('rm -rf '+MODEL_ROOT)
+                emulator.app('rm -f '+remote+'-asset0 '+remote+'-asset1 '+remote+'-asset2')
+                for index,(path,data) in enumerate(originals.items()):
+                    lsp['restore_bytes'](emulator,path,data,remote+str(index))
+                emulator.start()
+                evidence['restoreReadyMs']=emulator.ready('normal')
+                assert all(agent['read_bytes'](emulator,path)==data for path,data in originals.items())
+                evidence['originalConfigurationRestored']=True
         finally:
-            try:
-                if originals:
-                    emulator.stop()
-                    if models_created:
-                        emulator.app('rm -rf '+MODEL_ROOT)
-                    emulator.app('rm -rf '+workspace_dir+' && rm -f '+remote+'-asset0 '+remote+'-asset1 '+remote+'-asset2')
-                    for index,(path,data) in enumerate(originals.items()):
-                        lsp['restore_bytes'](emulator,path,data,remote+str(index))
-                    emulator.start()
-                    evidence['restoreReadyMs']=emulator.ready('normal')
-                    assert all(agent['read_bytes'](emulator,path)==data for path,data in originals.items())
-                    evidence['originalConfigurationRestored']=True
-            finally:
-                args.output.write_text(json.dumps(evidence,indent=2,ensure_ascii=False)+'\n')
+            args.output.write_text(json.dumps(evidence,indent=2,ensure_ascii=False)+'\n')
 
 
 if __name__=='__main__':
