@@ -343,6 +343,7 @@ async function main() {
   const ptcUrl = paths('dsh-ptc-runtime-node/lib/index.js');
   const officeUrl = paths('dsh-office-kit/lib/index.js');
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
+  const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
   const speechUrl = paths('dsh-experimental-speech-to-text-sensevoice/lib/index.js');
   const speechEntry = path.join(dsh, '@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/worker.js');
@@ -435,6 +436,14 @@ async function main() {
         patched = replacePinned(patched, 'console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);',
           'console.log("dsh inspector: /inspector/devtools/");');
         return { ...result, source: patched };
+      }
+      if (url === liveshareUrl && !safeMode) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        const entry = path.join(dsh, '@deepseek-ai/dsh-experimental-liveshare/lib/owner-gateway/cli.js');
+        globalThis.__harmonyLiveshareSpawn = require(path.join(root, 'dsh-harmony-liveshare.cjs'))
+          .createTunnelLauncher(entry, mark);
+        return { ...result, source: replacePinned(source, 'import { spawn } from "node:child_process";',
+          'const spawn = globalThis.__harmonyLiveshareSpawn;') };
       }
       if (url === speechUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();

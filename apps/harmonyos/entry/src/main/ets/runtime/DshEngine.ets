@@ -121,6 +121,7 @@ class DshEngine {
     this.copyGuest(context, 'dsh-harmony-sharp.cjs', root + '/dsh-harmony-sharp.cjs');
     this.copyGuest(context, 'dsh-harmony-package.cjs', root + '/dsh-harmony-package.cjs');
     this.copyGuest(context, 'dsh-harmony-inspector-worker.cjs', root + '/dsh-harmony-inspector-worker.cjs');
+    this.copyGuest(context, 'dsh-harmony-liveshare.cjs', root + '/dsh-harmony-liveshare.cjs');
     this.copyGuest(context, 'dsh-harmony-speech.cjs', root + '/dsh-harmony-speech.cjs');
     this.copyGuest(context, 'dsh-harmony-pnpm-fetch.cjs', root + '/dsh-harmony-pnpm-fetch.cjs');
     this.copyGuest(context, 'dsh-harmony-workflow.cjs', root + '/dsh-harmony-workflow.cjs');
