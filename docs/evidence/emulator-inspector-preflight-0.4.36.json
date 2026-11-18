@@ -1,0 +1,148 @@
+{
+  "recordedAt": "2026-11-18T00:08:51.023226+00:00",
+  "target": "API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "installedArtifact": {
+    "sourceCommit": "3ff6db7f33b985e08eabb564c9af9b506fb13213",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.36-unsigned.hap",
+    "sha256": "3108593b6f797a73fda41c93f904edb9babc6d8632a16438ef87273259d30e82",
+    "bytes": 662457444,
+    "version": "0.4.36",
+    "versionCode": 43,
+    "unsigned": true,
+    "resources": {
+      "dsh-native-web.cjs": "41ff536c57233f3d9c3c517e66a0c71765941735f48255e9b020c7cfa4beb9cd",
+      "dsh-harmony-fs.mjs": "2f5d81ab69129a30d1a65b9c00f249b6da782ceb71be4a5b3dfa2add920875c8"
+    },
+    "publicationHelper": {
+      "samePackagedBytesAs035": true,
+      "packagedBytes": 5280,
+      "packagedSha256": "c57895c315e4cef12b3bccd290db81a1b3aef273b1a4c5a3939a3e02571d3a2a",
+      "pinnedInputSha256": "4df1a50e227048a21a1c6f68f2a12b98ba3f0c9626519e34096def7a0a340077",
+      "note": "Initial audit incorrectly compared an unstripped input hash to packaged stripped bytes. Input matches the pin; deployed helper is byte-identical to0.4.35. Both digests retained."
+    }
+  },
+  "scope": "Diagnostic preflight only; no production code/HAP changed",
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-builtin-binding.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/builtin.json"
+      ],
+      "testSourceCommit": "e6c746f011bd96d5371662ce530b5d3f3f56efa6",
+      "exitCode": 1,
+      "result": {
+        "fixture": "mh-builtin-probe-2852f81899",
+        "readyMs": 6444,
+        "probe": {
+          "error": {
+            "code": "ERR_DLOPEN_FAILED",
+            "message": "Error loading shared library libstdc++.so.6: (needed by /data/storage/el1/bundle/libs/arm64/libguest_require_builtin.so)"
+          }
+        },
+        "restoredReadyMs": 4968,
+        "configurationHashesRestored": {
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+        }
+      },
+      "resultSha256": "8911021fce83fd6593f1769855b43a6ba7e617e88ccfaad018439ba42c3c4914",
+      "logSha256": "533dd024a22d858a89b1498b01f3e0c44edb9575d9a32e5e00dc597173ba9c3d"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-builtin-binding.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/builtin-inspector.json"
+      ],
+      "testSourceCommit": "1ec4c3bce4004497bf82a56cdf0c0d2be569b369",
+      "exitCode": 1,
+      "result": {
+        "fixture": "mh-builtin-probe-8f48456af4",
+        "readyMs": 6173,
+        "probe": {
+          "hostBindingError": {
+            "code": "ERR_DLOPEN_FAILED",
+            "message": "Error loading shared library libstdc++.so.6: (needed by /data/storage/el1/bundle/libs/arm64/libguest_require_builtin.so)"
+          },
+          "error": {
+            "message": "Worker probe timeout"
+          }
+        },
+        "restoredReadyMs": 4631,
+        "configurationHashesRestored": {
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+        }
+      },
+      "resultSha256": "05653c37af8a696ea93a335afaef6c13c78629b6effdbadf0fc6c9de7e8e4c4e",
+      "logSha256": "533dd024a22d858a89b1498b01f3e0c44edb9575d9a32e5e00dc597173ba9c3d"
+    },
+    {
+      "command": [
+        "python3",
+        "tests/smoke/emulator-builtin-binding.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/builtin-stages.json"
+      ],
+      "testSourceCommit": "faac8460269c56438764c168a17e943c72db0e25",
+      "exitCode": 1,
+      "result": {
+        "fixture": "mh-builtin-probe-da90365033",
+        "readyMs": 6675,
+        "probe": {
+          "hostBindingError": {
+            "code": "ERR_DLOPEN_FAILED",
+            "message": "Error loading shared library libstdc++.so.6: (needed by /data/storage/el1/bundle/libs/arm64/libguest_require_builtin.so)"
+          },
+          "workerStages": [
+            "worker-start",
+            "binding-finished",
+            "inspector-imported",
+            "inspector-connected"
+          ],
+          "worker": {
+            "bindingError": {
+              "code": "ERR_DLOPEN_FAILED",
+              "message": "Error loading shared library libstdc++.so.6: (needed by /data/storage/el1/bundle/libs/arm64/libguest_require_builtin.so)"
+            },
+            "inspector": {
+              "result": {
+                "type": "number",
+                "value": 42,
+                "description": "42"
+              }
+            }
+          }
+        },
+        "restoredReadyMs": 5563,
+        "configurationHashesRestored": {
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+        }
+      },
+      "resultSha256": "4a1cfd7518ac292a2fa449c3df4e13f41f87a7393a330e4dde051fab6b900df4",
+      "logSha256": "533dd024a22d858a89b1498b01f3e0c44edb9575d9a32e5e00dc597173ba9c3d"
+    }
+  ],
+  "conclusion": {
+    "existingLinuxAddonNativeLoad": false,
+    "actualWorkerInspectorConnectAndRuntimeEvaluate42": true,
+    "completeInspectorCdp": false,
+    "officialWorkerBootstrapResolved": false,
+    "credentials": "Key slot required empty; no LLM or secret capture in probe",
+    "configuration": "Original manifest, lock and boot bytes restored after each attempt; probe files and home patch removed"
+  },
+  "sourceResearchOnly": {
+    "repository": "https://github.com/deepseek-ai/dsh-node-addon-require-builtin",
+    "commit": "a58d3599a2e551d7d706d1ff796c9fd4bbaff63c",
+    "entryVersion": "0.1.9",
+    "productionSubmoduleAdded": false,
+    "nativeBuildRun": false
+  }
+}

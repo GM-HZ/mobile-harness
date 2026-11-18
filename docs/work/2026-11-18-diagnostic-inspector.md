@@ -8,4 +8,8 @@
 
 验收：准确制品、真实Worker和Client、鉴权拒绝与CDP实际结果、取消／关闭／重新启用和恢复，分开记录探测可用与完整通过。保留失败和测试口径变化；生产修改须重建新版本、做必要受影响回归后提交推送。
 
-状态：开始原生绑定与Inspector预探测。
+状态：三轮原生探测已执行，完整探针均失败，不算Inspector功能通过。第一轮确认既有libguest_require_builtin.so依赖Linux libstdc++.so.6，原生Host不能加载。第二轮将独立Worker测试与Host绑定失败分离，Worker响应超时。第三轮保留阶段消息，实际Worker完成启动、Inspector导入、connectToMainThread，并通过Runtime.evaluate返回42；Host／Worker的Linux绑定仍失败。原配置按字节恢复，正常模式就绪。
+
+结论：已有Node确实支持Inspector，无需据此重编译Node；尚需解决官方Worker的profile-resolution-bootstrap绑定，以及之后完整CDP／真实Client／鉴权与生命周期验收。已只读获取官方require-builtin源码HEAD a58d3599a2e551d7d706d1ff796c9fd4bbaff63c，其entry版本0.1.9，与现有npm对应；尚未加入生产submodule或编译，也未扩大上游支持矩阵。下一条行动是验证该小型N-API绑定的鸿蒙构建；不可跳过其符号、指针及机器码探测或伪造成功。
+
+[原生探针准确记录](../evidence/emulator-inspector-preflight-0.4.36.json)；本任务仍在进行。
