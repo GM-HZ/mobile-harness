@@ -118,11 +118,12 @@ def open_view(run, labels):
     return flow['wait'](run,expression,'conversation view '+str(labels))
 
 
-def verify_counter(emulator,title,evidence):
+def verify_counter(emulator,title,evidence,bundle):
     with flow['browser'](emulator) as run:
         flow['open_session'](emulator,run,title)
         try:
-            evidence['counterViewNavigation']=open_view(run,['Local Counter','本地计数器'])
+            origin=bundle.removeprefix('@dsh-local/view-').split('-',1)[0]
+            evidence['counterViewNavigation']=open_view(run,['Local Counter','本地计数器','local-counter-'+origin])
         except AssertionError:
             evidence['counterVisibleViewLabels']=run('''[...document.querySelectorAll(
               '[data-conversation-tabs] [role=tab], [role=menu] [role=menuitem]'
@@ -197,7 +198,7 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
         ]
         if status['data'].get('application')=='restart-required':
             flow['restart'](emulator)
-        verify_counter(emulator,title,evidence)
+        verify_counter(emulator,title,evidence,bundle)
         evidence['creatorCounterControls']=[0,1,0]
         print('Verified real Creator installed its own plugin',flush=True)
         with flow['browser'](emulator) as run:
@@ -221,7 +222,7 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
         assert market['catalog'](emulator,bundle)['installed']
         if restored['data'].get('application')=='restart-required':
             flow['restart'](emulator)
-        verify_counter(emulator,title,evidence)
+        verify_counter(emulator,title,evidence,bundle)
         evidence['creatorLifecycle']={'installed':status,'removed':removed,'restored':restored}
     else:
         result=wait_for(lambda:decisions(emulator,sid,call_id,{'dismissed'}),'page dismissal')

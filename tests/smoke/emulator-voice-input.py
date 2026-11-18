@@ -6,7 +6,6 @@ import io
 import json
 from pathlib import Path
 import runpy
-import shutil
 import threading
 import time
 import urllib.request
@@ -65,9 +64,17 @@ class ModelMirror(BaseHTTPRequestHandler):
         self.send_header('Content-Type','application/octet-stream')
         self.send_header('Content-Length',str(path.stat().st_size))
         self.end_headers()
-        with path.open('rb') as model:
-            shutil.copyfileobj(model,self.wfile,1024*1024)
-        self.server.completed.append(path.name)
+        sent=0
+        try:
+            with path.open('rb') as model:
+                for chunk in iter(lambda:model.read(256*1024),b''):
+                    self.wfile.write(chunk)
+                    sent+=len(chunk)
+                    # Limit emulator reverse-port backpressure while DSH hashes and writes the model.
+                    time.sleep(len(chunk)/(12*1024*1024))
+            self.server.completed.append(path.name)
+        finally:
+            self.server.transferred[path.name]=sent
 
 
 def model_mirror(root):
@@ -80,6 +87,7 @@ def model_mirror(root):
     server.assets=files
     server.completed=[]
     server.requests=[]
+    server.transferred={}
     threading.Thread(target=server.serve_forever,daemon=True).start()
     return server
 
@@ -287,6 +295,7 @@ def run(emulator,args):
                     mirror.shutdown()
                     mirror.server_close()
                     evidence['mirrorRequests']=mirror.requests
+                    evidence['mirrorBytesSent']=mirror.transferred
                 args.output.write_text(json.dumps(evidence,indent=2,ensure_ascii=False)+'\n')
 
 
