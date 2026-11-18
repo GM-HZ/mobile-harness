@@ -39,10 +39,13 @@ def find(rows, labels, kind=None):
 
 def wait_control(emulator, labels, kind=None):
     until = time.monotonic() + 12
+    last_row = None
     while time.monotonic() < until:
-        row = find(controls(emulator), labels, kind)
-        if row:
+        rows = controls(emulator)
+        row = find(rows, labels, kind)
+        if row and row == last_row:
             return row
+        last_row = row
         time.sleep(.2)
     visible = [row for row in rows if row['type'] in {'dialog', 'heading'} or
                'DeepSeek' in row['text'] or row['text'] in {'导出文件', 'Export file'}]
@@ -52,7 +55,7 @@ def wait_control(emulator, labels, kind=None):
 def tap(emulator, row):
     left, top, right, bottom = map(int, re.findall(r'\d+', row['bounds']))
     assert right > left and bottom > top, row
-    emulator.hdc('shell', 'uitest', 'uiInput', 'click', str((left+right)//2), str((top+bottom)//2))
+    return emulator.hdc('shell', 'uitest', 'uiInput', 'click', str((left+right)//2), str((top+bottom)//2))
 
 
 def open_sidebar(emulator):
@@ -79,7 +82,7 @@ def run(emulator, output):
         evidence['enabledReadyMs'] = flow['switch'](emulator, True)
         open_sidebar(emulator)
         evidence['importButton'] = wait_control(emulator, IMPORT_LABELS, 'button')
-        tap(emulator, evidence['importButton'])
+        evidence['importButtonTap'] = tap(emulator, evidence['importButton'])
         evidence['importDialogTitle'] = wait_control(emulator, TITLE_LABELS)
         evidence['exportFileControl'] = wait_control(emulator, {'导出文件', 'Export file'})
         evidence['disabledReadyMs'] = flow['switch'](emulator, False)
