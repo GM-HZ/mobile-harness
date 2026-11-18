@@ -1,0 +1,353 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15563",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "testSource": "980f473a7ef1cfda606f6783574b492406640bfe",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "artifact": {
+    "sourceCommit": "31c55d7b549d10d0a6b0dcaef0fa1c6d79961dac",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.64-unsigned.hap",
+    "version": "0.4.64",
+    "versionCode": 71,
+    "bytes": 768543004,
+    "sha256": "7f441dc62f113ad42f960dd15a374ac859b40ff71b445b052a229cbc3cdd0f77",
+    "layerSha256": "2f357f696054b33b3390111843a802116a4e622503909dec5e4fe47aef89fe77",
+    "pyrightVersion": "1.1.414",
+    "pyrightEntrySha256": "f200762078eb9880faf421a5b30f9ef3055b1d85c6f10780d75db4da8d8499f1",
+    "signedArtifact": {
+      "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.64-signed.hap",
+      "bytes": 772215209,
+      "sha256": "cec88d56f79f8fc004e10d2c7423fa334504105473446475c004aa0fc5bfa393",
+      "profileVerified": true,
+      "signatureVerified": true,
+      "matchingPayloadEntries": 209
+    }
+  },
+  "build": {
+    "exitCode": 0,
+    "logSha256": "4e95fe5bff5ef9bc28eee761f28e04e201db92bb4a4d8eef8bcb99de077245cf"
+  },
+  "install": {
+    "exitCode": 0,
+    "logSha256": "e05ea7ea23d3747622529d48918a02db54099cce4df1e050c6ea8a9e59b988b5"
+  },
+  "programPolicy": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-liveshare-relay.py",
+      "127.0.0.1:15563",
+      ".build/batch-074/program.json",
+      "--program-policy",
+      "--host-port",
+      "19652"
+    ],
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "495e67c71c8ea66404d4e08cc399c430f4210333c939c210655befa2782f6887",
+    "observed": {
+      "reachable": {
+        "ok": true,
+        "httpReachable": true,
+        "blocking": false
+      },
+      "authorized": {
+        "ok": true,
+        "blocking": false
+      },
+      "created": {
+        "link": "http://127.0.0.1:19769/?shareId=u_V5ZCmneqSG",
+        "shareId": "u_V5ZCmneqSG",
+        "sessionId": "session-6b1b18e8-e45d-4cc4-83d1-a4e695cfd47c",
+        "sessionIds": [
+          "session-6b1b18e8-e45d-4cc4-83d1-a4e695cfd47c"
+        ],
+        "sessionMode": "view",
+        "access": {
+          "mode": "selected",
+          "selected": [],
+          "deploymentAllowedSubjectIds": [],
+          "shareAllowedSubjectIds": [
+            "fixture:local:reader"
+          ],
+          "broadenedByDeploymentSubjects": false,
+          "identityKeyAcl": true
+        }
+      },
+      "addedSecondSource": true,
+      "restoredOnlineSources": [
+        "session-6b1b18e8-e45d-4cc4-83d1-a4e695cfd47c",
+        "session-c8087431-9c1c-4da3-a4b3-b0a62aca642b"
+      ],
+      "readerBeforeRevocation": {
+        "anonymousRefused": true,
+        "htmlBytes": 42007,
+        "visibleSessionIds": [
+          "session-6b1b18e8-e45d-4cc4-83d1-a4e695cfd47c",
+          "session-c8087431-9c1c-4da3-a4b3-b0a62aca642b"
+        ],
+        "accessRefusalCodes": {
+          "outsideSession": "remote-access/denied",
+          "ownerManagement": "remote-access/denied"
+        },
+        "sharedHistoryReadable": true
+      },
+      "actualViewerModelTurn": {
+        "principal": {
+          "kind": "share-viewer",
+          "shareId": "u_V5ZCmneqSG",
+          "actor": {
+            "providerId": "fixture",
+            "tenantId": "local",
+            "subjectId": "reader"
+          }
+        },
+        "exactReply": true,
+        "endReason": "completed"
+      },
+      "programPolicy": {
+        "viewRemainsReadOnlyAlongsideWriteShare": true,
+        "nestedWriteDeniedAcrossViewerTiers": true,
+        "escalationDeniedBeforeWorkerLaunch": true,
+        "boundedWriteCompleted": true,
+        "readOnlyForkAndReplay": true,
+        "childSessionId": "session-8571399e-4084-4982-9ca0-459fc5fa4a9f",
+        "ownerPolicyUnaffected": true
+      },
+      "testModelKeyRemoved": true,
+      "ownerAppliedLiveRevocation": true,
+      "revokedForkHistoryRefused": true,
+      "stop": {
+        "ok": true
+      },
+      "stoppedShareUnavailable": true,
+      "gatewayThreadStopped": true,
+      "restoredReadyMs": 4368,
+      "configRestored": true,
+      "relayMessages": [
+        {
+          "registered": "test-Zo8f_9nW",
+          "probe": true
+        },
+        {
+          "closed": "test-Zo8f_9nW",
+          "code": 1000
+        },
+        {
+          "registered": "u_V5ZCmneqSG",
+          "probe": false
+        },
+        {
+          "closed": "u_V5ZCmneqSG",
+          "code": 1006
+        },
+        {
+          "registered": "u_V5ZCmneqSG",
+          "probe": false
+        },
+        {
+          "registered": "Catth4ffq_GX",
+          "probe": false
+        },
+        {
+          "closed": "Catth4ffq_GX",
+          "code": 1000
+        },
+        {
+          "deleted": "Catth4ffq_GX"
+        },
+        {
+          "closed": "u_V5ZCmneqSG",
+          "code": 1000
+        },
+        {
+          "deleted": "u_V5ZCmneqSG"
+        }
+      ]
+    }
+  },
+  "ownerLogin": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-liveshare-relay.py",
+      "127.0.0.1:15563",
+      ".build/batch-074/owner-login.json",
+      "--owner-login",
+      "--model",
+      "--host-port",
+      "19652"
+    ],
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "1b7cd6e0e261ba9a9a2aec86c469045b998ed02d17f914982a84e0cbc931ce2d",
+    "observed": {
+      "reachable": {
+        "ok": true,
+        "httpReachable": true,
+        "blocking": false
+      },
+      "arkwebOwnerVerified": true,
+      "authorized": {
+        "ok": true,
+        "blocking": false
+      },
+      "created": {
+        "link": "http://127.0.0.1:19769/?shareId=bI0lS-vlZIPn",
+        "shareId": "bI0lS-vlZIPn",
+        "sessionId": "32b8cdb3-112c-4746-8b36-d610c8b4d10a",
+        "sessionIds": [
+          "32b8cdb3-112c-4746-8b36-d610c8b4d10a"
+        ],
+        "sessionMode": "view",
+        "access": {
+          "mode": "selected",
+          "selected": [],
+          "deploymentAllowedSubjectIds": [],
+          "shareAllowedSubjectIds": [
+            "fixture:local:reader"
+          ],
+          "broadenedByDeploymentSubjects": false,
+          "identityKeyAcl": true
+        }
+      },
+      "addedSecondSource": true,
+      "restoredOnlineSources": [
+        "32b8cdb3-112c-4746-8b36-d610c8b4d10a",
+        "96cf753f-db1e-44ea-bbdb-97c2b2d7b79f"
+      ],
+      "readerBeforeRevocation": {
+        "anonymousRefused": true,
+        "htmlBytes": 44304,
+        "visibleSessionIds": [
+          "32b8cdb3-112c-4746-8b36-d610c8b4d10a",
+          "96cf753f-db1e-44ea-bbdb-97c2b2d7b79f"
+        ],
+        "accessRefusalCodes": {
+          "outsideSession": "remote-access/denied",
+          "ownerManagement": "remote-access/denied"
+        },
+        "sharedHistoryReadable": true
+      },
+      "actualViewerModelTurn": {
+        "principal": {
+          "kind": "share-viewer",
+          "shareId": "bI0lS-vlZIPn",
+          "actor": {
+            "providerId": "fixture",
+            "tenantId": "local",
+            "subjectId": "reader"
+          }
+        },
+        "exactReply": true,
+        "endReason": "completed"
+      },
+      "testModelKeyRemoved": true,
+      "ownerAppliedLiveRevocation": true,
+      "stop": {
+        "ok": true
+      },
+      "stoppedShareUnavailable": true,
+      "gatewayThreadStopped": true,
+      "restoredReadyMs": 4726,
+      "configRestored": true,
+      "relayMessages": [
+        {
+          "ownerAuthorizationDisplayed": true
+        },
+        {
+          "ownerCredentialRedeemed": true,
+          "pkceMatched": true
+        },
+        {
+          "registered": "test-Hv-tMUgT",
+          "probe": true
+        },
+        {
+          "closed": "test-Hv-tMUgT",
+          "code": 1000
+        },
+        {
+          "registered": "test-bADOYW3o",
+          "probe": true
+        },
+        {
+          "closed": "test-bADOYW3o",
+          "code": 1000
+        },
+        {
+          "registered": "bI0lS-vlZIPn",
+          "probe": false
+        },
+        {
+          "closed": "bI0lS-vlZIPn",
+          "code": 1006
+        },
+        {
+          "registered": "bI0lS-vlZIPn",
+          "probe": false
+        },
+        {
+          "closed": "bI0lS-vlZIPn",
+          "code": 1000
+        },
+        {
+          "deleted": "bI0lS-vlZIPn"
+        }
+      ]
+    }
+  },
+  "ownerPtcBaseline": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-ptc-host.py",
+      "127.0.0.1:15563",
+      ".build/batch-074/owner-ptc.json"
+    ],
+    "exitCode": 0,
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "8eb76a9cf3e11e1f0d4173a543e0f39c778ceccc949eedab54a53079ebd08f09",
+    "observed": {
+      "readyMs": 68,
+      "runCodeObserved": true,
+      "typeScriptResultReturned": true,
+      "fileContentsMatched": true,
+      "outsideReadDenied": true,
+      "nestedHostToolMatched": true,
+      "overwriteAndAppendMatched": true,
+      "outsideWriteDenied": true,
+      "exclusiveCreatePreservedExisting": true,
+      "directoryOperationsMatched": true,
+      "crossBoundaryDirectoryMutationsDenied": true,
+      "nonemptyDirectoryPreserved": true,
+      "metadataMatched": true,
+      "recursiveDirectoryOperationsMatched": true,
+      "outsideMetadataAndTraversalDenied": true,
+      "processDirectoryChangesMatched": true,
+      "outsideDirectoryChangeDenied": true,
+      "nextTurnStartedInSubdirectory": true,
+      "cancelledViaSession": true,
+      "cancelledWorkerReaped": true,
+      "temporaryModelCredentialRemoved": true
+    }
+  },
+  "preflight": {
+    "command": [
+      "node",
+      ".build/batch-074/policy-preflight.cjs"
+    ],
+    "exitCode": 0,
+    "sourceSha256": "f272750c17bb769cb84aa26831795beb2f5217a3113aa5d21adeded664b2d862",
+    "logSha256": "8c9bee9ab2105c43adfb610ebea329210799ea46b5149dd97be76d7672722e7f"
+  },
+  "earlierFailure": {
+    "exitCode": 1,
+    "logSha256": "f1ef833a714c05024c56bca14ba886b9fe8530de00bb303a417aa0ec769d3775",
+    "cause": "The getter tagged a different Cordis proxy identity. The final loader registers the actual native runtime constructor and unwraps the execution service before validating it."
+  },
+  "scope": {
+    "relay": "isolated loopback; real owner gateway, ArkWeb, DSH tool calls and model replies",
+    "fileEnforcement": "partial",
+    "Mate60": "HDC USB offline"
+  }
+}

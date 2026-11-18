@@ -392,3 +392,9 @@ Minimal 预设通过官方持久 Bash 工具复用一个受管 Alpine Shell。�
 官方 DSH LSP 通过随包 Pyright 提供 Python 源码、类型存根和标准库导航。实测定义、引用、类型提示与进程复用，保留 TypeScript 回归。原生 Host 的 60 秒启动计时在解包结束后开始。插件真实故障后仍可在安全模式读取会话，并恢复普通模式。
 
 独立模拟器全新安装约 28.3 秒显示聊天页，已解包重启约 7.4 秒。调试签名 HAP SHA-256 `803a08d5c679eb85ad1141d9d26de3e134bf656bfe9cf2227ab61b9d81aedf66`，离线验签及 209 个 payload 条目比对通过。Mate 60 安装待验。 [制品与实测](evidence/emulator-python-lsp-0.4.63.json)
+
+## 0.4.64 LiveShare 程序权限
+
+访客用实际链接和派生会话的授权运行 PTC，文件范围取共享目录与会话现有权限的交集。每个程序使用独立 worker。模拟器实测并存链接的只读与可写权限、内置写工具限制、派生重放与撤销、拒绝扩大权限及主人执行。ArkWeb 登录与真模型对话通过回归。
+
+调试签名 HAP SHA-256 `cec88d56f79f8fc004e10d2c7423fa334504105473446475c004aa0fc5bfa393`，离线验签及 209 个 payload 条目比对通过。当前验收使用回环 Relay，Mate 60 和公网 Relay 待验。 [制品与实测](evidence/emulator-liveshare-ptc-0.4.64.json)

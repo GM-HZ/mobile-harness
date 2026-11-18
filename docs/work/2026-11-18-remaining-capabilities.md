@@ -1,6 +1,6 @@
 # DSH 剩余工作清点
 
-截至 0.4.63，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.64，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
 - 28 类工具包中 25 类已有实际调用证据。3 类为当前不适用或暂缓项（pwsh、pwsh-persistent、terminal）。
 - 16 个官方可选 bundle 中，11 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector、auto-review、personalized-recommendations、cot-translation），2 个暂缓（cua、terminal），3 个待完成。Forge 已通过本地工作树场景。
@@ -11,7 +11,7 @@
 | 工作项 | 当前状态 |
 | --- | --- |
 | voice-input | 0.4.57 通过默认公网模型准备、合成录音与草稿回填。0.4.62 用 DSH 实际录音按钮触发模拟器系统授权，确认真实音轨和取消释放，权限已恢复。真机采集和说话转写待验 |
-| liveshare | 0.4.60 修复 ArkWeb 拦截 Relay 授权地址，真实窗口点击、隔离 Relay 的 PKCE 交换和身份绑定通过。重启恢复分享，独立查看端完成真实模型回合，范围拒绝和撤销通过。公网 Relay、真实身份提供方及公网跨设备部署待验 |
+| liveshare | 0.4.60 通过隔离 Relay 的 ArkWeb 登录、重启恢复、访客真实模型回合和撤销。0.4.64 将访客 PTC 绑定实际分享目录和链接档位，完成并存链接、可写、派生、拒绝扩大权限及回收测试。公网 Relay、真实身份提供方及公网跨设备部署待验 |
 | forge | 本地工作树和 ArkWeb 面板已验。0.4.62 用包内 gh 通过桌面认证代理读取 GM-HZ/omnix 公开 PR 的真实文件、提交和父提交，隔离服务中的评审、邀请及合并也通过复验。设备直接登录和托管仓库写操作待验 |
 
 ## 5 组补充验收
@@ -73,3 +73,5 @@ Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提�
 同一制品完成模拟器原生麦克风、真实 GitHub PR 只读及两小时 Workflow 首轮。包内 gh 在隔离服务的写操作复验通过。 [本轮证据](../evidence/emulator-voice-forge-workflow-0.4.62.json)
 
 0.4.63 补齐 Python 源码和类型存根导航，修复了公共语言服务器运行时路径及原生 Host 启动计时。在独立模拟器全新安装和重启均加载 ArkWeb，复验 TypeScript 和安全恢复。 [本轮证据](../evidence/emulator-python-lsp-0.4.63.json)
+
+0.4.64 修复 LiveShare 程序沿用宿主会话文件权限的问题。模拟器实测并存链接的档位权限、可写文件、只读派生与重放、程序要求扩大权限时的拒绝、worker 回收和主人执行。 [本轮证据](../evidence/emulator-liveshare-ptc-0.4.64.json)
