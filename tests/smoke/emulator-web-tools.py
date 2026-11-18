@@ -55,7 +55,7 @@ class Fixture(BaseHTTPRequestHandler):
         self.end_headers(); self.wfile.write(body)
 
 
-def run(emulator, output, search=False):
+def run(emulator, output, search=False, require_messages_search=False):
     evidence = {}
     sid = None
     server = ThreadingHTTPServer(("127.0.0.1", 0), Fixture)
@@ -122,9 +122,22 @@ def run(emulator, output, search=False):
             assert "Example Domain" in toolkit["texts"]([result])
             evidence["publicHttpsFetch"] = True
             if search:
+                previous_events = len(support["events"](emulator, sid))
                 result, _ = office["invoke"](emulator, sid, "web_search", {"queries": ["Alpine Linux official apk package manager documentation"]})
                 assert "http" in toolkit["texts"]([result]), result
                 evidence["deepseekSearch"] = True
+                if require_messages_search:
+                    new_events = support["events"](emulator, sid)[previous_events:]
+                    requests = [row["data"] for row in new_events if row["type"] == "web/deepseek-search-llm-request"]
+                    assert len(requests) == 1, [row["type"] for row in new_events]
+                    request = requests[0]
+                    assert request["endpoint"] == "https://api.deepseek.com/anthropic/v1/messages", request["endpoint"]
+                    assert request["body"]["tools"][0]["type"] == "web_search_20250305"
+                    evidence["deepseekMessagesSearch"] = {
+                        "endpoint": request["endpoint"],
+                        "apiVersion": request["apiVersion"],
+                        "model": request["body"]["model"],
+                    }
         evidence["temporaryModelCredentialRemoved"] = True
         lines = emulator.app("grep http-parser-portable alpine/tmp/dsh-native-timeline.log || true")
         evidence["parserTrace"] = [json.loads(row) for row in lines.splitlines()]
@@ -146,11 +159,14 @@ def run(emulator, output, search=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("target"); parser.add_argument("output", type=Path)
-    parser.add_argument("--search", action="store_true", help="Also exercise the credentialed DeepSeek Search API")
+    parser.add_argument("--search", action="store_true", help="Also exercise the selected DeepSeek search provider")
+    parser.add_argument("--require-messages-search", action="store_true", help="Require the official RC.5 Messages search event")
     options = parser.parse_args()
+    if options.require_messages_search and not options.search:
+        parser.error("--require-messages-search requires --search")
     if not os.environ.get("MH_TEST_DEEPSEEK_API_KEY"): parser.error("MH_TEST_DEEPSEEK_API_KEY is required")
     emulator = support["Emulator"](options.target, 19643)
     forward = ("tcp:19643", "tcp:19592")
     assert "Forwardport result:OK" in emulator.hdc("fport", *forward)
-    try: run(emulator, options.output, options.search)
+    try: run(emulator, options.output, options.search, options.require_messages_search)
     finally: emulator.hdc("fport", "rm", *forward)
