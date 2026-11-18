@@ -326,3 +326,7 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 用回环 Messages 服务返回两次 `context_length_exceeded`。真实 Host 自动压缩并在原回合重试，输入历史从 19,758 与 20,197 字节分别缩至 1,897 字节，原始日志逐条一致，重启后继续使用最近检查点。PTC、LiveShare、故障恢复及旧会话审计同时通过。首次安装因模拟器空间不足失败，清理可重建的 RC.3 解包缓存后覆盖安装成功。
 
 未签名 HAP 720,518,295 字节，SHA-256 `ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d`，生产源 `83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d`。 [实测与制品](evidence/emulator-forge-overflow-0.4.57.json)
+
+### 0.4.57 公网语音与多模态补验
+
+已发布的同一模拟器 HAP 从空缓存经默认公网来源完成准备，核对模型、词表、VAD 三份原始摘要，并通过转写、ArkWeb 草稿回填、取消和线程回收。显式公网镜像完成下载与转写。Hugging Face 主站在模拟器上返回连接被拒。真实 DeepSeek Flash 正确识别两张随机 PNG 中的四个颜色，重启后附件字节一致，测试密钥已移除。 [补验记录](evidence/emulator-public-voice-vision-0.4.57.json)

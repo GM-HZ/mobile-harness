@@ -1,0 +1,408 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "testSource": "79964f11a292e81426c68cd73f2f0ae8d3153673",
+  "voice": {
+    "exitCode": 0,
+    "command": [
+      "python3",
+      "tests/smoke/emulator-voice-input.py",
+      "127.0.0.1:15557",
+      ".build/batch-058/voice-public-auto.json",
+      "--audio",
+      ".build/voice-native/mandarin-sample.wav",
+      "--arkweb",
+      "--public-download",
+      "auto"
+    ],
+    "scope": "No model preload or local mirror. Public default origins with all original byte checks, two transcripts, ArkWeb synthetic audio, cancel, worker cleanup.",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "db261696322f0412aaa76aab4cb259abb924fcb76a67549f430410bd93400792",
+    "checkingToWorkerLoadMs": 15017,
+    "observed": {
+      "defaultCatalog": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "downloadInitialState": {
+        "phase": "unprepared",
+        "steps": [
+          {
+            "kind": "check",
+            "status": "complete"
+          },
+          {
+            "kind": "model",
+            "status": "pending"
+          },
+          {
+            "kind": "vad",
+            "status": "pending"
+          },
+          {
+            "kind": "verify",
+            "status": "pending"
+          },
+          {
+            "kind": "load",
+            "status": "pending"
+          }
+        ]
+      },
+      "publicOrigin": "auto",
+      "downloadPreparation": {
+        "phase": "ready",
+        "steps": [
+          {
+            "kind": "check",
+            "status": "complete",
+            "startedAt": 1795023570571
+          },
+          {
+            "kind": "model",
+            "status": "complete",
+            "startedAt": 1795023570571
+          },
+          {
+            "kind": "vad",
+            "status": "complete",
+            "startedAt": 1795023583769
+          },
+          {
+            "kind": "verify",
+            "status": "complete",
+            "startedAt": 1795023584695
+          },
+          {
+            "kind": "load",
+            "status": "complete",
+            "startedAt": 1795023585588
+          }
+        ]
+      },
+      "publicAssetSha256": {
+        "model.int8.onnx": "c71f0ce00bec95b07744e116345e33d8cbbe08cef896382cf907bf4b51a2cd51",
+        "tokens.txt": "f449eb28dc567533d7fa59be34e2abca8784f771850c78a47fb731a31429a1dc",
+        "silero_vad.onnx": "a35ebf52fd3ce5f1469b2a36158dba761bc47b973ea3382b3186ca15b1f5af28"
+      },
+      "firstTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06631616600000052
+      },
+      "repeatTranscript": {
+        "text": "今天我们测试语音输入。",
+        "audioSeconds": 2.3916875,
+        "inferenceSeconds": 0.06175512499999968
+      },
+      "invalidAudioRejected": true,
+      "arkWebStartControl": [
+        {
+          "disabled": false,
+          "visible": true,
+          "ariaDisabled": null
+        }
+      ],
+      "arkWebStartHit": {
+        "dom": {
+          "hit": true,
+          "hitLabel": "开始录音",
+          "x": 339,
+          "y": 408.5,
+          "width": 28,
+          "height": 28,
+          "dpr": 3,
+          "viewport": [
+            440,
+            677
+          ]
+        },
+        "nativeBounds": "[1017,1342][1101,1427]"
+      },
+      "arkWebSyntheticDraft": true,
+      "arkWebRecordingCancelled": true,
+      "workerReusedAndStopped": true,
+      "restoreReadyMs": 5254,
+      "originalConfigurationRestored": true
+    }
+  },
+  "vision": {
+    "exitCode": 0,
+    "command": [
+      "python3",
+      "tests/smoke/emulator-deepseek-vision.py",
+      "127.0.0.1:15557",
+      ".build/batch-058/vision-confirm.json"
+    ],
+    "scope": "Actual authenticated DeepSeek Flash with two generated images and a randomized color layout. No client-side recognition or tools.",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "jsonSha256": "d40bf03cc9328b82ba9ca2f4d956837e9a537be6cb21c03ace07872697e73955",
+    "observed": {
+      "requestedModel": {
+        "provider": "deepseek-official",
+        "model": "deepseek-flash",
+        "reasoningEffort": "off"
+      },
+      "expectedImageOrder": [
+        "red",
+        "green",
+        "blue",
+        "yellow"
+      ],
+      "sourcePNGHashes": [
+        "b4eec422c53c850a47a3526f2316dfe18894e902dd341e2768a9b45555432eec",
+        "fad984c133857829dee4ee644d1f00279245fce97deaa57361d5db162c350bae"
+      ],
+      "reply": "red green blue yellow",
+      "turnEndReason": {
+        "kind": "completed"
+      },
+      "restartReadyMs": 5569,
+      "attachmentBytesRestored": true,
+      "testKeyRemoved": true
+    }
+  },
+  "otherAttempts": [
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-voice-input.py",
+        "127.0.0.1:15557",
+        ".build/batch-058/voice-public-first.json",
+        "--audio",
+        ".build/voice-native/mandarin-sample.wav",
+        "--arkweb",
+        "--public-download",
+        "https://huggingface.co"
+      ],
+      "scope": "Initial test request placed downloadSource at the wrong Remote argument level.",
+      "logSha256": "d52fb75f95535d9deef54f4769390de4d5939ab1bdece981c634b024734ecfd0",
+      "jsonSha256": "10dfe7e9c578a4c16dcf554b6d5371b14ed65070bf867502688a1d5450566297",
+      "diagnostic": "gateway/arguments-invalid"
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-voice-input.py",
+        "127.0.0.1:15557",
+        ".build/batch-058/voice-public.json",
+        "--audio",
+        ".build/voice-native/mandarin-sample.wav",
+        "--arkweb",
+        "--public-download",
+        "https://huggingface.co"
+      ],
+      "scope": "Explicit Hugging Face origin after the fixture argument correction.",
+      "logSha256": "5eeac802a122daa5df4f002ac5f4564718e1d3e7ded76d2a576c593e54c82971",
+      "jsonSha256": "4dbc3a4bc9aacdf9e03a6c2c0b48d7d5988b86274c6e307850dd81beca0174dd",
+      "diagnostic": "ECONNREFUSED during model download"
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-voice-input.py",
+        "127.0.0.1:15557",
+        ".build/batch-058/voice-mirror-public.json",
+        "--audio",
+        ".build/voice-native/mandarin-sample.wav",
+        "--arkweb",
+        "--public-download",
+        "https://hf-mirror.com"
+      ],
+      "scope": "Explicit public mirror downloaded and verified all files and both transcripts passed. Native UI did not expose the recording control after preparation.",
+      "logSha256": "8198787c9b14c298fb842d3d996d7572856be9da35420a4d65413bb8e2d86a63",
+      "jsonSha256": "631696e3576913f634a999dd0fc2af2be94f10c6d39405537a89eaa8687fce5b",
+      "observed": {
+        "publicAssetSha256": {
+          "model.int8.onnx": "c71f0ce00bec95b07744e116345e33d8cbbe08cef896382cf907bf4b51a2cd51",
+          "tokens.txt": "f449eb28dc567533d7fa59be34e2abca8784f771850c78a47fb731a31429a1dc",
+          "silero_vad.onnx": "a35ebf52fd3ce5f1469b2a36158dba761bc47b973ea3382b3186ca15b1f5af28"
+        },
+        "firstTranscript": {
+          "text": "今天我们测试语音输入。",
+          "audioSeconds": 2.3916875,
+          "inferenceSeconds": 0.06876466600000276
+        },
+        "repeatTranscript": {
+          "text": "今天我们测试语音输入。",
+          "audioSeconds": 2.3916875,
+          "inferenceSeconds": 0.06772383400000036
+        },
+        "originalConfigurationRestored": true
+      }
+    },
+    {
+      "exitCode": 1,
+      "command": [
+        "python3",
+        "tests/smoke/emulator-deepseek-vision.py",
+        "127.0.0.1:15557",
+        ".build/batch-058/vision.json"
+      ],
+      "scope": "The actual model matched all four colors and restart attachment bytes. Cleanup tried to cancel a completed session after restart.",
+      "logSha256": "5c6eff224290c84e77c7e3418fcd88d1ba5caeec7876d18ba0c5f5bba55539ea",
+      "jsonSha256": "3f01f07a96e5eeda33eeb654e08080a5b34da67008f40393d29884b86d103e00",
+      "diagnostic": "session/cancel: session/not-found"
+    }
+  ],
+  "restoredAudit": {
+    "exitCode": 0,
+    "command": [
+      "python3",
+      ".build/batch-058/audit.py",
+      "post-regression"
+    ],
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "jsonSha256": "4d9104607ea6f9f46b478de376bf2fa7f61a60c3eee4f906816993314fb5ab94",
+    "observed": {
+      "target": "127.0.0.1:15557",
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "readyMs": 77,
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      },
+      "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "titlesAndBadgeDefaultOff": {
+        "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.5"
+        },
+        "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+          "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "removable": false,
+          "enabled": false,
+          "version": "0.2.2-rc.5"
+        }
+      },
+      "fourOptionalBundlesDefaultOff": {
+        "@deepseek-ai/dsh-experimental-ralph-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-session-search": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-tool-worktree": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        },
+        "@deepseek-ai/dsh-experimental-forge-bundle": {
+          "availability": "installation",
+          "optional": true,
+          "official": true,
+          "installed": false,
+          "removable": false,
+          "version": "0.2.2-rc.5",
+          "enabled": false
+        }
+      },
+      "chatImportDefaultOff": {
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "inspectorDefaultOff": true,
+      "translationDefaultOff": true,
+      "recommendationsDefaultOff": {
+        "name": "@deepseek-ai/dsh-personalized-recommendations",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "badgeDefaultOff": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "batchDefaultOff": [
+        {
+          "name": "@deepseek-ai/dsh-experimental-auto-review",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        {
+          "name": "@deepseek-ai/dsh-experimental-liveshare",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        }
+      ],
+      "voiceDefaultOff": {
+        "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "temporaryVoiceCacheRemoved": true
+    }
+  },
+  "remainingScope": [
+    "Physical microphone authorization and recording",
+    "OAuth and other providers"
+  ]
+}
