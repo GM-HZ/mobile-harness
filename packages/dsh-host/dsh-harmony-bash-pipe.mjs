@@ -1,8 +1,10 @@
-'use strict';
+import path from 'node:path';
+import { randomUUID } from 'node:crypto';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const path = require('node:path');
-const { randomUUID } = require('node:crypto');
-
+const root = path.dirname(fileURLToPath(import.meta.url));
+const terminal = path.join(root, '.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/dsh-terminal/lib/index.js');
+const { TerminalError } = await import(pathToFileURL(terminal).href);
 const MAX_CHARS = 128 * 1024;
 const fences = new WeakSet();
 
@@ -148,9 +150,13 @@ class BashPipeSession {
   }
 }
 
-function registerBashPipe(ctx, type, root, TerminalError, mark) {
+export const name = 'harmony-bash-pipe';
+export const inject = ['terminals', 'sandboxPolicy', 'subprocess', 'workingDirectory'];
+
+export function apply(ctx) {
+  const mark = globalThis.__harmonyBashPipeMark;
   ctx.terminals.registerBackend({
-    type,
+    type: 'shell',
     async spawn(spec) {
       const owner = spec.owner;
       const policy = () => ctx.sandboxPolicy.resolve({ session: owner.session }).mode;
@@ -197,5 +203,3 @@ function registerBashPipe(ctx, type, root, TerminalError, mark) {
     },
   });
 }
-
-module.exports = { registerBashPipe };

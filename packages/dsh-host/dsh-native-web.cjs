@@ -70,6 +70,25 @@ function patchWorkspaceDependencies(source) {
   return replacePinned(patched, 'This does not change PATH or package-manager settings.',
     'In Mobile Harness these paths are inside Alpine. Use them through Bash, with the usual approval for execution. This does not change PATH or package-manager settings.');
 }
+function adaptMinimalPreset(config) {
+  if (config.id !== 'minimal') return config;
+  const group = config.plugins.find(row => row.id === 'persistent-shell' && row.group);
+  if (!Array.isArray(group?.config)) return config;
+  const backend = group.config.find(row => row.id === 'terminal-bash' &&
+    row.name === '@deepseek-ai/dsh-terminal-bash');
+  if (!backend || backend.config?.shellPath || backend.config?.shellArgs?.length ||
+      (backend.config?.backendType ?? 'shell') !== 'shell') return config;
+  const adapted = group.config.map(row => {
+    if (row === backend) {
+      return { ...row, name: path.join(root, 'dsh-harmony-bash-pipe.mjs'), config: {} };
+    }
+    if (row.id !== 'persistent-bash' || row.name !== '@deepseek-ai/dsh-tool-bash-persistent') return row;
+    return { ...row, config: { ...row.config,
+      description: (row.config?.description ?? 'Run commands in a persistent Bash shell.') +
+        '\nThis Alpine shell uses pipes and gives commands an empty stdin. It requires a session with explicitly selected full access.' } };
+  });
+  return { ...config, plugins: config.plugins.map(row => row === group ? { ...group, config: adapted } : row) };
+}
 function patchWorkflow(source) {
   const start = '\t\t\tif (this.runtime.sandboxMode === void 0 && this.policy.mode';
   const end = '\t\t\tthis.terminal = true;';
@@ -399,7 +418,7 @@ async function main() {
   const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
   const workspaceDependenciesUrl = paths('dsh-tool-workspace-dependencies/lib/index.js');
-  const terminalBashUrl = paths('dsh-terminal-bash/lib/index.js');
+  const agentPresetUrl = paths('dsh-agent-preset/lib/index.js');
   const proxyUrl = paths('dsh-http-proxy/lib/index.js');
   const undiciUrl = pathToFileURL(path.join(dsh, 'undici/index.js')).href;
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
@@ -511,15 +530,12 @@ async function main() {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         return { ...result, source: patchWorkspaceDependencies(source) };
       }
-      if (url === terminalBashUrl && !safeMode) {
+      if (url === agentPresetUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
-        globalThis.__harmonyBashPipe = (ctx, type, TerminalError) =>
-          require(path.join(root, 'dsh-harmony-bash-pipe.cjs')).registerBashPipe(ctx, type, root, TerminalError, mark);
-        const registration = 'ctx.terminals.registerBackend(new BashTerminalBackend(ctx, resolved));';
-        return { ...result, source: replacePinned(source, registration,
-          'if (resolved.backendType === "shell" && resolved.shellDialect === "bash" && !config.shellPath && !config.shellArgs?.length) {\n' +
-          '  return globalThis.__harmonyBashPipe(ctx, resolved.backendType, TerminalError);\n' +
-          '}\n' + registration) };
+        globalThis.__harmonyMinimalPreset = adaptMinimalPreset;
+        globalThis.__harmonyBashPipeMark = mark;
+        return { ...result, source: replacePinned(source, 'this.config = config;',
+          'this.config = globalThis.__harmonyMinimalPreset(config);') };
       }
       if (url === liveshareUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
