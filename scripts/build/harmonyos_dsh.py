@@ -58,10 +58,11 @@ def stage_dsh(root, raw, baseline):
     for package, source in json.loads((manifest / "lsp-sources.json").read_text()).items():
         recorded = pinned["node_modules/" + package]
         checkout = root / source["source"]
+        package_json = checkout / source.get("packageJson", "package.json")
         head = subprocess.check_output(["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True).strip()
         if (head != source["commit"] or recorded["version"] != source["version"] or
                 recorded["integrity"] != source["integrity"] or
-                json.loads((checkout / "package.json").read_text())["version"] != source["version"]):
+                json.loads(package_json.read_text())["version"] != source["version"]):
             raise ValueError(f"LSP source / npm pin mismatch: {package}")
     cache = root / ".build/dsh-runtime" / key
     archive = cache / ARCHIVE

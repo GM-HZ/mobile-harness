@@ -19,3 +19,6 @@
 [submodule "vendor/repos/typescript"]
 	path = vendor/repos/typescript
 	url = https://github.com/microsoft/TypeScript.git
+[submodule "vendor/repos/pyright"]
+	path = vendor/repos/pyright
+	url = https://github.com/microsoft/pyright.git

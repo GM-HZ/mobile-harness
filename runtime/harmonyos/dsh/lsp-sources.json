@@ -7,6 +7,15 @@
     "integrity": "sha512-Glr+4Ss9g6AupBPj3tnk3mrlSH1ROS2Zmr5h0Vmy3DA+MVq+5qq4tv4+SogB8VsEZ13Z9xU01zm54MMyI7Gdzw==",
     "provenance": "Official source release tag; npm metadata does not declare gitHead. No source-to-bundle reproducibility claim."
   },
+  "pyright": {
+    "version": "1.1.414",
+    "source": "vendor/repos/pyright",
+    "packageJson": "packages/pyright/package.json",
+    "commit": "a28cce4077d87b80bead12de809f79845e39c8ba",
+    "tag": "1.1.414",
+    "integrity": "sha512-FPZZb51jepDX4eP7TEYDeNFtmE3WgwkkEcJpvH3/QmUSsj0EAy3LXu+xB4T/FWDejtsXlCfFr/rbWFjwuwuXww==",
+    "provenance": "Official source release tag; npm metadata does not declare gitHead."
+  },
   "typescript": {
     "version": "6.0.3",
     "source": "vendor/repos/typescript",

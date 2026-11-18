@@ -27,5 +27,12 @@
               tsserver:
                 path: !!js process.env.HARMONY_NATIVE_WEB_ROOT + '/.dsh-0.2.2-rc.5/toolchains/lsp/node_modules/typescript/lib/tsserver.js'
                 useSyntaxServer: never
+          python:
+            command: node
+            args: !!js >-
+              ['--max-old-space-size=256', process.env.HARMONY_NATIVE_WEB_ROOT + '/.dsh-0.2.2-rc.5/dsh/node_modules/pyright/langserver.index.js', '--stdio']
+            extensionToLanguage:
+              .py: python
+              .pyi: python
     - id: tool-lsp
       name: '@deepseek-ai/dsh-tool-lsp'
