@@ -435,9 +435,30 @@ async function main() {
             !supported.slice(start, end).includes('DSH_SPEECH_TOKEN: token')) {
           throw new Error('Unexpected pinned SenseVoice worker launch');
         }
-        return { ...result, source: supported.slice(0, start) +
-          'const handle = globalThis.__harmonySpeechLaunch(runtime.worker, Object.assign({}, this.config, runtime), token, this.config.maxLogBytes);' +
-          supported.slice(end) };
+        let patched = supported.slice(0, start) +
+          'const handle = globalThis.__harmonySpeechLaunch(runtime.worker, Object.assign({}, this.config, runtime), this.config.maxLogBytes);' +
+          supported.slice(end);
+        patched = replacePinned(patched, 'const token = randomBytes(32).toString("hex");', '');
+        patched = replacePinned(patched,
+          'const worker = {\n\t\t\t\t\thandle,\n\t\t\t\t\turl: `http://127.0.0.1:${await readReady(handle, this.config.maxLogBytes, setup.signal)}`,\n\t\t\t\t\ttoken,',
+          'await waitFor(handle.ready, setup.signal);\n\t\t\t\tconst worker = { handle,');
+        const request = 'const result = await readTranscript(await fetch(`${worker.url}/transcribe?';
+        const send = patched.indexOf(request);
+        const settled = patched.indexOf('\n\t\t\t\tcall.signal.throwIfAborted();\n\t\t\t\treturn result;', send);
+        if (send < 0 || settled < 0 || patched.indexOf(request, send + 1) >= 0 ||
+            !patched.slice(send, settled).includes('body: Buffer.from(input.audio)')) {
+          throw new Error('Unexpected pinned SenseVoice request transport');
+        }
+        return { ...result, source: patched.slice(0, send) + `const reply = await worker.handle.transcribe(input.audio, input.language, call.signal);
+          call.signal.throwIfAborted();
+          if (!reply.ok) {
+            if (reply.invalidInput) throw new SpeechInputError(reply.message);
+            throw new Error(reply.message);
+          }
+          if (Buffer.byteLength(JSON.stringify(reply.value)) > this.config.maxResponseBytes) {
+            throw new Error("Speech transcript exceeded its byte limit");
+          }
+          const result = transcriptSchema.parse(reply.value);` + patched.slice(settled) };
       }
       if (url === creatorUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
