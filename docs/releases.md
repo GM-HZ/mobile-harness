@@ -334,3 +334,7 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 ### 0.4.57 LiveShare 查看者与 Goal 续跑补验
 
 同一模拟器 HAP 通过独立回环客户端的共享读取、模型对话、身份来源与撤销。Goal 经过两次 Host 重启完成三个检查点，重启后工作历史与文件内容一致。用尽轮次和旧修订恢复均被拒，新修订恢复成功。回归后核对旧会话、默认权限和原 profile。 [补验记录](evidence/emulator-live-reader-goals-0.4.57.json)
+
+### 0.4.57 公网插件依赖与实际页面翻译补验
+
+同一 HAP 通过公网 npm 插件安装、依赖校验、重启后的实际工具调用和卸载。DSH 插件 API 来自包内同一实例。ArkWeb 用 DeepSeek Flash 翻译合成会话，重启时移除密钥仍可打开已保存的译文。此前未通过的匿名翻译端点仍保留在待验清单。 [补验记录](evidence/emulator-public-plugin-translation-0.4.57.json)

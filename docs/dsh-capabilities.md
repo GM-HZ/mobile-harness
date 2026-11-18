@@ -10,6 +10,8 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 
 0.4.57 已通过回环 Relay 验证独立查看者读取共享历史、真实 DeepSeek Flash 回复、Host 授权边界和即时撤销。同一模型驱动一个 Goal 完成三个文件检查点。两次重启后工作历史与 Goal 状态完整，旧修订恢复被拒，当前修订可以继续。公网 Relay、实际跨设备交互和长时压力仍待验。 [补验记录](evidence/emulator-live-reader-goals-0.4.57.json)
 
+0.4.57 的 ArkWeb 页面使用真实 DeepSeek Flash 翻译，移除测试密钥后仍可重启查看保存的译文。PluginManager 经公网 npm 安装合成插件的直接、传递与可选依赖，并复用包内 `@deepseek-ai/dsh-tools`。模型在重启后实际调用插件工具，卸载后复核原 profile。 [补验记录](evidence/emulator-public-plugin-translation-0.4.57.json)
+
 0.4.57 的官方 Forge 使用随包交付的 Alpine ARM64 GitHub CLI，经本机 TLS 夹具验证指定提交的文件读取和两页 GraphQL 提交列表。真实 DSH Host 消费两条受控的 Messages HTTP 400 溢出响应，均完成压缩、原回合重试并在重启后继续使用最近检查点。同包通过标准 PTC、LiveShare、启动与故障恢复回归。 [0.4.57 证据](evidence/emulator-forge-overflow-0.4.57.json)
 
 0.4.54 完成 Creator 的生成、安装、计数按钮、撤销提示、重启后的移除及从保留副本恢复。实际 npm 插件下载被取消后，配置一致，随后重新安装、升级、失败回滚和卸载均成功。0.4.55 的 LiveShare 经私有回环 Relay 验证发布、增加会话、重连和停止。 [0.4.54 与 0.4.55 证据](evidence/emulator-creator-liveshare-0.4.55.json)

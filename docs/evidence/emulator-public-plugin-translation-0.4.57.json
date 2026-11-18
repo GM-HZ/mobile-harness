@@ -1,0 +1,179 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "testSource": "8f93ed22ba80a6d68539d53af5e3b7eb991524a0",
+  "dsh": {
+    "registryNext": "0.2.2-rc.5",
+    "submoduleCommit": "9c2670d3bce5275e0d1610272958121af87787bb",
+    "release": "https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5"
+  },
+  "realArkWebTranslation": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-cot-translation.py",
+      "127.0.0.1:15557",
+      ".build/batch-060/cot-live-arkweb.json",
+      "--live",
+      "deepseek-official",
+      "--arkweb-live"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "7915e742b63048b0e3eefdaf09396142b2d63162c4d587aa29840b4ceeadedcc",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "defaultCatalog": {
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "availableProviders": [
+        "bing",
+        "google",
+        "deepseek-official"
+      ],
+      "liveArkWebTranslation": "仅在已归档的导出上下文中搜索。",
+      "isolatedFlashRequest": {
+        "model": "deepseek-flash",
+        "reasoningEffort": "off",
+        "messages": 1
+      },
+      "translationReopenedWithoutCredential": true,
+      "noAdditionalTranslationAfterRestart": true,
+      "restoredReadyMs": 4949,
+      "restoredHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+      }
+    }
+  },
+  "publicNpmGraph": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-plugin-public-graph.py",
+      "127.0.0.1:15557",
+      ".build/batch-060/plugin-public-graph.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "6bedb88794ab79293fb33e677476d5550775ba4810dbe6dced09ed841595707a",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "registry": "https://registry.npmjs.org/",
+    "installation": {
+      "application": "applied",
+      "packageExitCode": 0,
+      "pnpmPeerWarningObserved": true
+    },
+    "lock": {
+      "directAndOptional": [
+        "string-width@7.2.0",
+        "number-is-nan@1.0.1",
+        "is-odd@3.0.1"
+      ],
+      "integrity": {
+        "string-width": "sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ==",
+        "number-is-nan": "sha512-4jbtZXNAsfZbAHiiqjLPBiCl16dES1zI4Hpzzxw61Tk+loF+sBDBKx1ICKKKwIqQ7M0mFn1TmkN7euSncWgHiQ=="
+      },
+      "singleBundledHostPeer": true,
+      "newPackageEntries": [
+        "ansi-regex@6.6.0",
+        "emoji-regex@10.6.0",
+        "get-east-asian-width@1.7.0",
+        "is-number@6.0.0",
+        "is-odd@3.0.1",
+        "mh-public-npm-e9245e94e1@file:../../../workspace-native/mh-public-npm-e9245e94e1",
+        "number-is-nan@1.0.1",
+        "string-width@7.2.0",
+        "strip-ansi@7.2.0"
+      ]
+    },
+    "restartReadyMs": 6681,
+    "actualTool": {
+      "width": 7,
+      "commonJsNaN": true,
+      "commonJsString": false,
+      "optionalOdd": true
+    },
+    "bundledDshToolsPeer": "file:///data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/dsh-tools/lib/index.js",
+    "removal": {
+      "application": "restart-required",
+      "restartReason": "module-comparison"
+    },
+    "restoredHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+      "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+    }
+  },
+  "earlierExternalPeerAttempt": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-plugin-public-graph.py",
+      "127.0.0.1:15557",
+      ".build/batch-060/plugin-public-graph.json"
+    ],
+    "exitCode": 1,
+    "jsonSha256": "5d31f857d773105bcb8be559a7c1f061e104ba97b43c28b7019d2ad335fd442d",
+    "logSha256": "4408d4ad569726f4b0fcacf7fca12c37d1cea62c900683ccd4692d9648aa1f23",
+    "packageExitCode": 0,
+    "application": "failed",
+    "stage": "enable",
+    "diagnostic": "dsh: warning: 1 entry did not activate\nmh-public-npm-a0790922a8 (mh-public-npm-a0790922a8): failed to import: Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'number-is-nan' imported from /data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/node_modules/mh-public-npm-a0790922a8/index.mjs",
+    "downloadedFromRegistry": true,
+    "finding": "The upstream profile leaves auto-installation off so plugins share host peers. The first fixture required an unprovided external peer. The final fixture declares that library as a dependency and tests the bundled DSH API as a genuine peer."
+  },
+  "audit": {
+    "command": [
+      "python3",
+      ".build/batch-060/audit.py",
+      "post-regression"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "da2033f32ffce5651c931551626a5af845ec01e8e3dab6be659e17f89c54bee0",
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "observed": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      }
+    }
+  },
+  "unverified": [
+    "Unauthenticated Bing and Google public endpoints remain open based on the earlier probes.",
+    "A user-selected public plugin index and plugins with native dependencies.",
+    "The Mate 60 USB target remained offline for this batch."
+  ]
+}

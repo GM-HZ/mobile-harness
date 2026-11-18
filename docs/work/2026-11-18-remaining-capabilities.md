@@ -11,7 +11,7 @@
 | 工作项 | 当前状态 |
 | --- | --- |
 | voice-input | 0.4.57 已从空缓存经默认公网来源选择下载三个锁定文件，并完成 ArkWeb 合成录音、草稿回填、取消和 worker 回收。显式公网镜像也通过 SHA-256 和转写，Hugging Face 主站在本模拟器上连接被拒。真机麦克风授权和采集待验 |
-| cot-translation | 正式 ArkWeb 界面、受控 Bing／Google、真实 DeepSeek Flash、重启复用和停用取消已验。0.4.54 复验两个公开匿名端点均失败 |
+| cot-translation | 0.4.57 已从正式 ArkWeb 页面请求真实 DeepSeek Flash，移除密钥后重启仍可打开译文。受控 Bing／Google、停用取消已验。两个公开匿名端点仍待成功 |
 | liveshare | 0.4.57 已通过独立客户端在回环 Relay 查看已共享会话，并用真实 DeepSeek Flash 对话。Host 拒绝查看未共享会话和调用 Owner 接口，撤销立即生效。公网 Relay、真实账户授权和实际跨设备交互待验 |
 | forge | 本地工作树正式接口已验证恢复、取消、重试和重启。0.4.47 已验 ArkWeb 面板。0.4.57 通过包内 gh 读取本机 TLS 夹具的文件与分页提交。公网账号和评审、合并等写入待验 |
 
@@ -19,7 +19,7 @@
 
 1. 长会话已通过受控 Messages HTTP 400 的两次自动压缩、重试及重启恢复。真实 DeepSeek Flash 已驱动同一 Goal 完成三轮文件操作，跨两次重启恢复，旧修订无法续跑。真实公网模型的上下文上限和长时压力仍待实测。
 2. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
-3. 插件扩展兼容已通过本机 Git 来源的固定提交安装和升级，浮动分支被拒。0.4.54 已通过 npm 下载在途取消及恢复。其他依赖组合及公共索引仍待验。npm 仓库纯 JS 依赖、升级、失败回滚、卸载和禁止安装脚本已有实测。
+3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer，重启后经模型实际调用。含原生依赖的插件与用户指定的公网索引仍待验。DSH 官方市场接受自定义索引。
 4. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。完整官方登录授权与其他提供者待验。
 5. 最新真机交付仍需验证签名 HAP、主流程、长运行、前后台、网络切换与性能。Mate 60 当前不在线。
 
@@ -46,3 +46,5 @@
 0.4.57 补验公网语音准备和真实图片识别，计入原语音与账号两项的部分完成。 [本轮证据](../evidence/emulator-public-voice-vision-0.4.57.json)
 
 同一制品通过独立 LiveShare 查看者和三轮 Goal 跨重启续跑。Goal Gateway 对超轮次限制和旧修订均返回通用错误，状态保持一致，允许的修订可继续。 [本轮证据](../evidence/emulator-live-reader-goals-0.4.57.json)
+
+同一制品通过真实 ArkWeb 翻译、公网 npm 插件依赖图、模型调用和卸载。Host 复用包内 DSH peer，上游 profile 保留 `autoInstallPeers: false`。 [本轮证据](../evidence/emulator-public-plugin-translation-0.4.57.json)

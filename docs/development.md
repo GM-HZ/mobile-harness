@@ -284,15 +284,25 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-plugin-market-ui.py <loopback-target> .build/plugin-market-ui.json
 ```
 
+官方 DSH profile 的 `autoInstallPeers: false` 让插件复用包内依赖。插件可将 DSH Host 提供的 API 声明为 peer。若插件还需要 Host 和 profile 均未提供的 npm 库，可将其列入自己的 `dependencies`；只有具备缺省处理的库才适合列为 `optionalDependencies`。官方插件市场由用户添加索引来源。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-plugin-public-graph.py <loopback-target> .build/plugin-public-graph.json
+```
+
 ## 思考内容翻译
 
-安装 0.4.45 后在独立 Phone 模拟器执行。脚本通过正式导入接口创建合成会话，并用内嵌 ArkWeb 检查展开、原译文、跨重启复用、重试及取消。正常模式使用回环服务，`--live` 显式使用指定提供者。只提交合成的文本，结束后恢复测试配置。
+在独立 Phone 模拟器执行。脚本通过正式导入接口创建合成会话，并用内嵌 ArkWeb 检查展开、原译文、跨重启复用、重试及取消。正常模式使用回环服务，`--live` 显式使用指定提供者。`--arkweb-live` 从页面触发真实 DeepSeek Flash 请求，并在移除测试密钥后重开已保存的译文。只提交合成文本，结束后恢复测试配置。
 
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-translation.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-flash.json --live deepseek-official
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-flash-arkweb.json \
+  --live deepseek-official --arkweb-live
 ```
 
 ## 个性化推荐
