@@ -41,18 +41,17 @@ function replacePinned(source, point, replacement) {
   if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
   return source.replace(point, replacement);
 }
-function patchTranslation(source, proxyUrl, undiciUrl) {
+function patchProfileFetch(source, proxyUrl, undiciUrl, call) {
   const adapter = `
 import { proxyRouteFor as harmonyProxyRouteFor } from ${JSON.stringify(proxyUrl)};
-async function harmonyTranslationFetch(url, init) {
-  const route = harmonyProxyRouteFor(url);
+async function harmonyProfileFetch(url, init) {
+  const route = harmonyProxyRouteFor(new URL(url));
   if (!route.proxied) return fetch(url, init);
   const { fetch: routedFetch } = await import(${JSON.stringify(undiciUrl)});
   return routedFetch(url, { ...init, dispatcher: route.dispatcher });
 }
 `;
-  return adapter + replacePinned(source, 'const response = await fetch(url, {',
-    'const response = await harmonyTranslationFetch(url, {');
+  return adapter + replacePinned(source, call, call.replace('fetch(', 'harmonyProfileFetch('));
 }
 function patchWorkspaceDependencies(source) {
   const resolver = 'async function resolvePrimaryRuntime(source) {';
@@ -460,6 +459,7 @@ async function main() {
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
   const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
+  const pluginMarketUrl = paths('dsh-plugin-market/lib/index.js');
   const workspaceDependenciesUrl = paths('dsh-tool-workspace-dependencies/lib/index.js');
   const agentPresetUrl = paths('dsh-agent-preset/lib/index.js');
   const proxyUrl = paths('dsh-http-proxy/lib/index.js');
@@ -570,9 +570,10 @@ async function main() {
         return { ...result, source: replacePinned(source, 'import { execa } from "execa";',
           'const execa = globalThis.__harmonyGh;') };
       }
-      if (url === translatorUrl) {
+      if (url === translatorUrl || url === pluginMarketUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
-        return { ...result, source: patchTranslation(source, proxyUrl, undiciUrl) };
+        const call = url === translatorUrl ? 'const response = await fetch(url, {' : 'response = await fetch(url, {';
+        return { ...result, source: patchProfileFetch(source, proxyUrl, undiciUrl, call) };
       }
       if (url === workspaceDependenciesUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
