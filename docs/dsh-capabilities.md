@@ -1,10 +1,12 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.51，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.53，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
 ## 当前验收
+
+0.4.53 在模拟器通过空缓存下载、原生 ArkWeb 触屏启动录音、真实录音器采集的合成普通话、草稿回填、取消和停用回收。Git 插件通过本机仓库固定提交安装、拒绝浮动分支升级和重启保留。Creator 已生成并安装可操作页面，完整撤销和恢复仍待验。 [0.4.53 证据](evidence/emulator-creator-and-voice-0.4.53.json)
 
 0.4.51 提供官方语音输入 bundle，默认关闭。标准 Speech Remote 使用校验后的 SenseVoice 与 Silero 数据，在鸿蒙原生 Node 专属 worker 内完成普通话转写。连续两次转写、坏音频拒绝和停用回收通过。ArkWeb 录音与草稿回填继续验收。 [0.4.51 证据](evidence/emulator-voice-input-0.4.51.json)
 

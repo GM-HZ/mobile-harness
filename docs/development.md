@@ -300,9 +300,15 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-person
 
 ## 鸿蒙语音
 
-在独立 Phone 模拟器安装对应 HAP。先准备上游 RC.5 锁定的 SenseVoice int8 模型、词表及 Silero VAD，放在同一测试输入目录。官方模型清单位于锁定 DSH 的 `packages/experimental/speech-to-text-sensevoice/runtime/assets.json`。测试临时填充 App 私有模型缓存，校验后加载，再验证普通话转写、无效音频与关闭回收。退出后移除测试缓存并恢复原配置。可选 `--arkweb` 继续验证模拟器录音与草稿，当前这条路径待完成。
+在独立 Phone 模拟器安装对应 HAP。先准备上游 RC.5 锁定的 SenseVoice int8 模型、词表及 Silero VAD，放在同一测试输入目录。官方模型清单位于锁定 DSH 的 `packages/experimental/speech-to-text-sensevoice/runtime/assets.json`。测试临时填充 App 私有模型缓存，校验后加载，再验证普通话转写、无效音频与关闭回收。退出后移除测试缓存并恢复原配置。可选 `--arkweb` 使用真实模拟器触屏启动 ArkWeb 录音，采集合成音频并验证草稿和取消。使用 `--download` 可从空缓存经独立限速镜像准备原始模型。真机麦克风与公网下载单独验收。
 
 ```sh
 python3 tests/smoke/emulator-voice-input.py <loopback-target> .build/voice-api.json \
   --model-root <fixture-model-dir> --audio <16k-mono-pcm16-wav>
+```
+
+从独立的本机 Git 服务测试固定提交包的安装、拒绝未固定的升级、同来源升级及重启保留。
+
+```sh
+python3 tests/smoke/emulator-plugin-git-update.py <loopback-target> .build/git-plugin-upgrade.json
 ```
