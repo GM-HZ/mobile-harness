@@ -102,10 +102,32 @@ def decisions(emulator,sid,call_id,phases):
     return last if last and last['phase'] in phases else None
 
 
-def verify_counter(emulator,title):
+def open_view(run, labels):
+    expression = f'''(() => {{
+      const labels={json.dumps(labels,ensure_ascii=False)};
+      const tabs=[...document.querySelectorAll('[data-conversation-tabs] [role=tab]')];
+      const rows=[...document.querySelectorAll('[role=menu] [role=menuitem]')];
+      const visible=node=>node.getClientRects().length>0;
+      const view=[...tabs,...rows].find(node=>visible(node)&&labels.includes(node.textContent.trim()));
+      if(view){{view.click(); return tabs.includes(view)?'tab':'menu';}}
+      const more=[...document.querySelectorAll('button[aria-haspopup=menu]')].find(node=>
+        visible(node)&&['更多会话视图','More conversation views'].includes(node.getAttribute('aria-label')));
+      if(more?.getAttribute('aria-expanded')==='false') more.click();
+      return false;
+    }})()'''
+    return flow['wait'](run,expression,'conversation view '+str(labels))
+
+
+def verify_counter(emulator,title,evidence):
     with flow['browser'](emulator) as run:
         flow['open_session'](emulator,run,title)
-        button(run,'[data-conversation-tabs] [role=tab]',['Local Counter'])
+        try:
+            evidence['counterViewNavigation']=open_view(run,['Local Counter'])
+        except AssertionError:
+            evidence['counterVisibleViewLabels']=run('''[...document.querySelectorAll(
+              '[data-conversation-tabs] [role=tab], [role=menu] [role=menuitem]'
+            )].filter(node=>node.getClientRects().length).map(node=>node.textContent.trim())''')
+            raise
         flow['wait'](run,"document.body.innerText.includes('Count: 0')",'initial counter value')
         button(run, 'button', ['Increment'])
         flow['wait'](run,"document.body.innerText.includes('Count: 1')",'incremented counter value')
@@ -165,13 +187,18 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
         assert re.fullmatch(r'@dsh-local/view-[a-f0-9-]{36}',bundle),bundle
         row=market['catalog'](emulator,bundle)
         assert row and row['installed'],row
+        evidence['creatorPluginRows']=[
+            {key:row.get(key) for key in ['patchId','fiberPhase']}
+            for row in emulator.rpc('pluginManager/listPlugins',{})
+            if str(row.get('patchId','')).startswith(bundle+':')
+        ]
         if status['data'].get('application')=='restart-required':
             flow['restart'](emulator)
-        verify_counter(emulator,title)
+        verify_counter(emulator,title,evidence)
         evidence['creatorCounterControls']=[0,1,0]
         print('Verified real Creator installed its own plugin',flush=True)
         with flow['browser'](emulator) as run:
-            button(run,'[data-conversation-tabs] [role=tab]',['对话','Chat'])
+            open_view(run,['聊天','对话','Chat'])
             selector=card_selector(kind)
             button(run,selector+' button',['撤销','Undo'])
         removed=wait_for(lambda:decisions(emulator,sid,call_id,{'removed'}),'generated page removal',50)
@@ -183,7 +210,7 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
         assert market['catalog'](emulator,bundle)['installed']
         if restored['data'].get('application')=='restart-required':
             flow['restart'](emulator)
-        verify_counter(emulator,title)
+        verify_counter(emulator,title,evidence)
         evidence['creatorLifecycle']={'installed':status,'removed':removed,'restored':restored}
     else:
         result=wait_for(lambda:decisions(emulator,sid,call_id,{'dismissed'}),'page dismissal')
