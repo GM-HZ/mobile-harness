@@ -1,10 +1,12 @@
 import { abilityAccessCtrl, common } from '@kit.AbilityKit';
+import { url } from '@kit.ArkTS';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, dshEngine } from '../runtime/DshEngine';
 
 const LOCAL_ORIGIN = 'http://127.0.0.1:19592';
 const RECOVERY_URL = LOCAL_ORIGIN + '/.mobile-harness/recovery';
+type LoginFlow = 'unbound' | 'deepseek' | 'liveshare';
 
 @Entry
 @Component
@@ -21,6 +23,8 @@ struct Index {
   @State loginAddress: string = '正在连接 DeepSeek…';
   @State loginError: string = '';
   private loginController: webview.WebviewController = new webview.WebviewController();
+  private loginFlow: LoginFlow = 'unbound';
+  private relayOrigin: string = '';
   private detachEngine?: () => void;
 
   aboutToAppear(): void {
@@ -92,10 +96,54 @@ struct Index {
     return /^http:\/\/127\.0\.0\.1:19592\/oauth\/callback(?:[?#]|$)/.test(url);
   }
 
+  private parseLoginAddress(address: string): url.URL | undefined {
+    try {
+      const parsed = url.URL.parseURL(address);
+      return parsed.username || parsed.password ? undefined : parsed;
+    } catch {
+      return undefined;
+    }
+  }
+
+  private liveShareAuthorization(address: url.URL): boolean {
+    const secure = address.protocol === 'https:';
+    const testRelay = address.protocol === 'http:' && address.hostname === '127.0.0.1' &&
+      address.origin !== LOCAL_ORIGIN;
+    const params = address.searchParams;
+    return (secure || testRelay) && address.pathname.endsWith('/__liveshare/owner-authorize') &&
+      params.get('origin') === LOCAL_ORIGIN && /^[A-Za-z0-9_-]{22}$/.test(params.get('state') ?? '') &&
+      /^[A-Za-z0-9_-]{43}$/.test(params.get('code_challenge') ?? '') && !!params.get('instance');
+  }
+
+  private allowPopupNavigation(address: string): boolean {
+    if (address === 'about:blank') return true;
+    const parsed = this.parseLoginAddress(address);
+    if (!parsed) return false;
+    if (this.loginFlow === 'liveshare') {
+      // A deployed Relay may redirect to an HTTPS identity provider.
+      return parsed.protocol === 'https:' || parsed.origin === this.relayOrigin;
+    }
+    if (this.loginHost(address) || this.isLoginCallback(address)) {
+      this.loginFlow = 'deepseek';
+      return true;
+    }
+    if (this.loginFlow === 'unbound' && this.liveShareAuthorization(parsed)) {
+      this.loginFlow = 'liveshare';
+      this.relayOrigin = parsed.origin;
+      return true;
+    }
+    return false;
+  }
+
   private openLogin(event: OnWindowNewEvent): void {
     const target = event.targetUrl;
-    if (this.loginVisible || !event.isUserTrigger ||
-        (target && target !== 'about:blank' && !this.loginHost(target))) {
+    if (this.loginVisible || !event.isUserTrigger) {
+      event.handler.setWebController(null!);
+      return;
+    }
+    this.loginFlow = 'unbound';
+    this.relayOrigin = '';
+    if (target && !this.allowPopupNavigation(target)) {
       event.handler.setWebController(null!);
       return;
     }
@@ -110,6 +158,8 @@ struct Index {
   private closeLogin(): void {
     this.loginVisible = false;
     this.loginError = '';
+    this.loginFlow = 'unbound';
+    this.relayOrigin = '';
   }
 
   onBackPress(): boolean {
@@ -141,13 +191,16 @@ struct Index {
         .onLoadIntercept((event) => {
           if (!event || !event.data.isMainFrame()) return false;
           const url = event.data.getRequestUrl();
-          if (url === 'about:blank' || this.loginHost(url) || this.isLoginCallback(url)) return false;
-          this.loginError = '这个登录地址不受支持。返回聊天后可以重试，或使用 API Key。';
+          if (this.allowPopupNavigation(url)) return false;
+          this.loginError = '这个登录地址不受支持。返回聊天后可以重试。';
           return true;
         })
         .onPageBegin((event) => {
           const host = this.loginHost(event?.url ?? '');
-          if (host) {
+          if (this.loginFlow === 'liveshare') {
+            this.loginAddress = this.parseLoginAddress(event?.url ?? '')?.origin || '正在连接分享服务…';
+            this.loginError = '';
+          } else if (host) {
             this.loginAddress = host;
             this.loginError = '';
             hilog.info(0xD005, 'DSHClient', 'account popup opened %{public}s', host);
@@ -161,7 +214,7 @@ struct Index {
           if (host) {
             hilog.info(0xD005, 'DSHClient', 'account popup page ended %{public}s', host);
           }
-          if (/^https:\/\/platform\.deepseek\.com\/dsh\/authorized(?:[/?#]|$)/.test(url)) {
+          if (this.loginFlow === 'deepseek' && /^https:\/\/platform\.deepseek\.com\/dsh\/authorized(?:[/?#]|$)/.test(url)) {
             this.closeLogin();
           }
         })
