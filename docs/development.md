@@ -9,7 +9,7 @@ git submodule update --init --depth=1
 ./scripts/vendor/verify.sh
 ```
 
-父仓库 Git 链接固定每个组件的完整提交。当前直接子模块为 DSH、Node、Termux PRoot、DSHM、Termony、TypeScript language server 和 TypeScript。构建只读取锁定的子模块，DSHM 的 fetch shim 与许可证直接取自相应子模块。Termony 的嵌套终端组件在当前路径未使用。升级子模块时先提交并推送上游改动，再更新父仓库的 Git 链接。
+父仓库 Git 链接固定每个组件的完整提交。当前直接子模块为 DSH、Node、Termux PRoot、DSHM、Termony、TypeScript language server、TypeScript 和 Pyright。构建只读取锁定的子模块，DSHM 的 fetch shim 与许可证直接取自相应子模块。Termony 的嵌套终端组件在当前路径未使用。升级子模块时先提交并推送上游改动，再更新父仓库的 Git 链接。
 
 ## 准备输入并打包
 
@@ -54,6 +54,8 @@ python3 tests/smoke/emulator-recovery.py <loopback-target> .build/emulator-recov
 ```
 
 启动计时的 `fresh` 模式会清空目标 App 数据，仅用于独立模拟器。恢复测试要求正常模式已启动，并会记录匿名鉴权、插件崩溃、安全模式和旧会话续接。
+
+启动计时可通过第三个参数指定观测次数，默认 60。需要观察并行负载下的慢启动时可指定 120，并从设备日志分别核对解包、Host 就绪和 ArkWeb 就绪。应用的 60 秒 Host 看门狗从启动 Host 时起算。
 
 ## MCP 模拟器回归
 

@@ -1,4 +1,4 @@
-"""Real model-facing TypeScript LSP navigation through the packaged phone server."""
+"""Real model-facing JavaScript, TypeScript and Python navigation on HarmonyOS."""
 import argparse
 import hashlib
 import json
@@ -24,6 +24,17 @@ CONSUMER = '\n'.join([
     'export const answer = describe(new Circle(2));',
     'export const constant = Math.PI;',
     'const compass = "🧭"; export const result = describe(new Circle(3));', '',
+])
+PY_SOURCE = 'def diameter(radius: float) -> float:\n    return radius * 2\n'
+PY_STUB = 'def product(value: int) -> int: ...\n'
+PY_CONSUMER = '\n'.join([
+    'from shapes import diameter',
+    'from numeric import product',
+    'import math',
+    'area = diameter(4.0)',
+    'total = product(3)',
+    'root = math.sqrt(16)',
+    '',
 ])
 
 
@@ -53,6 +64,73 @@ def query(emulator, sid, args, evidence, key, expect_error=False):
     evidence[key] = {'args': args, 'text': text, 'elapsedMs': round((time.monotonic() - started) * 1000), 'isError': expect_error}
     print(key, json.dumps(evidence[key], ensure_ascii=False), flush=True)
     return text
+
+
+def verify_python(emulator, output, expect_absent):
+    name = 'mh-lsp-python-' + uuid.uuid4().hex[:10]
+    path = support['WORKSPACE'] + '/' + name
+    app = 'alpine/workspace-native/' + name
+    package = 'alpine/.dsh-0.2.2-rc.5/dsh/node_modules/pyright/package.json'
+    sid = workspace = None
+    created = False
+    evidence = {}
+    try:
+        emulator.ready('normal')
+        has_package = emulator.app('test -f ' + package + ' && printf PRESENT') == 'PRESENT'
+        assert has_package != expect_absent
+        if has_package:
+            evidence['version'] = json.loads(emulator.app('cat ' + package))['version']
+            assert evidence['version'] == '1.1.414'
+        evidence['noServerBeforeFirstQuery'] = not live_helpers(emulator)
+        assert evidence['noServerBeforeFirstQuery']
+        emulator.app('mkdir ' + app)
+        created = True
+        workspace = emulator.rpc('workspace/create', {'request': {'path': path}})['workspace']['workspaceId']
+        with support['model_key'](emulator):
+            sid = emulator.rpc('session/create', {'request': {'workspaceId': workspace}})['sessionId']
+            emulator.rpc('session/selectModel', {'request': {'sessionId': sid, 'provider': 'deepseek-official',
+                                                               'model': 'deepseek-flash', 'reasoningEffort': 'off'}})
+            evidence['sessionId'] = sid
+            for file, content in [('shapes.py', PY_SOURCE), ('numeric.pyi', PY_STUB), ('consumer.py', PY_CONSUMER)]:
+                agent['tool'](emulator, sid, 'write', {'file_path': file, 'content': content})
+                assert agent['read_bytes'](emulator, app + '/' + file) == content.encode()
+            text = query(emulator, sid, at('goToDefinition', 'consumer.py', PY_CONSUMER, 4, 'diameter'), evidence,
+                         'definition', expect_error=expect_absent)
+            if expect_absent:
+                assert text == 'Error: no LSP provider handles "consumer.py"', text
+                assert not live_helpers(emulator)
+            else:
+                assert text == 'shapes.py:1:5', text
+                pooled = live_helpers(emulator)
+                assert len(pooled) == 1, pooled
+                text = query(emulator, sid, at('goToDefinition', 'consumer.py', PY_CONSUMER, 5, 'product'), evidence, 'stub')
+                assert text == 'numeric.pyi:1:5', text
+                text = query(emulator, sid, at('hover', 'numeric.pyi', PY_STUB, 1, 'product'), evidence, 'stubHover')
+                assert 'product(value: int)' in text and '-> int' in text, text
+                text = query(emulator, sid, at('hover', 'consumer.py', PY_CONSUMER, 4, 'diameter'), evidence, 'hover')
+                assert 'diameter(radius: float)' in text and '-> float' in text, text
+                text = query(emulator, sid, at('findReferences', 'shapes.py', PY_SOURCE, 1, 'diameter'), evidence, 'references')
+                assert {'consumer.py:1:20', 'consumer.py:4:8'} <= set(text.splitlines()), text
+                text = query(emulator, sid, at('goToDefinition', 'consumer.py', PY_CONSUMER, 6, 'sqrt'), evidence, 'stdlib')
+                assert '/node_modules/pyright/dist/typeshed-fallback/stdlib/math/__init__.pyi:' in text, text
+                assert live_helpers(emulator) == pooled, pooled
+                evidence['sameServerReusedAcrossQueries'] = True
+        evidence['temporaryModelCredentialRemoved'] = True
+    finally:
+        try:
+            if sid:
+                emulator.rpc('session/cancel', {'request': {'sessionId': sid}})
+                emulator.rpc('workspace/archiveSession', {'request': {'sessionId': sid}})
+            if workspace:
+                assert emulator.rpc('workspace/delete', {'request': {'workspaceId': workspace}}) == {'deleted': True}
+            if created:
+                emulator.stop()
+                emulator.app('rm -rf ' + app)
+                emulator.start()
+                evidence['finalNormalReadyMs'] = emulator.ready('normal')
+                assert not live_helpers(emulator)
+        finally:
+            output.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + '\n')
 
 
 def run(emulator, output):
@@ -142,8 +220,20 @@ def run(emulator, output):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('target'); parser.add_argument('output', type=Path); options = parser.parse_args()
+    parser.add_argument('target')
+    parser.add_argument('output', type=Path)
+    scenarios = parser.add_mutually_exclusive_group()
+    scenarios.add_argument('--python', action='store_true', help='Exercise the shipped Pyright provider')
+    scenarios.add_argument('--expect-python-absent', action='store_true', help='Check an older build without Pyright')
+    parser.add_argument('--port', type=int, default=19643)
+    options = parser.parse_args()
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'): parser.error('MH_TEST_DEEPSEEK_API_KEY is required')
-    emulator = support['Emulator'](options.target, 19643); forward = ('tcp:19643', 'tcp:19592'); emulator.hdc('fport', *forward)
-    try: run(emulator, options.output)
+    emulator = support['Emulator'](options.target, options.port)
+    forward = (f'tcp:{options.port}', 'tcp:19592')
+    assert 'Forwardport result:OK' in emulator.hdc('fport', *forward)
+    try:
+        if options.python or options.expect_python_absent:
+            verify_python(emulator, options.output, options.expect_python_absent)
+        else:
+            run(emulator, options.output)
     finally: emulator.hdc('fport', 'rm', *forward)

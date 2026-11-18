@@ -3,6 +3,7 @@ set -euo pipefail
 export LC_ALL=C
 target="${1:?pass the loopback DevEco Phone emulator target}"
 mode="${2:-restart}"
+checks="${3:-60}"
 case "$target" in
   127.0.0.1:*) ;;
   *) echo 'This measurement only accepts a loopback emulator target' >&2; exit 2 ;;
@@ -11,6 +12,10 @@ case "$mode" in
   fresh|restart) ;;
   *) echo 'Expected fresh or restart' >&2; exit 2 ;;
 esac
+if ! [[ "$checks" =~ ^[1-9][0-9]*$ ]]; then
+  echo 'The startup observation limit must be a positive number of checks' >&2
+  exit 2
+fi
 hdc="${HARMONY_HDC:-/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc}"
 bundle=org.sayact.nodepoc
 device=("$hdc" -t "$target")
@@ -26,7 +31,7 @@ fi
 started=$("${device[@]}" shell aa start -a EntryAbility -b "$bundle")
 printf '%s\n' "$started"
 printf '%s\n' "$started" | grep -q 'start ability successfully'
-for ((second=0; second<60; second++)); do
+for ((second=0; second<checks; second++)); do
   pids=$("${device[@]}" shell pidof "$bundle")
   for pid in $pids; do
     [[ "$pid" =~ ^[0-9]+$ && " $previous_pids " != *" $pid "* ]] || continue
@@ -38,5 +43,5 @@ for ((second=0; second<60; second++)); do
   done
   sleep 1
 done
-echo 'ArkWeb load milestone was not observed within 60 checks' >&2
+printf 'ArkWeb load milestone was not observed within %s checks\n' "$checks" >&2
 exit 1
