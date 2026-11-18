@@ -12,6 +12,8 @@ function createGhRunner(launch, quote) {
     const environment = [
       'HOME=/native-benchmark-home', 'GH_CONFIG_DIR=/native-benchmark-home/.config/gh',
       'GH_PROMPT_DISABLED=1', 'GH_NO_UPDATE_NOTIFIER=1', 'GH_PAGER=', 'NO_COLOR=1', 'CLICOLOR=0',
+      ...['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY', 'http_proxy', 'https_proxy', 'no_proxy']
+        .filter(name => typeof options.env[name] === 'string').map(name => name + '=' + options.env[name]),
     ];
     let child;
     try {
