@@ -51,6 +51,15 @@ def stage_speech(root, stage, raw):
         "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     )
     shutil.copy2(license_file, raw)
+    # The official Sherpa HarmonyOS ARM64 archive carries ONNX Runtime 1.16.3.
+    for name, source, expected in [
+        ("LICENSE.onnxruntime.txt", "LICENSE",
+         "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"),
+        ("NOTICE.onnxruntime.txt", "ThirdPartyNotices.txt",
+         "d7d726424fc23a8395c139bbc7eb2aefa2b5bb2eb3332ec34ad0442d149d2308"),
+    ]:
+        notice = pinned_asset(cache, name, "https://cdn.jsdelivr.net/gh/microsoft/onnxruntime@v1.16.3/" + source, expected)
+        shutil.copy2(notice, raw)
     libraries = stage / "entry/libs/arm64-v8a"
     sdk = Path(os.environ.get("DEVECO_HOME", "/Applications/DevEco-Studio.app/Contents")) / "sdk/default/openharmony/native"
     with tempfile.TemporaryDirectory(dir=cache) as directory:
