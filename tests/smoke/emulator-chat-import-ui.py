@@ -2,6 +2,7 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import runpy
@@ -79,16 +80,21 @@ def run(emulator, output):
             flow['PROFILE']+'/package.json', flow['PROFILE']+'/pnpm-lock.yaml', 'mobile-harness-boot.json',
         ]}
         flow['bundle'](emulator, False)
-        evidence['enabledReadyMs'] = flow['switch'](emulator, True)
-        open_sidebar(emulator)
-        evidence['importButton'] = wait_control(emulator, IMPORT_LABELS, 'button')
-        evidence['importButtonTap'] = tap(emulator, evidence['importButton'])
-        evidence['importDialogTitle'] = wait_control(emulator, TITLE_LABELS)
-        evidence['exportFileControl'] = wait_control(emulator, {'导出文件', 'Export file'})
-        evidence['disabledReadyMs'] = flow['switch'](emulator, False)
-        open_sidebar(emulator)
-        assert find(controls(emulator), IMPORT_LABELS, 'button') is None
-        evidence['buttonRemovedAfterDisable'] = True
+        # Verify the import action in a configured client. The first-use
+        # credential dialog can appear after the sidebar already opened and
+        # intercept a tap on an otherwise visible underlying control.
+        with support['model_key'](emulator):
+            evidence['enabledReadyMs'] = flow['switch'](emulator, True)
+            open_sidebar(emulator)
+            evidence['importButton'] = wait_control(emulator, IMPORT_LABELS, 'button')
+            evidence['importButtonTap'] = tap(emulator, evidence['importButton'])
+            evidence['importDialogTitle'] = wait_control(emulator, TITLE_LABELS, 'dialog')
+            evidence['exportFileControl'] = wait_control(emulator, {'导出文件', 'Export file'})
+            evidence['disabledReadyMs'] = flow['switch'](emulator, False)
+            open_sidebar(emulator)
+            assert find(controls(emulator), IMPORT_LABELS, 'button') is None
+            evidence['buttonRemovedAfterDisable'] = True
+        evidence['testCredentialRemoved'] = True
     finally:
         try:
             if originals:
@@ -111,6 +117,8 @@ if __name__ == '__main__':
     parser.add_argument('target')
     parser.add_argument('output', type=Path)
     args = parser.parse_args()
+    if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
+        parser.error('MH_TEST_DEEPSEEK_API_KEY is required for the configured-client fixture')
     emulator = support['Emulator'](args.target, 19643)
     forward = ('tcp:19643', 'tcp:19592')
     emulator.hdc('fport', *forward)
