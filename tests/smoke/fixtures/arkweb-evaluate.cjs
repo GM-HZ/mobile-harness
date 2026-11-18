@@ -37,8 +37,12 @@ async function run() {
     for (;;) {
       const line = await lines.next();
       if (line.done) return;
-      const expression = JSON.parse(line.value);
-      const result = await call('Runtime.evaluate', { contextId, expression, returnByValue: true, awaitPromise: true });
+      const input = JSON.parse(line.value);
+      const expression = typeof input === 'string' ? input : input.expression;
+      const result = await call('Runtime.evaluate', {
+        contextId, expression, returnByValue: true, awaitPromise: true,
+        ...(input.userGesture === true ? { userGesture: true } : {}),
+      });
       if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
       console.log(JSON.stringify(result.result.value ?? null));
     }

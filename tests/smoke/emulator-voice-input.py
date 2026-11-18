@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import runpy
 import time
+import urllib.request
 import uuid
 import wave
 
@@ -61,6 +62,21 @@ def readiness(emulator, timeout=40):
     raise AssertionError('SenseVoice never became ready')
 
 
+def transcribe(emulator,payload):
+    body=json.dumps({
+        'type':'client-request','rpcId':str(uuid.uuid4()),'method':'speech/transcribe',
+        'payload':{'args':{'request':payload}},
+    }).encode()
+    request=urllib.request.Request(emulator.url+'/api/speech/transcribe',body,headers={
+        'Content-Type':'application/json','Host':support['HOST_HEADER'],'Cookie':emulator.cookie(),
+    })
+    with emulator.opener.open(request,timeout=55) as response:
+        result=json.load(response)['result']
+    if not result['ok']:
+        raise RuntimeError(f"{result['error']['code']}: {result['error']['message']}")
+    return result['value']
+
+
 def verify_arkweb(emulator,title,audio,evidence):
     with browser['browser'](emulator) as run:
         browser['open_session'](emulator,run,title)
@@ -85,7 +101,7 @@ def verify_arkweb(emulator,title,audio,evidence):
         })()'''.replace('AUDIO',json.dumps(base64.b64encode(audio).decode()))
         assert run(script)
         try:
-            flow['button'](run,'button',['开始录音','Start recording'])
+            flow['button'](lambda expression:run({'expression':expression,'userGesture':True}),'button',['开始录音','Start recording'])
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'official recorder running')
             duration=run('globalThis.__mhVoiceTest.duration')
             time.sleep(duration+.5)
@@ -93,7 +109,7 @@ def verify_arkweb(emulator,title,audio,evidence):
             browser['wait'](run,f'''[...document.querySelectorAll('textarea,[contenteditable=true]')].some(
               node=>(node.value||node.textContent||'').includes({json.dumps(EXPECTED)}))''','transcript inserted into composer draft')
             evidence['arkWebSyntheticDraft']=True
-            flow['button'](run,'button',['开始录音','Start recording'])
+            flow['button'](lambda expression:run({'expression':expression,'userGesture':True}),'button',['开始录音','Start recording'])
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'second recording running')
             flow['button'](run,'[data-voice-activity] button',['取消','Cancel'])
             browser['wait'](run, '''!document.querySelector('[data-voice-activity]')''','recorder releases cancelled recording')
@@ -123,13 +139,13 @@ def run(emulator,args):
         browser['restart'](emulator)
         evidence['cachePreparation']=readiness(emulator)
         payload={'audioBase64':base64.b64encode(audio).decode(),'language':'auto','providerId':PROVIDER}
-        evidence['firstTranscript']=emulator.rpc('speech/transcribe',{'request':payload},timeout=55)
+        evidence['firstTranscript']=transcribe(emulator,payload)
         assert evidence['firstTranscript']['text']==EXPECTED, evidence['firstTranscript']
         payload['language']='zh'
-        evidence['repeatTranscript']=emulator.rpc('speech/transcribe',{'request':payload},timeout=55)
+        evidence['repeatTranscript']=transcribe(emulator,payload)
         assert evidence['repeatTranscript']['text']==EXPECTED,evidence['repeatTranscript']
         try:
-            emulator.rpc('speech/transcribe',{'request':{'audioBase64':'INVALID'}})
+            transcribe(emulator,{'audioBase64':'INVALID'})
         except RuntimeError as error:
             assert 'speech/transcription-failed' in str(error),error
             evidence['invalidAudioRejected']=True
@@ -152,6 +168,10 @@ def run(emulator,args):
         assert sum(row['event']=='speech-worker-started' for row in rows)==1
         assert sum(row['event']=='speech-worker-stopped' for row in rows)==1
         evidence['workerReusedAndStopped']=True
+    except Exception:
+        rows=emulator.app("grep 'speech-worker' alpine/tmp/dsh-native-timeline.log || true")
+        evidence['workerTimelineOnFailure']=[json.loads(line) for line in rows.splitlines()]
+        raise
     finally:
         try:
             for sid in sessions:
