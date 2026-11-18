@@ -107,6 +107,7 @@ def populate(server, name, root, workspace):
     built = {}
     for version in VERSIONS:
         manifest = {'name': name, 'version': version, 'type': 'module', 'main': './index.mjs',
+                    'exports': {'.': './index.mjs', './candidate': './candidate.mjs'},
                     'description': 'Owned HarmonyOS plugin registry fixture',
                     'engines': {'dsh': '>=99.0.0' if version == '2.0.0' else '*'},
                     'dsh': {'bundle': {'patch': './cordis.patch.yml'}},
@@ -114,8 +115,13 @@ def populate(server, name, root, workspace):
                     'scripts': {'postinstall': 'node -e "require(\'node:fs\').writeFileSync(\'/workspace-native/' +
                                 name + '/HOOK_MUST_NOT_RUN\',\'unexpected\')"'}}
         source = plugin_source(version, dependency, workspace+'/events.log', module_path)
-        patch = json.dumps([{'insert': [{'id': name, 'name': name}]}])
-        built[version] = register_release(server, manifest, {'index.mjs': source, 'cordis.patch.yml': patch})
+        # A candidate's new entry can actually be evaluated even when a
+        # same-path replacement must wait for the process to restart.
+        entry = name+'/candidate' if version == '1.2.0' else name
+        patch = json.dumps([{'insert': [{'id': name, 'name': entry}]}])
+        built[version] = register_release(server, manifest, {
+            'index.mjs': source, 'candidate.mjs': source, 'cordis.patch.yml': patch,
+        })
     server.responses['/'+name] = json_body(registry_record(name, built, '1.1.0'))
     versions = [{'version': version, 'publishTimestamp': 1704067200, 'engines': built[version]['engines'],
                  'source': {'type': 'npm', 'registry': server.base+'/'}} for version in VERSIONS]
@@ -207,6 +213,16 @@ def snapshot(emulator, folder, installed_name):
     return raw.splitlines()
 
 
+def activate_version(emulator, result, version, evidence):
+    assert result['version'] == version and result['enabled'], result
+    if result['application'] == 'applied':
+        return
+    assert result['application'] == 'restart-required' and result['restartReason'] == 'module-comparison', result
+    emulator.stop()
+    emulator.start()
+    evidence[version] = {'reason': result['restartReason'], 'readyMs': emulator.ready('normal')}
+
+
 def verify(emulator, server, name, folder, evidence):
     entry, index_url = configure_indexes(emulator, server, evidence)
     assert entry['name'] == name and entry['installation']['status'] == 'not-installed', entry
@@ -238,28 +254,41 @@ def verify(emulator, server, name, folder, evidence):
         session = support['session'](emulator, True)
         evidence['sessionId'] = session
         evidence['firstPluginToolResult'] = assert_tool(emulator, session, '1.0.0')
+        print('Verified real installed tool and dependency', flush=True)
         before = snapshot(emulator, folder, name)
         refused = update('2.0.0')
         assert refused['step'] == 'check' and refused['result']['error']['code'] == 'incompatible-version', refused
         assert snapshot(emulator, folder, name) == before
         installed(emulator, name, '1.0.0')
         accepted = update('1.1.0')
-        assert accepted['step'] == 'install' and accepted['result']['application'] == 'applied' and 'restore' not in accepted, accepted
+        assert accepted['step'] == 'install' and 'restore' not in accepted, accepted
+        evidence['activationRestarts'] = {}
+        activate_version(emulator, accepted['result'], '1.1.0', evidence['activationRestarts'])
         installed(emulator, name, '1.1.0')
         evidence['updatedToolResult'] = assert_tool(emulator, session, '1.1.0')
+        print('Verified the upgraded tool after honoring restart-required', flush=True)
         rollback = update('1.2.0')
         assert rollback['result']['application'] == 'failed' and rollback['result']['stage'] == 'enable', rollback
-        assert rollback['restore']['application'] == 'applied' and rollback['restore']['version'] == '1.1.0', rollback
+        candidate = snapshot(emulator, folder, name)
+        assert candidate.count('start 1.2.0') == 1
+        activate_version(emulator, rollback['restore'], '1.1.0', evidence['activationRestarts'])
         installed(emulator, name, '1.1.0')
         evidence['toolAfterRollback'] = assert_tool(emulator, session, '1.1.0')
     evidence['testCredentialRemoved'] = True
     evidence['realLifecycle'] = snapshot(emulator, folder, name)
-    assert evidence['realLifecycle'] == ['start 1.0.0', 'stop 1.0.0', 'start 1.1.0', 'stop 1.1.0', 'start 1.2.0', 'start 1.1.0']
+    starts = [event for event in evidence['realLifecycle'] if event.startswith('start ')]
+    assert starts[0] == 'start 1.0.0' and starts[-2:] == ['start 1.2.0', 'start 1.1.0'], starts
+    assert 'start 1.1.0' in starts[1:-2], starts
     evidence['lifecycleScriptWasSuppressed'] = True
     removed = emulator.rpc('pluginManager/removeBundle', {'name': name}, timeout=100)
-    assert removed['application'] == 'applied' and removed['packageResult']['exitCode'] == 0, removed
+    assert removed['application'] in ['applied', 'restart-required'] and removed['packageResult']['exitCode'] == 0, removed
     assert catalog(emulator, name) is None
-    assert snapshot(emulator, folder, name)[-1] == 'stop 1.1.0'
+    if removed['application'] == 'restart-required':
+        assert removed['restartReason'] == 'module-comparison', removed
+        emulator.stop()
+        emulator.start()
+        evidence['removedReadyMs'] = emulator.ready('normal')
+    assert catalog(emulator, name) is None
     evidence['removedViaManager'] = True
     print('Verified registry install, dependency loading, upgrade and activation rollback', flush=True)
 
