@@ -249,3 +249,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-titles-badge.py <loopback-target> .build/titles-badge.json
 ```
+
+## DeepSeek 会话导入
+
+在独立 Phone 模拟器安装 0.4.39，用合成的 v3 档案验证正式上传、错误处理、原图回读和真实模型续接。测试结束归档夹具会话、移除夹具工作区登记并恢复原配置。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-chat-import.py <loopback-target> .build/chat-import.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-chat-import-ui.py <loopback-target> .build/chat-import-ui.json
+```
