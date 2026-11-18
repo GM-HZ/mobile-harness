@@ -1,0 +1,110 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "testSource": "83c05f0eeb0bc70d5c012b3e0c147a47e896015f",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "account": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-account.py",
+      "127.0.0.1:15557",
+      ".build/batch-062/account.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "06faa4b1fb68684030825711d3bbc680755c06e81551f7f608e5bf81029e22ed",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "public": {
+        "popupOpened": true,
+        "platformPageVisible": true,
+        "publicPath": "/dsh/authorize",
+        "returnedToDsh": true,
+        "finalPhase": "cancelled"
+      },
+      "fixture": {
+        "pkceExchangeAndCommit": true,
+        "persistedAcrossRestart": true,
+        "signedOutAndRevoked": true,
+        "originalProfileRestored": true
+      }
+    }
+  },
+  "publicNativeWheel": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-python-wheel.py",
+      "127.0.0.1:15557",
+      ".build/batch-062/wheel.json"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "c17cb2fa34a33b266c34e2c11d10c3dfbfa61164f8e110eebfb570be9d640e74",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "toolOutput": "Collecting xxhash==3.6.0 (from -r requirements.txt (line 1))\n  Downloading xxhash-3.6.0-cp312-cp312-musllinux_1_2_aarch64.whl (210 kB)\nInstalling collected packages: xxhash\nSuccessfully installed xxhash-3.6.0\nHARMONY_NATIVE_PYTHON:{\"wheel\": \"xxhash-3.6.0-cp312-cp312-musllinux_1_2_aarch64.whl\", \"sha256\": \"bd17fede52a17a4f9a7bc4472a5867cb0b160deeb431795c0e4abe158bc784e9\", \"distribution\": \"3.6.0\", \"binary\": \"_xxhash.cpython-312-aarch64-linux-musl.so\", \"digest\": \"ef46db3751d8e999\", \"isolated\": true}\n[stderr]\nUnable to symlink '/usr/bin/python3' to '/workspace-native/mh-native-wheel-bd205612de/.venv/bin/python3'\nUnable to symlink '/workspace-native/mh-native-wheel-bd205612de/.venv/bin/python3' to '/workspace-native/mh-native-wheel-bd205612de/.venv/bin/python'\nUnable to symlink '/workspace-native/mh-native-wheel-bd205612de/.venv/bin/python3' to '/workspace-native/mh-native-wheel-bd205612de/.venv/bin/python3.12'\n  WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError(\"HTTPSConnectionPool(host='files.pythonhosted.org', port=443): Read timed out. (read timeout=8.0)\")': /packages/53/5a/ddbb83eee8e28b778eacfc5a85c969673e4023cdeedcfcef61f36731610b/xxhash-3.6.0-cp312-cp312-musllinux_1_2_aarch64.whl\n",
+      "wheelProbe": {
+        "wheel": "xxhash-3.6.0-cp312-cp312-musllinux_1_2_aarch64.whl",
+        "sha256": "bd17fede52a17a4f9a7bc4472a5867cb0b160deeb431795c0e4abe158bc784e9",
+        "distribution": "3.6.0",
+        "binary": "_xxhash.cpython-312-aarch64-linux-musl.so",
+        "digest": "ef46db3751d8e999",
+        "isolated": true
+      },
+      "exactBashApproval": true,
+      "testCredentialRemoved": true
+    }
+  },
+  "pypiRelease": "https://pypi.org/project/xxhash/3.6.0/",
+  "audit": {
+    "command": [
+      "python3",
+      ".build/batch-062/audit.py",
+      "post-regression"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "d78320775444c387c11bb6be1cdcea4d1273e1ee68c8055999fe65f942a06f82",
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "observed": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      }
+    }
+  },
+  "unverified": [
+    "A real account granting access on the official platform and other providers.",
+    "Native Python wheels with other ABIs or shared-library dependencies.",
+    "Physical Mate 60, offline in HDC throughout the batch."
+  ]
+}

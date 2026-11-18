@@ -28,7 +28,7 @@
 ## 项目包管理器
 
 - **Python**。从 0.4.30 起，受管 Bash 支持 `python3 -m venv .venv`、`source .venv/bin/activate` 和 `pip install -r requirements.txt`。也可直接调用 `.venv/bin/python` 和项目安装的命令。Alpine Python 用 `lib` 安装模块，鸿蒙拒绝创建兼容的 `lib64` 链接时仍可继续，解释器由 CPython 复制。基础 Python 标记为 `EXTERNALLY-MANAGED`，原有 `pip install --target .python-packages` 工作流仍可用。 [Python venv](https://docs.python.org/3.12/library/venv.html) · [0.4.30 实测](evidence/emulator-venv-0.4.30.json)
-- **Python 原生扩展**。带原生代码的 wheel 需要验证 CPython ABI、`musllinux` 平台标签、共享库及真机加载。已验收且经常使用的扩展可以纳入签名 HAP。仅有 glibc `manylinux` 制品的依赖交给具备相应环境的执行端。
+- **Python 原生扩展**。0.4.57 在模拟器用 DSH Bash 单次审批，从 PyPI 安装固定的 CPython 3.12 ARM64 musllinux `xxhash 3.6.0`，校验 SHA-256 并在 venv 导入 `.so`、计算已知摘要。其他 wheel 仍需按 CPython ABI、平台标签和共享库验收。仅有 glibc `manylinux` 制品的依赖需要相应执行端。 [实测记录](evidence/emulator-account-python-wheel-0.4.57.json)
 - **Node**。现有 pnpm 适配已验证 DSH 插件纯 JS 依赖安装。项目级支持独立验收，沿用项目自己的 `package.json` 和锁文件。优先复用已有 hoisted、copy 和网络适配。纯 JS 安装与含原生 addon 或安装脚本的项目分别验收。
 - **DSH 插件**。复用现有 bundle、profile 和插件管理器。保持现有安装、启动和恢复入口。安装项目依赖时，依赖写入该项目，启用的插件及其依赖通过 DSH 自己管理。
 

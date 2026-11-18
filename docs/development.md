@@ -119,8 +119,19 @@ HARMONY_EXPERIMENTAL_HOST_PROCESS=1 ./build.sh
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-toolkit.py <loopback-target> .build/emulator-toolkit.json
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-python-wheel.py <loopback-target> .build/emulator-python-wheel.json
 ```
 
+原生 Python 回归通过正式 Bash 单次审批，在隔离 venv 从公网 PyPI 下载固定 CPython 3.12 ARM64 musllinux wheel，验证 SHA-256 并实际导入扩展。网络与符号链接诊断保留在工具输出。
+
+## 账号登录回归
+
+脚本点击 ArkWeb 的登录入口，确认正式 DeepSeek 页面打开并可返回聊天。随后使用独立回环服务和临时凭据文件验证 DSH 账号回调、PKCE 交换、重启恢复与登出撤销。运行在已退出账号的独立模拟器，结束后恢复原 profile。
+
+```sh
+python3 tests/smoke/emulator-account.py <loopback-target> .build/emulator-account.json
+```
 
 ## Office 模拟器回归
 

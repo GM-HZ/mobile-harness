@@ -82,9 +82,9 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **Bash 隔离**：PRoot 不提供内核隔离。普通 Bash 继续拒绝没有系统沙箱的默认执行，仅经具体审批扩大权限。不能把它称为已实现 bwrap／Landlock。
 - **PTC 范围**：独立进程和 seccomp 文件代理向上游报告 `partial` enforcement。它不是任意 Node／Linux API 执行环境；网络与子进程能力应调用 Host 暴露的工具。符号链接／硬链接攻击及并发移动父目录的完整压力回归尚未完成。
 - **JIT／WASM**：主 Host 保持 jitless，Office 使用独立进程执行官方 WASM，PTC 使用同版本 Amaro 的 JS 产物处理 TypeScript。0.4.57 已在模拟器的 Alpine 子进程中验证默认设置下无 WASM，显式启用后可执行 WASM、TypeScript 文件并用 Node 自带的 fetch 取得 HTTP 200。真机 JIT 能力待复验。
-- **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 加载返回 `ERR_DLOPEN_FAILED`。原生 wheel、其他 addon、APK 和安装脚本需按具体包验收。 [运行时补验](evidence/emulator-node-extensions-0.4.57.json)
+- **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包和公网 CPython 3.12 ARM64 musllinux `xxhash`。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。其他 wheel、addon、APK 和安装脚本需按具体包验收。 [Node 补验](evidence/emulator-node-extensions-0.4.57.json) · [Python 补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
-- **浏览器与账号**：没有随包 Chromium／Playwright；手机 ArkWeb 不等于可供 Agent 使用的浏览器。完整官方账号授权、每一种模型提供者和每个实验插件尚未逐一回归。
+- **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权及其他模型提供者待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
 - **后台**：定时任务跨 App 重启已测，不代表 App 被系统终止时仍会唤醒执行。运行中 Bash 的 OS 进程、PTC 的内存变量不能据此承诺跨进程存活。
 - **剩余能力清点**：Ralph、会话搜索和工作树的限定场景已通过；压缩核心与可控自动压力已补验；真实API overflow、反复压缩／长目标压力及其他可选 bundle 尚未全部端到端回归。LSP 已由本工程补充装配，当前验收为 TypeScript；Forge 的工作树恢复、取消与重启已验，托管平台联动和 UI 继续验收。公共 provider 不提供额外控制 fd，进程范围沿用上游 fallback 的观测限制。见 [RC.4 清单](research/dsh-rc4-capability-inventory.md)。
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
