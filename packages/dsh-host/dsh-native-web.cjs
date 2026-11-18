@@ -457,6 +457,8 @@ async function main() {
   const officeUrl = paths('dsh-office-kit/lib/index.js');
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
+  const fileUploadsUrl = paths('dsh-client-file-upload/lib/index.js');
+  const fileUploadSchemasUrl = paths('dsh-client-file-upload/lib/typert.host.js');
   const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
   const pluginMarketUrl = paths('dsh-plugin-market/lib/index.js');
@@ -586,12 +588,20 @@ async function main() {
         return { ...result, source: replacePinned(source, 'this.config = config;',
           'this.config = globalThis.__harmonyMinimalPreset(config);') };
       }
+      if ((url === fileUploadsUrl || url === fileUploadSchemasUrl) && liveshareMobile) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        const patch = url === fileUploadsUrl ? liveshareMobile.patchFileUploads : liveshareMobile.patchFileUploadSchemas;
+        return { ...result, source: patch(source, replacePinned) };
+      }
       if (url === liveshareUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         const entry = path.join(dsh, '@deepseek-ai/dsh-experimental-liveshare/lib/owner-gateway/cli.js');
         globalThis.__harmonyLiveshareSpawn = liveshareMobile.createTunnelLauncher(entry, mark);
-        return { ...result, source: replacePinned(patchLivesharePolicies(source), 'import { spawn } from "node:child_process";',
-          'const spawn = globalThis.__harmonyLiveshareSpawn;') };
+        globalThis.__harmonyShareViewerUploads = liveshareMobile.addViewerUploads;
+        const patched = replacePinned(patchLivesharePolicies(source), 'import { spawn } from "node:child_process";',
+          'const spawn = globalThis.__harmonyLiveshareSpawn;');
+        return { ...result, source: replacePinned(patched, 'withoutManifestLink(read) : read;',
+          'globalThis.__harmonyShareViewerUploads(withoutManifestLink(read)) : read;') };
       }
       if (url === ptcExecutorUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
