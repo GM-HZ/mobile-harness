@@ -70,7 +70,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 自定义模型提供者 | 0.4.58 经标准设置热添加 pi-ai 路由，在 DeepSeek 公网验证 Chat Completions 和 Responses 的模型发现、文件读取工具往返与重启续接。 [模型路由证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
 | 定时任务 | 0.4.57 模拟器后台三次任务投递并由真实模型回复。0.4.58 长测在第 106 秒强停重启，保留旧会话与待执行任务，第 4 次投递通过。两小时长测尚在运行。 [检查点](evidence/emulator-translation-schedule-0.4.58.json) |
-| 思考内容翻译 | 真实 DeepSeek Flash 已从 ArkWeb 验证。Bing 和 Google 通过现有电脑代理返回真实公开译文，跨重启保留。模拟器直连仍有 Bing 400 和 Google 超时。 [公网与 ArkWeb 证据](evidence/emulator-translation-schedule-0.4.58.json) |
+| 思考内容翻译 | 0.4.59 通过应用私有 `HTTPS_PROXY` 访问 Bing 和 Google 的官方默认地址，真实译文和记录可跨重启回读。ArkWeb 的 DeepSeek Flash、切换原译文、拒绝后保留原文和停用取消均通过。模拟器直连仍有 Bing 400 和 Google 超时。 [公网与 ArkWeb 证据](evidence/emulator-translation-proxy-0.4.59.json) |
 | 插件及恢复 | 标准 bundle 安装、注入真实崩溃、自动安全模式及旧会话回读通过；实际点击设置恢复入口、原生正常模式按钮后恢复通过 |
 | 插件管理补验 | 本版经实际 API 安装、启用、禁用和卸载自建 bundle，pnpm remove 退出0；postinstall 没有执行。恢复测试安装前备份原配置，结束后回普通模式且 manifest／lock 摘要一致；任意插件升级与安装脚本仍不据此承诺 |
 | 官方插件市场 | 受控索引发现、分页缓存、仓库安装与纯 JS 依赖、拒绝不兼容版本、升级后重启、激活失败后跨重启回滚、卸载和 ArkWeb 确认／取消已验。公共索引与 Git 来源升级另行验收 |

@@ -360,3 +360,9 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 保留当前回合输入，摘要仅覆盖先前历史。鸿蒙模拟器从 0.4.57 覆盖安装 0.4.58 后，请求公网 DeepSeek Flash，收到实际 HTTP 400。随后摘要只发送 688,454 个输入 token，原回合在约 19.2 秒内完成并返回准确标签，重启后再次准确回忆。复验了两次受控溢出、手动压缩、阈值压缩和旧会话。
 
 未签名 HAP SHA-256 `37fa495563b212e1e46ad918cf27040872a7b3660fefadf27214c5295fb4d458`。调试签名 HAP SHA-256 `8c825f80a959ea493ba4ab380d011a80e1227b648884fff7b974a65ec86daa6d`，通过离线验签。Mate 60 离线，尚未安装此版。 [制品与实测](evidence/emulator-live-overflow-0.4.58.json)
+
+## 0.4.59 公网翻译代理
+
+鸿蒙的匿名翻译使用 DSH 已配置的代理策略。独立模拟器从 0.4.58 覆盖安装，两条官方默认翻译地址均实际建立 HTTPS 隧道并返回译文。重启后回读译文，ArkWeb 受控回归及真实 DeepSeek Flash 通过。
+
+未签名 HAP SHA-256 `662b1e28302f0a997aca46ebce2929d7f720f459729272c727e675b3d456a72b`。调试签名 HAP SHA-256 `9026c2b5843a9dc8ac45f15de0501b7fddf6b291b0134250809c7920fe7fb125`，离线验签及 204 个 payload 条目比对通过。Mate 60 安装待验。 [制品与实测](evidence/emulator-translation-proxy-0.4.59.json)

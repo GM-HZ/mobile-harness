@@ -1,0 +1,294 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15559",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "testSource": "5213f07a0f834d5a8bf069fb567eeff09e13ed57",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.59-unsigned.hap",
+    "version": "0.4.59",
+    "versionCode": 66,
+    "sha256": "662b1e28302f0a997aca46ebce2929d7f720f459729272c727e675b3d456a72b",
+    "bytes": 720521075,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "9e0c019b99db4577aa53b4f4858c742637fb7319",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "47db914e6bb60e5bbadcc0402e8984254bf4b97d2e287ad5af2d210e8a4c8085",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "build": {
+    "command": [
+      "./build.sh",
+      "--package"
+    ],
+    "unsignedExitCode": 0,
+    "signedExitCode": 0,
+    "unsignedLogSha256": "050e0c01104c080ce8fd6fdcc599967e2e1459b5bd534a1ed0b96f2142639cb2",
+    "signedLogSha256": "ffc1c10e470668de551567371fe939362b37505767c182684d7593abddb4acb3",
+    "initialExitCode": 1,
+    "initialFailure": "The worktree lacked the shared pinned inputs. HARMONY_INPUTS_DIR then pointed to the repository input directory.",
+    "initialLogSha256": "c24c2a381f1412e2a6e3b59c75cfcde4ebff35cab6c8a615ea3ad2000cf6b394"
+  },
+  "signedArtifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.59-signed.hap",
+    "sha256": "9026c2b5843a9dc8ac45f15de0501b7fddf6b291b0134250809c7920fe7fb125",
+    "bytes": 724194003,
+    "signatureVerified": true,
+    "profileVerified": true,
+    "comparison": {
+      "testedSha256": "662b1e28302f0a997aca46ebce2929d7f720f459729272c727e675b3d456a72b",
+      "rebuiltSha256": "a3bec5e32b6259572d1739eb4149ae5a4af2b73ff2bb863ac4f5c460645d91a6",
+      "signedSha256": "9026c2b5843a9dc8ac45f15de0501b7fddf6b291b0134250809c7920fe7fb125",
+      "signedBytes": 724194003,
+      "rebuilt": {
+        "matchingPayloadEntries": 204,
+        "mismatches": [],
+        "extraEntries": []
+      },
+      "signed": {
+        "matchingPayloadEntries": 204,
+        "mismatches": [],
+        "extraEntries": [
+          ".pages.info"
+        ]
+      }
+    },
+    "verifyAppLogSha256": "7cfbf62d108e09ec91a29205a02dbc93337d036f93558b095b553881aae58021",
+    "verifyProfileLogSha256": "ec2d7ef90e23f0076f30c45777457d97d289cee565e4d608cbe3f4471b53c263"
+  },
+  "upgradeInstall": {
+    "from": "0.4.58",
+    "to": "0.4.59",
+    "exitCode": 0,
+    "logSha256": "05e7a94e4e8e5a4e7a4209937b12103580cbd4c5925de5a00e6e97c7aff5d3dc"
+  },
+  "baseline": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-cot-translation.py",
+      "127.0.0.1:15559",
+      ".build/batch-068/configured-0.4.58.json",
+      "--live",
+      "profile-proxy",
+      "--host-port",
+      "19648"
+    ],
+    "exitCode": 1,
+    "jsonSha256": "7049a5abbec93c7dc5b2ec0c3af0561cb81295547bc2702c9191e562646582f4",
+    "logSha256": "3c50f267359f2edbac866bb65d59956bae1b6876e10b6d9888ddbaeaf249eaa3",
+    "observed": {
+      "defaultCatalog": {
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "availableProviders": [
+        "bing",
+        "google",
+        "deepseek-official"
+      ],
+      "publicTranslations": {},
+      "publicRequests": [],
+      "restoredReadyMs": 6671,
+      "restoredHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "ef189a8c27db6d63930aa3046a3040482e952eafcb7487c644d508e8d461f027",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+        "alpine/native-benchmark-home/.env": null
+      }
+    }
+  },
+  "live": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-cot-translation.py",
+      "127.0.0.1:15559",
+      ".build/batch-068/configured-0.4.59.json",
+      "--live",
+      "profile-proxy",
+      "--host-port",
+      "19648"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "2efdb8e01071e92cd4379606a15674400ed3c76f101ce09ce7c8f0e25b3cf5cc",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "defaultCatalog": {
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "availableProviders": [
+        "bing",
+        "google",
+        "deepseek-official"
+      ],
+      "publicTranslations": {
+        "bing": "只搜索归档的导出上下文。",
+        "google": "仅搜索存档的导出上下文。"
+      },
+      "publicRequests": [
+        {
+          "authority": "edge.microsoft.com:443",
+          "connectStatus": 200
+        },
+        {
+          "authority": "translate.googleapis.com:443",
+          "connectStatus": 200
+        }
+      ],
+      "officialProviderEndpointsUnmodified": true,
+      "publicTranslationRecordsRestored": true,
+      "restoredReadyMs": 9453,
+      "restoredHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "ef189a8c27db6d63930aa3046a3040482e952eafcb7487c644d508e8d461f027",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+        "alpine/native-benchmark-home/.env": null
+      }
+    }
+  },
+  "arkWebControl": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-cot-translation.py",
+      "127.0.0.1:15559",
+      ".build/batch-068/control-arkweb.json",
+      "--host-port",
+      "19648"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "0a5e662574a9eb386dc4eed7ac29460a4910e56e217868c588ea86ec131aa26b",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "defaultCatalog": {
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "availableProviders": [
+        "bing",
+        "google",
+        "deepseek-official"
+      ],
+      "originalAndTranslatedViews": true,
+      "appendedEventTypes": [
+        "session/end-seed",
+        "plugin:translator/request",
+        "plugin:translator/result",
+        "session/end-seed",
+        "plugin:translator/request",
+        "plugin:translator/request",
+        "plugin:translator/result",
+        "plugin:translator/request"
+      ],
+      "providerCalls": [
+        {
+          "provider": "bing",
+          "target": "zh-Hans",
+          "text": "Search only the archived export context.",
+          "requestShape": true,
+          "authorization": false,
+          "cookie": false
+        },
+        {
+          "provider": "google",
+          "target": "ja",
+          "text": "Search only the archived export context.",
+          "requestShape": true,
+          "authorization": false,
+          "cookie": false
+        },
+        {
+          "provider": "google",
+          "target": "ja",
+          "text": "Search only the archived export context.",
+          "requestShape": true,
+          "authorization": false,
+          "cookie": false
+        },
+        {
+          "provider": "google",
+          "target": "de",
+          "text": "Search only the archived export context.",
+          "requestShape": true,
+          "authorization": false,
+          "cookie": false
+        }
+      ],
+      "persistedAcrossRestart": true,
+      "failureRetainedOriginal": true,
+      "pendingRequestCancelledOnDisable": true,
+      "originalConversationUnchanged": true,
+      "restoredReadyMs": 4639,
+      "restoredHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "ef189a8c27db6d63930aa3046a3040482e952eafcb7487c644d508e8d461f027",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+      }
+    }
+  },
+  "arkWebDeepSeek": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-cot-translation.py",
+      "127.0.0.1:15559",
+      ".build/batch-068/deepseek-arkweb.json",
+      "--live",
+      "deepseek-official",
+      "--arkweb-live",
+      "--host-port",
+      "19648"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "b74011046794a2389ec89ff119f26b4e3924a4a59738221ffdf598d89b92b28a",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "defaultCatalog": {
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      "availableProviders": [
+        "bing",
+        "google",
+        "deepseek-official"
+      ],
+      "liveArkWebTranslation": "仅搜索已归档的导出上下文。",
+      "isolatedFlashRequest": {
+        "model": "deepseek-flash",
+        "reasoningEffort": "off",
+        "messages": 1
+      },
+      "translationReopenedWithoutCredential": true,
+      "noAdditionalTranslationAfterRestart": true,
+      "restoredReadyMs": 4361,
+      "restoredHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "ef189a8c27db6d63930aa3046a3040482e952eafcb7487c644d508e8d461f027",
+        "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+      }
+    }
+  },
+  "audit": {
+    "installedVersion": "0.4.59",
+    "installedVersionCode": 66,
+    "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "profileMatchesPriorVersion": true,
+    "testCredentialRemoved": true,
+    "translationDefaultOff": true,
+    "temporaryReversePortRemoved": true,
+    "unauthenticatedStatus": 401
+  },
+  "mate60": "USB offline. No on-device installation or microphone test."
+}
