@@ -50,8 +50,10 @@ function createPackageRunner(root, home, launch) {
       return (copyDirectory ? 'file:' : match[1] || '') + guest;
     });
     if (command === 'pnpm' && ['add', 'install', 'remove', 'update'].includes(packageAction)) {
+      // The profile filesystem rejects symlinks, including hoisted executables.
       remapped.push('--config.node-linker=hoisted', '--config.package-import-method=copy',
-        '--store-dir=' + profileHome + '/package-store', '--config.ignore-scripts=true');
+        '--config.prefer-symlinked-executables=false', '--store-dir=' + profileHome + '/package-store',
+        '--config.ignore-scripts=true');
     }
     const child = launch(guestPath(cwd),
       'export HOME=' + quote(profileHome) + ' GIT_TERMINAL_PROMPT=0; exec ' +
