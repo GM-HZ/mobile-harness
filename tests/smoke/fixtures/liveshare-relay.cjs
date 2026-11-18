@@ -33,17 +33,21 @@ function forwardViewer(request, response, state) {
     const body = JSON.parse(Buffer.concat(chunks));
     const id = ++requestId;
     const channel = state.channel;
+    const upload = body.op === 'call' && body.path === '/api/fileUploads/upload';
+    const started = performance.now();
     const done = (data) => {
       const frame = JSON.parse(data);
       if (frame.type !== 'share-rpc-res' || frame.id !== id) return;
       clearTimeout(timer);
       channel.off('message', done);
+      if (upload) log({ attachmentCall: id, status: frame.status, elapsedMs: Math.round(performance.now() - started) });
       reply(response, frame.status, frame.body);
     };
     const timer = setTimeout(() => {
       channel.off('message', done);
+      if (upload) log({ attachmentCall: id, status: 504, elapsedMs: Math.round(performance.now() - started) });
       reply(response, 504, { error: 'viewer-read-timed-out' });
-    }, 6000);
+    }, upload ? 25000 : 6000);
     channel.on('message', done);
     channel.send(JSON.stringify({ type: 'share-rpc', id, actor, body }));
   });

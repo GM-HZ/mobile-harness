@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import os
+import random
 from pathlib import Path
 import runpy
 import select
@@ -43,36 +44,45 @@ def reader_rpc(port, share, method, args):
     return relay_call(port, share, {'op': 'call', 'path': '/api/'+method, 'body': body})
 
 
+def viewer_turn(device, port, share, session, content):
+    request_id = str(uuid.uuid4())
+    status, body = reader_rpc(port, share, 'session/prompt', {'request': {
+        'sessionId': session, 'requestId': request_id, 'mode': 'queue', 'content': content,
+    }})
+    assert status == 200 and body['result']['ok'], (status, body)
+    return observed_viewer_turn(device, share, session, request_id)
+
+
+def observed_viewer_turn(device, share, session, request_id):
+    deadline = time.monotonic()+60
+    while time.monotonic() < deadline:
+        rows = support['events'](device, session)
+        submitted = next((row for row in rows if row['type'] == 'user/message'
+                          and row['data']['source'].get('rpcId') == request_id), None)
+        if submitted:
+            messages = [row for row in rows if row['seq'] > submitted['seq']]
+            ended = next((row['data']['reason']['kind'] for row in messages if row['type'] == 'turn/end'), None)
+            if ended:
+                assert ended == 'completed'
+                assert not any(row['type'] == 'tool/call' for row in messages)
+                principal = submitted['data']['source']['principal']
+                assert principal == {'kind': 'share-viewer', 'shareId': share,
+                                     'actor': {'providerId': 'fixture', 'tenantId': 'local',
+                                               'subjectId': 'reader'}}, principal
+                return submitted['data'], agent['assistant_texts'](messages).strip(), ended
+        time.sleep(.2)
+    raise AssertionError('The specific viewer prompt did not complete')
+
+
 def verify_viewer_turn(device, port, share, session, evidence):
     nonce = 'VIEWER_' + uuid.uuid4().hex.upper()
     text = 'Reply only with '+nonce+'. Use no tools.'
-    request_id = str(uuid.uuid4())
     device.rpc('session/selectModel', {'request': {'sessionId': session, 'provider': 'deepseek-official',
         'model': 'deepseek-flash', 'reasoningEffort': 'off'}})
-    status, body = reader_rpc(port, share, 'session/prompt', {'request': {
-        'sessionId': session, 'requestId': request_id, 'mode': 'queue',
-        'content': [{'type': 'text', 'text': text}],
-    }})
-    assert status == 200 and body['result']['ok'], (status, body)
-    deadline = time.monotonic()+60
-    while time.monotonic()<deadline:
-        rows = support['events'](device, session)
-        submitted = next((row for row in rows if row['type']=='user/message'
-                          and row['data']['source'].get('rpcId')==request_id), None)
-        if submitted:
-            messages = [row for row in rows if row['seq']>submitted['seq']]
-            ended = next((row['data']['reason']['kind'] for row in messages if row['type']=='turn/end'),None)
-            if ended:
-                assert ended=='completed'
-                assert not any(row['type']=='tool/call' for row in messages)
-                assert agent['assistant_texts'](messages).strip()==nonce
-                principal = submitted['data']['source']['principal']
-                assert principal=={'kind':'share-viewer','shareId':share,
-                                   'actor':{'providerId':'fixture','tenantId':'local','subjectId':'reader'}},principal
-                evidence['actualViewerModelTurn']={'principal':principal,'exactReply':True,'endReason':ended}
-                return
-        time.sleep(.2)
-    raise AssertionError('The specific viewer prompt did not complete')
+    message, reply, ended = viewer_turn(device, port, share, session, [{'type': 'text', 'text': text}])
+    assert reply == nonce
+    evidence['actualViewerModelTurn'] = {'principal': message['source']['principal'],
+                                         'exactReply': True, 'endReason': ended}
 
 
 def verify_shared_attachments(device, port, share, session, evidence):
@@ -113,6 +123,55 @@ def verify_shared_attachments(device, port, share, session, evidence):
         'turnEndReason': reason['kind'], 'attachmentIds': attached,
         'viewerBytesMatchedOwner': True, 'viewerBytesRestoredAfterRestart': True,
         'sha256': checksums}
+
+
+def verify_guest_uploads(device, port, share, session, outside, html, evidence):
+    vision = runpy.run_path(str(Path(__file__).with_name('emulator-deepseek-vision.py')))
+    marker = ('Guest attachment ' + uuid.uuid4().hex).encode()
+    filename = 'guest-note.txt'
+    colors = random.SystemRandom().sample(list(vision['COLORS']), len(vision['COLORS']))
+    blobs = [vision['sample'](*colors[:2]), vision['sample'](*colors[2:])]
+    files = [{'data': base64.b64encode(marker).decode(), 'name': filename}] + [
+        {'data': base64.b64encode(blob).decode(), 'name': f'guest-{index}.png', 'mediaType': 'image/png'}
+        for index, blob in enumerate(blobs)
+    ]
+    protocol = ('alpine/.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/'
+                'dsh-experimental-liveshare-protocol/lib/index.js')
+    carrier = base64.b64encode(agent['read_bytes'](device, protocol)).decode()
+    fixture = Path(__file__).with_name('fixtures')/'liveshare-viewer-upload.cjs'
+    node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
+    run = subprocess.run([str(node), str(fixture)], input=json.dumps({
+        'base': f'http://127.0.0.1:{port}', 'share': share, 'session': session, 'outside': outside,
+        'html': html.decode(), 'carrier': carrier, 'files': files,
+    }), text=True, capture_output=True, timeout=30)
+    assert run.returncode == 0, run.stderr
+    result = json.loads(run.stdout)
+    file, *images = result['staged']
+    assert file['file']['name'] == filename and file['file']['bytes'] == len(marker)
+    assert all((image['image']['width'], image['image']['height']) == (vision['WIDTH'], vision['HEIGHT'])
+               for image in images), images
+    prompt = ('Read the two images in order. Each image has two solid vertical halves. '
+              'Return only the four English color names, separated by spaces, left then right for each image. '
+              'Ignore the text file. Do not use tools.')
+    content = [{'type': 'file', 'receiptId': upload['receiptId']} for upload in result['staged']]
+    content.append({'type': 'text', 'text': prompt})
+    message, reply, end = viewer_turn(device, port, share, session, content)
+    assert reply.lower().split() == colors, (colors, reply)
+    attachments = [block['attachment'] for block in message['content'] if block['type'] == 'image']
+    assert attachments == [image['image'] for image in images]
+    assert any(file['file']['attachmentId'] in json.dumps(block) for block in message['content']), message['content']
+    for attachment in attachments:
+        request = {'request': {'sessionId': session, 'attachment': attachment}}
+        status, body = reader_rpc(port, share, 'session/attachment', request)
+        assert status == 200 and body['result']['ok'], (status, list(body))
+        assert body['result']['value'] == device.rpc('session/attachment', request)
+    evidence['guestSubmittedAttachments'] = {
+        'fileName': filename, 'fileBytes': file['file']['bytes'], 'expectedColors': colors, 'modelReply': reply,
+        'endReason': end, 'visitorPrincipal': message['source']['principal'], 'imageCount': len(attachments),
+        'outsideUploadsRefused': result['refused'], 'allReceiptsConsumedByPrompt': True,
+        'servedHookAndPackagedCarrier': True, 'cancelledBeforeTransfer': result['cancelledBeforeTransfer'],
+        'maxConcurrentRelayUploads': result['peak'],
+    }
 
 
 def program_result(device, port, share, session, args):
@@ -223,7 +282,7 @@ def verify_program_policy(device, port, share, session, folder, sessions, eviden
         assert owner(device, 'stop', {'shareId': other}) == {'ok': True}
 
 
-def verify_reader(device, port, share, shared, outside, evidence, model, program_check, attachments):
+def verify_reader(device, port, share, shared, outside, evidence, model, program_check, attachments, guest_check):
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''}, token=None)
     assert status == 401 and body['error'] == 'viewer-login-required'
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
@@ -252,11 +311,13 @@ def verify_reader(device, port, share, shared, outside, evidence, model, program
         'anonymousRefused': True, 'htmlBytes': len(html), 'visibleSessionIds': sorted(visible),
         'accessRefusalCodes': refusals, 'sharedHistoryReadable': True,
     }
-    if model or program_check or attachments:
+    if model or program_check or attachments or guest_check:
         with support['model_key'](device):
             verify_viewer_turn(device, port, share, shared[0], evidence)
             if attachments:
                 verify_shared_attachments(device, port, share, shared[0], evidence)
+            if guest_check:
+                guest_check(device, port, share, shared[0], outside, html, evidence)
             if program_check:
                 program_check()
         evidence['testModelKeyRemoved'] = True
@@ -299,7 +360,7 @@ def verify_owner_login(device, title, evidence):
     evidence['arkwebOwnerVerified'] = True
 
 
-def run(device, output, model, owner_login, host_port, program_policy, attachments=False):
+def run(device, output, model, owner_login, host_port, program_policy, attachments=False, guest_check=None):
     node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
     fixture = Path(__file__).with_name('fixtures')/'liveshare-relay.cjs'
     name = 'mh-share-relay-'+uuid.uuid4().hex[:10]
@@ -400,7 +461,7 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
             verify_program_policy(device, relay_port, share, sessions[0], folder, sessions, evidence)
 
         verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model,
-                      program_check if program_policy else None, attachments)
+                      program_check if program_policy else None, attachments, guest_check)
         evidence['stop'] = owner(device, 'stop', {'shareId': share})
         assert evidence['stop'] == {'ok': True} and device.rpc('liveshareShares/list', {}) == {'shares': []}
         status, _ = relay_call(relay_port, share, {'op': 'asset', 'path': ''})
@@ -469,11 +530,12 @@ if __name__ == '__main__':
     parser.add_argument('--owner-login', action='store_true', help='Complete LiveShare owner authorization in ArkWeb')
     parser.add_argument('--program-policy', action='store_true', help='Exercise viewer and fork workspace programs')
     parser.add_argument('--attachments', action='store_true', help='Verify viewer access to shared images after restart')
+    parser.add_argument('--guest-uploads', action='store_true', help='Submit visitor files and images through the shared Gateway')
     parser.add_argument('--host-port', type=int, default=19643)
     args = parser.parse_args()
-    if (args.model or args.owner_login or args.program_policy or args.attachments) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
+    if (args.model or args.owner_login or args.program_policy or args.attachments or args.guest_uploads) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('The selected live model scenario requires MH_TEST_DEEPSEEK_API_KEY')
     if args.program_policy and args.owner_login:
         parser.error('--program-policy requires the program preset; run the native login test separately')
     run(support['Emulator'](args.target, args.host_port), args.output, args.model, args.owner_login,
-        args.host_port, args.program_policy, args.attachments)
+        args.host_port, args.program_policy, args.attachments, verify_guest_uploads if args.guest_uploads else None)
