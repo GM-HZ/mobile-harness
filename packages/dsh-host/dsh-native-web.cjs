@@ -127,13 +127,17 @@ function patchPtc(source) {
   const patched = replacePinned(source.slice(0, index) + replacement + source.slice(stop),
     'import { stripTypeScriptTypes } from "node:module";',
     'const stripTypeScriptTypes = globalThis.__harmonyPtc.strip;');
-  return replacePinned(patched, 'get sandboxMode() {\n\t\treturn this.ctx.sandboxPolicy.defaultMode;',
-    'get sandboxMode() {\n\t\tglobalThis.__harmonySharedPtc.trustRuntime(this);\n\t\treturn this.ctx.sandboxPolicy.defaultMode;');
+  return replacePinned(patched, 'validateConfig(this.config);\n\t\tthis.processes = new PolicyProcesses(ctx);',
+    'validateConfig(this.config);\n\t\tglobalThis.__harmonySharedPtc.trustRuntime(this);\n\t\tthis.processes = new PolicyProcesses(ctx);');
 }
 function patchSharedPtcExecutor(source) {
   let patched = replacePinned(source, 'let policy = standingPolicy;', `const shareGrant = globalThis.__harmonySharedPtc.take(exec.token);
-    let policy = shareGrant === undefined ? standingPolicy
-      : await globalThis.__harmonySharedPtc.restrict(runtime, standingPolicy, shareGrant, args, callSignal);`);
+    let policy = standingPolicy;
+    if (shareGrant !== undefined) {
+      let provider = runtime;
+      while (provider[symbols.original] !== undefined) provider = provider[symbols.original];
+      policy = await globalThis.__harmonySharedPtc.restrict(provider, standingPolicy, shareGrant, args, callSignal);
+    }`);
   return replacePinned(patched, '...exec.agent === void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },',
     '...exec.agent === void 0 || shareGrant !== void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },');
 }

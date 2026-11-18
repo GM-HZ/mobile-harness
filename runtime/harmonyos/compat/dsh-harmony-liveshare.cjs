@@ -54,9 +54,11 @@ function createSharedPtcPolicy(mark) {
       return grant;
     },
     async restrict(runtime, standing, sourceGrant, args, signal) {
-      if (!nativeRuntimes.has(runtime) || !standing ||
-          !['read-only', 'workspace-write', 'danger-full-access'].includes(standing.mode)) {
+      if (!nativeRuntimes.has(runtime)) {
         throw new Error('Shared PTC requires the HarmonyOS file supervisor');
+      }
+      if (!standing || !['read-only', 'workspace-write', 'danger-full-access'].includes(standing.mode)) {
+        throw new Error('Shared PTC requires a standing file policy');
       }
       if (args.sandbox_permissions !== undefined || args.justification !== undefined) {
         throw new Error('A shared program cannot request wider sandbox permissions');
