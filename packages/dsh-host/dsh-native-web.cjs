@@ -469,6 +469,9 @@ async function main() {
           'they supplement the dsh-doc skill and its plugin references.');
         patched = replacePinned(patched, 'Build and export all runtime entry points before reporting ready.',
           'Export all runtime entry points before reporting ready. On HarmonyOS under workspace-write, shell execution may be unavailable. For dependency-free pages, use the shipped browser JavaScript template, write loadable JavaScript without JSX or TypeScript compilation, and read back the manifest, patch and exported modules using file tools. The parent performs installation and live activation checks. Report ready:false if the actual request requires a build or cannot be supported within the current permissions.');
+        // A saved removal may require the Host to restart before the old module leaves memory.
+        patched = replacePinned(patched, 'phase: result.application === "applied" ? "removed" : previous.phase',
+          'phase: (result.application === "applied" || (result.application === "restart-required" && result.changed && !(await this.ctx.pluginManager.listBundles()).some(item => item.name === previous.bundleName && item.installed))) ? "removed" : previous.phase');
         return { ...result, source: patched };
       }
       if (url !== flockUrl && url !== persistenceUrl && url !== subprocessUrl &&
