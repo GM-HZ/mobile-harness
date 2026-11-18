@@ -13,6 +13,7 @@ import uuid
 agent = runpy.run_path(str(Path(__file__).with_name('emulator-agent-continuation.py')))
 toolkit = agent['toolkit']
 support = agent['support']
+restore_bytes = runpy.run_path(str(Path(__file__).with_name('emulator-lsp-lifecycle.py')))['restore_bytes']
 NAME = 'load_workspace_dependencies'
 LOCK = Path(__file__).resolve().parents[2] / 'runtime/harmonyos/dsh/office-wheels.json'
 PROBE = """import json
@@ -74,12 +75,15 @@ def run(device, output, expect_absent, port):
     assert 'Forwardport result:OK' in device.hdc('fport', *bridge)
     evidence = {}
     remote = '/data/local/tmp/' + name
+    profile = 'alpine/native-benchmark-home/profiles/web/cordis.patch.yml'
+    original = None
     workspace = session = None
     try:
         started = time.monotonic()
         device.start()
         device.ready('normal')
         evidence['initialReadyMs'] = round((time.monotonic() - started) * 1000)
+        original = agent['read_bytes'](device, profile)
         assert device.rpc('permissionPresets/catalog', {})['defaultPreset'] == 'workspace-write'
         device.app('mkdir ' + folder)
         path = support['WORKSPACE'] + '/' + name
@@ -157,6 +161,14 @@ def run(device, output, expect_absent, port):
                 assert device.rpc('workspace/delete', {'request': {'workspaceId': workspace}}) == {'deleted': True}
             device.app('rm -rf ' + folder)
             device.hdc('shell', 'rm', '-f', remote)
+            if original is not None:
+                if agent['read_bytes'](device, profile) != original:
+                    device.stop()
+                    restore_bytes(device, profile, original, remote + '-profile')
+                    device.start()
+                    device.ready('normal')
+                assert agent['read_bytes'](device, profile) == original
+                evidence['originalProfileRestored'] = True
         finally:
             device.hdc('fport', 'rm', *bridge)
             output.write_text(json.dumps(evidence, indent=2) + '\n')
