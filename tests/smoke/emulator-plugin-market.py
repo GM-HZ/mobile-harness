@@ -1,6 +1,7 @@
 """Verify the official market against an owned npm registry and real DSH plugin updates."""
 import argparse
 import base64
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import io
@@ -38,7 +39,17 @@ class Registry(BaseHTTPRequestHandler):
         self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
-        self.wfile.write(body)
+        gate = self.server.download_gates.get(path)
+        if gate:
+            started, release = gate
+            started.set()
+            if not release.wait(timeout=40):
+                return
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            if not gate:
+                raise
 
 
 def tarball(files):
@@ -229,6 +240,33 @@ def activate_version(emulator, result, version, evidence):
     evidence[version] = {'reason': result['restartReason'], 'readyMs': emulator.ready('normal')}
 
 
+def verify_install_cancellation(emulator, server, name, folder, target):
+    path = f'/{name}/-/{name}-1.0.0.tgz'
+    request_id = str(uuid.uuid4())
+    files = [PROFILE+'/'+part for part in ['package.json', 'pnpm-lock.yaml']]
+    originals = {file: agent['read_bytes'](emulator, file) for file in files}
+    started, release = threading.Event(), threading.Event()
+    server.download_gates[path] = (started, release)
+    options = {'registry': target['registry'], 'enabled': True, 'saveExact': True, 'requestId': request_id}
+    with ThreadPoolExecutor(max_workers=1) as worker:
+        installing = worker.submit(emulator.rpc, 'pluginManager/installBundle',
+                                   {'spec': target['spec'], 'options': options}, timeout=90)
+        try:
+            assert started.wait(28) and not installing.done(), 'Expected a live package download'
+            cancellation = emulator.rpc('pluginManager/cancelInstall', {'requestId': request_id}, timeout=20)
+            result = installing.result(timeout=4)
+            assert cancellation == {'status': 'cancelled'} and result['application'] == 'cancelled', (cancellation, result)
+            assert emulator.rpc('pluginManager/cancelInstall', {'requestId': request_id}) == {'status': 'not-running'}
+            assert all(agent['read_bytes'](emulator, file) == body for file, body in originals.items())
+            assert not catalog(emulator, name)['installed']
+            assert emulator.app(f'test ! -e {folder}/events.log && printf ABSENT') == 'ABSENT'
+        finally:
+            release.set()
+            del server.download_gates[path]
+    return {'downloadReached': path, 'cancellation': cancellation, 'outcome': result,
+            'profileFilesUnchanged': True, 'pluginNeverActivated': True}
+
+
 def verify(emulator, server, name, folder, evidence):
     entry, index_url = configure_indexes(emulator, server, evidence)
     assert entry['name'] == name and entry['installation']['status'] == 'not-installed', entry
@@ -236,6 +274,7 @@ def verify(emulator, server, name, folder, evidence):
     assert set(versions) == set(VERSIONS) and not versions['2.0.0']['compatibility']['compatible'], versions
     target = versions['1.0.0']['install']
     assert target == {'spec': name+'@1.0.0', 'registry': server.base+'/'}, target
+    evidence['cancelledInstall'] = verify_install_cancellation(emulator, server, name, folder, target)
     result = emulator.rpc('pluginManager/installBundle', {'spec': target['spec'], 'options': {
         'registry': target['registry'], 'enabled': True, 'saveExact': True,
     }}, timeout=100)
@@ -320,6 +359,7 @@ def run(emulator, output):
     server.base = f'http://127.0.0.1:{DEVICE_PORT}'
     server.requests = []
     server.responses = {}
+    server.download_gates = {}
     populate(server, name, root, workspace)
     reverse = (f'tcp:{DEVICE_PORT}', f'tcp:{server.server_port}')
     task = threading.Thread(target=server.serve_forever, daemon=True)
