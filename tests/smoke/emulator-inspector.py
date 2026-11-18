@@ -27,7 +27,7 @@ def catalog(emulator, enabled):
     return {key: row[key] for key in ['availability', 'enabled', 'optional', 'official', 'version']}
 
 
-def cdp(emulator):
+def cdp(emulator, verify_panel):
     assert request(emulator, BOOTSTRAP, False)[0] == 401
     status, body = request(emulator, BOOTSTRAP, True)
     if status != 200:
@@ -61,17 +61,19 @@ def cdp(emulator):
         payload = {'proxy': emulator.url.replace('http:', 'ws:') + '/inspector/devtools/cdp',
                    'direct': 'ws://127.0.0.1:19645' + page.path,
                    'cookie': emulator.cookie()}
+        if verify_panel:
+            payload['panelKey'] = emulator.device + ['shell', 'uitest', 'uiInput', 'keyEvent', '2072', '2047', '2044']
         node = '/Applications/DevEco-Studio.app/Contents/tools/node/bin/node'
         fixture = Path(__file__).with_name('fixtures') / 'inspector-cdp.cjs'
         result = subprocess.check_output([node, str(fixture), str(approval['ws_module']())],
-                                         input=json.dumps(payload), text=True, timeout=25)
+                                         input=json.dumps(payload), text=True, timeout=45)
         return {'workerPort': target.port, 'anonymousDiscoveryStatus': 403, 'targetCount': len(targets),
                 'devtoolsAssetSha256': hashlib.sha256(html).hexdigest(), **json.loads(result)}
     finally:
         emulator.hdc('fport', 'rm', *forward)
 
 
-def run(emulator, output):
+def run(emulator, output, verify_panel):
     evidence, originals = {}, {}
     remote = '/data/local/tmp/mh-inspector-' + uuid.uuid4().hex
     try:
@@ -90,7 +92,7 @@ def run(emulator, output):
                 emulator.ready('normal')
             catalog(emulator, enabled)
             if enabled:
-                evidence['cdp'] = cdp(emulator)
+                evidence['cdp'] = cdp(emulator, verify_panel)
             else:
                 assert request(emulator, BOOTSTRAP, True)[0] == 404
                 port = evidence['cdp']['workerPort']
@@ -125,11 +127,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output', type=Path)
+    parser.add_argument('--panel', action='store_true', help='Open the actual ArkWeb bottom panel with the native keyboard shortcut')
     args = parser.parse_args()
     emulator = support['Emulator'](args.target, 19643)
     forward = ('tcp:19643', 'tcp:19592')
     assert 'Forwardport result:OK' in emulator.hdc('fport', *forward)
     try:
-        run(emulator, args.output)
+        run(emulator, args.output, args.panel)
     finally:
         emulator.hdc('fport', 'rm', *forward)

@@ -1,4 +1,5 @@
 const assert = require('node:assert/strict');
+const { execFileSync } = require('node:child_process');
 const { once } = require('node:events');
 const fs = require('node:fs');
 const WebSocket = require(process.argv[2]);
@@ -59,8 +60,32 @@ async function verify() {
       returnByValue: true,
     });
     assert.deepEqual(page.result.value, { origin, document: 9 });
-    console.log(JSON.stringify({ anonymousProxyStatus: 401, directCdpStatus: 403,
-      hostEvaluation: host.result.value, arkWeb: page.result.value }));
+    const evidence = { anonymousProxyStatus: 401, directCdpStatus: 403,
+      hostEvaluation: host.result.value, arkWeb: page.result.value };
+    if (input.panelKey) {
+      const [command, ...args] = input.panelKey;
+      execFileSync(command, args, { timeout: 5000 });
+      const expression = `(() => {
+        const panel = document.querySelector('[data-inspector-panel]');
+        const frame = panel?.querySelector('[data-inspector-devtools]');
+        return {
+          visible: !!panel && !panel.hidden,
+          path: frame?.contentWindow?.location.pathname ?? '',
+          ready: frame?.contentDocument?.readyState === 'complete',
+        };
+      })()`;
+      for (let retry = 0; retry < 55; retry++) {
+        const panel = await call('Runtime.evaluate', { contextId: client.id, expression, returnByValue: true });
+        const value = panel.result.value;
+        if (value?.visible && value.path === '/inspector/devtools/devtools_app.html' && value.ready) {
+          evidence.panel = value;
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      assert.ok(evidence.panel, 'Native keyboard shortcut did not open the DevTools iframe');
+    }
+    console.log(JSON.stringify(evidence));
   } finally {
     socket.terminate();
   }
