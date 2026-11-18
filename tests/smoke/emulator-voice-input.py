@@ -132,7 +132,7 @@ def verify_arkweb(emulator,audio,evidence):
             })()''')
             raise
         finally:
-            run('void globalThis.__mhVoiceTest?.context.close(); delete navigator.mediaDevices.getUserMedia; delete globalThis.__mhVoiceTest; true')
+            run('void globalThis.__mhVoiceTest?.context?.close(); delete navigator.mediaDevices.getUserMedia; delete globalThis.__mhVoiceTest; true')
 
 
 def run(emulator,args):
