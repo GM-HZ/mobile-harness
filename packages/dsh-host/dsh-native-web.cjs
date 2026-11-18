@@ -647,11 +647,11 @@ async function main() {
   };
   const nativePatch = path.join(root, 'tmp/dsh-native.patch.yml');
   fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n' +
-    (safeMode ? '' : '- id: subprocess\n  disabled: true\n- id: fs-sandbox\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
+    (safeMode ? '' : '- id: workspace-dependencies\n  disabled: false\n  config:\n    source: ' + JSON.stringify(root) +
+      '\n    root: !!js undefined\n- id: skill-office\n  config:\n    pythonEnvironment: workspace-dependencies\n' +
+      '- id: subprocess\n  disabled: true\n- id: fs-sandbox\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
       JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n    - id: harmony-fs\n      name: ' +
-      JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n' +
-      '    - id: workspace-dependencies\n      name: "@deepseek-ai/dsh-tool-workspace-dependencies"\n' +
-      '      config:\n        source: ' + JSON.stringify(root) + '\n'), { mode: 0o600 });
+      JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n'), { mode: 0o600 });
   const profileArgs = safeMode
     ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
     : ['--profile', 'web'];
