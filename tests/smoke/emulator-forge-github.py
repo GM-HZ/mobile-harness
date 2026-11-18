@@ -1,5 +1,6 @@
 """Exercise the shipped GitHub CLI and official Forge RPCs over an owned TLS fixture."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import runpy
@@ -22,6 +23,10 @@ SECOND = 'c'*40
 TEXT = 'Owned Forge contents transported using the packaged gh CLI.'
 HOST = 'forge-fixture.test'
 URL = 'https://'+HOST+'/fixture/mobile/pull/7'
+PUBLIC_REPO = 'GM-HZ/omnix'
+PUBLIC_PULL = 9
+PUBLIC_PATH = 'codex-rs/codex-api/src/chat_completions/types.rs'
+FORGE_SOURCE = Path(__file__).resolve().parents[2] / 'vendor/repos/dsh/packages/experimental/forge-github/src'
 PULL = '/api/v3/repos/fixture/mobile/pulls/7'
 REVIEW_BODY = "Owned review with 'quotes', a second line, and 中文.\nKeep the file change."
 INLINE = {'path': 'fixture.txt', 'side': 'R', 'startLine': 2, 'endLine': 3, 'body': 'Check lines 2–3.'}
@@ -177,6 +182,87 @@ class ConnectProxy(BaseHTTPRequestHandler):
                         return
 
 
+def github_api(*args, body=None):
+    return subprocess.check_output(['gh', 'api', '--hostname', 'github.com', *args],
+                                   input=body, timeout=25, stderr=subprocess.DEVNULL)
+
+
+def saved_file(device, path):
+    if device.app('test -f '+path+' && printf PRESENT') == 'PRESENT':
+        return agent['read_bytes'](device, path)
+    return None
+
+
+class PublicPullFixture(GitHubFixture):
+    """Forward exactly two read operations, with credentials kept on the desktop."""
+
+    def do_GET(self):
+        path = '/api/v3/' + self.server.contents
+        if not self.authenticated() or self.path != path:
+            self.reply(403, {'message': 'Path is outside the public read fixture'})
+            return
+        if self.headers.get('Accept') != 'application/vnd.github.raw+json':
+            self.reply(400, {'message': 'Expected the GitHub raw contents media type'})
+            return
+        try:
+            content = github_api('-H', 'Accept: application/vnd.github.raw+json', self.server.contents)
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            self.reply(502, {'message': 'GitHub contents request failed'})
+            return
+        self.server.calls.append({'operation': 'contents', 'status': 200,
+                                  'sha256': hashlib.sha256(content).hexdigest()})
+        self.reply(200, content.decode(), 'text/plain')
+
+    def do_POST(self):
+        if not self.authenticated() or self.path != '/api/graphql':
+            self.reply(403, {'message': 'GraphQL path is outside the public read fixture'})
+            return
+        query = self.read_json()
+        variables = query.get('variables', {})
+        owner, repo = PUBLIC_REPO.split('/')
+        if (query.get('query') != self.server.commits_query or
+            set(variables) != {'owner', 'name', 'number', 'first'} or
+            variables['owner'].casefold() != owner.casefold() or variables['name'] != repo or
+            variables['number'] != PUBLIC_PULL or not 1 <= variables['first'] <= 100):
+            self.reply(403, {'message': 'Only the fixed public pull request commit query is allowed'})
+            return
+        try:
+            response = json.loads(github_api('graphql', '--input', '-', body=json.dumps(query).encode()))
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            self.reply(502, {'message': 'GitHub commit query failed'})
+            return
+        self.server.calls.append({'operation': 'commits', 'status': 200})
+        self.reply(200, response)
+
+    def do_PUT(self):
+        self.reply(403, {'message': 'The public read fixture forbids writes'})
+
+
+def verify_public_read(device, server, sid):
+    official = json.loads(github_api(f'repos/{PUBLIC_REPO}/pulls/{PUBLIC_PULL}'))
+    head = official['head']['sha']
+    reference_commits = json.loads(github_api(f'repos/{PUBLIC_REPO}/pulls/{PUBLIC_PULL}/commits'))
+    assert len(reference_commits) == official['commits'] and len(reference_commits) < 30
+    server.contents = f'repos/{PUBLIC_REPO}/contents/{PUBLIC_PATH}?ref={head}'
+    server.commits_query = (FORGE_SOURCE/'commits.ts').read_text().split(
+        'export const COMMITS_QUERY = `', 1)[1].split('`', 1)[0]
+    exact_content = github_api('-H', 'Accept: application/vnd.github.raw+json', server.contents)
+    proxy_url = f'https://{HOST}/{PUBLIC_REPO}/pull/{PUBLIC_PULL}'
+    args = {'sessionId': sid, 'url': proxy_url}
+    device.rpc('forgePanel/track', args)
+    response = device.rpc('forgePanel/changeRequestText', {**args, 'commit': head, 'path': PUBLIC_PATH})
+    assert response == exact_content.decode().removesuffix('\n').removesuffix('\r')
+    graph = device.rpc('forgePanel/changeRequestCommits', args)
+    assert graph['headSha'] == head and not graph['truncated']
+    assert [commit['sha'] for commit in graph['commits']] == [commit['sha'] for commit in reference_commits]
+    assert [commit['parent'] for commit in graph['commits']] == [
+        commit['parents'][0]['sha'] if commit['parents'] else None for commit in reference_commits]
+    assert {call['operation'] for call in server.calls} == {'contents', 'commits'}, server.calls
+    return {'pullRequest': official['html_url'], 'headSha': head, 'path': PUBLIC_PATH,
+            'contentSha256': hashlib.sha256(exact_content).hexdigest(), 'commits': graph['commits'],
+            'authorization': 'Authenticated host gh; disposable fixture credential on the emulator'}
+
+
 def make_tls(folder):
     conf = folder/'cert.conf'
     conf.write_text('[req]\ndistinguished_name=dn\nx509_extensions=extensions\nprompt=no\n'
@@ -243,14 +329,14 @@ def verify_writes(device, server, sid):
     }
 
 
-def run(device, output, writes=False):
+def run(device, output, writes=False, public_read=False, port=19643):
     evidence = {}
     cases = ['package.json', 'pnpm-lock.yaml', 'cordis.patch.yml']
     original = {}
     ident = 'mh-forge-github-'+uuid.uuid4().hex[:10]
     folder = 'alpine/workspace-native/'+ident
     remote = '/data/local/tmp/'+ident
-    forward = ('tcp:19643', 'tcp:19592')
+    forward = (f'tcp:{port}', 'tcp:19592')
     reverse = None
     server = None
     proxy = None
@@ -261,11 +347,11 @@ def run(device, output, writes=False):
     try:
         device.ready('normal')
         assert device.app('test ! -e '+GH_CONFIG+' && printf EMPTY') == 'EMPTY'
-        original = {path: agent['read_bytes'](device,path) for path in
+        original = {path: saved_file(device,path) for path in
                     [profile+'/'+case for case in cases]+['mobile-harness-boot.json', CA_BUNDLE]}
         with tempfile.TemporaryDirectory(prefix=ident) as temp:
             context, certificate = make_tls(Path(temp))
-            server = ThreadingHTTPServer(('127.0.0.1',0),GitHubFixture)
+            server = ThreadingHTTPServer(('127.0.0.1',0), PublicPullFixture if public_read else GitHubFixture)
             server.socket = context.wrap_socket(server.socket, server_side=True)
             server.calls = []
             server.reviews = []
@@ -302,6 +388,9 @@ def run(device, output, writes=False):
             assert registered['created']
             workspace = registered['workspace']['workspaceId']
             sid = device.rpc('session/create',{'request':{'workspaceId':workspace}})['sessionId']
+            if public_read:
+                evidence['publicRead'] = verify_public_read(device, server, sid)
+                return
             device.rpc('forgePanel/track',{'sessionId':sid,'url':URL})
             response = device.rpc('forgePanel/changeRequestText',
                                   {'sessionId':sid,'url':URL,'commit':HEAD,'path':'fixture.txt'})
@@ -329,10 +418,13 @@ def run(device, output, writes=False):
                     if owns_config:
                         device.app('rm -rf '+GH_CONFIG)
                     for i,(path,body) in enumerate(original.items()):
-                        lsp['restore_bytes'](device,path,body,remote+'-restore-'+str(i))
+                        if body is None:
+                            device.app('rm -f '+path)
+                        else:
+                            lsp['restore_bytes'](device,path,body,remote+'-restore-'+str(i))
                     device.start()
                     evidence['restoredReadyMs']=device.ready('normal')
-                    assert all(agent['read_bytes'](device,path)==body for path,body in original.items())
+                    assert all(saved_file(device,path)==body for path,body in original.items())
                     evidence['configAndCABytesRestored']=True
         finally:
             if reverse:
@@ -352,6 +444,9 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
-    parser.add_argument('--writes', action='store_true', help='Exercise review, review requests and merge against the isolated fixture')
+    parser.add_argument('--port', type=int, default=19643)
+    scenario = parser.add_mutually_exclusive_group()
+    scenario.add_argument('--writes', action='store_true', help='Exercise review, review requests and merge against the isolated fixture')
+    scenario.add_argument('--public-read', action='store_true', help='Read one public pull request through an allowlisted authenticated desktop gateway')
     args=parser.parse_args()
-    run(support['Emulator'](args.target,19643),args.output,args.writes)
+    run(support['Emulator'](args.target,args.port),args.output,args.writes,args.public_read,args.port)

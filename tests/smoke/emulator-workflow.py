@@ -14,6 +14,7 @@ model_key = capabilities["model_key"]
 session = capabilities["session"]
 events = capabilities["events"]
 STARTED = {}
+SOAK_SECONDS = (0, 600, 1800, 3600, 7200)
 
 
 def start_workflow(emulator, script, name, background=False):
@@ -138,7 +139,7 @@ def verify_concurrent_fanout(emulator, evidence):
                    for marker in markers[case]]
         script = "return await parallel([" + ",".join(
             "() => agent(" + json.dumps(prompt) + ")" for prompt in prompts) + "]);"
-        return start_workflow(emulator, script, "mh-fanout-" + case)
+        return start_workflow(emulator, script, f"mh-fanout-{nonce}-{case}")
 
     with ThreadPoolExecutor(max_workers=2) as threads:
         sessions = dict(zip(case_names, threads.map(launch, case_names), strict=True))
@@ -184,12 +185,44 @@ def verify_concurrent_fanout(emulator, evidence):
     raise AssertionError("Concurrent Workflow helpers did not all exit")
 
 
+def write_evidence(output, evidence):
+    temporary = output.with_suffix(".tmp")
+    temporary.write_text(json.dumps(evidence, indent=2) + "\n")
+    temporary.replace(output)
+
+
+def verify_soak(emulator, output, evidence):
+    started = time.monotonic()
+    evidence.update(soakDelaysSeconds=SOAK_SECONDS, rounds=[], coverageComplete=False)
+    write_evidence(output, evidence)
+    for target in SOAK_SECONDS:
+        remaining = started + target - time.monotonic()
+        if remaining > 0:
+            time.sleep(remaining)
+        assert emulator.state() == {"mode": "normal", "pending": False}
+        round_result = {"scheduledSeconds": target, "startedSeconds": round(time.monotonic() - started, 3)}
+        evidence["rounds"].append(round_result)
+        try:
+            verify_concurrent_fanout(emulator, round_result)
+            assert round_result["workersReaped"] == 2
+            round_result["completed"] = True
+        finally:
+            for name, sid in list(STARTED.items()):
+                emulator.rpc("session/cancel", {"request": {"sessionId": sid}})
+                emulator.rpc("workspace/archiveSession", {"request": {"sessionId": sid}})
+                del STARTED[name]
+            write_evidence(output, evidence)
+    evidence["coverageComplete"] = True
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("target")
     parser.add_argument("output", type=Path)
     parser.add_argument("--host-port", type=int, default=19641)
-    parser.add_argument("--fanout-only", action="store_true", help="Exercise two parent Workflows with four concurrent children each")
+    scenario = parser.add_mutually_exclusive_group()
+    scenario.add_argument("--fanout-only", action="store_true", help="Exercise two parent Workflows with four concurrent children each")
+    scenario.add_argument("--soak", action="store_true", help="Repeat concurrent fan-out for two hours on a dedicated emulator")
     options = parser.parse_args()
     if not os.environ.get("MH_TEST_DEEPSEEK_API_KEY"):
         raise SystemExit("MH_TEST_DEEPSEEK_API_KEY is required for real subagent verification")
@@ -202,7 +235,9 @@ def main():
         assert emulator.web_status(False) == 401
         with model_key(emulator):
             try:
-                if options.fanout_only:
+                if options.soak:
+                    verify_soak(emulator, options.output, evidence)
+                elif options.fanout_only:
                     verify_concurrent_fanout(emulator, evidence)
                 else:
                     verify_workflow(emulator, evidence)
@@ -210,12 +245,12 @@ def main():
                 # Cancel only this fixture's root Sessions before removing their temporary key.
                 for sid in STARTED.values():
                     emulator.rpc("session/cancel", {"request": {"sessionId": sid}})
-                    if options.fanout_only:
+                    if options.fanout_only or options.soak:
                         emulator.rpc("workspace/archiveSession", {"request": {"sessionId": sid}})
                 evidence["sessions"] = dict(STARTED)
         evidence["temporaryModelCredentialRemoved"] = True
     finally:
-        options.output.write_text(json.dumps(evidence, indent=2) + "\n")
+        write_evidence(options.output, evidence)
         emulator.hdc("fport", "rm", *forward)
 
 

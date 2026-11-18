@@ -22,6 +22,8 @@ PROVIDER = 'sensevoice-local'
 EXPECTED = '今天我们测试语音输入。'
 MODEL_ROOT = 'alpine/native-benchmark-home/speech-to-text/sensevoice'
 LOCK = Path(__file__).resolve().parents[2]/'vendor/repos/dsh/packages/experimental/speech-to-text-sensevoice/runtime/assets.json'
+APP_ID = 'org.sayact.nodepoc'
+START = {'开始录音', 'Start recording'}
 
 
 def canonical_wave(source):
@@ -123,12 +125,11 @@ def transcribe(emulator,payload):
     return result['value']
 
 
-def verify_arkweb(emulator,audio,evidence):
-    with browser['browser'](emulator) as run:
-        sidebar = browser['ui']
-        sidebar['open_sidebar'](emulator)
-        sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'新建会话','New session','新建聊天','New chat'},'button'))
-        start_hit = '''(() => {
+def open_voice_composer(emulator, run):
+    sidebar = browser['ui']
+    sidebar['open_sidebar'](emulator)
+    sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'新建会话','New session','新建聊天','New chat'},'button'))
+    start_hit = '''(() => {
           const button=Array.from(document.querySelectorAll('button')).find(node =>
             ['开始录音','Start recording'].includes(node.getAttribute('aria-label')) &&
             !node.disabled && node.getClientRects().length);
@@ -138,14 +139,19 @@ def verify_arkweb(emulator,audio,evidence):
           return {hit:hit?.closest('button')===button, hitLabel:hit?.closest('button')?.getAttribute('aria-label'),
             x:rect.x,y:rect.y,width:rect.width,height:rect.height,dpr:devicePixelRatio,viewport:[innerWidth,innerHeight]};
         })()'''
-        browser['wait'](run,start_hit,'official recording button')
-        position=run(start_hit)
-        if not position['hit']:
-            closers={'关闭侧边栏','Close sidebar'}
-            close=sidebar['find'](sidebar['controls'](emulator),closers,'button')
-            if close:
-                sidebar['tap'](emulator,close)
-        browser['wait'](run,'('+start_hit+')?.hit','unobstructed recording button')
+    browser['wait'](run,start_hit,'official recording button')
+    if not run(start_hit)['hit']:
+        closers={'关闭侧边栏','Close sidebar'}
+        close=sidebar['find'](sidebar['controls'](emulator),closers,'button')
+        if close:
+            sidebar['tap'](emulator,close)
+    return browser['wait'](run,'('+start_hit+')?.hit && ('+start_hit+')','unobstructed recording button')
+
+
+def verify_arkweb(emulator,audio,evidence):
+    with browser['browser'](emulator) as run:
+        sidebar = browser['ui']
+        position = open_voice_composer(emulator, run)
         # Route a synthetic MediaStream into the real ArkWeb recorder, retaining media
         # capture, audio conversion, the Remote request and the composer update.
         script='''(() => {
@@ -183,8 +189,8 @@ def verify_arkweb(emulator,audio,evidence):
               btn=>['开始录音','Start recording'].includes(btn.getAttribute('aria-label'))).map(btn=>({
                 disabled:btn.disabled, visible:btn.getClientRects().length>0, ariaDisabled:btn.getAttribute('aria-disabled')
               }))''')
-            control=sidebar['wait_control'](emulator,{'开始录音','Start recording'},'button')
-            evidence['arkWebStartHit']={'dom':run(start_hit),'nativeBounds':control['bounds']}
+            control=sidebar['wait_control'](emulator,START,'button')
+            evidence['arkWebStartHit']={'dom':position,'nativeBounds':control['bounds']}
             sidebar['tap'](emulator,control)
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'official recorder running')
             duration=run('globalThis.__mhVoiceTest.duration')
@@ -193,7 +199,7 @@ def verify_arkweb(emulator,audio,evidence):
             browser['wait'](run,f'''[...document.querySelectorAll('textarea,[contenteditable=true]')].some(
               node=>(node.value||node.textContent||'').includes({json.dumps(EXPECTED)}))''','transcript inserted into composer draft')
             evidence['arkWebSyntheticDraft']=True
-            sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'开始录音','Start recording'},'button'))
+            sidebar['tap'](emulator,sidebar['wait_control'](emulator,START,'button'))
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'second recording running')
             flow['button'](run,'[data-voice-activity] button',['取消','Cancel'])
             browser['wait'](run, '''!document.querySelector('[data-voice-activity]')''','recorder releases cancelled recording')
@@ -209,6 +215,63 @@ def verify_arkweb(emulator,audio,evidence):
             run('globalThis.__mhVoiceTest?.cleanup(); void globalThis.__mhVoiceTest?.context?.close(); delete navigator.mediaDevices.getUserMedia; delete globalThis.__mhVoiceTest; true')
 
 
+def microphone_permission(emulator):
+    info = json.loads(emulator.hdc('shell', 'atm', 'dump', '-t', '-b', APP_ID))
+    entries = [section for section in info.values() if isinstance(section, list)]
+    row, = (item for section in entries for item in section if item.get('permissionName') == 'ohos.permission.MICROPHONE')
+    return {'status': row['grantStatus'], 'flag': row['grantFlag']}
+
+
+def verify_native_arkweb(emulator, evidence):
+    assert microphone_permission(emulator) == {'status': -1, 'flag': 0}, 'Expected an unused test permission state'
+    ui = browser['ui']
+    result = evidence['nativeMicrophone'] = {}
+    try:
+        with browser['browser'](emulator) as run:
+            open_voice_composer(emulator, run)
+            assert run('''(() => {
+              const devices = navigator.mediaDevices;
+              const original = devices.getUserMedia.bind(devices);
+              Object.defineProperty(devices, 'getUserMedia', { configurable: true, value: async (constraints) => {
+                const stream = await original(constraints);
+                globalThis.__mhNativeTracks = stream.getAudioTracks();
+                return stream;
+              } });
+              return true;
+            })()''')
+            try:
+                ui['tap'](emulator, ui['wait_control'](emulator, START, 'button'))
+                deadline = time.monotonic() + 15
+                while time.monotonic() < deadline:
+                    rows = ui['controls'](emulator, bundle=None)
+                    dialog = next((row for row in rows if '麦克风' in row['text'] and '访问' in row['text']
+                                   or 'access your microphone' in row['text'].lower()), None)
+                    allow = ui['find'](rows, {'允许', 'Allow', 'While using the app', 'Allow while using the app'})
+                    if dialog and allow:
+                        break
+                    time.sleep(.2)
+                else:
+                    raise AssertionError('HarmonyOS did not present the native microphone permission dialog')
+                ui['tap'](emulator, allow)
+                result['nativePermissionDialog'] = True
+                browser['wait'](run, "Boolean(document.querySelector('[data-voice-activity=recording]'))",
+                                'official recorder using the native microphone')
+                active = run('globalThis.__mhNativeTracks.map(t => ({kind:t.kind, state:t.readyState, muted:t.muted}))')
+                assert active == [{'kind': 'audio', 'state': 'live', 'muted': False}], active
+                assert microphone_permission(emulator)['status'] == 0
+                result['liveAudioTrack'] = active[0]
+                flow['button'](run,'[data-voice-activity] button',['取消','Cancel'])
+                browser['wait'](run, '''!document.querySelector('[data-voice-activity]') &&
+                  globalThis.__mhNativeTracks.every(t => t.readyState === 'ended')''', 'native tracks ended on cancellation')
+                result['trackEndedOnCancel'] = True
+            finally:
+                run('globalThis.__mhNativeTracks?.forEach(t => t.stop()); delete globalThis.__mhNativeTracks; delete navigator.mediaDevices.getUserMedia; true')
+    finally:
+        emulator.hdc('shell', 'atm', 'perm', '-r', '-b', APP_ID)
+        assert microphone_permission(emulator) == {'status': -1, 'flag': 0}
+        result['permissionRestored'] = True
+
+
 def run(emulator,args):
     run_name='mh-voice-'+uuid.uuid4().hex[:10]
     remote='/data/local/tmp/'+run_name
@@ -220,7 +283,7 @@ def run(emulator,args):
     audio=canonical_wave(args.audio)
     try:
         emulator.ready('normal')
-        originals={f:agent['read_bytes'](emulator,f) for f in flags}
+        originals={f:browser['profile_bytes'](emulator,f) for f in flags}
         evidence['defaultCatalog']=flow['has_bundle'](emulator,VOICE,False)
         assert emulator.app(f'test ! -e {MODEL_ROOT} && printf ABSENT')=='ABSENT', 'Dedicated emulator already has voice cache'
         models_created=True
@@ -281,10 +344,13 @@ def run(emulator,args):
             evidence['invalidAudioRejected']=True
         else:
             raise AssertionError('Invalid audio reached the provider')
-        if args.arkweb:
+        if args.arkweb or args.native_mic:
             emulator.hdc('shell','power-shell','wakeup')
             emulator.start()
+        if args.arkweb:
             verify_arkweb(emulator,audio,evidence)
+        if args.native_mic:
+            verify_native_arkweb(emulator,evidence)
         browser['switch'](emulator,VOICE,False)
         rows=[json.loads(line) for line in emulator.app('cat alpine/tmp/dsh-native-timeline.log').splitlines()]
         assert sum(row['event']=='speech-worker-started' for row in rows)==1
@@ -302,10 +368,13 @@ def run(emulator,args):
                     emulator.app('rm -rf '+MODEL_ROOT)
                 emulator.app('rm -f '+remote+'-asset0 '+remote+'-asset1 '+remote+'-asset2')
                 for index,(path,data) in enumerate(originals.items()):
-                    lsp['restore_bytes'](emulator,path,data,remote+str(index))
+                    if data is None:
+                        emulator.app('rm -f '+path)
+                    else:
+                        lsp['restore_bytes'](emulator,path,data,remote+str(index))
                 emulator.start()
                 evidence['restoreReadyMs']=emulator.ready('normal')
-                assert all(agent['read_bytes'](emulator,path)==data for path,data in originals.items())
+                assert all(browser['profile_bytes'](emulator,path)==data for path,data in originals.items())
                 evidence['originalConfigurationRestored']=True
         finally:
             try:
@@ -328,6 +397,8 @@ if __name__=='__main__':
     parser.add_argument('--model-root',type=Path)
     parser.add_argument('--audio',type=Path,required=True)
     parser.add_argument('--arkweb',action='store_true')
+    parser.add_argument('--native-mic',action='store_true',help='Grant the real emulator microphone through the system dialog, then verify cancellation')
+    parser.add_argument('--port',type=int,default=19643)
     source=parser.add_mutually_exclusive_group()
     source.add_argument('--download',action='store_true',help='Prepare the pinned models via an isolated mirror')
     source.add_argument('--public-download',choices=['auto','https://huggingface.co','https://hf-mirror.com'],
@@ -335,8 +406,8 @@ if __name__=='__main__':
     args=parser.parse_args()
     if not args.public_download and args.model_root is None:
         parser.error('--model-root is required for local fixtures')
-    emulator=support['Emulator'](args.target,19643)
-    forward=('tcp:19643','tcp:19592')
+    emulator=support['Emulator'](args.target,args.port)
+    forward=(f'tcp:{args.port}','tcp:19592')
     assert 'Forwardport result:OK' in emulator.hdc('fport',*forward)
     try:
         run(emulator,args)

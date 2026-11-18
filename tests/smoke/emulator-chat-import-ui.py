@@ -16,10 +16,11 @@ IMPORT_LABELS = {'导入 DeepSeek 会话', 'Import DeepSeek chats'}
 TITLE_LABELS = {'导入 DeepSeek 会话记录', 'Import DeepSeek chat history'}
 
 
-def controls(emulator):
+def controls(emulator, bundle=APP_ID):
     remote = '/data/local/tmp/mh-import-layout-' + uuid.uuid4().hex + '.json'
     try:
-        emulator.hdc('shell', 'uitest', 'dumpLayout', '-b', APP_ID, '-p', remote)
+        window = ['-b', bundle] if bundle else []
+        emulator.hdc('shell', 'uitest', 'dumpLayout', *window, '-p', remote)
         document = json.loads(emulator.hdc('shell', 'cat', remote))
     finally:
         emulator.hdc('shell', 'rm', '-f', remote)

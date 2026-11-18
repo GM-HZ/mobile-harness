@@ -74,6 +74,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 加 `--fanout-only` 验证两个独立会话中的 Workflow。每条提交四个子任务，记录实际峰值并发、双 Workflow 重叠时间、结果归属和 helper 回收。
 
+加 `--soak` 在第 0、10、30、60 和 120 分钟重复上述双 Workflow。每轮产生不同的校验标记并归档测试会话，JSON 逐轮写入。只有 `coverageComplete` 和 `temporaryModelCredentialRemoved` 均为真才算结束。运行期间独占模拟器和它的测试凭据槽。
+
 ## pi-ai 真实模型路由回归
 
 在独立模拟器上按标准设置暂存两条 pi-ai 路由，使用同一个 DeepSeek 公网端点验证模型发现、文件读取工具往返和重启续接。测试结束移除临时凭据并恢复原 profile。
@@ -406,9 +408,12 @@ Forge 继续使用官方 GitHub provider，鸿蒙包将脚本调用转发给随�
 ```sh
 python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github.json
 python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github-writes.json --writes
+python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github-public.json --public-read
 ```
 
 `--writes` 用包内 gh 在隔离服务验证带行范围的评审、邀请评审和绑定当前提交的合并。脚本检查 403 拒绝、旧提交拒绝、503 的未知结果与无重复提交，并在 Host 重启后完成合并。
+
+`--public-read` 使用已登录的桌面 gh 查询 GM-HZ/omnix 的公开 PR #9。测试代理仅转发该 PR 的固定只读 GraphQL 查询和一个固定提交的文件读取。模拟器使用一次性夹具凭据，GitHub 账号凭据由桌面 gh 持有。文件逐字核对，提交和父提交与 GitHub REST 结果比对。
 
 ## LiveShare
 
@@ -437,6 +442,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ## 鸿蒙语音
 
 在独立 Phone 模拟器安装对应 HAP。先准备上游 RC.5 锁定的 SenseVoice int8 模型、词表及 Silero VAD，放在同一测试输入目录。官方模型清单位于锁定 DSH 的 `packages/experimental/speech-to-text-sensevoice/runtime/assets.json`。测试临时填充 App 私有模型缓存，校验后加载，再验证普通话转写、无效音频与关闭回收。退出后移除测试缓存并恢复原配置。可选 `--arkweb` 使用真实模拟器触屏启动 ArkWeb 录音，采集合成音频并验证草稿和取消。使用 `--download` 可从空缓存经独立限速镜像准备原始模型。真机麦克风单独验收。使用 `--public-download auto` 会从空缓存走应用默认公网来源，并核对下载文件的原始 SHA-256。
+
+可选 `--native-mic` 使用独立的调试模拟器和未授权的初始麦克风状态。测试触屏点击 DSH 录音按钮，通过系统弹窗授予权限，核对真实 ArkWeb 音轨进入 live、取消后进入 ended，结束时恢复系统权限。该步骤仅保留状态证据。可与 `--arkweb` 一起运行。
 
 ```sh
 python3 tests/smoke/emulator-voice-input.py <loopback-target> .build/voice-api.json \
