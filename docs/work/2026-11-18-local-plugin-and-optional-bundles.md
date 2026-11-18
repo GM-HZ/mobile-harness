@@ -30,3 +30,7 @@ Auto review 和 LiveShare 使用锁定的上游 bundle，默认关闭。Auto rev
 ## 0.4.53 后续
 
 通过真实模型、ArkWeb 与默认权限生成并操作计数页面。修复撤销保存后的卡片状态，完整撤销和恢复仍待验证。一次原生启动在系统 `getenv` 内发生 SIGSEGV，后续启动和原配置恢复，原因尚待核对。语音空缓存准备与合成音频草稿回填、录音取消及工作线程停用通过。本机 Git 的安装和升级通过。 [分版本实测](../evidence/emulator-creator-and-voice-0.4.53.json)
+
+## 0.4.54 至 0.4.55
+
+真实 Creator 通过生成、安装、初次计数器操作、撤销确认及重启后移除，从保留副本恢复同一包后再次操作。首次测试把分开的标签和数值误判为空，后续保留前后两组控件断言，补记撤销及恢复的独立结果。同时检查了在途 npm 安装取消、原配置及安装重试。LiveShare 在 0.4.54 复现尝试启动 appspawn 时被拒。0.4.55 使用 Node worker 适配官方 IPC，本机 Relay 探针通过发布、重连、撤销及停用。真实 Relay 登录和跨设备访问仍待验。 [测试与制品](../evidence/emulator-creator-liveshare-0.4.55.json)

@@ -1,0 +1,1325 @@
+{
+  "target": {
+    "kind": "DevEco ARM64 Phone Emulator",
+    "device": "127.0.0.1:15557",
+    "api": 26
+  },
+  "runtime": "0.2.2-rc.5",
+  "latestCheckedWith": "npm view @deepseek-ai/dsh dist-tags versions --json --registry https://registry.npmjs.org",
+  "attempts": {
+    "creatorInitial": "The generated browser module put the label and count in separate paragraphs. The original regex required a colon.",
+    "packageCancelInitial": "The cancellation and profile byte checks passed, then the assertion assumed an uninstalled package must leave a row.",
+    "liveshareBaseline": "The loopback Relay was reachable, but the official CLI spawn used /system/bin/appspawn and was refused before WebSocket registration."
+  },
+  "nativeFaults": [
+    {
+      "version": "0.4.54",
+      "newCrashLogs": [
+        {
+          "file": "cppcrash-org.sayact.nodepoc-20020074-20261119010142029.log",
+          "version": "0.4.54",
+          "reason": "Signal:SIGABRT(SI_TKILL)@0x01317b6a00000aae from:2734:20020074",
+          "topFrame": "#00 pc 00000000001c771c /system/lib/ld-musl-aarch64.so.1(raise+228)(801e486ab1fe94113d7726bdde5f054f)"
+        }
+      ],
+      "newGetenvFaults": 0
+    },
+    {
+      "version": "0.4.55",
+      "newCrashLogs": [
+        {
+          "file": "cppcrash-org.sayact.nodepoc-20020074-20261119011440239.log",
+          "version": "0.4.55",
+          "reason": "Signal:SIGABRT(SI_TKILL)@0x01317b6a000063c8 from:25544:20020074",
+          "topFrame": "#00 pc 00000000001c771c /system/lib/ld-musl-aarch64.so.1(raise+228)(801e486ab1fe94113d7726bdde5f054f)"
+        }
+      ],
+      "newGetenvFaults": 0
+    }
+  ],
+  "builds": [
+    {
+      "artifact": {
+        "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.54-unsigned.hap",
+        "version": "0.4.54",
+        "versionCode": 61,
+        "sha256": "f619e83d69739c135ce3ec1b0429ae1d494084cca02b298963cc8f1147777b31",
+        "bytes": 679566915,
+        "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+        "sourceCommit": "0c24f24cf21cc52887d5ed35f0d4bfab6faa9dcb",
+        "compatibilityAssets": {
+          "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+          "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+          "packages/dsh-host/dsh-native-web.cjs": "7b47fb0f76313e89a671e3f10af19f6a9fe4d70df54d0dc101c72cb56061f654",
+          "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+        }
+      },
+      "build": {
+        "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<locked inputs> ./build.sh --package",
+        "exitCode": 0,
+        "logSha256": "2499ded38f83df30ec3f7a3ed0615ea7af976a3e769c0ff545cddbeb26a837a0"
+      },
+      "install": {
+        "command": [
+          "hdc",
+          "-t",
+          "127.0.0.1:15557",
+          "install",
+          "-r",
+          ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.54-unsigned.hap"
+        ],
+        "exitCode": 0,
+        "logSha256": "8dd79fecc3c2ac15e351469b63da6c745c6d4afe1814da6f67f17b23fcc2bc33"
+      },
+      "testRuns": [
+        {
+          "case": "creator",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-personalized-recommendations.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/creator.json",
+            "--create"
+          ],
+          "exitCode": 1,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 231.475,
+          "log": ".build/batch-054/creator.log",
+          "logSha256": "98d6c3702ec1ddbef48f7ba9771b0687922773c33db905b7c29a6b5e66ab95ab",
+          "evidenceSha256": "9117136fd18dc1713a696e46c9348555233b2003a8eed13a9576c7e70946af60",
+          "observed": {
+            "creatorDecision": {
+              "callId": "call_00_xAyieOBt5zXnNjyd9Eeb4568",
+              "action": "create_personalized_page",
+              "phase": "installed",
+              "data": {
+                "slot": "page",
+                "bundleName": "@dsh-local/view-4502c56c-3515-48c4-a2af-9c6d86f7a374",
+                "application": "applied"
+              }
+            },
+            "creatorPluginRows": [
+              {
+                "patchId": "@dsh-local/view-4502c56c-3515-48c4-a2af-9c6d86f7a374:local-counter",
+                "fiberPhase": "active"
+              }
+            ],
+            "counterViewNavigation": "menu"
+          }
+        },
+        {
+          "case": "market",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-plugin-market.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/market.json"
+          ],
+          "exitCode": 1,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 39.338,
+          "log": ".build/batch-054/market.log",
+          "logSha256": "f3e0ac2fc7fd31f6bbd4e00f9c65765eac06a26edbe3c03a35f1e829a0a3a6bd",
+          "evidenceSha256": "d74746f391069e5599b39ea1d2124208864df21165742adf18c5af59065311da",
+          "observed": {
+            "defaultCatalog": {
+              "availability": "installation",
+              "enabled": false,
+              "optional": true,
+              "official": true,
+              "version": "0.2.2-rc.5"
+            },
+            "fixtureRequestPaths": [
+              "/invalid.json",
+              "/market.json",
+              "/mh-market-8f857f2c8f",
+              "/mh-market-8f857f2c8f",
+              "/mh-market-8f857f2c8f-dep",
+              "/mh-market-8f857f2c8f-dep/-/mh-market-8f857f2c8f-dep-1.0.0.tgz",
+              "/mh-market-8f857f2c8f/-/mh-market-8f857f2c8f-1.0.0.tgz"
+            ],
+            "restoredReadyMs": 5283
+          }
+        },
+        {
+          "case": "git",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-plugin-git-update.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/git.json"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 61.959,
+          "log": ".build/batch-054/git.log",
+          "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidenceSha256": "a7bde752e04a2b558712e8b4860a1afda0d2937cee483d57aa4f2c0aa22e1792",
+          "observed": {
+            "retainedUpgrade": true,
+            "configRestored": true,
+            "restoredReadyMs": 4984
+          }
+        },
+        {
+          "case": "inspector",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-inspector.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/inspector.json",
+            "--panel"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 15.689,
+          "log": ".build/batch-054/inspector.log",
+          "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidenceSha256": "5e183e3c2a9c4f97b3028efa41de2c21dbd2107a499549989f7f242fb6643e1b",
+          "observed": {
+            "defaultCatalog": {
+              "availability": "installation",
+              "enabled": false,
+              "optional": true,
+              "official": true,
+              "version": "0.2.2-rc.5"
+            },
+            "enable": "applied",
+            "cdp": {
+              "workerPort": 9230,
+              "anonymousDiscoveryStatus": 403,
+              "targetCount": 1,
+              "devtoolsAssetSha256": "371c96a262a80fcbf7f6bbd8122a06168b7c3de2acfc34bd4a3dd0afce5cb1e1",
+              "anonymousProxyStatus": 401,
+              "directCdpStatus": 403,
+              "hostEvaluation": 42,
+              "arkWeb": {
+                "origin": "http://127.0.0.1:19592",
+                "document": 9
+              },
+              "panel": {
+                "visible": true,
+                "path": "/inspector/devtools/devtools_app.html",
+                "ready": true
+              }
+            },
+            "disable": "applied",
+            "workerReleasedOnDisable": true,
+            "restoredReadyMs": 4981,
+            "restoredConfiguration": true
+          }
+        },
+        {
+          "case": "restart-1",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 8.638,
+          "log": ".build/batch-054/restart-1.log",
+          "logSha256": "537dcc2b5e46c8fce93f6ae043755e7a5692e203f5eb028366a9bc9482f48f10",
+          "arkWebComplete": true,
+          "loopbackReadyMs": 4592
+        },
+        {
+          "case": "restart-2",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 8.641,
+          "log": ".build/batch-054/restart-2.log",
+          "logSha256": "93f3dfe68986eb58beef9a99f8fefeb40d6ec85068fbdc576ba175d6a0d2bc04",
+          "arkWebComplete": true,
+          "loopbackReadyMs": 4605
+        },
+        {
+          "case": "restart-3",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 8.574,
+          "log": ".build/batch-054/restart-3.log",
+          "logSha256": "0ec4232e800d5e5f64c2ce3fad80b4766c8ac5bf123af7e27d9ceb1a5cf3e6aa",
+          "arkWebComplete": true,
+          "loopbackReadyMs": 4582
+        },
+        {
+          "case": "restart-4",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 8.491,
+          "log": ".build/batch-054/restart-4.log",
+          "logSha256": "82a0fab94ad716c5ac5882c29af4377d22d7f24856324372fff6619eee444715",
+          "arkWebComplete": true,
+          "loopbackReadyMs": 4782
+        },
+        {
+          "case": "restart-5",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 8.627,
+          "log": ".build/batch-054/restart-5.log",
+          "logSha256": "d3d6ee394049837d7bb22b22f665c3668f7d06968a87d356bc96faca4b102730",
+          "arkWebComplete": true,
+          "loopbackReadyMs": 4590
+        },
+        {
+          "case": "bing",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-cot-translation.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/bing.json",
+            "--live",
+            "bing"
+          ],
+          "exitCode": 1,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 22.758,
+          "log": ".build/batch-054/bing.log",
+          "logSha256": "3a945b23cd2800ab12b42df961452d39fe4273160544a47c3dfa8c74d2bbf614",
+          "evidenceSha256": "166ce71cd2dbb66ba004a82a510dd97b36c6203ef798867ab45f8d4ec51f38d5",
+          "observed": {
+            "selectedLiveProvider": "bing",
+            "recordsAfterFailure": [
+              "plugin:translator/request"
+            ],
+            "restoredHashes": {
+              "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+              "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+              "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+              "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+            }
+          }
+        },
+        {
+          "case": "google",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-cot-translation.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/google.json",
+            "--live",
+            "google"
+          ],
+          "exitCode": 1,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 32.701,
+          "log": ".build/batch-054/google.log",
+          "logSha256": "3a945b23cd2800ab12b42df961452d39fe4273160544a47c3dfa8c74d2bbf614",
+          "evidenceSha256": "595e9de2a6403fa0cf3079ef6ff7ddc3f67a1eb128dcefe84401479ab63900ab",
+          "observed": {
+            "selectedLiveProvider": "google",
+            "recordsAfterFailure": [
+              "plugin:translator/request"
+            ],
+            "restoredHashes": {
+              "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+              "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+              "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+              "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+            }
+          }
+        },
+        {
+          "case": "recovery",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-recovery.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/recovery.json"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 24.276,
+          "log": ".build/batch-054/recovery.log",
+          "logSha256": "ba75847bcaee3852595f39f53e5c7724bf6b207751fd7089c38e81f78b801c9c",
+          "evidenceSha256": "baab779f4e42eec1aa9dff36a54b28a0ed55e317ac12521bb96a6eb16fb2b6d7",
+          "observed": {
+            "fixture": "mobile-harness-crash-4e97e75194",
+            "normalReadyMs": 76,
+            "anonymousHttp": 401,
+            "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+            "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+            "pluginInstalledDisabled": true,
+            "actualPluginCrash": true,
+            "interruptedNormalBoot": {
+              "mode": "normal",
+              "pending": true
+            },
+            "safeReadyMs": 4909,
+            "safeAuthenticatedHttp": 200,
+            "pluginNotLoadedAgain": true,
+            "sameSessionInSafeMode": true,
+            "normalProfileRestored": true,
+            "returnNormalReadyMs": 4981,
+            "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+            "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+          }
+        },
+        {
+          "case": "audit",
+          "command": [
+            "python3",
+            ".build/batch-054/audit.py",
+            "post-regression"
+          ],
+          "exitCode": 0,
+          "testCommit": "d6c8dc83504cc487fb20bd5fbdd6de5e781142e5",
+          "elapsedSeconds": 4.639,
+          "log": ".build/batch-054/audit.log",
+          "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+          "evidenceSha256": "bd9dd72c4380c4a95885103faa0d7f355f0497fca22d4876f525124329933d06",
+          "observed": {
+            "target": "127.0.0.1:15557",
+            "boot": {
+              "mode": "normal",
+              "pending": false
+            },
+            "readyMs": 71,
+            "profileHashes": {
+              "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+              "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+              "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+            },
+            "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+            "legacySessionEvents": 30,
+            "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+            "anonymousHttp": 401,
+            "authenticatedHttp": 200,
+            "permission": "workspace-write",
+            "testCredentialAbsent": true,
+            "installedRuntime": "0.2.2-rc.5",
+            "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+            "titlesAndBadgeDefaultOff": {
+              "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+                "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+                "availability": "installation",
+                "official": true,
+                "optional": true,
+                "removable": false,
+                "enabled": false,
+                "version": "0.2.2-rc.5"
+              },
+              "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+                "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+                "availability": "installation",
+                "official": true,
+                "optional": true,
+                "removable": false,
+                "enabled": false,
+                "version": "0.2.2-rc.5"
+              }
+            },
+            "fourOptionalBundlesDefaultOff": {
+              "@deepseek-ai/dsh-experimental-ralph-bundle": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-session-search": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-tool-worktree": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-forge-bundle": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              }
+            },
+            "chatImportDefaultOff": {
+              "availability": "installation",
+              "official": true,
+              "optional": true,
+              "enabled": false,
+              "version": "0.2.2-rc.5"
+            },
+            "inspectorDefaultOff": true,
+            "translationDefaultOff": true,
+            "recommendationsDefaultOff": {
+              "name": "@deepseek-ai/dsh-personalized-recommendations",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "badgeDefaultOff": {
+              "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "batchDefaultOff": [
+              {
+                "name": "@deepseek-ai/dsh-experimental-auto-review",
+                "enabled": false,
+                "version": "0.2.2-rc.5",
+                "availability": "installation"
+              },
+              {
+                "name": "@deepseek-ai/dsh-experimental-liveshare",
+                "enabled": false,
+                "version": "0.2.2-rc.5",
+                "availability": "installation"
+              }
+            ],
+            "voiceDefaultOff": {
+              "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "temporaryVoiceCacheRemoved": true
+          }
+        },
+        {
+          "case": "liveshare",
+          "command": [
+            "python3",
+            ".build/batch-054/liveshare-probe.py",
+            "054"
+          ],
+          "exitCode": 1,
+          "testCommit": "d84bfe56a05748e2403cd96c26f2a10a3ac196bf",
+          "elapsedSeconds": 14.536,
+          "log": ".build/batch-054/liveshare.log",
+          "logSha256": "3935c8adcc3c8d9b3b47e09368ce460ad241b7edd24f915469c35cb4aa6d6a8a",
+          "evidenceSha256": "91d955011389807fde4afea8b9858adc4aca56388fdf570dc04688023a0ab43a",
+          "observed": {
+            "reachable": {
+              "ok": true,
+              "httpReachable": true,
+              "blocking": false
+            },
+            "authorized": {
+              "ok": false,
+              "blocking": false,
+              "error": "http://127.0.0.1:19769: spawn /system/bin/appspawn EACCES"
+            },
+            "restoredReadyMs": 4926,
+            "configRestored": true,
+            "relayMessages": []
+          }
+        },
+        {
+          "case": "creator-confirm",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-personalized-recommendations.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/creator-confirm.json",
+            "--create"
+          ],
+          "exitCode": 0,
+          "testCommit": "d84bfe56a05748e2403cd96c26f2a10a3ac196bf",
+          "elapsedSeconds": 295.425,
+          "log": ".build/batch-054/creator-confirm.log",
+          "logSha256": "2e2236f69e0960d1a2af5675ad72eea8f71d16d2f8fa5813b9d477ed4124f04f",
+          "evidenceSha256": "555df97ec7c3f5512c76bb2a6ac9fce4fc4b1d3fe6a50186d9b830cc2c907c7b",
+          "observed": {
+            "creatorLifecycle": {
+              "installed": {
+                "callId": "call_00_dWCVzgKBwn5vdTvYsouS0913",
+                "action": "create_personalized_page",
+                "phase": "installed",
+                "data": {
+                  "slot": "page",
+                  "bundleName": "@dsh-local/view-11afa8d3-f78c-4c36-af8f-d1f51ec1fd52",
+                  "application": "applied"
+                }
+              },
+              "removed": {
+                "callId": "call_00_dWCVzgKBwn5vdTvYsouS0913",
+                "action": "create_personalized_page",
+                "phase": "removed",
+                "data": {
+                  "slot": "page",
+                  "bundleName": "@dsh-local/view-11afa8d3-f78c-4c36-af8f-d1f51ec1fd52",
+                  "application": "restart-required"
+                }
+              },
+              "restored": {
+                "callId": "call_00_dWCVzgKBwn5vdTvYsouS0913",
+                "action": "create_personalized_page",
+                "phase": "installed",
+                "data": {
+                  "slot": "page",
+                  "bundleName": "@dsh-local/view-11afa8d3-f78c-4c36-af8f-d1f51ec1fd52",
+                  "application": "applied"
+                }
+              }
+            },
+            "creatorCounterControls": [
+              0,
+              1,
+              0
+            ],
+            "restoredCounterControls": [
+              0,
+              1,
+              0
+            ],
+            "restoreStartedNoTurn": true,
+            "skillsRemovedOnDisable": true,
+            "restoredReadyMs": 4951
+          }
+        },
+        {
+          "case": "market-confirm",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-plugin-market.py",
+            "127.0.0.1:15557",
+            ".build/batch-054/market-confirm.json"
+          ],
+          "exitCode": 0,
+          "testCommit": "d84bfe56a05748e2403cd96c26f2a10a3ac196bf",
+          "elapsedSeconds": 262.256,
+          "log": ".build/batch-054/market-confirm.log",
+          "logSha256": "f583e841e7e1c5d7d85b3a87cc5d01af3afa4fb2c2e1b08892baa2916701a39a",
+          "evidenceSha256": "9eb4e8829a9a8fb25cfb323734e2126d96979dbd49f36023d5f6c3cc0261114c",
+          "observed": {
+            "cancelledInstall": {
+              "downloadReached": "/mh-market-a396970f96/-/mh-market-a396970f96-1.0.0.tgz",
+              "cancellation": {
+                "status": "cancelled"
+              },
+              "outcome": {
+                "stage": "install",
+                "target": "mh-market-a396970f96@1.0.0",
+                "enabled": true,
+                "changed": false,
+                "application": "cancelled",
+                "registries": [
+                  "http://127.0.0.1:19742/"
+                ],
+                "packageResult": {
+                  "exitCode": 1,
+                  "output": "✓ Lockfile passes supply-chain policies (verified 22h ago)\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +2\n++\nProgress: resolved 7, reused 5, downloaded 0, added 0\nproot warning: signal 15 received from process 13470\n",
+                  "truncated": false,
+                  "logPath": "/data/storage/el2/base/haps/entry/files/alpine/native-benchmark-home/profiles/web/.plugin-manager/logs/operation-GbeBGc/pnpm.log",
+                  "kind": "unknown"
+                }
+              },
+              "profileFilesUnchanged": true,
+              "pluginNeverActivated": true
+            },
+            "updatedToolResult": {
+              "version": "1.1.0",
+              "dependency": "OWNED_DEPENDENCY_LOADED",
+              "marker": "MARKET_0551F8F7035E447CB0FD6DFF2FD52D03"
+            },
+            "toolAfterRollback": {
+              "version": "1.1.0",
+              "dependency": "OWNED_DEPENDENCY_LOADED",
+              "marker": "MARKET_6023C4E3E90D42E1BC0D917761CD67E7"
+            },
+            "lifecycleScriptWasSuppressed": true,
+            "removedViaManager": true,
+            "restoredReadyMs": 4880
+          }
+        },
+        {
+          "case": "audit",
+          "command": [
+            "python3",
+            ".build/batch-054/audit.py",
+            "post-regression"
+          ],
+          "exitCode": 0,
+          "testCommit": "d84bfe56a05748e2403cd96c26f2a10a3ac196bf",
+          "elapsedSeconds": 4.806,
+          "log": ".build/batch-054/audit.log",
+          "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+          "evidenceSha256": "bd9dd72c4380c4a95885103faa0d7f355f0497fca22d4876f525124329933d06",
+          "observed": {
+            "target": "127.0.0.1:15557",
+            "boot": {
+              "mode": "normal",
+              "pending": false
+            },
+            "readyMs": 71,
+            "profileHashes": {
+              "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+              "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+              "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+            },
+            "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+            "legacySessionEvents": 30,
+            "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+            "anonymousHttp": 401,
+            "authenticatedHttp": 200,
+            "permission": "workspace-write",
+            "testCredentialAbsent": true,
+            "installedRuntime": "0.2.2-rc.5",
+            "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+            "titlesAndBadgeDefaultOff": {
+              "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+                "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+                "availability": "installation",
+                "official": true,
+                "optional": true,
+                "removable": false,
+                "enabled": false,
+                "version": "0.2.2-rc.5"
+              },
+              "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+                "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+                "availability": "installation",
+                "official": true,
+                "optional": true,
+                "removable": false,
+                "enabled": false,
+                "version": "0.2.2-rc.5"
+              }
+            },
+            "fourOptionalBundlesDefaultOff": {
+              "@deepseek-ai/dsh-experimental-ralph-bundle": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-session-search": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-tool-worktree": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-forge-bundle": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              }
+            },
+            "chatImportDefaultOff": {
+              "availability": "installation",
+              "official": true,
+              "optional": true,
+              "enabled": false,
+              "version": "0.2.2-rc.5"
+            },
+            "inspectorDefaultOff": true,
+            "translationDefaultOff": true,
+            "recommendationsDefaultOff": {
+              "name": "@deepseek-ai/dsh-personalized-recommendations",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "badgeDefaultOff": {
+              "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "batchDefaultOff": [
+              {
+                "name": "@deepseek-ai/dsh-experimental-auto-review",
+                "enabled": false,
+                "version": "0.2.2-rc.5",
+                "availability": "installation"
+              },
+              {
+                "name": "@deepseek-ai/dsh-experimental-liveshare",
+                "enabled": false,
+                "version": "0.2.2-rc.5",
+                "availability": "installation"
+              }
+            ],
+            "voiceDefaultOff": {
+              "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "temporaryVoiceCacheRemoved": true
+          }
+        }
+      ]
+    },
+    {
+      "artifact": {
+        "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.55-unsigned.hap",
+        "version": "0.4.55",
+        "versionCode": 62,
+        "sha256": "fbccf23c04f51504a6de47e7c3a520518dca123dff8f07facc09050919ff3be2",
+        "bytes": 679570311,
+        "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+        "sourceCommit": "350d638c2f1d26cf6b99c490d4b530210e5d21ee",
+        "compatibilityAssets": {
+          "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs": "8814c2cef8d58c0a8d46dd06b72acfabdc493185d6860ae7c91ab7c4a6e633d5",
+          "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+          "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+          "packages/dsh-host/dsh-native-web.cjs": "63c9f9bf1e06c008cff067ee50b36748fff7b4cd4a96825327387f78d7d85b65",
+          "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+        }
+      },
+      "build": {
+        "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<locked inputs> ./build.sh --package",
+        "exitCode": 0,
+        "logSha256": "fdd6f16f264117892d4ad85dc93a74c525163954d9b24583c7e907a6945c6a5c"
+      },
+      "install": {
+        "command": [
+          "hdc",
+          "-t",
+          "127.0.0.1:15557",
+          "install",
+          "-r",
+          ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.55-unsigned.hap"
+        ],
+        "exitCode": 0,
+        "logSha256": "710b64b711a5fe3b63ccf162512bb45e5eada500c89f39886534f62ef75715f7"
+      },
+      "testRuns": [
+        {
+          "case": "liveshare",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-liveshare-relay.py",
+            "127.0.0.1:15557",
+            ".build/batch-055/liveshare.json"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 29.744,
+          "log": ".build/batch-055/liveshare.log",
+          "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidenceSha256": "a91ac267fcf118909ef7fba143f17964ffccae945e1f0c298fcb2aa1f17e1946",
+          "observed": {
+            "reachable": {
+              "ok": true,
+              "httpReachable": true,
+              "blocking": false
+            },
+            "authorized": {
+              "ok": true,
+              "blocking": false
+            },
+            "created": {
+              "link": "http://127.0.0.1:19769/?shareId=5kPasdTMiGio",
+              "shareId": "5kPasdTMiGio",
+              "sessionId": "session-35d7813f-dd83-4e8e-8e6d-fc349f3185ba",
+              "sessionIds": [
+                "session-35d7813f-dd83-4e8e-8e6d-fc349f3185ba"
+              ],
+              "sessionMode": "view",
+              "access": {
+                "mode": "open",
+                "selected": [],
+                "deploymentAllowedSubjectIds": [],
+                "shareAllowedSubjectIds": [],
+                "broadenedByDeploymentSubjects": false,
+                "identityKeyAcl": true
+              }
+            },
+            "addedSecondSource": true,
+            "restoredOnlineSources": [
+              "session-35d7813f-dd83-4e8e-8e6d-fc349f3185ba",
+              "session-435437ba-849f-4388-9fcc-27d3789ee2c2"
+            ],
+            "stop": {
+              "ok": true
+            },
+            "gatewayThreadStopped": true,
+            "restoredReadyMs": 4963,
+            "configRestored": true,
+            "relayMessages": [
+              {
+                "registered": "test-OCcrm4fw",
+                "probe": true
+              },
+              {
+                "closed": "test-OCcrm4fw",
+                "code": 1000
+              },
+              {
+                "registered": "5kPasdTMiGio",
+                "probe": false
+              },
+              {
+                "closed": "5kPasdTMiGio",
+                "code": 1006
+              },
+              {
+                "registered": "5kPasdTMiGio",
+                "probe": false
+              },
+              {
+                "closed": "5kPasdTMiGio",
+                "code": 1000
+              },
+              {
+                "deleted": "5kPasdTMiGio"
+              }
+            ]
+          }
+        },
+        {
+          "case": "inspector",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-inspector.py",
+            "127.0.0.1:15557",
+            ".build/batch-055/inspector.json",
+            "--panel"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 16.085,
+          "log": ".build/batch-055/inspector.log",
+          "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidenceSha256": "2289380a94e68bb88075d86a60489624e9bbd2fe287b15b8579417416766705a",
+          "observed": {
+            "defaultCatalog": {
+              "availability": "installation",
+              "enabled": false,
+              "optional": true,
+              "official": true,
+              "version": "0.2.2-rc.5"
+            },
+            "enable": "applied",
+            "cdp": {
+              "workerPort": 9230,
+              "anonymousDiscoveryStatus": 403,
+              "targetCount": 1,
+              "devtoolsAssetSha256": "371c96a262a80fcbf7f6bbd8122a06168b7c3de2acfc34bd4a3dd0afce5cb1e1",
+              "anonymousProxyStatus": 401,
+              "directCdpStatus": 403,
+              "hostEvaluation": 42,
+              "arkWeb": {
+                "origin": "http://127.0.0.1:19592",
+                "document": 9
+              },
+              "panel": {
+                "visible": true,
+                "path": "/inspector/devtools/devtools_app.html",
+                "ready": true
+              }
+            },
+            "disable": "applied",
+            "workerReleasedOnDisable": true,
+            "restoredReadyMs": 5083,
+            "restoredConfiguration": true
+          }
+        },
+        {
+          "case": "voice",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-voice-input.py",
+            "127.0.0.1:15557",
+            ".build/batch-055/voice.json",
+            "--model-root",
+            ".build/voice-native/models",
+            "--audio",
+            ".build/voice-native/mandarin-sample.wav",
+            "--arkweb",
+            "--download"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 59.584,
+          "log": ".build/batch-055/voice.log",
+          "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "evidenceSha256": "61a55d1165c9008d5cce95d2399cf9df1f83c18b460295af9daecfa2649fea56",
+          "observed": {
+            "defaultCatalog": {
+              "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "downloadInitialState": {
+              "phase": "unprepared",
+              "steps": [
+                {
+                  "kind": "check",
+                  "status": "complete"
+                },
+                {
+                  "kind": "model",
+                  "status": "pending"
+                },
+                {
+                  "kind": "vad",
+                  "status": "pending"
+                },
+                {
+                  "kind": "verify",
+                  "status": "pending"
+                },
+                {
+                  "kind": "load",
+                  "status": "pending"
+                }
+              ]
+            },
+            "downloadPreparation": {
+              "phase": "ready",
+              "steps": [
+                {
+                  "kind": "check",
+                  "status": "complete",
+                  "startedAt": 1795021983384
+                },
+                {
+                  "kind": "model",
+                  "status": "complete",
+                  "startedAt": 1795021983384
+                },
+                {
+                  "kind": "vad",
+                  "status": "complete",
+                  "startedAt": 1795022007344
+                },
+                {
+                  "kind": "verify",
+                  "status": "complete",
+                  "startedAt": 1795022007516
+                },
+                {
+                  "kind": "load",
+                  "status": "complete",
+                  "startedAt": 1795022008487
+                }
+              ]
+            },
+            "downloadedAssets": [
+              "model.int8.onnx",
+              "silero_vad.onnx",
+              "tokens.txt"
+            ],
+            "firstTranscript": {
+              "text": "今天我们测试语音输入。",
+              "audioSeconds": 2.3916875,
+              "inferenceSeconds": 0.06919262499999967
+            },
+            "repeatTranscript": {
+              "text": "今天我们测试语音输入。",
+              "audioSeconds": 2.3916875,
+              "inferenceSeconds": 0.061362708000000564
+            },
+            "invalidAudioRejected": true,
+            "arkWebStartControl": [
+              {
+                "disabled": false,
+                "visible": true,
+                "ariaDisabled": null
+              }
+            ],
+            "arkWebStartHit": {
+              "dom": {
+                "hit": true,
+                "hitLabel": "开始录音",
+                "x": 339,
+                "y": 408.5,
+                "width": 28,
+                "height": 28,
+                "dpr": 3,
+                "viewport": [
+                  440,
+                  677
+                ]
+              },
+              "nativeBounds": "[1017,1342][1101,1427]"
+            },
+            "arkWebSyntheticDraft": true,
+            "arkWebRecordingCancelled": true,
+            "workerReusedAndStopped": true,
+            "restoreReadyMs": 6980,
+            "originalConfigurationRestored": true,
+            "mirrorRequests": [
+              "/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/2365baeacb507f821a0c8120fcee3d484dba7a07/model.int8.onnx",
+              "/csukuangfj/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17/resolve/2365baeacb507f821a0c8120fcee3d484dba7a07/tokens.txt",
+              "/csukuangfj/vad/resolve/fba88cd2e921609e7675c3aaf51e0b9b295da4bc/silero_vad.onnx"
+            ],
+            "mirrorBytesSent": {
+              "model.int8.onnx": 239233841,
+              "tokens.txt": 315894,
+              "silero_vad.onnx": 1807522
+            }
+          }
+        },
+        {
+          "case": "restart-1",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 8.539,
+          "log": ".build/batch-055/restart-1.log",
+          "logSha256": "36b2626eda00c55c86391a2505a6c40e6aa1ce59c69d822fd55d7e01834412d1",
+          "arkWebComplete": true
+        },
+        {
+          "case": "restart-2",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 8.508,
+          "log": ".build/batch-055/restart-2.log",
+          "logSha256": "4fc6b2a47d2108ddeabdc9768d64e23cc02e20555a0d1a44089d23e041cc7234",
+          "arkWebComplete": true,
+          "loopbackReadyMs": 4576
+        },
+        {
+          "case": "restart-3",
+          "command": [
+            "tests/bench/measure-emulator-start.sh",
+            "127.0.0.1:15557",
+            "restart"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 8.626,
+          "log": ".build/batch-055/restart-3.log",
+          "logSha256": "a9287c115fc4c16f113737ac23fea3f4fa91c97b9bbeba023021e8d247eb27b1",
+          "arkWebComplete": true,
+          "loopbackReadyMs": 4807
+        },
+        {
+          "case": "recovery",
+          "command": [
+            "python3",
+            "tests/smoke/emulator-recovery.py",
+            "127.0.0.1:15557",
+            ".build/batch-055/recovery.json"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 31.505,
+          "log": ".build/batch-055/recovery.log",
+          "logSha256": "f33b4cbb408da38c55cb763e84929a1a67778cad2c472183ec141402914d4f7e",
+          "evidenceSha256": "340843fd9fdf45b9de93b30cec68159f5c63d9d634c3095ec10d903f338276ef",
+          "observed": {
+            "fixture": "mobile-harness-crash-8fb55409cc",
+            "normalReadyMs": 60,
+            "anonymousHttp": 401,
+            "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+            "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+            "pluginInstalledDisabled": true,
+            "actualPluginCrash": true,
+            "interruptedNormalBoot": {
+              "mode": "normal",
+              "pending": true
+            },
+            "safeReadyMs": 5189,
+            "safeAuthenticatedHttp": 200,
+            "pluginNotLoadedAgain": true,
+            "sameSessionInSafeMode": true,
+            "normalProfileRestored": true,
+            "returnNormalReadyMs": 4968,
+            "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+            "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+          }
+        },
+        {
+          "case": "audit",
+          "command": [
+            "python3",
+            ".build/batch-055/audit.py",
+            "post-regression"
+          ],
+          "exitCode": 0,
+          "testCommit": "449c5f7f572e5777150f09a38c2d3d79187dd162",
+          "elapsedSeconds": 5.006,
+          "log": ".build/batch-055/audit.log",
+          "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+          "evidenceSha256": "3c4246f236870d466235b12c5d17b58ab73af3af789f15ed652123ce82966b5c",
+          "observed": {
+            "target": "127.0.0.1:15557",
+            "boot": {
+              "mode": "normal",
+              "pending": false
+            },
+            "readyMs": 73,
+            "profileHashes": {
+              "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+              "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+              "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+            },
+            "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+            "legacySessionEvents": 30,
+            "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+            "anonymousHttp": 401,
+            "authenticatedHttp": 200,
+            "permission": "workspace-write",
+            "testCredentialAbsent": true,
+            "installedRuntime": "0.2.2-rc.5",
+            "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+            "titlesAndBadgeDefaultOff": {
+              "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+                "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+                "availability": "installation",
+                "official": true,
+                "optional": true,
+                "removable": false,
+                "enabled": false,
+                "version": "0.2.2-rc.5"
+              },
+              "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+                "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+                "availability": "installation",
+                "official": true,
+                "optional": true,
+                "removable": false,
+                "enabled": false,
+                "version": "0.2.2-rc.5"
+              }
+            },
+            "fourOptionalBundlesDefaultOff": {
+              "@deepseek-ai/dsh-experimental-ralph-bundle": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-session-search": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-tool-worktree": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              },
+              "@deepseek-ai/dsh-experimental-forge-bundle": {
+                "availability": "installation",
+                "optional": true,
+                "official": true,
+                "installed": false,
+                "removable": false,
+                "version": "0.2.2-rc.5",
+                "enabled": false
+              }
+            },
+            "chatImportDefaultOff": {
+              "availability": "installation",
+              "official": true,
+              "optional": true,
+              "enabled": false,
+              "version": "0.2.2-rc.5"
+            },
+            "inspectorDefaultOff": true,
+            "translationDefaultOff": true,
+            "recommendationsDefaultOff": {
+              "name": "@deepseek-ai/dsh-personalized-recommendations",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "badgeDefaultOff": {
+              "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "batchDefaultOff": [
+              {
+                "name": "@deepseek-ai/dsh-experimental-auto-review",
+                "enabled": false,
+                "version": "0.2.2-rc.5",
+                "availability": "installation"
+              },
+              {
+                "name": "@deepseek-ai/dsh-experimental-liveshare",
+                "enabled": false,
+                "version": "0.2.2-rc.5",
+                "availability": "installation"
+              }
+            ],
+            "voiceDefaultOff": {
+              "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+              "enabled": false,
+              "version": "0.2.2-rc.5",
+              "availability": "installation"
+            },
+            "temporaryVoiceCacheRemoved": true
+          }
+        }
+      ]
+    }
+  ]
+}

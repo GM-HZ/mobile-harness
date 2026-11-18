@@ -291,11 +291,19 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 ## 个性化推荐
 
-覆盖安装对应 HAP 后，按顺序在独立 Phone 模拟器运行两条命令。两个测试会临时启用同一 profile 的个性化推荐和 Inspector，退出时恢复原配置。第二条会批准 Creator 生成仅含计数器的本地页面，0.4.46 的已知结果是安装失败。
+覆盖安装对应 HAP 后，按顺序在独立 Phone 模拟器运行两条命令。两个测试会临时启用同一 profile 的个性化推荐和 Inspector，退出时恢复原配置。第二条会批准 Creator 生成仅含计数器的本地页面，然后验证操作、撤销、重启和从原副本恢复。它同时核对恢复未触发新的模型回合。
 
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-personalized-recommendations.py <loopback-target> .build/recommendation-cards.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-personalized-recommendations.py <loopback-target> .build/recommendation-creator.json --create
+```
+
+## LiveShare
+
+独立 Phone 模拟器临时启用 LiveShare，使用仅回环可达的测试 Relay 和一次性测试会话。验收覆盖连接、发布授权探针、发布、添加来源会话、Host 重启重连、Relay 删除及停用后网关回收。脚本会恢复原 profile 并清除转发。
+
+```sh
+python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-relay.json
 ```
 
 ## 鸿蒙语音
