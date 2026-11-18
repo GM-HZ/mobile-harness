@@ -67,8 +67,7 @@ class MessagesFixture(BaseHTTPRequestHandler):
             if step not in self.server.faulted:
                 self.server.faulted.add(step)
                 record.update(action='overflow',step=step,status=400)
-                self.send_body(400,b'{"error":{"message":"Maximum context length exceeded.",'
-                                   b'"type":"invalid_request_error","code":"context_length_exceeded"}}')
+                self.send_body(400,json.dumps({'type':'error','error':self.server.overflow_error}).encode())
             else:
                 record.update(action='retry',step=step,status=200,checkpointPresent='Pending owned marker '+marker in history)
                 self.send_text(marker if record['checkpointPresent'] else 'MISSING-CHECKPOINT')
@@ -81,7 +80,7 @@ class MessagesFixture(BaseHTTPRequestHandler):
         self.server.calls.append(record)
 
 
-def run(device, output):
+def run(device, output, overflow_error):
     nonce = 'mh-overflow-'+uuid.uuid4().hex[:10]
     target = '/data/local/tmp/'+nonce
     folder = 'alpine/workspace-native/'+nonce
@@ -91,9 +90,10 @@ def run(device, output):
     credential_installed = False
     workspace = None
     sid = None
-    evidence = {}
+    evidence = {'replayedError': overflow_error}
     server = ThreadingHTTPServer(('127.0.0.1',0),MessagesFixture)
     server.calls, server.faulted = [], set()
+    server.overflow_error = overflow_error
     server.marker = 'OWNED_'+uuid.uuid4().hex.upper()
     threading.Thread(target=server.serve_forever,daemon=True).start()
     assert 'Forwardport result:OK' in device.hdc('fport', *bridge)
@@ -177,6 +177,15 @@ def run(device, output):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('target'); parser.add_argument('output',type=Path)
+    parser.add_argument('target')
+    parser.add_argument('output',type=Path)
+    parser.add_argument('--provider-error-report',type=Path,help='Replay a captured public provider HTTP 400 envelope')
     args = parser.parse_args()
-    run(support['Emulator'](args.target,19643),args.output)
+    error = {'message':'Maximum context length exceeded.',
+             'type':'invalid_request_error','code':'context_length_exceeded'}
+    if args.provider_error_report:
+        report = json.loads(args.provider_error_report.read_text())
+        assert report['httpStatus']==400 and report['explicitWindowRejection']
+        error = {key: report['error'][key] for key in ('type','message')}
+        error['message'] = re.sub(r' \(request_id: [^)]+\)$','',error['message'])
+    run(support['Emulator'](args.target,19643),args.output,error)
