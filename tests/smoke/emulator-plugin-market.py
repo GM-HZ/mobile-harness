@@ -318,7 +318,8 @@ def run(emulator, output):
             originals[path] = agent['read_bytes'](emulator, path) if exists else None
         evidence['defaultCatalog'] = market(emulator, False)
         emulator.app('mkdir ' + folder)
-        assert 'Forwardport result:OK' in emulator.hdc('rport', *reverse)
+        reply = emulator.hdc('rport', *reverse)
+        assert 'Forwardport result:OK' in reply, reply
         forwarded = True
         evidence['enabledReadyMs'] = switch(emulator, True)
         evidence['enabledCatalog'] = market(emulator, True)
@@ -349,7 +350,8 @@ def run(emulator, output):
                 }
         finally:
             if forwarded:
-                emulator.hdc('rport', 'rm', *reverse)
+                emulator.hdc('fport', 'rm', *reverse)
+                assert ' '.join(reverse) not in emulator.hdc('fport', 'ls')
             server.shutdown()
             server.server_close()
             evidence['fixtureRequestPaths'] = server.requests
