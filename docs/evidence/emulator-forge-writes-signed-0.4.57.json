@@ -1,0 +1,362 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15557",
+    "kind": "DevEco ARM64 Phone",
+    "api": 26
+  },
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "testSource": "838833979d9fddcf13ee7a740ded54440506e289",
+  "dshRegistryNext": "0.2.2-rc.5",
+  "forge": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-forge-github.py",
+      "127.0.0.1:15557",
+      ".build/batch-063/forge-writes.json",
+      "--writes"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "b0ed15e5a9892dcefe0383194fe421d636863c4917eb4c7533bc13f42e7a2da9",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "rawFileAtCommit": true,
+      "paginatedCommitGraph": {
+        "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "commits": [
+          {
+            "sha": "cccccccccccccccccccccccccccccccccccccccc",
+            "parent": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "title": "First commit",
+            "author": "Fixture",
+            "authoredAt": "2026-01-01T00:00:00Z"
+          },
+          {
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "parent": "cccccccccccccccccccccccccccccccccccccccc",
+            "title": "Second commit",
+            "author": "Fixture",
+            "authoredAt": "2026-01-01T00:00:00Z"
+          }
+        ],
+        "truncated": false
+      },
+      "writes": {
+        "reviewStaleDeniedBeforeWrite": "stale",
+        "review403Denied": "failed",
+        "reviewReceipt": {
+          "ok": true,
+          "url": "https://forge-fixture.test/fixture/mobile/pull/7#pullrequestreview-1"
+        },
+        "review503UnknownWithoutRetry": "unknown",
+        "reviewPayload": {
+          "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "event": "COMMENT",
+          "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+          "comments": [
+            {
+              "path": "fixture.txt",
+              "side": "RIGHT",
+              "start_side": "RIGHT",
+              "start_line": 2,
+              "line": 3,
+              "body": "Check lines 2–3."
+            }
+          ]
+        },
+        "reviewerRequest": {
+          "input": {
+            "pullRequestId": "PR_fixture",
+            "union": true,
+            "userIds": [
+              "U_fixture"
+            ]
+          }
+        },
+        "staleMergeDenied": true,
+        "mergeRequests": [
+          {
+            "merge_method": "squash",
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          },
+          {
+            "merge_method": "squash",
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "mergedAfterRestartReadyMs": 5256
+      },
+      "restoredReadyMs": 5253,
+      "configAndCABytesRestored": true,
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/contents/fixture.txt",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": "next"
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/reviews",
+          "authenticated": true,
+          "body": {
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "event": "COMMENT",
+            "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+            "comments": [
+              {
+                "path": "fixture.txt",
+                "side": "RIGHT",
+                "line": 3,
+                "body": "Check lines 2–3.",
+                "start_line": 2,
+                "start_side": "RIGHT"
+              }
+            ]
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/reviews",
+          "authenticated": true,
+          "body": {
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "event": "COMMENT",
+            "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+            "comments": [
+              {
+                "path": "fixture.txt",
+                "side": "RIGHT",
+                "line": 3,
+                "body": "Check lines 2–3.",
+                "start_line": 2,
+                "start_side": "RIGHT"
+              }
+            ]
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7",
+          "authenticated": true
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/reviews",
+          "authenticated": true,
+          "body": {
+            "commit_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "event": "COMMENT",
+            "body": "Owned review with 'quotes', a second line, and 中文.\nKeep the file change.",
+            "comments": [
+              {
+                "path": "fixture.txt",
+                "side": "RIGHT",
+                "line": 3,
+                "body": "Check lines 2–3.",
+                "start_line": 2,
+                "start_side": "RIGHT"
+              }
+            ]
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/merge",
+          "authenticated": true,
+          "body": {
+            "merge_method": "squash",
+            "sha": "cccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/api/graphql",
+          "authenticated": true,
+          "cursor": null
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v3/repos/fixture/mobile/pulls/7/merge",
+          "authenticated": true,
+          "body": {
+            "merge_method": "squash",
+            "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        }
+      ]
+    },
+    "earlierFixtureFailure": {
+      "exitCode": 1,
+      "logSha256": "42695d92b18401c50097cc95618e5f64eabb818399622e293371645787af4bc0",
+      "jsonSha256": "61c349505b7303a4d616a35d2819b1b982dcc3826e172748edfb6ad34ef05e52",
+      "finding": "The first fixture omitted HTTP chunked request decoding. The packaged gh supplied the mutation JSON by stdin, and the updated fixture decoded and asserted those bytes."
+    }
+  },
+  "signing": {
+    "buildCommand": [
+      "./build.sh"
+    ],
+    "buildExitCode": 0,
+    "buildCheckout": "2d34a85ce6538eeb86b2aafb9a92cc5bafae7ffa",
+    "buildLogSha256": "3a41189345b558df6d56fedea10b47a739eb89ea20c0f2a847a1702e17a2671c",
+    "signatureVerificationExitCode": 0,
+    "signatureLogSha256": "e3dee1a3d8c833ea813ea2c4dbe369f8587224f7cefd2d0fd90d4ee346702327",
+    "profileVerificationExitCode": 0,
+    "profileLogSha256": "c94cb6c1ce0377c25c525a0ef4e8a418cb8c3c48b3f4ab6e5b404cabe1e2f654",
+    "deviceIdType": "udid",
+    "provisionType": "debug",
+    "provisionDeviceCount": 2,
+    "mate60UdidMatch": "unverified — HDC USB serial is a different identifier",
+    "payload": {
+      "signedHap": ".build/batch-063/dsh-mh-harmonyos-arm64-v0.4.57-signed.hap",
+      "bytes": 724194020,
+      "sha256": "307f9002484f2bba5d3df07f25552818b66ad861e387fc81f470de26ceb64365",
+      "runtimeVersion": "0.4.57",
+      "runtimeVersionCode": 64,
+      "payloadEntriesCompared": 201,
+      "differencesFromPreviousUnsigned": [],
+      "sameEntriesAsRebuiltUnsigned": true,
+      "criticalSha256": {
+        "libs/arm64-v8a/libnode.so": {
+          "simulator": "05f5edecd7a94f3aae6a7c1a921c9d333353c0a8c0aa04103b9e395509e5c33e",
+          "signed": "05f5edecd7a94f3aae6a7c1a921c9d333353c0a8c0aa04103b9e395509e5c33e"
+        },
+        "libs/arm64-v8a/libpoc.so": {
+          "simulator": "fff6d0f98701f44aed85011c1718f5d21b6768cbbdda120a8e5a5bf0b46c9170",
+          "signed": "fff6d0f98701f44aed85011c1718f5d21b6768cbbdda120a8e5a5bf0b46c9170"
+        },
+        "resources/rawfile/dsh-layer.zip": {
+          "simulator": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+          "signed": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4"
+        },
+        "ets/modules.abc": {
+          "simulator": "4076b4018d62fac19dfc4745b262deb78a7fefed7ee69fa640fbe95174317536",
+          "signed": "4076b4018d62fac19dfc4745b262deb78a7fefed7ee69fa640fbe95174317536"
+        }
+      }
+    },
+    "physicalInstall": "unverified — Mate 60 was offline"
+  },
+  "audit": {
+    "command": [
+      "python3",
+      ".build/batch-063/audit.py",
+      "post-regression"
+    ],
+    "exitCode": 0,
+    "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+    "jsonSha256": "812a03078101a15fabf1460d6aeb40120df3dd8ebebb5a0df554e88795c435e7",
+    "observed": {
+      "boot": {
+        "mode": "normal",
+        "pending": false
+      },
+      "legacySessionEvents": 30,
+      "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+      "anonymousHttp": 401,
+      "authenticatedHttp": 200,
+      "permission": "workspace-write",
+      "testCredentialAbsent": true,
+      "installedRuntime": "0.2.2-rc.5",
+      "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+      "profileHashes": {
+        "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+      }
+    }
+  },
+  "unverified": [
+    "Real GitHub account and hosted review/merge operations.",
+    "Device UDID coverage and actual Mate 60 install, startup and regression."
+  ]
+}

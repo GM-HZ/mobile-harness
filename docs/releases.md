@@ -346,3 +346,7 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 ### 0.4.57 官方登录入口与 Python 原生 wheel 补验
 
 同一 HAP 在 ArkWeb 打开并退出公开 DeepSeek 登录页。隔离回环服务通过账号回调、重启保留与登出撤销。公网 PyPI 的 ARM64 musllinux `xxhash 3.6.0` 经正式 Bash 单次审批安装，SHA-256、venv 模块边界和原生摘要均符合预期。下载第一次超时，重试成功。 [补验记录](evidence/emulator-account-python-wheel-0.4.57.json)
+
+### 0.4.57 Forge 写入与调试签名包
+
+已验收的模拟器包通过隔离服务验证评审、邀请评审、旧提交拒绝与重启后合并，并保留 403 拒绝和 503 未知结果。新构建的调试签名包通过 DevEco 应用签名和 debug profile 校验。Node、原生 Host、ArkWeb 字节码和 DSH 层的 SHA-256 与模拟器包一致。Mate 60 离线，仍需验证 UDID 覆盖和实际安装。 [补验记录](evidence/emulator-forge-writes-signed-0.4.57.json)

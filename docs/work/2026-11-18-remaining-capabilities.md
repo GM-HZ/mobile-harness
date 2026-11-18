@@ -13,7 +13,7 @@
 | voice-input | 0.4.57 已从空缓存经默认公网来源选择下载三个锁定文件，并完成 ArkWeb 合成录音、草稿回填、取消和 worker 回收。显式公网镜像也通过 SHA-256 和转写，Hugging Face 主站在本模拟器上连接被拒。真机麦克风授权和采集待验 |
 | cot-translation | 0.4.57 已从正式 ArkWeb 页面请求真实 DeepSeek Flash，移除密钥后重启仍可打开译文。受控 Bing／Google、停用取消已验。两个公开匿名端点仍待成功 |
 | liveshare | 0.4.57 已通过独立客户端在回环 Relay 查看已共享会话，并用真实 DeepSeek Flash 对话。Host 拒绝查看未共享会话和调用 Owner 接口，撤销立即生效。公网 Relay、真实账户授权和实际跨设备交互待验 |
-| forge | 本地工作树正式接口已验证恢复、取消、重试和重启。0.4.47 已验 ArkWeb 面板。0.4.57 通过包内 gh 读取本机 TLS 夹具的文件与分页提交。公网账号和评审、合并等写入待验 |
+| forge | 本地工作树正式接口已验证恢复、取消、重试和重启。0.4.47 已验 ArkWeb 面板。0.4.57 通过包内 gh 在隔离 TLS 服务验证文件读取、分页提交、评审、邀请评审和合并。公网账号与托管仓库操作待验 |
 
 ## 5 组补充验收
 
@@ -21,7 +21,7 @@
 2. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
 3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。其他原生依赖组合与用户指定的公网索引待验。DSH 官方市场接受自定义索引。
 4. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。0.4.57 已从 ArkWeb 打开 DeepSeek 官方登录页，隔离回环服务通过授权回调、重启保留与登出撤销。真实账号完成授权与其他提供者待验。
-5. 最新真机交付仍需验证签名 HAP、主流程、长运行、前后台、网络切换与性能。Mate 60 当前不在线。
+5. 0.4.57 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
 
 系统 PTY、Phone／Computer Use、Windows 专用工具和 desktop-only workspace-dependencies 按既有范围单列。语言服务器、原生 wheel、WASM 与原生 addon 组合按具体需要验收。
 
@@ -52,3 +52,5 @@
 同一制品通过 Alpine N-API、WASM、TypeScript、原生 fetch 和公网 npm ARM64 musl addon。主 Host 保持 jitless，能加载 HAP 内的语音 addon，测试中的外部鸿蒙 addon 加载失败。真机 JIT 待复验。 [本轮证据](../evidence/emulator-node-extensions-0.4.57.json)
 
 同一制品通过官方登录入口、回环账号交换及真实 PyPI ARM64 musllinux wheel。设备上的账号授权和其他原生 wheel 保留待验。 [本轮证据](../evidence/emulator-account-python-wheel-0.4.57.json)
+
+Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提交、403 拒绝和 503 未知结果。调试签名 HAP 通过离线验签，真机安装待验。 [本轮证据](../evidence/emulator-forge-writes-signed-0.4.57.json)

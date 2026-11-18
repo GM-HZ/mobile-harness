@@ -339,7 +339,10 @@ Forge 继续使用官方 GitHub provider，鸿蒙包将脚本调用转发给随�
 
 ```sh
 python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github.json
+python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github-writes.json --writes
 ```
+
+`--writes` 用包内 gh 在隔离服务验证带行范围的评审、邀请评审和绑定当前提交的合并。脚本检查 403 拒绝、旧提交拒绝、503 的未知结果与无重复提交，并在 Host 重启后完成合并。
 
 ## LiveShare
 
