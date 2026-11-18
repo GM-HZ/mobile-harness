@@ -22,6 +22,14 @@ SECOND = 'c'*40
 TEXT = 'Owned Forge contents transported using the packaged gh CLI.'
 HOST = 'forge-fixture.test'
 URL = 'https://'+HOST+'/fixture/mobile/pull/7'
+PULL = '/api/v3/repos/fixture/mobile/pulls/7'
+REVIEW_BODY = "Owned review with 'quotes', a second line, and 中文.\nKeep the file change."
+INLINE = {'path': 'fixture.txt', 'side': 'R', 'startLine': 2, 'endLine': 3, 'body': 'Check lines 2–3.'}
+REVIEW_PAYLOAD = {
+    'commit_id': HEAD, 'event': 'COMMENT', 'body': REVIEW_BODY,
+    'comments': [{'path': 'fixture.txt', 'side': 'RIGHT', 'start_side': 'RIGHT',
+                  'start_line': 2, 'line': 3, 'body': INLINE['body']}],
+}
 CA_BUNDLE = 'alpine/etc/ssl/certs/ca-certificates.crt'
 GH_CONFIG = 'alpine/native-benchmark-home/.config/gh'
 
@@ -47,6 +55,8 @@ class GitHubFixture(BaseHTTPRequestHandler):
         self.server.calls.append({'method': 'GET', 'path': url.path, 'authenticated': auth})
         if not auth:
             self.reply(401, {'message': 'Bad credentials'})
+        elif url.path == PULL:
+            self.reply(200, {'head': {'sha': HEAD}, 'state': 'closed' if self.server.merged else 'open'})
         elif (url.path == '/api/v3/repos/fixture/mobile/contents/fixture.txt'
               and parse_qs(url.query) == {'ref': [HEAD]}
               and self.headers.get('Accept') == 'application/vnd.github.raw+json'):
@@ -54,18 +64,81 @@ class GitHubFixture(BaseHTTPRequestHandler):
         else:
             self.reply(404, {'message': 'Fixture route not found'})
 
+    def read_json(self):
+        if self.headers.get('Transfer-Encoding', '').lower() == 'chunked':
+            body = bytearray()
+            while True:
+                size = int(self.rfile.readline(64).split(b';', 1)[0], 16)
+                if not size:
+                    assert self.rfile.readline(64) == b'\r\n'
+                    return json.loads(body)
+                assert len(body) + size <= 65_536
+                body.extend(self.rfile.read(size))
+                assert self.rfile.read(2) == b'\r\n'
+        return json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+
+    def do_PUT(self):
+        auth = self.authenticated()
+        body = self.read_json()
+        self.server.calls.append({'method': 'PUT', 'path': self.path, 'authenticated': auth, 'body': body})
+        if not auth:
+            self.reply(401, {'message': 'Bad credentials'})
+        elif self.path != PULL + '/merge' or body.get('merge_method') != 'squash':
+            self.reply(400, {'message': 'Unexpected fixture merge'})
+        elif body.get('sha') != HEAD:
+            self.reply(409, {'message': 'The supplied head SHA does not match'})
+        elif self.server.merged:
+            self.reply(405, {'message': 'Pull request already merged'})
+        else:
+            self.server.merged = True
+            self.reply(200, {'sha': 'd'*40, 'merged': True, 'message': 'Fixture merged'})
+
     def do_POST(self):
         auth = self.authenticated()
-        query = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+        query = self.read_json()
+        if self.path == PULL + '/reviews':
+            self.server.calls.append({'method': 'POST', 'path': self.path, 'authenticated': auth, 'body': query})
+            if not auth:
+                self.reply(401, {'message': 'Bad credentials'})
+            elif self.server.review_mode == 'refuse':
+                self.reply(403, {'message': 'Review permission denied by fixture'})
+            elif query != REVIEW_PAYLOAD:
+                self.reply(422, {'message': 'Review JSON was not preserved'})
+            else:
+                self.server.reviews.append(query)
+                if self.server.review_mode == 'uncertain':
+                    self.reply(503, {'message': 'Receipt unavailable after fixture recorded review'})
+                else:
+                    self.reply(200, {'html_url': URL + '#pullrequestreview-1'})
+            return
+        document = query.get('query', '')
         values = query.get('variables', {})
         cursor = values.get('cursor')
         self.server.calls.append({'method': 'POST', 'path': self.path, 'authenticated': auth, 'cursor': cursor})
         if not auth:
             self.reply(401, {'message': 'Bad credentials'})
             return
-        if (self.path != '/api/graphql' or 'commits(first:' not in query.get('query', '')
-                or [values.get(key) for key in ['owner', 'name', 'number']] != ['fixture', 'mobile', 7]
-                or cursor not in [None, 'next']):
+        if self.path != '/api/graphql':
+            self.reply(404, {'message': 'Fixture route not found'})
+            return
+        if 'u0: user(login: $u0)' in document and values == {'u0': 'fixture-reviewer'}:
+            self.reply(200, {'data': {'u0': {'id': 'U_fixture'}}})
+            return
+        if 'requestReviews(input:' in document:
+            expected = {'input': {'pullRequestId': 'PR_fixture', 'union': True, 'userIds': ['U_fixture']}}
+            if values != expected:
+                self.reply(422, {'message': 'Reviewer mutation variables were not preserved'})
+                return
+            self.server.requested_reviews.append(values)
+            self.reply(200, {'data': {'requestReviews': {'clientMutationId': None}}})
+            return
+        if [values.get(key) for key in ['owner', 'name', 'number']] != ['fixture', 'mobile', 7]:
+            self.reply(400, {'message': 'Unexpected fixture GraphQL reference'})
+            return
+        if '{ id headRefOid }' in document:
+            self.reply(200, {'data': {'repository': {'pullRequest': {'id': 'PR_fixture', 'headRefOid': HEAD}}}})
+            return
+        if 'commits(first:' not in document or cursor not in [None, 'next']:
             self.reply(400, {'message': 'Unexpected fixture GraphQL request'})
             return
         sha, parent, title = (SECOND, BASE, 'First commit') if cursor is None else (HEAD, SECOND, 'Second commit')
@@ -94,11 +167,14 @@ class ConnectProxy(BaseHTTPRequestHandler):
                 if not readable:
                     return
                 for stream in readable:
-                    data = stream.recv(65536)
-                    if not data:
+                    try:
+                        data = stream.recv(65536)
+                        if not data:
+                            return
+                        target = upstream if stream is self.connection else self.connection
+                        target.sendall(data)
+                    except (BrokenPipeError, ConnectionResetError):
                         return
-                    target = upstream if stream is self.connection else self.connection
-                    target.sendall(data)
 
 
 def make_tls(folder):
@@ -114,7 +190,60 @@ def make_tls(folder):
     return context, cert.read_bytes()
 
 
-def run(device, output):
+def verify_writes(device, server, sid):
+    bound = {'sessionId': sid, 'url': URL}
+    review = {'kind': 'review', 'event': 'comment', 'body': REVIEW_BODY, 'comments': [INLINE]}
+
+    def submit(head):
+        return device.rpc('forgePanel/submitReview', {**bound, 'request': {**review, 'headSha': head}})
+
+    stale = submit(SECOND)
+    assert stale['ok'] is False and stale['code'] == 'stale', stale
+    assert not any(row['path'] == PULL + '/reviews' for row in server.calls)
+    server.review_mode = 'refuse'
+    refused = submit(HEAD)
+    assert refused['ok'] is False and refused['code'] == 'failed' and 'HTTP 403' in refused['message'], refused
+    assert not server.reviews
+    server.review_mode = 'success'
+    receipt = submit(HEAD)
+    assert receipt == {'ok': True, 'url': URL + '#pullrequestreview-1'}, receipt
+    assert server.reviews == [REVIEW_PAYLOAD]
+    server.review_mode = 'uncertain'
+    count = len(server.calls)
+    uncertain = submit(HEAD)
+    assert uncertain['ok'] is False and uncertain['code'] == 'unknown', uncertain
+    assert server.reviews == [REVIEW_PAYLOAD, REVIEW_PAYLOAD]
+    assert sum(row['path'] == PULL + '/reviews' for row in server.calls[count:]) == 1
+
+    reviewer = {'kind': 'user', 'login': 'fixture-reviewer'}
+    device.rpc('forgePanel/requestReviews', {**bound, 'reviewers': [reviewer]})
+    assert server.requested_reviews == [
+        {'input': {'pullRequestId': 'PR_fixture', 'union': True, 'userIds': ['U_fixture']}}
+    ]
+    merge = {**bound, 'method': 'squash'}
+    try:
+        device.rpc('forgePanel/merge', {**merge, 'headSha': SECOND})
+    except RuntimeError as error:
+        assert str(error) == 'forgePanel/merge: forgePanel/stale-head', error
+    else:
+        raise AssertionError('The stale merge was not rejected')
+    assert not server.merged
+    device.stop()
+    device.start()
+    ready_ms = device.ready('normal')
+    device.rpc('forgePanel/merge', {**merge, 'headSha': HEAD})
+    assert server.merged
+    merge_requests = [row['body'] for row in server.calls if row['path'] == PULL + '/merge']
+    assert merge_requests == [{'merge_method': 'squash', 'sha': sha} for sha in (SECOND, HEAD)], merge_requests
+    return {
+        'reviewStaleDeniedBeforeWrite': stale['code'], 'review403Denied': refused['code'],
+        'reviewReceipt': receipt, 'review503UnknownWithoutRetry': uncertain['code'],
+        'reviewPayload': REVIEW_PAYLOAD, 'reviewerRequest': server.requested_reviews[0],
+        'staleMergeDenied': True, 'mergeRequests': merge_requests, 'mergedAfterRestartReadyMs': ready_ms,
+    }
+
+
+def run(device, output, writes=False):
     evidence = {}
     cases = ['package.json', 'pnpm-lock.yaml', 'cordis.patch.yml']
     original = {}
@@ -139,6 +268,10 @@ def run(device, output):
             server = ThreadingHTTPServer(('127.0.0.1',0),GitHubFixture)
             server.socket = context.wrap_socket(server.socket, server_side=True)
             server.calls = []
+            server.reviews = []
+            server.requested_reviews = []
+            server.merged = False
+            server.review_mode = 'success'
             threading.Thread(target=server.serve_forever,daemon=True).start()
             proxy = ThreadingHTTPServer(('127.0.0.1',0),ConnectProxy)
             proxy.destination = server.server_port
@@ -179,6 +312,8 @@ def run(device, output):
             assert [commit['sha'] for commit in commits['commits']]==[SECOND,HEAD],commits
             assert [commit['parent'] for commit in commits['commits']]==[BASE,SECOND],commits
             evidence['paginatedCommitGraph']=commits
+            if writes:
+                evidence['writes'] = verify_writes(device, server, sid)
             assert all(row['authenticated'] for row in server.calls),server.calls
     finally:
         try:
@@ -217,5 +352,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
+    parser.add_argument('--writes', action='store_true', help='Exercise review, review requests and merge against the isolated fixture')
     args=parser.parse_args()
-    run(support['Emulator'](args.target,19643),args.output)
+    run(support['Emulator'](args.target,19643),args.output,args.writes)
