@@ -4,7 +4,6 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include "workflow-broker.h"
 #ifdef MOBILE_HARNESS_EXPERIMENTAL_FORK
 #include <errno.h>
@@ -36,10 +35,8 @@ static int RunHost(void) {
         harmony_workflow_broker_close();
         return -2;
     }
-    char *argv[] = {"node", "--jitless", "--expose-internals", entry, NULL};
-    setenv("HARMONY_NATIVE_WEB_ROOT", directory, 1);
-    setenv("HARMONY_SAFE_MODE", safe_mode ? "1" : "0", 1);
-    int code = start(4, argv);
+    char *argv[] = {"node", "--jitless", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
+    int code = start(5, argv);
     harmony_workflow_broker_close();
     return code == 0 ? -3 : -4;
 }

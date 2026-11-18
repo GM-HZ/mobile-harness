@@ -16,6 +16,7 @@ bundle=org.sayact.nodepoc
 device=("$hdc" -t "$target")
 type=$("${device[@]}" shell 'param get const.product.devicetype' | tr -d '[:space:]')
 test "$type" = phone
+previous_pids=$("${device[@]}" shell pidof "$bundle")
 "${device[@]}" shell aa force-stop "$bundle"
 if [[ "$mode" == fresh ]]; then
   cleaned=$("${device[@]}" shell bm clean -n "$bundle" -d)
@@ -26,14 +27,15 @@ started=$("${device[@]}" shell aa start -a EntryAbility -b "$bundle")
 printf '%s\n' "$started"
 printf '%s\n' "$started" | grep -q 'start ability successfully'
 for ((second=0; second<60; second++)); do
-  pid=$("${device[@]}" shell pidof "$bundle" | awk '{print $1; exit}')
-  if [[ "$pid" =~ ^[0-9]+$ ]]; then
+  pids=$("${device[@]}" shell pidof "$bundle")
+  for pid in $pids; do
+    [[ "$pid" =~ ^[0-9]+$ && " $previous_pids " != *" $pid "* ]] || continue
     logs=$("${device[@]}" shell hilog -x -P "$pid" | grep 'DSHClient:' || true)
     if printf '%s\n' "$logs" | grep -q 'ArkWeb loaded.*complete'; then
       printf '%s\n' "$logs" | grep -E 'startup archive|starting native Web|native loopback ready|ArkWeb loaded'
       exit 0
     fi
-  fi
+  done
   sleep 1
 done
 echo 'ArkWeb load milestone was not observed within 60 checks' >&2

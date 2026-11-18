@@ -5,14 +5,17 @@ const http = require('node:http');
 const { Socket } = require('node:net');
 const { spawn } = require('node:child_process');
 const { EventEmitter } = require('node:events');
-const { constants } = require('node:os');
-const { Module, registerHooks } = require('node:module');
+const os = require('node:os');
+const { constants } = os;
+const { Module, registerHooks, syncBuiltinESMExports } = require('node:module');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { performance } = require('node:perf_hooks');
 const started = performance.now();
-const safeMode = process.env.HARMONY_SAFE_MODE === '1';
-const root = process.env.HARMONY_NATIVE_WEB_ROOT;
+const mode = process.argv[2];
+if (mode !== 'normal' && mode !== 'safe') throw new Error('Invalid Harmony Host boot mode');
+const safeMode = mode === 'safe';
+const root = __dirname;
 const dsh = path.join(root, '.dsh-0.2.2-rc.5/dsh/node_modules');
 const cli = path.join(dsh, '@deepseek-ai/dsh/lib/bin.js');
 const home = path.join(root, 'native-benchmark-home');
@@ -303,12 +306,20 @@ async function main() {
 `, { mode: 0o644 });
   fs.renameSync(passwd + '.new', passwd);
   process.chdir(workspace);
-  process.env.HOME = home;
-  process.env.DSH_HOME = home;
-  process.env.TMPDIR = path.join(root, 'tmp');
-  process.env.DSH_TELEMETRY_DISABLED = '1';
-  process.env.DSH_PERMISSION_MODE = 'workspace-write';
-  process.env.NO_COLOR = '1';
+  // This Node environment shares a process with ArkUI and system libraries.
+  // Keep DSH and its .env writes off the native environ used by those threads.
+  const temp = path.join(root, 'tmp');
+  process.env = Object.assign(Object.create(null), process.env, {
+    HOME: home, DSH_HOME: home, TMPDIR: temp,
+    DSH_TELEMETRY_DISABLED: '1', DSH_PERMISSION_MODE: 'workspace-write', NO_COLOR: '1',
+  });
+  // Node's native os getters still read the system environment. Give the
+  // embedded Host the same private paths through its JS builtin exports.
+  os.homedir = () => home;
+  os.tmpdir = () => temp;
+  os.homedir[Symbol.toPrimitive] = os.homedir;
+  os.tmpdir[Symbol.toPrimitive] = os.tmpdir;
+  syncBuiltinESMExports();
   require(path.join(root, 'fetch-shim.cjs')).installFetchShim();
 
   const realLoad = Module._load;
