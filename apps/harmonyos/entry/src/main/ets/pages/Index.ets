@@ -123,13 +123,13 @@ struct Index {
       // A deployed Relay may redirect to an HTTPS identity provider.
       return parsed.protocol === 'https:' || parsed.origin === this.relayOrigin;
     }
-    if (this.loginHost(address) || this.isLoginCallback(address)) {
-      this.loginFlow = 'deepseek';
-      return true;
-    }
     if (this.loginFlow === 'unbound' && this.liveShareAuthorization(parsed)) {
       this.loginFlow = 'liveshare';
       this.relayOrigin = parsed.origin;
+      return true;
+    }
+    if (this.loginHost(address) || this.isLoginCallback(address)) {
+      this.loginFlow = 'deepseek';
       return true;
     }
     return false;
