@@ -17,6 +17,15 @@ NATIVE_MODULES = (
     "@img/sharp-libvips-linuxmusl-arm64/lib/libvips-cpp.so.8.18.7",
 )
 ARCHIVE = "dsh-layer.zip"
+# Advertise the official optional bundles validated on HarmonyOS. Selection
+# remains in the user's profile; an installation dependency only makes a
+# bundle available to PluginManager without downloading another copy.
+OPTIONAL_BUNDLES = (
+    "@deepseek-ai/dsh-experimental-forge-bundle",
+    "@deepseek-ai/dsh-experimental-ralph-bundle",
+    "@deepseek-ai/dsh-experimental-session-search",
+    "@deepseek-ai/dsh-experimental-tool-worktree",
+)
 
 
 def stage_dsh(root, raw, baseline):
@@ -62,6 +71,16 @@ def stage_dsh(root, raw, baseline):
         current = json.loads((modules / "@deepseek-ai/dsh/package.json").read_text())["version"]
         if current != expected:
             raise ValueError(f"Installed DSH {current}, expected {expected}")
+        official = pinned["node_modules/@deepseek-ai/dsh"]["dependencies"]
+        for name in OPTIONAL_BUNDLES:
+            version = pinned["node_modules/" + name]["version"]
+            folder = modules / name
+            metadata = json.loads((folder / "package.json").read_text())
+            patch = metadata.get("dsh", {}).get("bundle", {}).get("patch")
+            if (official.get(name) != version or version != expected or metadata.get("version") != version
+                    or not isinstance(patch, str) or not (folder / patch).is_file()):
+                raise ValueError(f"Invalid official optional bundle: {name}")
+            application["dependencies"][name] = version
         with ZipFile(baseline) as prior:
             for name in NATIVE_MODULES:
                 if (modules / name).read_bytes() != prior.read("dsh/node_modules/" + name):
