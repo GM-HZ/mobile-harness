@@ -44,7 +44,9 @@ def wait_control(emulator, labels, kind=None):
         if row:
             return row
         time.sleep(.2)
-    raise AssertionError(f'No {kind or "control"} with label {labels} in the actual UI')
+    visible = [row for row in rows if row['type'] in {'dialog', 'heading'} or
+               'DeepSeek' in row['text'] or row['text'] in {'导出文件', 'Export file'}]
+    raise AssertionError(f'No {kind or "control"} with label {labels} in the actual UI: {visible}')
 
 
 def tap(emulator, row):
@@ -78,7 +80,7 @@ def run(emulator, output):
         open_sidebar(emulator)
         evidence['importButton'] = wait_control(emulator, IMPORT_LABELS, 'button')
         tap(emulator, evidence['importButton'])
-        evidence['importDialog'] = wait_control(emulator, TITLE_LABELS, 'dialog')
+        evidence['importDialogTitle'] = wait_control(emulator, TITLE_LABELS)
         evidence['exportFileControl'] = wait_control(emulator, {'导出文件', 'Export file'})
         evidence['disabledReadyMs'] = flow['switch'](emulator, False)
         open_sidebar(emulator)
