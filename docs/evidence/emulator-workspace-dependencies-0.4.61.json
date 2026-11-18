@@ -1,0 +1,307 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15559",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "dshRegistryNext": "0.2.2-rc.5",
+  "testSource": "1efb095dfe07a827688f9dbf618baf2fffd84f44",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.61-unsigned.hap",
+    "version": "0.4.61",
+    "versionCode": 68,
+    "sha256": "6b5106dd72c2a2031935a93a8fd0472cb9bdc637362d1d5aeacf96077bc8f14a",
+    "bytes": 761936231,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "99099fa149c22bb131c86dcdb76cd731f54763aa",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "855e7a10cc4a135d8edebda9b194717733a4eb8c0f2359936417b960fcbf6cd4",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "signedArtifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.61-signed.hap",
+    "sha256": "eb38f9509c9a6a932bdde0465529d2b5ec320bfab5da6ddbfd11d2c9e40804a6",
+    "bytes": 765608726,
+    "matchingPayloadEntries": 208,
+    "wheelLayerSha256": "90894f7a78be77f40ef8d1d9688d475f1eb4d33e7939191636e5a01d3defb1e1",
+    "wheelLayerBytes": 41405056,
+    "wheelDistributions": 13,
+    "profileVerified": true,
+    "signatureVerified": true
+  },
+  "unsignedSizeDeltaBytes": 41409930,
+  "build": {
+    "command": [
+      "./build.sh",
+      "--package"
+    ],
+    "exitCode": 0,
+    "logSha256": "cd1e54b2d0bae8271f231c0d8d5c360df895805cbdad02bbdcf484835d8834f7",
+    "initialLogSha256": "63a32218475c2cfaafa199e598586f4d9b1025f7f86b04920c0003bd625e8771",
+    "initialFailure": "The SDK Python version does not provide hashlib.file_digest."
+  },
+  "install": {
+    "from": "0.4.60",
+    "to": "0.4.61",
+    "exitCode": 0,
+    "logSha256": "a5c18fa9285ab2d623e13b5186e9b7f98c696d6612e3057f777160d04448a693"
+  },
+  "baseline": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-workspace-dependencies.py",
+      "127.0.0.1:15559",
+      ".build/batch-070/baseline.json",
+      "--expect-absent",
+      "--port",
+      "19648"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "2d896534f96c5fd08c0aa11081f9bf230aa07e8db09ad68880b6c0b7ccb29dd1",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "advertised": false
+    }
+  },
+  "live": {
+    "command": [
+      "python3",
+      "tests/smoke/emulator-workspace-dependencies.py",
+      "127.0.0.1:15559",
+      ".build/batch-070/workspace.json",
+      "--port",
+      "19648"
+    ],
+    "exitCode": 0,
+    "jsonSha256": "3c5901fb444488031c569d24bfcf3d7a35461b866d530040e8fbfe832a727c77",
+    "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "initialReadyMs": 6250,
+      "sessionId": "session-bcc036fd-0bb1-403f-be68-b9ff1ceed949",
+      "advertised": true,
+      "resolved": {
+        "python": "/usr/bin/python3",
+        "node": "/bin/node",
+        "pnpm": "/pnpm-harmony-v2/bin/pnpm.mjs",
+        "pythonPackages": "/opt/tools/office-python/064b04a93984c39992ed02482d4facf92f556e53ec24e5e7250c350b4c14bcfa/site-packages",
+        "nodePackages": "/opt/tools/node_modules",
+        "pythonDistributions": {
+          "numpy": "2.3.5",
+          "pandas": "3.0.1",
+          "python-dateutil": "2.9.0.post0",
+          "six": "1.17.0",
+          "tzdata": "2025.2",
+          "python-docx": "1.2.0",
+          "python-pptx": "1.0.2",
+          "openpyxl": "3.1.5",
+          "Pillow": "12.3.0",
+          "lxml": "6.1.3",
+          "XlsxWriter": "3.2.9",
+          "typing_extensions": "4.16.0",
+          "et_xmlfile": "2.0.0",
+          "pip": "25.0.1"
+        }
+      },
+      "readOnlyLookup": true,
+      "officeSkillUsesBundledRuntime": true,
+      "offlinePython": {
+        "python": "3.12.16",
+        "distributions": {
+          "numpy": "2.3.5",
+          "pandas": "3.0.1",
+          "python-dateutil": "2.9.0.post0",
+          "six": "1.17.0",
+          "tzdata": "2025.2",
+          "python-docx": "1.2.0",
+          "python-pptx": "1.0.2",
+          "openpyxl": "3.1.5",
+          "Pillow": "12.3.0",
+          "lxml": "6.1.3",
+          "XlsxWriter": "3.2.9",
+          "typing_extensions": "4.16.0",
+          "et_xmlfile": "2.0.0",
+          "pip": "25.0.1"
+        },
+        "formats": [
+          "xlsx",
+          "docx",
+          "pptx",
+          "png",
+          "xml"
+        ],
+        "numpyDot": true
+      },
+      "node": "24.14.1",
+      "pnpm": "11.28.5",
+      "pnpmExec": true,
+      "exactBashApproval": true,
+      "restartReadyMs": 5672,
+      "samePathsAfterRestart": true,
+      "temporaryCredentialRemoved": true,
+      "originalProfileRestored": true
+    }
+  },
+  "freshStartup": {
+    "freshEmulator": true,
+    "target": "127.0.0.1:15561",
+    "firstLaunch": {
+      "observedArkWebMs": 48363,
+      "archiveValidationMarker": "2059053:1795032922",
+      "logSha256": "2bb1fb8f2be75ff704498316505c2d67aeede659b181ab6e19b2aaa2c12ae4d9",
+      "command": [
+        "tests/bench/measure-emulator-start.sh",
+        "127.0.0.1:15561",
+        "fresh"
+      ],
+      "archiveWasAlreadyExtracted": false
+    },
+    "restart": {
+      "observedArkWebMs": 14262,
+      "archiveValidationMarker": "2059053:1795032922",
+      "logSha256": "1662d4a041a29877e38962d8511a9e65cac5b8899deceed67a37735fac89617c",
+      "command": [
+        "tests/bench/measure-emulator-start.sh",
+        "127.0.0.1:15561",
+        "restart"
+      ],
+      "archiveWasAlreadyExtracted": true
+    }
+  },
+  "recovery": {
+    "readyMs": 6163,
+    "runtimeToolPatchOmitted": true,
+    "authenticatedRecoveryPageStatus": 200,
+    "normalModeRestored": true
+  },
+  "profileAudit": {
+    "installedVersion": "0.4.61",
+    "installedVersionCode": 68,
+    "profileMatches0.4.60": true,
+    "testKeyAbsent": true,
+    "permission": "workspace-write",
+    "unauthenticatedStatus": 401
+  },
+  "earlierFixtureFailures": [
+    {
+      "logSha256": "1b35e6d037d57ded02eddf6719696d00f554abfd9389b4225d3847a426a80b5b",
+      "cause": "The generic office skill has no Python-specific section. The fixture now calls office-xlsx."
+    },
+    {
+      "logSha256": "fcf1dc3e6b0031d97e54713dca1cce3954682382f7b698d8fa8fca28a50491c0",
+      "cause": "The first long inline command did not produce an approval event. The verified version runs a named, owned script."
+    },
+    {
+      "jsonSha256": "0fb312d6fd8fa61323d341bfca4b877cb10d0a0d788c3d3f1ae20d2efb989a75",
+      "cause": "A first profile audit caught the default model written by fixture selection. The fixture now restores the starting patch."
+    }
+  ],
+  "background0.4.58": {
+    "snapshotUtc": "2026-11-18T20:19:17+00:00",
+    "state": "running",
+    "jsonSha256": "72894b7685f97ad6c9c533ef579cef9a8b8b1b7f517548d8f410e2df388aa22c",
+    "observed": {
+      "deliveries": [
+        {
+          "afterSeconds": 16,
+          "finishedTurn": 2,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:12:39.773Z",
+            "deliveredAt": "2026-11-18T19:12:39.811Z",
+            "messageId": "57a3673c-9547-49db-96e7-09a0ce5f3abd",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 16876
+        },
+        {
+          "afterSeconds": 48,
+          "finishedTurn": 3,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:13:11.818Z",
+            "deliveredAt": "2026-11-18T19:13:11.843Z",
+            "messageId": "688c6723-36c9-457a-ba0c-48fd21c6660c",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 49645
+        },
+        {
+          "afterSeconds": 80,
+          "finishedTurn": 4,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:13:43.860Z",
+            "deliveredAt": "2026-11-18T19:13:43.889Z",
+            "messageId": "51adf218-7706-4bee-8c65-0c6a8304ce59",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 81869
+        },
+        {
+          "afterSeconds": 160,
+          "finishedTurn": 5,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:15:03.901Z",
+            "deliveredAt": "2026-11-18T19:15:04.013Z",
+            "messageId": "0168fc81-d81d-4ec7-be28-7dababa3297d",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 161448
+        },
+        {
+          "afterSeconds": 1800,
+          "finishedTurn": 6,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T19:42:23.939Z",
+            "deliveredAt": "2026-11-18T19:42:24.060Z",
+            "messageId": "aea9f860-8aa6-4951-86de-35e1dda08904",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 1813297
+        },
+        {
+          "afterSeconds": 3600,
+          "finishedTurn": 7,
+          "exactReply": true,
+          "source": "schedule",
+          "receipt": {
+            "scheduledAt": "2026-11-18T20:12:23.979Z",
+            "deliveredAt": "2026-11-18T20:12:24.136Z",
+            "messageId": "c9d27aad-c820-457f-9909-78ca0d8840dc",
+            "targetSessionId": "session-2f919df5-3f6a-4c2e-b711-4e22140b4efb"
+          },
+          "observedAtMs": 3609957
+        }
+      ],
+      "delaysSeconds": [
+        16,
+        48,
+        80,
+        160,
+        1800,
+        3600,
+        7200
+      ],
+      "restartAtSeconds": 105,
+      "finished": false,
+      "restart": {
+        "atMs": 106412,
+        "readyMs": 5689,
+        "priorJournalPreserved": true,
+        "undeliveredTasksPreserved": 4
+      }
+    }
+  },
+  "physicalDevice": "Mate 60 USB offline. No physical installation."
+}

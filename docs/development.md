@@ -278,6 +278,15 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 `--soak` 将七次投递分布在两小时内，并在第 105 秒后安排一次应用强停重启。检查旧事件前缀、重启前尚未投递的任务以及回到桌面后的真实模型回复。每次投递更新 JSON 检查点，`finished` 为真时表示最终回忆和清理已通过。长测占用该模拟器和临时模型密钥槽。
 
+## 工作区依赖工具
+
+构建使用 [PyPI wheel 锁文件](../runtime/harmonyos/dsh/office-wheels.json)，缓存位于 `.build/runtime-package-inputs/office-wheels/`。模拟器验收用真实模型调用 `load_workspace_dependencies` 和 `office-xlsx` 技能，再通过单次批准执行返回的 Python、Node 和 pnpm 路径。加 `--expect-absent` 可在 0.4.60 核对工具尚未暴露。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-workspace-dependencies.py <loopback-target> .build/workspace-deps.json
+```
+
 ## Cordis 与替代编辑回归
 
 0.4.36 修复独占创建发布后，以下检查使用真实模型和正式插件。Cordis 要求真实 ArkWeb 客户端已连接；超出 inline 上限时验证正式保留文件和实际 read。编辑测试仅临时启用官方字符串编辑器与 apply_patch；权限、完整字节、多文件预检及部分提交报告均保留检查。文件发布检查通过标准测试 bundle 验证实际 ctx.fs，包含真实暂存后的竞争创建和取消。

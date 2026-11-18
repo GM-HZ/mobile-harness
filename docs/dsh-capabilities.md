@@ -58,6 +58,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 原子创建与替代编辑 | 0.4.36 修复 hard-link EACCES，真实 ctx.fs 的竞争发布、取消与清理通过；官方字符串编辑、临时启用的 apply_patch、多文件预检及部分提交报告、越界和只读拒绝通过，保留默认开关。见 [适配](research/harmonyos-file-publication.md) |
 | Cordis 查询与诊断 Inspector | Cordis 查询 Host 与真实 ArkWeb 的 API 分类、分页、schema 和保留结果通过。0.4.44 的独立 Inspector 通过正式 DevTools 代理执行 Host 与 ArkWeb CDP 求值，端点访问控制与停用回收已验 |
 | Bash、Git、Python、pip、venv | 默认无系统沙箱则拒绝；精确命令单次审批后，两套 pip target／venv、Git、Node fetch、curl、SQLite 和时区夹具通过 |
+| 工作区依赖 | 0.4.61 通过官方工具读取 Alpine Python、Node、pnpm 和库路径，Office 技能使用随包 Python。13 个库的版本核对、离线文档读写、pnpm exec 与重启复用通过。 [实测证据](evidence/emulator-workspace-dependencies-0.4.61.json) |
 | 通用 PTC | 普通包默认提供 TypeScript 擦除、工作区文件读写、目录操作、元数据与跨目录相对路径 |
 | PTC 执行模式 | 默认模式、REPL、无持久化 Script、持久化 Script 均通过 |
 | PTC 文件策略 | 只读、工作区写、附加目录及目录边界拒绝通过 |
@@ -69,7 +70,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | Workflow／子代理 | 同步超时、两类运行中取消、后台结果投递通过。0.4.58 两条 Workflow 同时运行，各完成四个真实子任务，单条峰值并发为二，结果隔离和 helper 回收已验。 [并发证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | 自定义模型提供者 | 0.4.58 经标准设置热添加 pi-ai 路由，在 DeepSeek 公网验证 Chat Completions 和 Responses 的模型发现、文件读取工具往返与重启续接。 [模型路由证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
-| 定时任务 | 0.4.58 长测在第 106 秒强停重启，保留旧会话与待执行任务。跨过 30 分钟后第五次真实模型投递通过，两小时长测尚在运行。 [检查点](evidence/emulator-liveshare-owner-0.4.60.json) |
+| 定时任务 | 0.4.58 长测在第 106 秒强停重启，保留旧会话与待执行任务。跨过一小时后第六次真实模型投递通过，两小时长测尚在运行。 [检查点](evidence/emulator-workspace-dependencies-0.4.61.json) |
 | LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。公网 Relay 及真实身份提供方待验。 [实测证据](evidence/emulator-liveshare-owner-0.4.60.json) |
 | 思考内容翻译 | 0.4.59 通过应用私有 `HTTPS_PROXY` 访问 Bing 和 Google 的官方默认地址，真实译文和记录可跨重启回读。ArkWeb 的 DeepSeek Flash、切换原译文、拒绝后保留原文和停用取消均通过。模拟器直连仍有 Bing 400 和 Google 超时。 [公网与 ArkWeb 证据](evidence/emulator-translation-proxy-0.4.59.json) |
 | 插件及恢复 | 标准 bundle 安装、注入真实崩溃、自动安全模式及旧会话回读通过；实际点击设置恢复入口、原生正常模式按钮后恢复通过 |

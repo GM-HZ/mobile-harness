@@ -372,3 +372,9 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 鸿蒙 ArkWeb 支持 LiveShare 所有者登录窗口及授权回传。模拟器覆盖安装后完成隔离 Relay 的 PKCE 交换，验证重启恢复、独立查看端对话、范围拒绝及撤销。真实 DeepSeek 登录入口与受控账号回调均通过。
 
 未签名 HAP SHA-256 `46a930c796f2da483e8f875e33c04befaddf98c6d302711fd58cee88a241ceb5`。调试签名 HAP SHA-256 `67ef2fad340b3a6aac2925755eae984ca23d12809746e0a0773c8f0fb029bb3d`，离线验签及 204 个 payload 条目比对通过。公网 Relay 和 Mate 60 安装待验。 [制品与实测](evidence/emulator-liveshare-owner-0.4.60.json)
+
+## 0.4.61 工作区依赖与 Office Python
+
+鸿蒙普通 profile 启用 DSH 的工作区依赖工具，并交付上游同版本的 13 个 Python 库。真实模型查询路径，Office 技能指向随包运行时。单次批准后的 NumPy、pandas、DOCX、PPTX、XLSX、PNG、XML 与 pnpm 子命令实测通过。
+
+未签名 HAP 增加约 39.5 MiB。独立模拟器清空测试数据到观测 ArkWeb 加载完成约 48.4 秒，强停重启约 14.3 秒。调试签名 SHA-256 `eb38f9509c9a6a932bdde0465529d2b5ec320bfab5da6ddbfd11d2c9e40804a6`，离线验签及 208 个 payload 条目比对通过。Mate 60 安装待验。 [制品与实测](evidence/emulator-workspace-dependencies-0.4.61.json)

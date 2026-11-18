@@ -1,8 +1,8 @@
 # DSH 剩余工作清点
 
-截至 0.4.60，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.61，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
-- 28类工具包：23类已有实际调用证据，覆盖深度不同；5类为当前不适用／暂缓项（pwsh、pwsh-persistent、bash-persistent、terminal、workspace-dependencies）。
+- 28 类工具包中 24 类已有实际调用证据。4 类为当前不适用或暂缓项（pwsh、pwsh-persistent、bash-persistent、terminal）。
 - 16 个官方可选 bundle 中，11 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector、auto-review、personalized-recommendations、cot-translation），2 个暂缓（cua、terminal），3 个待完成。Forge 已通过本地工作树场景。
 - 3 个可选 bundle 和 5 组补充验收合计 8 个工作项。官方 RC.5 升级已在 0.4.42 验证。
 
@@ -20,9 +20,9 @@
 2. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。
 3. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。外部鸿蒙 addon 在主 Host 加载失败。其他原生依赖组合与用户指定的公网索引待验。DSH 官方市场接受自定义索引。
 4. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。0.4.57 已从 ArkWeb 打开 DeepSeek 官方登录页，隔离回环服务通过授权回调、重启保留与登出撤销。0.4.58 经标准设置添加 pi-ai 路由，使用 DeepSeek 公网通过 Chat Completions 和 Responses 两种协议的模型发现、工具往返与重启续接。真实账号授权与其他供应商端点待验。
-5. 0.4.60 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。0.4.58 模拟器两小时测试已跨过半小时并完成第 5 次后台投递，此前在第 106 秒强停后保留了会话及排队任务。最终结果待记录。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
+5. 0.4.61 调试签名 HAP 已构建，DevEco 应用签名和调试 profile 校验通过。0.4.58 模拟器两小时测试已跨过一小时并完成第 6 次后台投递，此前在第 106 秒强停后保留了会话及排队任务。最终结果待记录。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。
 
-系统 PTY、Phone／Computer Use、Windows 专用工具和 desktop-only workspace-dependencies 按既有范围单列。语言服务器、原生 wheel、WASM 与原生 addon 组合按具体需要验收。
+系统 PTY、Phone／Computer Use 和 Windows 专用工具按既有范围单列。语言服务器、原生 wheel、WASM 与原生 addon 组合按具体需要验收。
 
 0.4.41 通过插件市场、LSP 开关与恢复回归。0.4.42 升级 RC.5，覆盖安装后验证原权限、旧会话、实际搜索路由及受影响能力。[0.4.41 证据](../evidence/emulator-plugin-market-0.4.41.json) · [0.4.42 证据](../evidence/emulator-dsh-rc5-0.4.42.json)
 
@@ -65,3 +65,5 @@ Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提�
 0.4.59 修复了匿名翻译对 DSH 代理配置的应用。使用两个官方默认地址完成真实 CONNECT 和中文翻译，重启后完整回读两次译文。ArkWeb 的取消、失败保留原文和 DeepSeek Flash 复验通过。该模拟器的直接公网访问仍受环境限制。 [本轮证据](../evidence/emulator-translation-proxy-0.4.59.json)
 
 0.4.60 通过原生 LiveShare 弹窗和隔离 Relay 的所有者登录。复验真实 DeepSeek 登录入口及回环账号生命周期。0.4.58 并行后台测试在 30 分钟检查点完成第五次投递。 [本轮证据](../evidence/emulator-liveshare-owner-0.4.60.json)
+
+0.4.61 补齐工作区依赖工具和 13 个 Office Python 库。模型经正式工具找到路径后，批准的本地命令完成文件操作和 pnpm 执行。0.4.58 并行后台测试在一小时检查点完成第六次投递。 [本轮证据](../evidence/emulator-workspace-dependencies-0.4.61.json)

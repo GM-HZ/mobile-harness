@@ -13,6 +13,7 @@
 | Mobile Harness 管理的额外命令 | `/usr/local/bin` | 使用经打包验证的入口，启用时把该目录加入受管 Shell 的 `PATH`。 |
 | 多文件工具及私有依赖 | `/opt/mobile-harness/tools/<工具>/<版本>/{bin,lib,share}` | 命令入口选定明确版本，私有库由工具自己的加载路径解析。 |
 | Python 与 Node 项目依赖 | 工作区的 Python 依赖目录和 `node_modules` | Python 使用 `pip`，Node 使用项目声明的管理器和锁文件。环境可从锁文件重建，下载缓存可清理。 |
+| 随包工作区运行时 | `/opt/tools/office-python/<锁文件摘要>/site-packages`、`/opt/tools/node_modules` | 前者存放随包的 Office Python 库，后者为随包 Node 库预留。项目依赖沿用本项目的包管理目录。 |
 | DSH 插件 | DSH 管理的插件目录及 bundle／profile | 通过 DSH 插件管理器安装、启停和恢复，插件依赖按插件版本管理。 |
 
 `/usr/local/bin` 和工具私有目录是新增工具的约定。当前鸿蒙受管 Shell 的 `PATH` 是 `/bin:/usr/bin`。宿主的鸿蒙 NDK 库由 HAP 原生加载器加载。Linux ELF 随 HAP 交付时也可以使用 `libguest_*.so` 包内名，再由 PRoot 映射回 Linux 路径。按文件用途和 ABI 分类。比如 `libguest_bash.so` 实际暴露的是命令 `/bin/bash`，`libguest_musl.so` 暴露的是 Linux 加载器和 libc。见 [随包映射](../runtime/harmonyos/native/poc.c) 和 [生成的工具映射](../runtime/harmonyos/native/guest-tools.inc)。
@@ -59,3 +60,7 @@
 ## 0.4.57 GitHub CLI
 
 Forge GitHub provider 通过签名映射使用 Alpine 3.22 community 的 ARM64 `github-cli 2.72.0-r6`。同一工具锁文件记录 APK 来源与摘要，暂存输入逐字节匹配原始 ELF，HAP 使用 DevEco 的标准符号剥离输出。可执行程序固定来自随包 `/usr/bin/gh`，账号配置位于应用私有 Harness home。保留上游调用的非交互、超时、取消与输出上限语义。 [实测记录](evidence/emulator-forge-overflow-0.4.57.json)
+
+## 0.4.61 工作区运行时
+
+标准 `load_workspace_dependencies` 返回 Alpine 的 Python、Node、pnpm 和库路径。Python 通过系统级 `.pth` 指向当前 HAP 的 Office 库，版本与上游 RC.5 清单一致。构建按 SHA-256 从 PyPI 校验 13 个 wheel，保留发行包元数据和许可证。用户项目仍可使用自己的 venv 和 pnpm 锁文件。 [wheel 锁文件](../runtime/harmonyos/dsh/office-wheels.json) · [回归记录](evidence/emulator-workspace-dependencies-0.4.61.json)

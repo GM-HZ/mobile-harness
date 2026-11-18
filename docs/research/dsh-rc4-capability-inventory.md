@@ -32,7 +32,7 @@
 | todo | 是 | 精确全量 todo/write 快照已验 |
 | working-directory | 是 | 切目录、相对文件、子任务 cwd 独立性与重启后继续均通过 |
 | workflow | 是 | 真实并行、同步超时、实际同步片段取消、子任务取消与后台投递已验 |
-| workspace-dependencies | 是 | 上游仅在 desktop＋DSH_PRIMARY_RUNTIME 时启用；当前 web profile 不启用 |
+| workspace-dependencies | 是 | 0.4.61 通过官方工具查询 Alpine 应用内 Python、Node、pnpm 与库路径。Office 技能和本地脚本经过模拟器验证 |
 | web | 是 | 实际 HTTP/1、HTTPS、搜索、跳转、限额与取消通过；代理有电脑双运行时对照 |
 
 官方还提供 16 个默认关闭的可选 bundle，以及 Claude Code／Codex 两个按需安装入口。Phone／Computer Use、系统 PTY 的既有暂缓要求保持；任意外部 CLI、其他供应商账号、语音提供者或桌面插件不能凭组件存在宣称鸿蒙兼容。
