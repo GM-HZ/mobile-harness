@@ -240,11 +240,17 @@ def activate_version(emulator, result, version, evidence):
     evidence[version] = {'reason': result['restartReason'], 'readyMs': emulator.ready('normal')}
 
 
+def profile_file(emulator, path):
+    if emulator.app(f'test -f {path} && printf PRESENT') == 'PRESENT':
+        return agent['read_bytes'](emulator, path)
+    return None
+
+
 def verify_install_cancellation(emulator, server, name, folder, target):
     path = f'/{name}/-/{name}-1.0.0.tgz'
     request_id = str(uuid.uuid4())
     files = [PROFILE+'/'+part for part in ['package.json', 'pnpm-lock.yaml']]
-    originals = {file: agent['read_bytes'](emulator, file) for file in files}
+    originals = {file: profile_file(emulator, file) for file in files}
     started, release = threading.Event(), threading.Event()
     server.download_gates[path] = (started, release)
     options = {'registry': target['registry'], 'enabled': True, 'saveExact': True, 'requestId': request_id}
@@ -257,7 +263,7 @@ def verify_install_cancellation(emulator, server, name, folder, target):
             result = installing.result(timeout=4)
             assert cancellation == {'status': 'cancelled'} and result['application'] == 'cancelled', (cancellation, result)
             assert emulator.rpc('pluginManager/cancelInstall', {'requestId': request_id}) == {'status': 'not-running'}
-            assert all(agent['read_bytes'](emulator, file) == body for file, body in originals.items())
+            assert all(profile_file(emulator, file) == body for file, body in originals.items())
             row = catalog(emulator, name)
             assert row is None or not row['installed'], row
             assert emulator.app(f'test ! -e {folder}/events.log && printf ABSENT') == 'ABSENT'
@@ -370,8 +376,7 @@ def run(emulator, output):
         emulator.ready('normal')
         for path in [PROFILE+'/package.json', PROFILE+'/pnpm-lock.yaml', 'mobile-harness-boot.json',
                      PROFILE+'/cordis.patch.yml']:
-            exists = emulator.app(f'test -f {path} && printf PRESENT') == 'PRESENT'
-            originals[path] = agent['read_bytes'](emulator, path) if exists else None
+            originals[path] = profile_file(emulator, path)
         evidence['defaultCatalog'] = market(emulator, False)
         emulator.app('mkdir ' + folder)
         reply = emulator.hdc('rport', *reverse)

@@ -2,6 +2,7 @@
 import argparse
 import base64
 from datetime import datetime, timedelta, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -72,6 +73,46 @@ def verify_viewer_turn(device, port, share, session, evidence):
                 return
         time.sleep(.2)
     raise AssertionError('The specific viewer prompt did not complete')
+
+
+def verify_shared_attachments(device, port, share, session, evidence):
+    vision = runpy.run_path(str(Path(__file__).with_name('emulator-deepseek-vision.py')))
+    colors = ('green', 'blue', 'red', 'yellow')
+    blobs = [vision['sample'](*colors[:2]), vision['sample'](*colors[2:])]
+    receipts = [vision['upload'](device, session, f'share-image-{index}.png', image)
+                for index, image in enumerate(blobs)]
+    reply, reason, attached = vision['execute'](device, session, receipts)
+    assert reply.lower().split() == list(colors), reply
+
+    def read_images():
+        images = []
+        for receipt in receipts:
+            attachment = receipt['image']
+            request = {'request': {'sessionId': session, 'attachment': attachment}}
+            status, body = reader_rpc(port, share, 'session/attachment', request)
+            assert status == 200 and body['result']['ok'], (status, list(body))
+            shared = body['result']['value']
+            assert shared['attachment']['attachmentId'] == attachment['attachmentId']
+            assert shared == device.rpc('session/attachment', request)
+            images.append(hashlib.sha256(base64.b64decode(shared['data'], validate=True)).hexdigest())
+        return images
+
+    checksums = read_images()
+    assert len(set(checksums)) == len(blobs)
+    flow['flow']['restart'](device)
+    until = time.monotonic()+18
+    while time.monotonic() < until:
+        rows = device.rpc('liveshareShares/list', {})['shares']
+        if any(row['shareId'] == share and row['online'] for row in rows):
+            break
+        time.sleep(.25)
+    else:
+        raise AssertionError('LiveShare did not reconnect for the attachment read')
+    assert read_images() == checksums
+    evidence['sharedAttachments'] = {'count': len(blobs), 'modelReply': reply,
+        'turnEndReason': reason['kind'], 'attachmentIds': attached,
+        'viewerBytesMatchedOwner': True, 'viewerBytesRestoredAfterRestart': True,
+        'sha256': checksums}
 
 
 def program_result(device, port, share, session, args):
@@ -182,7 +223,7 @@ def verify_program_policy(device, port, share, session, folder, sessions, eviden
         assert owner(device, 'stop', {'shareId': other}) == {'ok': True}
 
 
-def verify_reader(device, port, share, shared, outside, evidence, model, program_check):
+def verify_reader(device, port, share, shared, outside, evidence, model, program_check, attachments):
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''}, token=None)
     assert status == 401 and body['error'] == 'viewer-login-required'
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
@@ -211,9 +252,11 @@ def verify_reader(device, port, share, shared, outside, evidence, model, program
         'anonymousRefused': True, 'htmlBytes': len(html), 'visibleSessionIds': sorted(visible),
         'accessRefusalCodes': refusals, 'sharedHistoryReadable': True,
     }
-    if model or program_check:
+    if model or program_check or attachments:
         with support['model_key'](device):
             verify_viewer_turn(device, port, share, shared[0], evidence)
+            if attachments:
+                verify_shared_attachments(device, port, share, shared[0], evidence)
             if program_check:
                 program_check()
         evidence['testModelKeyRemoved'] = True
@@ -256,7 +299,7 @@ def verify_owner_login(device, title, evidence):
     evidence['arkwebOwnerVerified'] = True
 
 
-def run(device, output, model, owner_login, host_port, program_policy):
+def run(device, output, model, owner_login, host_port, program_policy, attachments=False):
     node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
     fixture = Path(__file__).with_name('fixtures')/'liveshare-relay.cjs'
     name = 'mh-share-relay-'+uuid.uuid4().hex[:10]
@@ -357,7 +400,7 @@ def run(device, output, model, owner_login, host_port, program_policy):
             verify_program_policy(device, relay_port, share, sessions[0], folder, sessions, evidence)
 
         verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model,
-                      program_check if program_policy else None)
+                      program_check if program_policy else None, attachments)
         evidence['stop'] = owner(device, 'stop', {'shareId': share})
         assert evidence['stop'] == {'ok': True} and device.rpc('liveshareShares/list', {}) == {'shares': []}
         status, _ = relay_call(relay_port, share, {'op': 'asset', 'path': ''})
@@ -425,11 +468,12 @@ if __name__ == '__main__':
     parser.add_argument('--model', action='store_true', help='Also send an owned prompt to the actual model')
     parser.add_argument('--owner-login', action='store_true', help='Complete LiveShare owner authorization in ArkWeb')
     parser.add_argument('--program-policy', action='store_true', help='Exercise viewer and fork workspace programs')
+    parser.add_argument('--attachments', action='store_true', help='Verify viewer access to shared images after restart')
     parser.add_argument('--host-port', type=int, default=19643)
     args = parser.parse_args()
-    if (args.model or args.owner_login or args.program_policy) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
+    if (args.model or args.owner_login or args.program_policy or args.attachments) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('The selected live model scenario requires MH_TEST_DEEPSEEK_API_KEY')
     if args.program_policy and args.owner_login:
         parser.error('--program-policy requires the program preset; run the native login test separately')
     run(support['Emulator'](args.target, args.host_port), args.output, args.model, args.owner_login,
-        args.host_port, args.program_policy)
+        args.host_port, args.program_policy, args.attachments)
