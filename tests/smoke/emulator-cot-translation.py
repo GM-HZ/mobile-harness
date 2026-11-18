@@ -205,9 +205,11 @@ def verify_fixture(emulator, server, title, marker, session, evidence):
         assert server.closed.wait(12), 'Disabling translation did not close its HTTP request'
         wait(run, f'!document.querySelector({json.dumps(BODY)})', 'translation controls to unmount')
     events = support['events'](emulator, session)
-    assert [row for row in events if not row['type'].startswith('plugin:translator/')] == original
-    assert sum(row['type']=='plugin:translator/result' for row in events)==2
-    evidence['persistedRecordTypes'] = [row['type'] for row in events if row['type'].startswith('plugin:translator/')]
+    assert events[:len(original)] == original
+    appended = [row['type'] for row in events[len(original):]]
+    assert set(appended) <= {'plugin:translator/request','plugin:translator/result','session/end-seed'}, appended
+    assert appended.count('plugin:translator/result') == 2
+    evidence['appendedEventTypes'] = appended
     expected = [('bing', 'zh-Hans'), ('google', 'ja'), ('google', 'ja'), ('google', 'de')]
     assert [(row['provider'],row['target']) for row in server.calls] == expected, server.calls
     assert all(row['requestShape'] and row['text']==SOURCE and not row['authorization'] and not row['cookie'] for row in server.calls)
@@ -269,26 +271,25 @@ def run(emulator, output, live):
             evidence['availableProviders'] = limits['availableProviders']
             setting(emulator,'bing','zh')
             if live:
-                evidence['liveTranslations'] = {}
-                for provider in ['bing', 'deepseek-official']:
-                    assert provider in limits['availableProviders'], limits
-                    setting(emulator,provider,'zh')
-                    evidence['selectedLiveProvider'] = provider
-                    try:
-                        translation = emulator.rpc('cotTranslation/translate',{
-                            'request':{'text':SOURCE,'sessionId':session,'provider':provider,'targetLanguage':'zh'},
-                        },timeout=70)
-                    except RuntimeError:
-                        evidence['recordsAfterFailure'] = [row['type'] for row in support['events'](emulator,session)
-                                                           if row['type'].startswith('plugin:translator/')]
-                        raise
-                    assert translation != SOURCE and any('\u4e00' <= char <= '\u9fff' for char in translation), translation
-                    evidence['liveTranslations'][provider] = translation
-                paid, = [row['data']['metadata']['modelRequest'] for row in support['events'](emulator,session)
-                         if row['type']=='plugin:translator/request' and row['data']['provider']=='deepseek-official']
-                assert paid['config']['model']=='deepseek-flash' and paid['config']['reasoningEffort']=='off', paid['config']
-                assert paid['messages']==[{'role':'user','content':[{'type':'text','text':SOURCE}]}]
-                evidence['isolatedFlashRequest'] = {'model':'deepseek-flash','reasoningEffort':'off','messages':1}
+                assert live in limits['availableProviders'], limits
+                setting(emulator,live,'zh')
+                evidence['selectedLiveProvider'] = live
+                try:
+                    translation = emulator.rpc('cotTranslation/translate',{
+                        'request':{'text':SOURCE,'sessionId':session,'provider':live,'targetLanguage':'zh'},
+                    },timeout=70)
+                except RuntimeError:
+                    evidence['recordsAfterFailure'] = [row['type'] for row in support['events'](emulator,session)
+                                                       if row['type'].startswith('plugin:translator/')]
+                    raise
+                assert translation != SOURCE and any('\u4e00' <= char <= '\u9fff' for char in translation), translation
+                evidence['liveTranslation'] = translation
+                if live == 'deepseek-official':
+                    paid, = [row['data']['metadata']['modelRequest'] for row in support['events'](emulator,session)
+                             if row['type']=='plugin:translator/request' and row['data']['provider']=='deepseek-official']
+                    assert paid['config']['model']=='deepseek-flash' and paid['config']['reasoningEffort']=='off', paid['config']
+                    assert paid['messages']==[{'role':'user','content':[{'type':'text','text':SOURCE}]}]
+                    evidence['isolatedFlashRequest'] = {'model':'deepseek-flash','reasoningEffort':'off','messages':1}
             else:
                 restart(emulator)
                 verify_fixture(emulator,server,title,fixture,session,evidence)
@@ -322,7 +323,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
-    parser.add_argument('--live',action='store_true',help='Use real Bing and configured DeepSeek Flash with the synthetic fixture')
+    parser.add_argument('--live',choices=['bing','google','deepseek-official'],help='Use a real provider with the synthetic fixture')
     args = parser.parse_args()
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('MH_TEST_DEEPSEEK_API_KEY is required for the configured ArkWeb fixture')
