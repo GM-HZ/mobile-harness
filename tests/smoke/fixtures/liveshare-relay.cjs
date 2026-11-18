@@ -142,7 +142,8 @@ server.on('upgrade', (request, socket, head) => {
         owner,
         authority: {
           version: 1, accessMode: url.searchParams.get('accessMode'),
-          allowedSubjectIds: url.searchParams.getAll('allowedSubjectId'), sessionMode: 'view',
+          allowedSubjectIds: url.searchParams.getAll('allowedSubjectId'),
+          sessionMode: url.searchParams.get('sessionMode') === 'write' ? 'write' : 'view',
         },
       };
       state.channel = channel;

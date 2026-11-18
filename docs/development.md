@@ -423,6 +423,8 @@ python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-gith
 
 加 `--owner-login` 可以通过实际 ArkWeb 的分享对话框打开授权，点击测试 Relay 的同意按钮并检查 PKCE 交换与身份显示。测试 Relay 使用本机回环和临时身份，生产 Relay 的部署与真实身份提供方单独验证。
 
+加 `--program-policy` 使用 PTC 预设，在同一会话同时开设只读和可写链接。真实模型调用 `run_code`，检查原生 worker 获准的模式、作用域、单次生命周期和派生会话的撤销。测试另核对主人直接执行、访客申请扩大权限时的拒绝及程序调用内置写工具的权限。需要测试模型凭据。与 `--owner-login` 分开运行。
+
 ```sh
 python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-relay.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
@@ -430,6 +432,9 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-owner.json \
   --owner-login --model
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-program.json \
+  --program-policy
 ```
 
 ## Goal 跨重启续跑

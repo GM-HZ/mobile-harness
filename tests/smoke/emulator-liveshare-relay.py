@@ -74,7 +74,115 @@ def verify_viewer_turn(device, port, share, session, evidence):
     raise AssertionError('The specific viewer prompt did not complete')
 
 
-def verify_reader(device, port, share, shared, outside, evidence, model):
+def program_result(device, port, share, session, args):
+    req = str(uuid.uuid4())
+    prompt = 'Actually call run_code exactly once with precisely ' + json.dumps(args) + '. Use no other tools. Report the result.'
+    status, body = reader_rpc(port, share, 'session/prompt', {'request': {
+        'sessionId': session, 'requestId': req, 'mode': 'queue', 'content': [{'type': 'text', 'text': prompt}],
+    }})
+    assert status == 200 and body['result']['ok'], (status, body)
+    deadline = time.monotonic() + 60
+    while time.monotonic() < deadline:
+        rows = support['events'](device, session)
+        anchor = next((row for row in rows if row['type'] == 'user/message' and
+                       row['data']['source'].get('rpcId') == req), None)
+        if anchor:
+            source = anchor['data']['source']['principal']
+            assert source['kind'] == 'share-viewer' and source['shareId'] == share
+            following = [row for row in rows if row['seq'] > anchor['seq']]
+            end = next((row for row in following if row['type'] == 'turn/end'), None)
+            if end:
+                assert end['data']['reason']['kind'] == 'completed', end
+                calls = [row['data'] for row in following if row['seq'] < end['seq'] and row['type'] == 'tool/call']
+                call, = calls
+                assert call['name'] == 'run_code' and json.loads(call['arguments']) == args, call
+                result, = (row['data']['message'] for row in following if row['seq'] < end['seq'] and
+                           row['type'] == 'tool/result' and row['data']['message']['toolCallId'] == call['callId'])
+                return result, end['seq']
+        time.sleep(.15)
+    raise AssertionError('The viewer program did not finish')
+
+
+def program_trace(device):
+    return [json.loads(row) for row in device.app('cat alpine/tmp/dsh-native-timeline.log').splitlines()]
+
+
+def scoped_program(device, port, share, session, args, marker, mode, *, fork=False):
+    offset = len(program_trace(device))
+    result, seq = program_result(device, port, share, session, args)
+    text = agent['toolkit']['texts']([result])
+    assert not result['isError'] and marker in text, result
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        rows = program_trace(device)[offset:]
+        policies = [row for row in rows if row['event'] == 'liveshare-ptc-policy']
+        entered = [row for row in rows if row['event'] == 'ptc-worker-admitted']
+        reaped = {row['id'] for row in rows if row['event'] == 'ptc-worker-reaped'}
+        if entered and entered[0]['id'] in reaped:
+            policy, = policies
+            worker, = entered
+            assert policy['mode'] == worker['mode'] == mode and policy['fork'] == fork, rows
+            return seq
+        time.sleep(.12)
+    raise AssertionError('The scoped PTC worker did not exit')
+
+
+def verify_program_policy(device, port, share, session, folder, sessions, evidence):
+    result = evidence['programPolicy'] = {}
+    mark = 'OWNED_'+uuid.uuid4().hex.upper()
+    device.app(f'printf %s {mark} > {folder}/shared-fixture.txt')
+    source = {'sessionId': session, 'sessionTitle': 'Scoped write fixture', 'sessionMode': 'write',
+              'allowsFork': True, 'accessMode': 'selected', 'allowedSubjectIds': ['fixture:local:reader']}
+    other = owner(device, 'create', source)['shareId']
+    try:
+        read = {'description': 'Read the shared fixture', 'code':
+                'const fs = await import("node:fs/promises"); return await fs.readFile("shared-fixture.txt", "utf8");'}
+        at_seq = scoped_program(device, port, share, session, read, mark, 'read-only')
+        result['viewRemainsReadOnlyAlongsideWriteShare'] = True
+        nested = {'description': 'Check the shared file tool authorization', 'code':
+                  'try { await tools.write({file_path:"readonly-output.txt",content:"fixture"}); '
+                  'return "UNEXPECTED_WRITE"; } catch (error) { return String(error); }'}
+        scoped_program(device, port, share, session, nested, 'this share does not allow writing', 'read-only')
+        assert device.app('test ! -e '+folder+'/readonly-output.txt && printf ABSENT') == 'ABSENT'
+        result['nestedWriteDeniedAcrossViewerTiers'] = True
+        offset = len(program_trace(device))
+        denied, _ = program_result(device, port, share, session, {
+            'description': 'Check the share escalation policy', 'code': 'return "SCOPE_CHECK";',
+            'sandbox_permissions': 'danger-full-access', 'justification': 'Only run the isolated scope check.',
+        })
+        assert denied['isError'] and 'cannot request wider sandbox permissions' in agent['toolkit']['texts']([denied]), denied
+        assert not any(row['event'] == 'ptc-worker-admitted' for row in program_trace(device)[offset:])
+        result['escalationDeniedBeforeWorkerLaunch'] = True
+        write = {'description': 'Write the fixture inside the shared directory', 'code':
+                 'const fs = await import("node:fs/promises"); await fs.writeFile("owned-output.txt", '
+                 + json.dumps(mark) + '); return "SCOPED_WRITE";'}
+        scoped_program(device, port, other, session, write, 'SCOPED_WRITE', 'workspace-write')
+        assert device.app('cat '+folder+'/owned-output.txt') == mark
+        result['boundedWriteCompleted'] = True
+        fork_request = {'request': {'sessionId': session, 'atSeq': at_seq, 'operationId': str(uuid.uuid4())}}
+        status, response = reader_rpc(port, share, 'session/fork', fork_request)
+        assert status == 200 and response['result']['ok'], (status, response)
+        child = response['result']['value']['sessionId']
+        sessions.append(child)
+        status, replay = reader_rpc(port, share, 'session/fork', fork_request)
+        assert status == 200 and replay['result']['value']['sessionId'] == child, replay
+        device.rpc('session/selectModel', {'request': {'sessionId': child, 'provider': 'deepseek-official',
+                                                        'model': 'deepseek-flash', 'reasoningEffort': 'off'}})
+        scoped_program(device, port, share, child, read, mark, 'read-only', fork=True)
+        result['readOnlyForkAndReplay'] = True
+        result['childSessionId'] = child
+        offset = len(program_trace(device))
+        confirmed, _ = agent['tool'](device, session, 'run_code', read)
+        assert mark in agent['toolkit']['texts']([confirmed])
+        owner_rows = program_trace(device)[offset:]
+        assert not any(row['event'] == 'liveshare-ptc-policy' for row in owner_rows), owner_rows
+        assert any(row['event'] == 'ptc-worker-admitted' and row['mode'] == 'workspace-write' for row in owner_rows)
+        result['ownerPolicyUnaffected'] = True
+    finally:
+        assert owner(device, 'stop', {'shareId': other}) == {'ok': True}
+
+
+def verify_reader(device, port, share, shared, outside, evidence, model, program_check):
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''}, token=None)
     assert status == 401 and body['error'] == 'viewer-login-required'
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
@@ -103,15 +211,21 @@ def verify_reader(device, port, share, shared, outside, evidence, model):
         'anonymousRefused': True, 'htmlBytes': len(html), 'visibleSessionIds': sorted(visible),
         'accessRefusalCodes': refusals, 'sharedHistoryReadable': True,
     }
-    if model:
+    if model or program_check:
         with support['model_key'](device):
             verify_viewer_turn(device, port, share, shared[0], evidence)
+            if program_check:
+                program_check()
         evidence['testModelKeyRemoved'] = True
     status, body = relay_call(port, share, {}, path='/__fixture/revoke', token='fixture-admin')
     assert status == 200 and body['revoked'] is True
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
     assert (status, body.get('error')) == (403, 'viewer-not-authorized'), (status, body)
     evidence['ownerAppliedLiveRevocation'] = True
+    if program_check:
+        status, body = history(evidence['programPolicy']['childSessionId'])
+        assert (status, body.get('error')) == (403, 'viewer-not-authorized'), (status, body)
+        evidence['revokedForkHistoryRefused'] = True
 
 
 def verify_owner_login(device, title, evidence):
@@ -142,7 +256,7 @@ def verify_owner_login(device, title, evidence):
     evidence['arkwebOwnerVerified'] = True
 
 
-def run(device, output, model, owner_login, host_port):
+def run(device, output, model, owner_login, host_port, program_policy):
     node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
     fixture = Path(__file__).with_name('fixtures')/'liveshare-relay.cjs'
     name = 'mh-share-relay-'+uuid.uuid4().hex[:10]
@@ -207,7 +321,10 @@ def run(device, output, model, owner_login, host_port):
             sessions.extend(uploaded[-1]['outcome']['value']['sessionIds'])
             assert 1 <= len(sessions) <= 2
         for _ in range(3 - len(sessions)):
-            sessions.append(device.rpc('session/create', {'request': {'workspaceId': workspace}})['sessionId'])
+            args = {'workspaceId': workspace}
+            if program_policy and not sessions:
+                args['agentPreset'] = 'ptc'
+            sessions.append(device.rpc('session/create', {'request': args})['sessionId'])
         if owner_login:
             with support['model_key'](device):
                 device.rpc('session/selectModel', {'request': {'sessionId': sessions[0], 'provider': 'deepseek-official',
@@ -217,7 +334,7 @@ def run(device, output, model, owner_login, host_port):
         evidence['authorized'] = owner(device, 'testPublish', {'sessionId': sessions[0]})
         assert evidence['authorized'] == {'ok': True, 'blocking': False}, evidence['authorized']
         created = owner(device, 'create', {'sessionId': sessions[0], 'sessionTitle': 'Loopback DSH fixture',
-                                           'sessionMode': 'view', 'allowsFork': False, 'accessMode': 'selected',
+                                           'sessionMode': 'view', 'allowsFork': program_policy, 'accessMode': 'selected',
                                            'allowedSubjectIds': ['fixture:local:reader']})
         share = created['shareId']
         evidence['created'] = created
@@ -236,7 +353,11 @@ def run(device, output, model, owner_login, host_port):
         else:
             raise AssertionError('LiveShare did not reconnect after restarting the Host')
         evidence['restoredOnlineSources'] = rows[0]['sessionIds']
-        verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model)
+        def program_check():
+            verify_program_policy(device, relay_port, share, sessions[0], folder, sessions, evidence)
+
+        verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model,
+                      program_check if program_policy else None)
         evidence['stop'] = owner(device, 'stop', {'shareId': share})
         assert evidence['stop'] == {'ok': True} and device.rpc('liveshareShares/list', {}) == {'shares': []}
         status, _ = relay_call(relay_port, share, {'op': 'asset', 'path': ''})
@@ -303,8 +424,12 @@ if __name__ == '__main__':
     parser.add_argument('output', type=Path)
     parser.add_argument('--model', action='store_true', help='Also send an owned prompt to the actual model')
     parser.add_argument('--owner-login', action='store_true', help='Complete LiveShare owner authorization in ArkWeb')
+    parser.add_argument('--program-policy', action='store_true', help='Exercise viewer and fork workspace programs')
     parser.add_argument('--host-port', type=int, default=19643)
     args = parser.parse_args()
-    if (args.model or args.owner_login) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
-        parser.error('--model and --owner-login require MH_TEST_DEEPSEEK_API_KEY')
-    run(support['Emulator'](args.target, args.host_port), args.output, args.model, args.owner_login, args.host_port)
+    if (args.model or args.owner_login or args.program_policy) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
+        parser.error('The selected live model scenario requires MH_TEST_DEEPSEEK_API_KEY')
+    if args.program_policy and args.owner_login:
+        parser.error('--program-policy requires the program preset; run the native login test separately')
+    run(support['Emulator'](args.target, args.host_port), args.output, args.model, args.owner_login,
+        args.host_port, args.program_policy)
