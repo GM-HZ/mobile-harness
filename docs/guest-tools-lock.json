@@ -159,6 +159,12 @@
       "sha256": "3a9d21f071031f36a323dc245005b6f711e7e0a9f76854dd5c85be0ba8a7e651"
     },
     {
+      "name": "github-cli",
+      "archive": "github-cli-2.72.0-r6.apk",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/community/aarch64/",
+      "sha256": "86e94d775a6e79950663ee3bedabf7cf4e6ef6cfb5919c7fd686d025f8817b0c"
+    },
+    {
       "name": "sqlite",
       "archive": "sqlite-3.49.2-r1.apk",
       "sha256": "23cc7ebfee1170d2e6be5740ef5eae1c522691e164e399629f9147705370e8c9"

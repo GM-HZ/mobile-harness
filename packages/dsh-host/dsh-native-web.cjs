@@ -344,6 +344,7 @@ async function main() {
   const officeUrl = paths('dsh-office-kit/lib/index.js');
   const inspectorUrl = paths('dsh-experimental-inspector/lib/index.js');
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
+  const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
   const speechUrl = paths('dsh-experimental-speech-to-text-sensevoice/lib/index.js');
   const speechEntry = path.join(dsh, '@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/worker.js');
@@ -360,6 +361,9 @@ async function main() {
   }
   const mcpStdioUrl = pathToFileURL(path.join(dsh, '@modelcontextprotocol/client/dist/stdio.mjs')).href;
   const launchGuest = installProotSpawn(workspace);
+  globalThis.__harmonyGh = safeMode
+    ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
+    : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(launchGuest, quoteShellArgument);
   globalThis.__harmonyOffice = safeMode ? {
     createConverter() { throw Object.assign(new Error('Office workers are disabled in HarmonyOS recovery mode'), { code: 'unavailable' }); },
   } : require(path.join(root, 'dsh-harmony-office.cjs')).createOfficeFactory(root,
@@ -436,6 +440,11 @@ async function main() {
         patched = replacePinned(patched, 'console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);',
           'console.log("dsh inspector: /inspector/devtools/");');
         return { ...result, source: patched };
+      }
+      if (url === forgeGithubUrl) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        return { ...result, source: replacePinned(source, 'import { execa } from "execa";',
+          'const execa = globalThis.__harmonyGh;') };
       }
       if (url === liveshareUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();

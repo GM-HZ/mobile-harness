@@ -15,6 +15,7 @@ PIP_WHEEL = "ensurepip/_bundled/pip-25.0.1-py3-none-any.whl"
 EXECUTABLES = {
     "curl": ("usr/bin/curl", "libguest_tool_curl.so"),
     "sqlite": ("usr/bin/sqlite3", "libguest_tool_sqlite3.so"),
+    "github-cli": ("usr/bin/gh", "libguest_tool_gh.so"),
 }
 
 
@@ -46,7 +47,7 @@ def stage_guest_extras(root, stage, raw):
     data = {}
     native = stage / "entry/libs/arm64-v8a"
     for entry in lock["extras"]:
-        source = locked_archive(lock["base"], entry, cache)
+        source = locked_archive(entry.get("base", lock["base"]), entry, cache)
         with tarfile.open(source, ignore_zeros=True) as package:
             if entry["name"] == "tzdata":
                 for member in package.getmembers():

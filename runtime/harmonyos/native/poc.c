@@ -303,6 +303,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         { "libguest_busybox.so", "/bin/whoami" },
         { "libguest_tool_curl.so", "/usr/bin/curl" },
         { "libguest_tool_sqlite3.so", "/usr/bin/sqlite3" },
+        { "libguest_tool_gh.so", "/usr/bin/gh" },
         { "libguest_rg.so", "/bin/rg" },
         { "libguest_sharp.so", "/dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node" },
         { "libguest_vips.so", "/usr/lib/libvips-cpp.so.8.18.7" },
