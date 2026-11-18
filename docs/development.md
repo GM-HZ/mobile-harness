@@ -278,6 +278,15 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 `--soak` 将七次投递分布在两小时内，并在第 105 秒后安排一次应用强停重启。检查旧事件前缀、重启前尚未投递的任务以及回到桌面后的真实模型回复。每次投递更新 JSON 检查点，`finished` 为真时表示最终回忆和清理已通过。长测占用该模拟器和临时模型密钥槽。
 
+## Minimal 持久 Bash 回归
+
+仅在独立 Phone 模拟器运行。使用实际模型和官方 Bash 工具核对默认拒绝、两条会话状态隔离、退出码、后台任务、空 stdin，以及用户取消后的进程回收和重建。测试仅给测试会话选择完整文件权限，结束时恢复 profile 与临时模型凭据。0.4.61 可加 `--expect-absent` 验证旧包未暴露 Minimal 预设。
+
+```sh
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-persistent-bash.py <loopback-target> .build/persistent-bash.json
+```
+
 ## 工作区依赖工具
 
 构建使用 [PyPI wheel 锁文件](../runtime/harmonyos/dsh/office-wheels.json)，缓存位于 `.build/runtime-package-inputs/office-wheels/`。模拟器验收用真实模型调用 `load_workspace_dependencies` 和 `office-xlsx` 技能，再通过单次批准执行返回的 Python、Node 和 pnpm 路径。加 `--expect-absent` 可在 0.4.60 核对工具尚未暴露。

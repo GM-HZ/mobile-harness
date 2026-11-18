@@ -378,3 +378,11 @@ Creator 生成后计数器可以增加和重置。撤销写入需要重启的提
 鸿蒙普通 profile 启用 DSH 的工作区依赖工具，并交付上游同版本的 13 个 Python 库。真实模型查询路径，Office 技能指向随包运行时。单次批准后的 NumPy、pandas、DOCX、PPTX、XLSX、PNG、XML 与 pnpm 子命令实测通过。
 
 未签名 HAP 增加约 39.5 MiB。独立模拟器清空测试数据到观测 ArkWeb 加载完成约 48.4 秒，强停重启约 14.3 秒。调试签名 SHA-256 `eb38f9509c9a6a932bdde0465529d2b5ec320bfab5da6ddbfd11d2c9e40804a6`，离线验签及 208 个 payload 条目比对通过。Mate 60 安装待验。 [制品与实测](evidence/emulator-workspace-dependencies-0.4.61.json)
+
+## 0.4.62 持久 Bash
+
+Minimal 预设通过官方持久 Bash 工具复用一个受管 Alpine Shell。模拟器覆盖安装后，两条会话保留各自的目录、环境和函数。验证默认权限拒绝、明确授权后的后台任务、命令退出码，以及取消后进程回收和状态重建。Standard 预设经单次审批运行常用工具链，文件工具回归通过。
+
+同包复验工作区依赖、Office Python 和 pnpm。模拟器中的故障插件触发安全恢复，原会话可读，恢复后 profile 清单摘要一致。
+
+调试签名 HAP SHA-256 `9d6f5def40a5e2699418e180814ede28f7a19716936eddaf50307cc5501d0b41`，离线验签及 209 个 payload 条目比对通过。Mate 60 安装待验。 [制品与实测](evidence/emulator-persistent-bash-0.4.62.json)

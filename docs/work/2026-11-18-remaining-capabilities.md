@@ -1,8 +1,8 @@
 # DSH 剩余工作清点
 
-截至 0.4.61，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
+截至 0.4.62，按本工程的实际调用证据统计。工具包与可选包清单从 RC.4 建立，RC.5 的升级对照和测试见制品记录。
 
-- 28 类工具包中 24 类已有实际调用证据。4 类为当前不适用或暂缓项（pwsh、pwsh-persistent、bash-persistent、terminal）。
+- 28 类工具包中 25 类已有实际调用证据。3 类为当前不适用或暂缓项（pwsh、pwsh-persistent、terminal）。
 - 16 个官方可选 bundle 中，11 个完成当前验收（session-search、ralph、tool-worktree、badge-skill、session-titles、deepseek-chat-import、plugin-market、inspector、auto-review、personalized-recommendations、cot-translation），2 个暂缓（cua、terminal），3 个待完成。Forge 已通过本地工作树场景。
 - 3 个可选 bundle 和 5 组补充验收合计 8 个工作项。官方 RC.5 升级已在 0.4.42 验证。
 
@@ -67,3 +67,5 @@ Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提�
 0.4.60 通过原生 LiveShare 弹窗和隔离 Relay 的所有者登录。复验真实 DeepSeek 登录入口及回环账号生命周期。0.4.58 并行后台测试在 30 分钟检查点完成第五次投递。 [本轮证据](../evidence/emulator-liveshare-owner-0.4.60.json)
 
 0.4.61 补齐工作区依赖工具和 13 个 Office Python 库。模型经正式工具找到路径后，批准的本地命令完成文件操作和 pnpm 执行。0.4.58 并行后台测试在一小时检查点完成第六次投递。 [本轮证据](../evidence/emulator-workspace-dependencies-0.4.61.json)
+
+0.4.62 补齐 Minimal 预设的持久 Bash，支持跨轮目录、环境变量和函数、后台任务、退出码与两条会话隔离。默认权限下在启动前拒绝，已明确选择完整文件权限的会话可用。验证用户取消后回收进程、下轮重建、显式退出和配置恢复。 [本轮证据](../evidence/emulator-persistent-bash-0.4.62.json)

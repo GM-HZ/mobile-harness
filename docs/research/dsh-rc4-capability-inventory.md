@@ -13,7 +13,7 @@
 | present | 是 | 真实工具及持久交付事件已验，测试文件随后按夹具清理 |
 | pwsh | 是 | Windows 选择项；鸿蒙未启用，不承诺 PowerShell |
 | cordis | 是 | 0.4.36 真实模型查询 Host 四类和 ArkWeb 五类 provider，准确 schema、分页、完整 retention、拒绝与重启通过；与独立诊断 Inspector 区分，后者 Worker 鸿蒙绑定错误仍待修复 |
-| bash-persistent | 是 | 可选终端能力；系统 PTY 暂缓，未承诺完整持久终端 |
+| bash-persistent | 是 | 0.4.62 在 Minimal 预设通过官方工具的管道执行、跨轮状态、权限拒绝、后台进程、用户取消和独立会话。系统 PTY 暂缓。 [实测证据](../evidence/emulator-persistent-bash-0.4.62.json) |
 | pwsh-persistent | 是 | Windows／可选终端，不在鸿蒙验收范围 |
 | str-replace-editor | 是 | 0.4.36 修复原子创建后，创建／查看／替换／歧义／插入／删除及工作区、只读拒绝通过；仍由 preset 选择 |
 | fs | 是 | read／write／edit 既有回归；临时开启 apply_patch 的创建／移动／删除、预检零修改、部分提交报告和权限通过，正式默认开关不变 |

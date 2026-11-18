@@ -1,6 +1,6 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.58，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.62，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
@@ -58,6 +58,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 原子创建与替代编辑 | 0.4.36 修复 hard-link EACCES，真实 ctx.fs 的竞争发布、取消与清理通过；官方字符串编辑、临时启用的 apply_patch、多文件预检及部分提交报告、越界和只读拒绝通过，保留默认开关。见 [适配](research/harmonyos-file-publication.md) |
 | Cordis 查询与诊断 Inspector | Cordis 查询 Host 与真实 ArkWeb 的 API 分类、分页、schema 和保留结果通过。0.4.44 的独立 Inspector 通过正式 DevTools 代理执行 Host 与 ArkWeb CDP 求值，端点访问控制与停用回收已验 |
 | Bash、Git、Python、pip、venv | 默认无系统沙箱则拒绝；精确命令单次审批后，两套 pip target／venv、Git、Node fetch、curl、SQLite 和时区夹具通过 |
+| 持久 Bash | 0.4.62 在 Minimal 预设使用官方 Bash 工具，经受管 Alpine 管道跨轮保留目录、环境变量和函数。已验证会话隔离、后台任务、退出码与取消回收。仅在明确选择完整文件权限的会话启用，命令 stdin 立即 EOF。 [实测证据](evidence/emulator-persistent-bash-0.4.62.json) |
 | 工作区依赖 | 0.4.61 通过官方工具读取 Alpine Python、Node、pnpm 和库路径，Office 技能使用随包 Python。13 个库的版本核对、离线文档读写、pnpm exec 与重启复用通过。 [实测证据](evidence/emulator-workspace-dependencies-0.4.61.json) |
 | 通用 PTC | 普通包默认提供 TypeScript 擦除、工作区文件读写、目录操作、元数据与跨目录相对路径 |
 | PTC 执行模式 | 默认模式、REPL、无持久化 Script、持久化 Script 均通过 |
