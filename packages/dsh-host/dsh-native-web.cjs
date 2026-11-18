@@ -410,6 +410,8 @@ async function main() {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         const workerArgs = ['--expose-internals', '--require', path.join(root, 'dsh-harmony-inspector-worker.cjs')];
         let patched = replacePinned(source, 'execArgv: []', 'execArgv: ' + JSON.stringify(workerArgs));
+        patched = replacePinned(patched, 'workerData: boot,',
+          'workerData: { ...boot, harmonyInspectorWorkerUrl: new URL("./worker.js", import.meta.url).href },');
         patched = replacePinned(patched, 'for (const [key, value] of Object.entries(req.headers)) if (key.startsWith("sec-websocket-")',
           'upstream.write("X-DSH-Inspector-Token: " + handle.endpoint.client.protocol + "\\r\\n");\n' +
           'for (const [key, value] of Object.entries(req.headers)) if (key.startsWith("sec-websocket-")');

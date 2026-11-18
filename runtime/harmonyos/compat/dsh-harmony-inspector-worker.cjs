@@ -1,10 +1,12 @@
 'use strict';
 
 const { Module, registerHooks } = require('node:module');
-const { pathToFileURL } = require('node:url');
-const { isMainThread } = require('node:worker_threads');
+const { isMainThread, workerData } = require('node:worker_threads');
 
-if (isMainThread || !process.argv[1]) throw new Error('Expected the packaged Inspector Worker');
+const entry = workerData?.harmonyInspectorWorkerUrl;
+if (isMainThread || typeof entry !== 'string' || !entry.startsWith('file:')) {
+  throw new Error('Expected the packaged Inspector Worker');
+}
 
 const allowed = new Set([
   'internal/modules/cjs/loader',
@@ -29,7 +31,6 @@ Module._load = function (id, ...args) {
 
 // Forward only requests authorized by the Host's existing DevTools proxy.
 // The browser ingest socket keeps its independent origin and protocol checks.
-const entry = pathToFileURL(process.argv[1]).href;
 registerHooks({
   load(url, context, nextLoad) {
     const result = nextLoad(url, context);
