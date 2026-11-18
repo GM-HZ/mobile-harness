@@ -120,9 +120,11 @@ def click(selector):
 
 
 def open_session(emulator, run, title):
-    ui['open_sidebar'](emulator)
+    search_field = "[data-sidebar-workspace-header] input[type=text]"
+    if not run(f'!!document.querySelector({json.dumps(search_field)})?.getClientRects().length'):
+        ui['open_sidebar'](emulator)
     wait(run, f'''(() => {{
-        const field=document.querySelector('[data-sidebar-workspace-header] input[type=text]');
+        const field=document.querySelector({json.dumps(search_field)});
         if (!field?.getClientRects().length) return false;
         const search=field.parentElement.querySelector('button[aria-expanded]');
         if (search?.getAttribute('aria-expanded') === 'false') search.click();

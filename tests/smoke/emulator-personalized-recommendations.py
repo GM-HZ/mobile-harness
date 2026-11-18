@@ -102,6 +102,17 @@ def decisions(emulator,sid,call_id,phases):
     return last if last and last['phase'] in phases else None
 
 
+def verify_counter(emulator,title):
+    with flow['browser'](emulator) as run:
+        flow['open_session'](emulator,run,title)
+        button(run,'[data-conversation-tabs] [role=tab]',['Local Counter'])
+        flow['wait'](run,"document.body.innerText.includes('Count: 0')",'initial counter value')
+        button(run, 'button', ['Increment'])
+        flow['wait'](run,"document.body.innerText.includes('Count: 1')",'incremented counter value')
+        button(run, 'button', ['Reset'])
+        flow['wait'](run,"document.body.innerText.includes('Count: 0')",'reset counter value')
+
+
 def verify_official(emulator,workspace,name,sessions,evidence):
     title='Official recommendation '+name
     sid=session(emulator,workspace,title,sessions)
@@ -133,7 +144,7 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
     title=('Creator ' if create else 'Page recommendation ')+name
     sid=session(emulator,workspace,title,sessions)
     kind='create_personalized_page'
-    args={'action':kind,'title':'Local Counter','brief':'A local counter starts at 0 and supports increment and reset. No network, files or other data.',
+    args={'action':kind,'title':'Local Counter','brief':'Name the counter tab Local Counter. Display Count: 0 initially, with Increment and Reset buttons. No network, files or other data.',
           'details':{'slot':'sidebar-right'}}
     call_id,turns=proposal(emulator,sid,'personalized-pages',args,
                          'Please propose a small local interface for a counter that starts at 0, increments, and resets. It needs no data source.')
@@ -154,9 +165,14 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
         assert re.fullmatch(r'@dsh-local/view-[a-f0-9-]{36}',bundle),bundle
         row=market['catalog'](emulator,bundle)
         assert row and row['installed'],row
+        if status['data'].get('application')=='restart-required':
+            flow['restart'](emulator)
+        verify_counter(emulator,title)
+        evidence['creatorCounterControls']=[0,1,0]
         print('Verified real Creator installed its own plugin',flush=True)
         with flow['browser'](emulator) as run:
-            selector=card(emulator,run,title,kind)
+            button(run,'[data-conversation-tabs] [role=tab]',['对话','Chat'])
+            selector=card_selector(kind)
             button(run,selector+' button',['撤销','Undo'])
         removed=wait_for(lambda:decisions(emulator,sid,call_id,{'removed'}),'generated page removal',50)
         assert market['catalog'](emulator,bundle) is None
@@ -165,6 +181,9 @@ def verify_page(emulator,workspace,name,sessions,evidence,create):
             button(run,selector+' button',['恢复','Restore'])
         restored=wait_for(lambda:decisions(emulator,sid,call_id,{'installed'}),'generated page restore',70)
         assert market['catalog'](emulator,bundle)['installed']
+        if restored['data'].get('application')=='restart-required':
+            flow['restart'](emulator)
+        verify_counter(emulator,title)
         evidence['creatorLifecycle']={'installed':status,'removed':removed,'restored':restored}
     else:
         result=wait_for(lambda:decisions(emulator,sid,call_id,{'dismissed'}),'page dismissal')
