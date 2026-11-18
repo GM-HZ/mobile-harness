@@ -206,6 +206,12 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 ## 会话压缩模拟器回归
 
+受控 Messages 夹具覆盖 HTTP 400 溢出、两次自动压缩、重试及重启检查点。它使用一次性凭据和回环服务，测试结束恢复原 profile。
+
+```sh
+python3 tests/smoke/emulator-compaction-overflow.py <loopback-target> .build/compaction-overflow.json
+```
+
 以下三个脚本要求已经安装普通0.4.35包。手动脚本验证真实摘要、事实回忆和同会话重启；故障脚本临时安装一个标准 bundle，在收到真实模型文本后才取消或注入流错误；自动脚本复制完整standard到独立临时预设，仅降低压缩阈值／保留预算，保留全部工具，不修改正式默认配置。结束后恢复原预设、profile、锁文件、凭据和普通模式。
 
 ```sh
@@ -296,6 +302,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-personalized-recommendations.py <loopback-target> .build/recommendation-cards.json
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-personalized-recommendations.py <loopback-target> .build/recommendation-creator.json --create
+```
+
+## Forge GitHub
+
+Forge 继续使用官方 GitHub provider，鸿蒙包将脚本调用转发给随包签名的 `/usr/bin/gh`。CLI 从应用私有 `/native-benchmark-home/.config/gh` 读取账号配置。模拟器夹具对 GitHub 兼容的 REST 和 GraphQL 路径执行实际 TLS 请求，用临时 CA 与合成凭据，退出后恢复原始文件。
+
+```sh
+python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github.json
 ```
 
 ## LiveShare

@@ -318,3 +318,11 @@ Creator 已使用 `dsh-doc`，子会话仍因需要 Bash 验证和客户端查�
 Creator 生成后计数器可以增加和重置。撤销写入需要重启的提示，重启后确认包被移除，恢复同一保留副本再次验证控件。npm 实际下载中取消后，原清单和锁文件逐字节一致。正常重试、依赖加载、升级、激活失败回滚和卸载通过。公网 Bing／Google 翻译复测仍失败。
 
 0.4.55 将 LiveShare 网关接入 Node worker，复用官方网关及管理 RPC。私有回环 Relay 验证预检、发布、添加会话、重启后恢复、撤销 Relay 记录及关闭网关。公网 Relay、真实授权及跨设备访问仍待验。模拟器用未签名 HAP 679,570,311 字节，SHA-256 `fbccf23c04f51504a6de47e7c3a520518dca123dff8f07facc09050919ff3be2`，生产源 `350d638c2f1d26cf6b99c490d4b530210e5d21ee`。 [两版准确制品、实测和失败](evidence/emulator-creator-liveshare-0.4.55.json)
+
+## 0.4.56 至 0.4.57 Forge 与长会话恢复
+
+随包的 Alpine ARM64 GitHub CLI 接入官方 Forge provider，恢复其指定提交文件读取和提交分页路径。模拟器使用私有 TLS 夹具、合成凭据及受信代理。公网 GitHub 登录与外部写入仍待验。HAP 比 0.4.55 增加 40,947,984 字节，主要来自 `gh`。
+
+用回环 Messages 服务返回两次 `context_length_exceeded`。真实 Host 自动压缩并在原回合重试，输入历史从 19,758 与 20,197 字节分别缩至 1,897 字节，原始日志逐条一致，重启后继续使用最近检查点。PTC、LiveShare、故障恢复及旧会话审计同时通过。首次安装因模拟器空间不足失败，清理可重建的 RC.3 解包缓存后覆盖安装成功。
+
+未签名 HAP 720,518,295 字节，SHA-256 `ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d`，生产源 `83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d`。 [实测与制品](evidence/emulator-forge-overflow-0.4.57.json)

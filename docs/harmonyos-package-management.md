@@ -55,3 +55,7 @@
 ## 0.4.35 LSP 编译器工具链
 
 自带 LSP 的编译器放在 Host 发布目录 `<alpine>/.dsh-0.2.2-rc.5/toolchains/lsp/node_modules/typescript/`，与 DSH 的 node_modules 为兄弟目录。它是版本锁定的只读生产输入，由 HAP 更新，来自同一 npm 锁文件，不是用户项目的包安装目录；原 npm 副本保留。此布局避免 tsserver 为标准库递归监听全部 DSH 依赖，仍保留工作区依赖监听。语言服务器和插件经正式 bundle／profile 管理。见 [实现及复现](research/harmonyos-lsp.md)。
+
+## 0.4.57 GitHub CLI
+
+Forge GitHub provider 通过签名映射使用 Alpine 3.22 community 的 ARM64 `github-cli 2.72.0-r6`。同一工具锁文件记录 APK 来源与摘要，暂存输入逐字节匹配原始 ELF，HAP 使用 DevEco 的标准符号剥离输出。可执行程序固定来自随包 `/usr/bin/gh`，账号配置位于应用私有 Harness home。保留上游调用的非交互、超时、取消与输出上限语义。 [实测记录](evidence/emulator-forge-overflow-0.4.57.json)

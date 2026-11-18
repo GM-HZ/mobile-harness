@@ -1,0 +1,573 @@
+{
+  "device": {
+    "target": "127.0.0.1:15557",
+    "kind": "DevEco Phone ARM64 emulator",
+    "api": 26
+  },
+  "runtime": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.57-unsigned.hap",
+    "version": "0.4.57",
+    "versionCode": 64,
+    "sha256": "ef858e482d779bdf76a6d1c56d3ee7d2080e99aa16f52d789dc24e665630c90d",
+    "bytes": 720518295,
+    "layerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+    "sourceCommit": "83c5bcc056c5e32169e2dbbec0d4645d3e85fb5d",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-forge.cjs": "477e2af8f0188ad66afc3257df039bab4eb724f28e0bd3b83ff133955acfbe43",
+      "runtime/harmonyos/compat/dsh-harmony-speech.cjs": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "cab66c3c1cde54eafb787b3affc8a3ecb240e9047b195757de20175372e6f677",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "productionBuild": {
+    "exitCode": 0,
+    "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<locked inputs> ./build.sh --package",
+    "logSha256": "565faf97ce6a07e71a0142d866a8e72ee216d6f12a3c0b62341ca073aac51a40"
+  },
+  "installed": {
+    "exitCode": 0,
+    "recordSha256": "cf41b6a48d63fdda5178d90d65d6083abd62e442e603b7115d87e1e5c664d6e3"
+  },
+  "githubCli": {
+    "version": "2.72.0-r6",
+    "lockedApkSha256": "86e94d775a6e79950663ee3bedabf7cf4e6ef6cfb5919c7fd686d025f8817b0c",
+    "packagedElfSha256": "a6748faf136e650bb3e7507641486541ccabbccff2a0df2f12858f1ecf5c78cc",
+    "packagedElfBytes": 40942512,
+    "matchesDevEcoStrippedElf": true
+  },
+  "knownAttempts": [
+    {
+      "version": "0.4.56",
+      "step": "install",
+      "diagnostic": "9568288 insufficient disk memory",
+      "logSha256": "73668e373d91645c4f7ddcda053a2a793bbf28c2f3e7b119d2e422030ba23afb",
+      "recovery": "Remove only the unused extracted RC.3 layer after verifying a local rebuild archive; RC.5, the workspace and session history remain."
+    },
+    {
+      "version": "0.4.56",
+      "step": "forge-fixture",
+      "logSha256": "4a9a3b680ff3b578fb15c6b5a8c8715bf579c7335e67eca86615c7619e55d71c",
+      "diagnostic": "The simulator HDC rejected the reverse forwarding rule for port 443.",
+      "recovery": "Route the fixture through a scoped high-port TLS CONNECT proxy, with a local temporary CA inside the guest only."
+    }
+  ],
+  "tests": [
+    {
+      "case": "forge",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-forge-github.py",
+        "127.0.0.1:15557",
+        ".build/batch-057/forge.json"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidenceSha256": "63c5da77d1bbda277bf2e8a5f2ff2db3f8a506794287d86803705cbba2a6cf4a",
+      "observed": {
+        "rawFileAtCommit": true,
+        "paginatedCommitGraph": {
+          "headSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "commits": [
+            {
+              "sha": "cccccccccccccccccccccccccccccccccccccccc",
+              "parent": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "title": "First commit",
+              "author": "Fixture",
+              "authoredAt": "2026-01-01T00:00:00Z"
+            },
+            {
+              "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "parent": "cccccccccccccccccccccccccccccccccccccccc",
+              "title": "Second commit",
+              "author": "Fixture",
+              "authoredAt": "2026-01-01T00:00:00Z"
+            }
+          ],
+          "truncated": false
+        },
+        "restoredReadyMs": 4994,
+        "configAndCABytesRestored": true,
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/api/v3/repos/fixture/mobile/contents/fixture.txt",
+            "authenticated": true
+          },
+          {
+            "method": "POST",
+            "path": "/api/graphql",
+            "authenticated": true,
+            "cursor": null
+          },
+          {
+            "method": "POST",
+            "path": "/api/graphql",
+            "authenticated": true,
+            "cursor": "next"
+          }
+        ]
+      }
+    },
+    {
+      "case": "overflow",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-compaction-overflow.py",
+        "127.0.0.1:15557",
+        ".build/batch-057/overflow.json"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidenceSha256": "ffe4f132aaa5d142bdd21371329a775957887cf91768f4f09717f73888e55fdb",
+      "observed": {
+        "recoveries": [
+          {
+            "overflow": {
+              "path": "/anthropic/v1/messages",
+              "messageCount": 3,
+              "historyBytes": 19758,
+              "staleArchivePresent": true,
+              "action": "overflow",
+              "step": 1,
+              "status": 400
+            },
+            "retry": {
+              "path": "/anthropic/v1/messages",
+              "messageCount": 1,
+              "historyBytes": 1897,
+              "staleArchivePresent": false,
+              "action": "retry",
+              "step": 1,
+              "status": 200,
+              "checkpointPresent": true
+            },
+            "compactionEvents": [
+              "compaction/start",
+              "compaction/summary",
+              "compaction/end"
+            ],
+            "oldJournalUnchanged": true
+          },
+          {
+            "overflow": {
+              "path": "/anthropic/v1/messages",
+              "messageCount": 5,
+              "historyBytes": 20197,
+              "staleArchivePresent": true,
+              "action": "overflow",
+              "step": 2,
+              "status": 400
+            },
+            "retry": {
+              "path": "/anthropic/v1/messages",
+              "messageCount": 1,
+              "historyBytes": 1897,
+              "staleArchivePresent": false,
+              "action": "retry",
+              "step": 2,
+              "status": 200,
+              "checkpointPresent": true
+            },
+            "compactionEvents": [
+              "compaction/start",
+              "compaction/summary",
+              "compaction/end"
+            ],
+            "oldJournalUnchanged": true
+          }
+        ],
+        "reopenedAtLatestCheckpoint": true,
+        "restoredReadyMs": 4926,
+        "fixtureConfigRemoved": true,
+        "requests": [
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 1,
+            "historyBytes": 19539,
+            "staleArchivePresent": true,
+            "action": "seed",
+            "status": 200
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 3,
+            "historyBytes": 19758,
+            "staleArchivePresent": true,
+            "action": "overflow",
+            "step": 1,
+            "status": 400
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 3,
+            "historyBytes": 21519,
+            "staleArchivePresent": true,
+            "action": "summary",
+            "status": 200
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 1,
+            "historyBytes": 1897,
+            "staleArchivePresent": false,
+            "action": "retry",
+            "step": 1,
+            "status": 200,
+            "checkpointPresent": true
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 3,
+            "historyBytes": 19978,
+            "staleArchivePresent": true,
+            "action": "seed",
+            "status": 200
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 5,
+            "historyBytes": 20197,
+            "staleArchivePresent": true,
+            "action": "overflow",
+            "step": 2,
+            "status": 400
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 5,
+            "historyBytes": 21958,
+            "staleArchivePresent": true,
+            "action": "summary",
+            "status": 200
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 1,
+            "historyBytes": 1897,
+            "staleArchivePresent": false,
+            "action": "retry",
+            "step": 2,
+            "status": 200,
+            "checkpointPresent": true
+          },
+          {
+            "path": "/anthropic/v1/messages",
+            "messageCount": 3,
+            "historyBytes": 3664,
+            "staleArchivePresent": false,
+            "action": "reopen",
+            "status": 200,
+            "checkpointPresent": true
+          }
+        ]
+      }
+    },
+    {
+      "case": "ptc",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-ptc-host.py",
+        "127.0.0.1:15557",
+        ".build/batch-057/ptc.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 27.719,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidenceSha256": "fc79768202a70b70460989cdd3b0922a6ef6c3b79a47960ad5580fe6de7944cb",
+      "observed": {
+        "readyMs": 65,
+        "runCodeObserved": true,
+        "typeScriptResultReturned": true,
+        "fileContentsMatched": true,
+        "outsideReadDenied": true,
+        "nestedHostToolMatched": true,
+        "overwriteAndAppendMatched": true,
+        "outsideWriteDenied": true,
+        "exclusiveCreatePreservedExisting": true,
+        "directoryOperationsMatched": true,
+        "crossBoundaryDirectoryMutationsDenied": true,
+        "nonemptyDirectoryPreserved": true,
+        "metadataMatched": true,
+        "recursiveDirectoryOperationsMatched": true,
+        "outsideMetadataAndTraversalDenied": true,
+        "processDirectoryChangesMatched": true,
+        "outsideDirectoryChangeDenied": true,
+        "nextTurnStartedInSubdirectory": true,
+        "cancelledViaSession": true,
+        "cancelledWorkerReaped": true,
+        "temporaryModelCredentialRemoved": true
+      }
+    },
+    {
+      "case": "liveshare",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-liveshare-relay.py",
+        "127.0.0.1:15557",
+        ".build/batch-057/liveshare.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 24.286,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "evidenceSha256": "b7d978e6501ac3205c6a6a56769062e26e0d2fa6025665b6880836ee5152f9b2",
+      "observed": {
+        "reachable": {
+          "ok": true,
+          "httpReachable": true,
+          "blocking": false
+        },
+        "authorized": {
+          "ok": true,
+          "blocking": false
+        },
+        "created": {
+          "link": "http://127.0.0.1:19769/?shareId=awaky1ZZ633o",
+          "shareId": "awaky1ZZ633o",
+          "sessionId": "session-cc1b0e77-e862-4824-bc9f-2c5b6341e0a2",
+          "sessionIds": [
+            "session-cc1b0e77-e862-4824-bc9f-2c5b6341e0a2"
+          ],
+          "sessionMode": "view",
+          "access": {
+            "mode": "open",
+            "selected": [],
+            "deploymentAllowedSubjectIds": [],
+            "shareAllowedSubjectIds": [],
+            "broadenedByDeploymentSubjects": false,
+            "identityKeyAcl": true
+          }
+        },
+        "addedSecondSource": true,
+        "restoredOnlineSources": [
+          "session-cc1b0e77-e862-4824-bc9f-2c5b6341e0a2",
+          "session-e917b079-f415-451a-a53c-64cae5341100"
+        ],
+        "stop": {
+          "ok": true
+        },
+        "gatewayThreadStopped": true,
+        "restoredReadyMs": 5367,
+        "configRestored": true,
+        "relayMessages": [
+          {
+            "registered": "test-5kdadYQT",
+            "probe": true
+          },
+          {
+            "closed": "test-5kdadYQT",
+            "code": 1000
+          },
+          {
+            "registered": "awaky1ZZ633o",
+            "probe": false
+          },
+          {
+            "closed": "awaky1ZZ633o",
+            "code": 1006
+          },
+          {
+            "registered": "awaky1ZZ633o",
+            "probe": false
+          },
+          {
+            "closed": "awaky1ZZ633o",
+            "code": 1000
+          },
+          {
+            "deleted": "awaky1ZZ633o"
+          }
+        ]
+      }
+    },
+    {
+      "case": "restart",
+      "command": [
+        "tests/bench/measure-emulator-start.sh",
+        "127.0.0.1:15557",
+        "restart"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 7.872,
+      "logSha256": "9f9ab882a97e7ba867ea277421c04a7ef28a82baa8f1494724f22a5be0ddf98c",
+      "observed": [
+        "11-19 01:28:41.879 12969 12969 I A0D005/org.sayact.nodepoc/DSHClient: native loopback ready ms=4616 mode=normal",
+        "11-19 01:28:44.397 12969 12969 I A0D005/org.sayact.nodepoc/DSHClient: ArkWeb loaded \"{\\\"title\\\":\\\"DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":125}\""
+      ]
+    },
+    {
+      "case": "recovery",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/batch-057/recovery.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 26.316,
+      "logSha256": "4f750167a3cdf2581622ec694b5e3f4587245311f26b6f9f18366f5835f0ac77",
+      "evidenceSha256": "4a21e646044699c666221c9b1bb3dc13996a2b02aeb2a1f8f22be9a31857e533",
+      "observed": {
+        "fixture": "mobile-harness-crash-8d3e96f532",
+        "normalReadyMs": 78,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 4962,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 5245,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      }
+    },
+    {
+      "case": "audit",
+      "command": [
+        "python3",
+        ".build/batch-057/audit.py",
+        "post-regression"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.862,
+      "logSha256": "ef9a3d3bf434ba324157ec3deb493dc43d1bd8c1c43b55dee5374b9d7ec87856",
+      "evidenceSha256": "158e3c64061a55cda495729ce19d86a93d6636003c467469492774aab8fea756",
+      "observed": {
+        "target": "127.0.0.1:15557",
+        "boot": {
+          "mode": "normal",
+          "pending": false
+        },
+        "readyMs": 98,
+        "profileHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+        },
+        "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+        "legacySessionEvents": 30,
+        "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+        "anonymousHttp": 401,
+        "authenticatedHttp": 200,
+        "permission": "workspace-write",
+        "testCredentialAbsent": true,
+        "installedRuntime": "0.2.2-rc.5",
+        "installedLayerSha256": "d25875f7453c143c032730041ab4cc7e64de076a54c3b4e16aa83e18c7dc82c4",
+        "titlesAndBadgeDefaultOff": {
+          "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": false,
+            "version": "0.2.2-rc.5"
+          },
+          "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+            "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+            "availability": "installation",
+            "official": true,
+            "optional": true,
+            "removable": false,
+            "enabled": false,
+            "version": "0.2.2-rc.5"
+          }
+        },
+        "fourOptionalBundlesDefaultOff": {
+          "@deepseek-ai/dsh-experimental-ralph-bundle": {
+            "availability": "installation",
+            "optional": true,
+            "official": true,
+            "installed": false,
+            "removable": false,
+            "version": "0.2.2-rc.5",
+            "enabled": false
+          },
+          "@deepseek-ai/dsh-experimental-session-search": {
+            "availability": "installation",
+            "optional": true,
+            "official": true,
+            "installed": false,
+            "removable": false,
+            "version": "0.2.2-rc.5",
+            "enabled": false
+          },
+          "@deepseek-ai/dsh-experimental-tool-worktree": {
+            "availability": "installation",
+            "optional": true,
+            "official": true,
+            "installed": false,
+            "removable": false,
+            "version": "0.2.2-rc.5",
+            "enabled": false
+          },
+          "@deepseek-ai/dsh-experimental-forge-bundle": {
+            "availability": "installation",
+            "optional": true,
+            "official": true,
+            "installed": false,
+            "removable": false,
+            "version": "0.2.2-rc.5",
+            "enabled": false
+          }
+        },
+        "chatImportDefaultOff": {
+          "availability": "installation",
+          "official": true,
+          "optional": true,
+          "enabled": false,
+          "version": "0.2.2-rc.5"
+        },
+        "inspectorDefaultOff": true,
+        "translationDefaultOff": true,
+        "recommendationsDefaultOff": {
+          "name": "@deepseek-ai/dsh-personalized-recommendations",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "badgeDefaultOff": {
+          "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "batchDefaultOff": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "voiceDefaultOff": {
+          "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "temporaryVoiceCacheRemoved": true
+      }
+    }
+  ],
+  "scope": {
+    "forge": "Official phone RPCs, packaged gh, synthetic credentials, TLS REST and GraphQL fixture. Public accounts and mutations were not tested.",
+    "overflow": "Official runtime consumed HTTP 400 context_length_exceeded from a deterministic Messages fixture. Public model capacity and long-goal stress remain open.",
+    "ptc": "Standard owned workspace operations and cancellation retested; no new guarantees about links or concurrent relocation."
+  }
+}
