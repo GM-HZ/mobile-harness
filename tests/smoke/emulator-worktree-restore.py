@@ -139,7 +139,9 @@ def check_restore(emulator, folder, repo, evidence, sessions):
     assert bash(emulator, session, 'git rev-parse HEAD') == base
     evidence['missingBranchRecreatedAtBaseAfterCancellation'] = True
     evidence['forgeActions'] = forge_actions(emulator, session)
-    assert evidence['forgeActions'] == ['request', 'restoring', 'restored', 'restoring', 'restored'], evidence
+    assert evidence['forgeActions'] == [
+        'request', 'restoring', 'restored', 'restoring', 'restoring', 'restored',
+    ], evidence
     emulator.stop()
     emulator.start()
     evidence['restartReadyMs'] = emulator.ready('normal')
