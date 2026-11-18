@@ -1,0 +1,185 @@
+{
+  "target": {
+    "emulator": "127.0.0.1:15563",
+    "api": 26,
+    "kind": "DevEco ARM64 Phone"
+  },
+  "testSource": "9f7164b62711e76d2b8e8f1ac1d519b6b79b2928",
+  "upstreamDSH": {
+    "version": "0.2.2-rc.5",
+    "npmTag": "next",
+    "gitCommit": "9c2670d3bce5275e0d1610272958121af87787bb",
+    "newerRcOnRegistry": false
+  },
+  "artifact": {
+    "sourceCommit": "4933817fe38af2d10b0b1d52073ddeadb2dfe80c",
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.66-unsigned.hap",
+    "version": "0.4.66",
+    "versionCode": 73,
+    "bytes": 768577281,
+    "sha256": "256ba5fbc84ed4117f19a08f1084669e9876bf649594adef846fa77de76fe099",
+    "layerSha256": "2f357f696054b33b3390111843a802116a4e622503909dec5e4fe47aef89fe77",
+    "pyrightVersion": "1.1.414",
+    "pyrightEntrySha256": "f200762078eb9880faf421a5b30f9ef3055b1d85c6f10780d75db4da8d8499f1",
+    "signedArtifact": {
+      "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.66-signed.hap",
+      "bytes": 772245887,
+      "sha256": "23d25191d4b66c565dc31989661a5d03a657c24174ca956043a0cf683eedf76f",
+      "profileVerified": true,
+      "signatureVerified": true,
+      "matchingPayloadEntries": 209
+    }
+  },
+  "previousArtifactBaseline": {
+    "version": "0.4.65",
+    "directRequestError": {
+      "code": "plugin-market/fetch-failed",
+      "message": "Could not fetch https://cdn.jsdelivr.net/npm/dsh-plugin-catalog/index.json: aborted",
+      "details": {
+        "url": "https://cdn.jsdelivr.net/npm/dsh-plugin-catalog/index.json",
+        "reason": "aborted"
+      }
+    },
+    "samePublicCatalogViaTestMirror": {
+      "bytes": 4976898,
+      "sha256": "4aa9db084f920f15a59010c3c7f43e8fbcb0edfb4f810a8f775000a2b3e5d27d"
+    },
+    "parsedEntries": 6112
+  },
+  "publicPluginIndex": {
+    "source": "https://cdn.jsdelivr.net/npm/dsh-plugin-catalog/index.json",
+    "fetchMs": 3856,
+    "restartReadyMs": 8377,
+    "title": {
+      "en": "Awesome DSH Plugin",
+      "zh": "Awesome DSH Plugin 插件精选"
+    },
+    "total": 6112,
+    "firstPage": [
+      "dsh-plan-note",
+      "@yolk_vat-y/dsh-project-memory",
+      "dsh-status-rotator"
+    ],
+    "secondPage": [
+      "dsh-telemetry-redactor",
+      "dsh-verification-receipt",
+      "qiushi-dsh-evidence-audit"
+    ],
+    "searchName": "dsh-plan-note",
+    "searchMatches": 17,
+    "persistedAfterRestart": true,
+    "sourceRemoved": true,
+    "connects": [
+      {
+        "authority": "cdn.jsdelivr.net:443",
+        "connectStatus": 200
+      },
+      {
+        "authority": "cdn.jsdelivr.net:443",
+        "connectStatus": 200
+      }
+    ],
+    "configRestored": true
+  },
+  "pluginMarketInstallRegression": {
+    "initialIssue": "The regression fixture tried to decode an absent optional pnpm lockfile as base64.",
+    "fixtureCorrection": "Snapshot absence or exact bytes before cancellation, and compare both file states afterward.",
+    "cancellation": {
+      "status": "cancelled"
+    },
+    "originalProfileUnchangedByCancellation": true,
+    "observedToolVersions": [
+      "1.0.0",
+      "1.1.0",
+      "1.1.0"
+    ],
+    "eventLog": [
+      "start 1.0.0",
+      "stop 1.0.0",
+      "start 1.0.0",
+      "start 1.1.0",
+      "stop 1.1.0",
+      "start 1.2.0",
+      "start 1.1.0",
+      "start 1.1.0"
+    ],
+    "postinstallScriptSuppressed": true,
+    "removedViaManager": true,
+    "testCredentialRemoved": true,
+    "restoredConfigurationHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": null,
+      "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "352adb98096d5478b9237b6e35a30415299d9cfb48b33805be24ef044b540d46"
+    }
+  },
+  "translationProxyRegression": {
+    "providers": [
+      "bing",
+      "google"
+    ],
+    "originalEndpoints": [
+      {
+        "authority": "edge.microsoft.com:443",
+        "connectStatus": 200
+      },
+      {
+        "authority": "translate.googleapis.com:443",
+        "connectStatus": 200
+      }
+    ],
+    "persistedAfterRestart": true
+  },
+  "liveshareAttachmentRegression": {
+    "actualViewerModelTurn": {
+      "principal": {
+        "kind": "share-viewer",
+        "shareId": "0MBCBzJTfput",
+        "actor": {
+          "providerId": "fixture",
+          "tenantId": "local",
+          "subjectId": "reader"
+        }
+      },
+      "exactReply": true,
+      "endReason": "completed"
+    },
+    "sharedAttachments": {
+      "count": 2,
+      "modelReply": "green blue red yellow",
+      "turnEndReason": "completed",
+      "attachmentIds": [
+        "sha256:cfe9bea87b8b9eac8066094ace3d5457f2b8f9ee44637e7e84b2131a2d17efea",
+        "sha256:84ff521a93509d00b021aca2b50534e2bc13dd9891bce746aa34613ef7c59711"
+      ],
+      "viewerBytesMatchedOwner": true,
+      "viewerBytesRestoredAfterRestart": true,
+      "sha256": [
+        "cfe9bea87b8b9eac8066094ace3d5457f2b8f9ee44637e7e84b2131a2d17efea",
+        "84ff521a93509d00b021aca2b50534e2bc13dd9891bce746aa34613ef7c59711"
+      ]
+    },
+    "ownerAppliedLiveRevocation": true,
+    "gatewayThreadStopped": true,
+    "configRestored": true,
+    "testModelKeyRemoved": true
+  },
+  "separateWorkflowSoak": {
+    "version": "0.4.62",
+    "emulator": "127.0.0.1:15561",
+    "completedCheckpointsSeconds": [
+      0,
+      600,
+      1800,
+      3600
+    ],
+    "scheduledCheckpointsSeconds": [
+      0,
+      600,
+      1800,
+      3600,
+      7200
+    ],
+    "complete": false
+  }
+}
