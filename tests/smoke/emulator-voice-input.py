@@ -84,9 +84,25 @@ def verify_arkweb(emulator,audio,evidence):
           button.getClientRects().length&&['新建会话','New session','新建聊天','New chat'].includes(
             (button.getAttribute('aria-label')||button.textContent).trim()))'''):
             sidebar['open_sidebar'](emulator)
-        flow['button'](run,'button',['新建会话','New session','新建聊天','New chat'])
-        browser['wait'](run, '''[...document.querySelectorAll('button')].some(button =>
-          ['开始录音','Start recording'].includes(button.getAttribute('aria-label')))''','official recording button')
+        sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'新建会话','New session','新建聊天','New chat'},'button'))
+        start_hit = '''(() => {
+          const button=Array.from(document.querySelectorAll('button')).find(node =>
+            ['开始录音','Start recording'].includes(node.getAttribute('aria-label')) &&
+            !node.disabled && node.getClientRects().length);
+          if(!button)return null;
+          const rect=button.getBoundingClientRect();
+          const hit=document.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2);
+          return {hit:hit?.closest('button')===button, hitLabel:hit?.closest('button')?.getAttribute('aria-label'),
+            x:rect.x,y:rect.y,width:rect.width,height:rect.height,dpr:devicePixelRatio,viewport:[innerWidth,innerHeight]};
+        })()'''
+        browser['wait'](run,start_hit,'official recording button')
+        position=run(start_hit)
+        if not position['hit']:
+            closers={'关闭侧边栏','Close sidebar'}
+            close=sidebar['find'](sidebar['controls'](emulator),closers,'button')
+            if close:
+                sidebar['tap'](emulator,close)
+        browser['wait'](run,'('+start_hit+')?.hit','unobstructed recording button')
         # Route a synthetic MediaStream into the real ArkWeb recorder, retaining media
         # capture, audio conversion, the Remote request and the composer update.
         script='''(() => {
@@ -124,7 +140,9 @@ def verify_arkweb(emulator,audio,evidence):
               btn=>['开始录音','Start recording'].includes(btn.getAttribute('aria-label'))).map(btn=>({
                 disabled:btn.disabled, visible:btn.getClientRects().length>0, ariaDisabled:btn.getAttribute('aria-disabled')
               }))''')
-            flow['button'](lambda expression:run({'expression':expression,'userGesture':True}),'button',['开始录音','Start recording'])
+            control=sidebar['wait_control'](emulator,{'开始录音','Start recording'},'button')
+            evidence['arkWebStartHit']={'dom':run(start_hit),'nativeBounds':control['bounds']}
+            sidebar['tap'](emulator,control)
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'official recorder running')
             duration=run('globalThis.__mhVoiceTest.duration')
             time.sleep(duration+.5)
