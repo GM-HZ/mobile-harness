@@ -91,7 +91,16 @@ def verify_arkweb(emulator,audio,evidence):
         # capture, audio conversion, the Remote request and the composer update.
         script='''(() => {
           const samples=atob(AUDIO);
-          globalThis.__mhVoiceTest={phase:'waiting', recorder:typeof MediaRecorder,
+          const trace={clicks:[], errors:[]};
+          const onClick=e=>trace.clicks.push({label:e.target.closest('button')?.getAttribute('aria-label'),
+            type:e.target.tagName, trusted:e.isTrusted});
+          const onError=e=>trace.errors.push(String(e.reason || e.error || e.message));
+          document.addEventListener('click',onClick,true);
+          window.addEventListener('unhandledrejection',onError);
+          window.addEventListener('error',onError);
+          globalThis.__mhVoiceTest={phase:'waiting', trace, recorder:typeof MediaRecorder,
+            cleanup:()=>{document.removeEventListener('click',onClick,true);
+              window.removeEventListener('unhandledrejection',onError); window.removeEventListener('error',onError);},
             audioContext:typeof AudioContext, destination:typeof AudioContext==='function'?
               typeof AudioContext.prototype.createMediaStreamDestination:'unavailable'};
           Object.defineProperty(navigator.mediaDevices,'getUserMedia',{ configurable:true,value:async () => {
@@ -111,7 +120,11 @@ def verify_arkweb(emulator,audio,evidence):
         })()'''.replace('AUDIO',json.dumps(base64.b64encode(audio).decode()))
         assert run(script)
         try:
-            sidebar['tap'](emulator,sidebar['wait_control'](emulator,{'开始录音','Start recording'},'button'))
+            evidence['arkWebStartControl']=run('''[...document.querySelectorAll('button')].filter(
+              btn=>['开始录音','Start recording'].includes(btn.getAttribute('aria-label'))).map(btn=>({
+                disabled:btn.disabled, visible:btn.getClientRects().length>0, ariaDisabled:btn.getAttribute('aria-disabled')
+              }))''')
+            flow['button'](lambda expression:run({'expression':expression,'userGesture':True}),'button',['开始录音','Start recording'])
             browser['wait'](run,"Boolean(document.querySelector('[data-voice-activity=recording]'))",'official recorder running')
             duration=run('globalThis.__mhVoiceTest.duration')
             time.sleep(duration+.5)
@@ -126,13 +139,13 @@ def verify_arkweb(emulator,audio,evidence):
             evidence['arkWebRecordingCancelled']=True
         except AssertionError:
             evidence['arkWebRecorderDiagnostic']=run('''(() => {
-              const {phase,recorder,audioContext,destination,context}=globalThis.__mhVoiceTest||{};
+              const {phase,recorder,audioContext,destination,context,trace}=globalThis.__mhVoiceTest||{};
               const row=document.querySelector('[data-voice-activity]');
-              return {phase, recorder, audioContext, destination, state:context?.state, ui:row?.textContent};
+              return {phase, recorder, audioContext, destination, state:context?.state, ui:row?.textContent, trace};
             })()''')
             raise
         finally:
-            run('void globalThis.__mhVoiceTest?.context?.close(); delete navigator.mediaDevices.getUserMedia; delete globalThis.__mhVoiceTest; true')
+            run('globalThis.__mhVoiceTest?.cleanup(); void globalThis.__mhVoiceTest?.context?.close(); delete navigator.mediaDevices.getUserMedia; delete globalThis.__mhVoiceTest; true')
 
 
 def run(emulator,args):
