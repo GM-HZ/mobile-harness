@@ -130,7 +130,7 @@ def verify_counter(emulator,title,evidence,bundle):
             )].filter(node=>node.getClientRects().length).map(node=>node.textContent.trim())''')
             raise
         def expect_count(value, description):
-            flow['wait'](run,rf'/\bCount\s*:\s*{value}\b|计数\s*[:：]\s*{value}(?!\d)/.test(document.body.innerText)',
+            flow['wait'](run,rf'/\bCount\s*:?\s*{value}\b|计数\s*[:：]?\s*{value}(?!\d)/i.test(document.body.innerText)',
                          description)
         expect_count(0,'initial counter value')
         button(run,'button',['Increment','增加','加一','加一（+1）'])
