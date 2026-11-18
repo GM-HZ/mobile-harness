@@ -223,7 +223,31 @@ def verify_fixture(emulator, server, title, marker, session, evidence):
                     pendingRequestCancelledOnDisable=True, originalConversationUnchanged=True)
 
 
-def run(emulator, output, live):
+def verify_paid_arkweb(emulator, title, marker, session, evidence):
+    with browser(emulator) as run:
+        open_reasoning(emulator, run, title, marker)
+        translation = wait(run, f'''(() => {{
+            const body=document.querySelector({json.dumps(BODY)});
+            const text=body && Array.from(body.children).slice(1).map(node => node.textContent).join('').trim();
+            return body?.dataset.translationState === 'ready' &&
+                body.dataset.translationView === 'translated' && /[\u4e00-\u9fff]/.test(text ?? '') && text;
+        }})()''', 'a live Chinese translation')
+        wait(run, click(BODY+' button'), 'show the original for the live translation')
+        check_body(run, 'ready', SOURCE, 'original')
+        wait(run, click(BODY+' button'), 'show the live translation')
+        check_body(run, 'ready', translation, 'translated')
+    rows = [row for row in support['events'](emulator,session) if row['type'].startswith('plugin:translator/')]
+    assert [row['type'] for row in rows]==['plugin:translator/request','plugin:translator/result'],rows
+    paid = rows[0]['data']['metadata']['modelRequest']
+    assert rows[0]['data']['provider']=='deepseek-official'
+    assert paid['config']['model']=='deepseek-flash' and paid['config']['reasoningEffort']=='off',paid['config']
+    assert paid['messages']==[{'role':'user','content':[{'type':'text','text':SOURCE}]}]
+    evidence['liveArkWebTranslation']=translation
+    evidence['isolatedFlashRequest']={'model':'deepseek-flash','reasoningEffort':'off','messages':1}
+    return rows
+
+
+def run(emulator, output, live, arkweb_live=False):
     fixture = 'mh-cot-' + uuid.uuid4().hex[:10]
     folder = 'alpine/workspace-native/'+fixture
     remote = '/data/local/tmp/'+fixture
@@ -276,7 +300,12 @@ def run(emulator, output, live):
             assert limits['preferences']=={'provider':'bing','targetLanguage':'auto'}, limits
             evidence['availableProviders'] = limits['availableProviders']
             setting(emulator,'bing','zh')
-            if live:
+            if arkweb_live:
+                assert 'deepseek-official' in limits['availableProviders'],limits
+                setting(emulator,'deepseek-official','zh')
+                restart(emulator)
+                paid_rows=verify_paid_arkweb(emulator,title,fixture,session,evidence)
+            elif live:
                 assert live in limits['availableProviders'], limits
                 setting(emulator,live,'zh')
                 evidence['selectedLiveProvider'] = live
@@ -299,6 +328,16 @@ def run(emulator, output, live):
             else:
                 restart(emulator)
                 verify_fixture(emulator,server,title,fixture,session,evidence)
+        if arkweb_live:
+            restart(emulator)
+            with browser(emulator) as run:
+                open_reasoning(emulator,run,title,fixture)
+                check_body(run,'ready',evidence['liveArkWebTranslation'],'translated')
+            restored=[row for row in support['events'](emulator,session)
+                      if row['type'].startswith('plugin:translator/')]
+            assert restored==paid_rows,restored
+            evidence['translationReopenedWithoutCredential']=True
+            evidence['noAdditionalTranslationAfterRestart']=True
     finally:
         try:
             for session in sessions:
@@ -330,13 +369,16 @@ if __name__ == '__main__':
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
     parser.add_argument('--live',choices=['bing','google','deepseek-official'],help='Use a real provider with the synthetic fixture')
+    parser.add_argument('--arkweb-live',action='store_true',help='Drive the selected DeepSeek Flash provider through ArkWeb')
     args = parser.parse_args()
+    if args.arkweb_live and args.live!='deepseek-official':
+        parser.error('--arkweb-live requires --live deepseek-official')
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('MH_TEST_DEEPSEEK_API_KEY is required for the configured ArkWeb fixture')
     emulator = support['Emulator'](args.target,19643)
     forward = ('tcp:19643','tcp:19592')
     assert 'Forwardport result:OK' in emulator.hdc('fport',*forward)
     try:
-        run(emulator,args.output,args.live)
+        run(emulator,args.output,args.live,args.arkweb_live)
     finally:
         emulator.hdc('fport','rm',*forward)
