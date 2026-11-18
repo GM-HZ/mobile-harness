@@ -14,6 +14,7 @@ from harmonyos_guest_extras import stage_guest_extras
 from harmonyos_ptc import PORTABLE_ASSETS, portable_assets
 from harmonyos_http import stage_http
 from harmonyos_speech import stage_speech
+from harmonyos_workspace_deps import stage_workspace_dependencies
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
@@ -144,6 +145,7 @@ def main():
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
     )
     stage_guest_extras(ROOT, STAGE, RAW)
+    stage_workspace_dependencies(ROOT, RAW)
     # Exact native launcher overlay paths, rather than a second manually kept
     # executable list. Harmony's signed loader can execute these while POSIX
     # X_OK returns false for the app UID on owner-executable package libraries.

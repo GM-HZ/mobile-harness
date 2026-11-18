@@ -54,6 +54,22 @@ async function harmonyTranslationFetch(url, init) {
   return adapter + replacePinned(source, 'const response = await fetch(url, {',
     'const response = await harmonyTranslationFetch(url, {');
 }
+function patchWorkspaceDependencies(source) {
+  const resolver = 'async function resolvePrimaryRuntime(source) {';
+  const patched = replacePinned(source, resolver, resolver + `
+  if (source === ${JSON.stringify(root)}) {
+    const guest = JSON.parse(await readFile(join(source, "dsh-harmony-workspace-deps.json"), "utf8"));
+    await validatePayloadEntries({
+      ...guest,
+      python: join(source, guest.python), node: join(source, guest.node), pnpm: join(source, guest.pnpm),
+      pythonPackages: join(source, guest.pythonPackages), nodePackages: join(source, guest.nodePackages),
+    });
+    return guest;
+  }
+`);
+  return replacePinned(patched, 'This does not change PATH or package-manager settings.',
+    'In Mobile Harness these paths are inside Alpine. Use them through Bash, with the usual approval for execution. This does not change PATH or package-manager settings.');
+}
 function patchWorkflow(source) {
   const start = '\t\t\tif (this.runtime.sandboxMode === void 0 && this.policy.mode';
   const end = '\t\t\tthis.terminal = true;';
@@ -382,6 +398,7 @@ async function main() {
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
   const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
+  const workspaceDependenciesUrl = paths('dsh-tool-workspace-dependencies/lib/index.js');
   const proxyUrl = paths('dsh-http-proxy/lib/index.js');
   const undiciUrl = pathToFileURL(path.join(dsh, 'undici/index.js')).href;
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
@@ -488,6 +505,10 @@ async function main() {
       if (url === translatorUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         return { ...result, source: patchTranslation(source, proxyUrl, undiciUrl) };
+      }
+      if (url === workspaceDependenciesUrl) {
+        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
+        return { ...result, source: patchWorkspaceDependencies(source) };
       }
       if (url === liveshareUrl && !safeMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
@@ -628,7 +649,9 @@ async function main() {
   fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n' +
     (safeMode ? '' : '- id: subprocess\n  disabled: true\n- id: fs-sandbox\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
       JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n    - id: harmony-fs\n      name: ' +
-      JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n'), { mode: 0o600 });
+      JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n' +
+      '    - id: workspace-dependencies\n      name: "@deepseek-ai/dsh-tool-workspace-dependencies"\n' +
+      '      config:\n        source: ' + JSON.stringify(root) + '\n'), { mode: 0o600 });
   const profileArgs = safeMode
     ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
     : ['--profile', 'web'];

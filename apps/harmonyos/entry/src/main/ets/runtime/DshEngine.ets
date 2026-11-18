@@ -229,6 +229,19 @@ class DshEngine {
         hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
           archive, String(extracted), Date.now() - phase);
       }
+      if (mode !== 'safe') {
+        let wheelId = '';
+        for (const byte of context.resourceManager.getRawFileContentSync('workspace-python-id.txt')) {
+          wheelId += String.fromCharCode(byte);
+        }
+        if (!/^[a-f0-9]{64}$/.test(wheelId)) throw new Error('Invalid packaged Python layer identity');
+        const phase = Date.now();
+        const extracted = await this.unpack(context, 'workspace-python-v1.zip', root, wheelId);
+        hilog.info(0xD005, 'DSHClient', 'startup archive workspace-python-v1.zip extracted=%{public}s ms=%{public}d',
+          String(extracted), Date.now() - phase);
+        this.copyGuest(context, 'workspace-python.pth', root + '/usr/lib/python3.12/site-packages/mobile-harness-workspace.pth');
+        this.copyGuest(context, 'dsh-harmony-workspace-deps.json', root + '/dsh-harmony-workspace-deps.json');
+      }
       this.prepareTimezone(root);
       const dshRelease = root + '/.dsh-0.2.2-rc.5';
       if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
