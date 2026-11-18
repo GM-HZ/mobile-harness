@@ -207,15 +207,29 @@ def owned_callback(device, evidence):
 def run(device, output, host_port=19643):
     evidence = {'public': {}, 'fixture': {}}
     bridge = (f'tcp:{host_port}', 'tcp:19592')
+    profile = market['PROFILE'] + '/cordis.patch.yml'
+    original = None
     assert 'Forwardport result:OK' in device.hdc('fport', *bridge)
     try:
         device.start()
         device.ready('normal')
+        original = market['agent']['read_bytes'](device, profile)
         public_popup(device, evidence['public'])
         owned_callback(device, evidence['fixture'])
     finally:
-        device.hdc('fport', 'rm', *bridge)
-        output.write_text(json.dumps(evidence, indent=2) + '\n')
+        try:
+            if original is not None:
+                if market['agent']['read_bytes'](device, profile) != original:
+                    device.stop()
+                    market['lsp']['restore_bytes'](device, profile, original,
+                        '/data/local/tmp/mh-account-profile-' + uuid.uuid4().hex)
+                    device.start()
+                    device.ready('normal')
+                assert market['agent']['read_bytes'](device, profile) == original
+                evidence['originalProfileRestored'] = True
+        finally:
+            device.hdc('fport', 'rm', *bridge)
+            output.write_text(json.dumps(evidence, indent=2) + '\n')
 
 
 if __name__ == '__main__':
