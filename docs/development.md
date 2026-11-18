@@ -407,10 +407,13 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" python3 tests/smoke/emulator-person
 
 Forge 继续使用官方 GitHub provider，鸿蒙包将脚本调用转发给随包签名的 `/usr/bin/gh`。CLI 从应用私有 `/native-benchmark-home/.config/gh` 读取账号配置。模拟器夹具对 GitHub 兼容的 REST 和 GraphQL 路径执行实际 TLS 请求，用临时 CA 与合成凭据，退出后恢复原始文件。
 
+从 DSH 的「设置 → 通用设置 → Forge GitHub 账号」可用 GitHub CLI 设备授权流程登录。原生页面显示一次性代码并提供系统浏览器入口。取消时终止该 CLI 进程，退出登录使用 CLI 的本地账号管理。凭据由包内 GitHub CLI 管理，界面状态仅保存流程阶段、一次性代码和账号名。 [GitHub CLI 登录文档](https://cli.github.com/manual/gh_auth_login)
+
 ```sh
 python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github.json
 python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github-writes.json --writes
 python3 tests/smoke/emulator-forge-github.py <loopback-target> .build/forge-github-public.json --public-read
+python3 tests/smoke/emulator-forge-account.py <loopback-target> .build/forge-account.json
 ```
 
 `--writes` 用包内 gh 在隔离服务验证带行范围的评审、邀请评审和绑定当前提交的合并。脚本检查 403 拒绝、旧提交拒绝、503 的未知结果与无重复提交，并在 Host 重启后完成合并。

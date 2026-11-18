@@ -160,7 +160,7 @@ class ConnectProxy(BaseHTTPRequestHandler):
         pass
 
     def do_CONNECT(self):
-        if self.path != HOST+':443':
+        if self.path not in {host + ':443' for host in getattr(self.server, 'hosts', (HOST,))}:
             self.send_error(403)
             return
         with socket.create_connection(('127.0.0.1',self.server.destination),timeout=5) as upstream:
@@ -263,10 +263,10 @@ def verify_public_read(device, server, sid):
             'authorization': 'Authenticated host gh; disposable fixture credential on the emulator'}
 
 
-def make_tls(folder):
+def make_tls(folder, hosts=(HOST,)):
     conf = folder/'cert.conf'
     conf.write_text('[req]\ndistinguished_name=dn\nx509_extensions=extensions\nprompt=no\n'
-                    '[dn]\nCN=Mobile Harness Forge fixture\n[extensions]\nsubjectAltName=DNS:'+HOST+'\n'
+                    '[dn]\nCN=Mobile Harness Forge fixture\n[extensions]\nsubjectAltName='+','.join('DNS:'+host for host in hosts)+'\n'
                     'basicConstraints=critical,CA:TRUE\nkeyUsage=critical,digitalSignature,keyEncipherment,keyCertSign\n')
     key, cert = folder/'fixture.key', folder/'fixture.pem'
     subprocess.run(['openssl','req','-x509','-newkey','rsa:2048','-nodes','-days','1','-config',str(conf),
