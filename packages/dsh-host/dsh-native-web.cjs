@@ -347,9 +347,10 @@ async function main() {
     require(path.join(root, 'dsh-harmony-office-launch.cjs')).createOfficeLauncher(addon('libdshworkflow.so'), globalThis.__harmonyMcpSpawn, mark),
     mark, pathToFileURL(path.join(dsh, '@deepseek-ai/libreoffice-kit/lib/index.js')).href);
   const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
-  const { createPackageRunner } = require(path.join(root, 'dsh-harmony-package.cjs'));
+  const { createPackageRunner, createRegistryOrigins } = require(path.join(root, 'dsh-harmony-package.cjs'));
   globalThis.__harmonySharp = createSharp(root, launchGuest);
   globalThis.__harmonyPackageRunner = createPackageRunner(root, home, launchGuest);
+  globalThis.__harmonyRegistryOrigins = createRegistryOrigins(home, mark);
   globalThis.__harmonyWorkflowRun = safeMode
     ? () => { throw new Error('Workflows are disabled while HarmonyOS recovery mode is active'); }
     : require(path.join(root, 'dsh-harmony-workflow.cjs')).createWorkflowRunner(addon('libdshworkflow.so'), mark);
@@ -431,8 +432,19 @@ async function main() {
         return { ...result, source: patched };
       }
       if (url === packageUrl) {
-        return { ...result, source: replacePinned(source, 'import { execa } from "execa";',
-          'const execa = globalThis.__harmonyPackageRunner;') };
+        let patched = replacePinned(source, 'import { execa } from "execa";',
+          'const execa = globalThis.__harmonyPackageRunner;');
+        patched = replacePinned(patched, 'this.installedFrom.set(name, used);',
+          'this.installedFrom.set(name, used);\n\t\t\t\t\tglobalThis.__harmonyRegistryOrigins.record(this.profile.dir, name, version, used);');
+        patched = replacePinned(patched, 'this.installedFrom.delete(name);',
+          'this.installedFrom.delete(name);\n\t\t\t\tglobalThis.__harmonyRegistryOrigins.forget(this.profile.dir, name);');
+        patched = replacePinned(patched, 'const previousRegistry = this.installedFrom.get(name);',
+          'const previousRegistry = this.installedFrom.has(name) ? this.installedFrom.get(name) :\n\t\t\t\tglobalThis.__harmonyRegistryOrigins.read(this.profile.dir, name, from);');
+        patched = replacePinned(patched, 'return requested !== void 0 ? requested : this.installedFrom.get(name);',
+          'if (requested !== void 0) return requested;\n\t\t\tif (this.installedFrom.has(name)) return this.installedFrom.get(name);\n' +
+          '\t\t\tconst version = bundleManifest(name, this.profile.dir, this.profile.installAnchor)?.version;\n' +
+          '\t\t\treturn globalThis.__harmonyRegistryOrigins.read(this.profile.dir, name, version);');
+        return { ...result, source: patched };
       }
       if (url === attachmentUrl) {
         let patched = replacePinned(source, 'ensureDurableDirectory(home, parse(home).root)',

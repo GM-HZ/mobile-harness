@@ -1,6 +1,7 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
+const { createHash, randomUUID } = require('node:crypto');
 const { finished, pipeline } = require('node:stream/promises');
 
 const quote = value => "'" + value.replaceAll("'", "'\\''") + "'";
@@ -97,4 +98,68 @@ function createPackageRunner(root, home, launch) {
     return Object.assign(result, { pid: child.pid, kill, nodeChildProcess: child, stdout: stdout.exposed, stderr: stderr.exposed });
   };
 }
-module.exports = { createPackageRunner };
+function createRegistryOrigins(home, mark) {
+  function fileFor(profile, name, create = false) {
+    const parent = fs.realpathSync(profile);
+    const base = fs.realpathSync(home);
+    if (!parent.startsWith(base + path.sep)) throw new Error('Registry provenance requires an application profile');
+    const managerDir = path.join(parent, '.plugin-manager');
+    const registryDir = path.join(managerDir, 'registry-origins');
+    for (const folder of [managerDir, registryDir]) {
+      if (create) {
+        try { fs.mkdirSync(folder, { mode: 0o700 }); }
+        catch (error) { if (error.code !== 'EEXIST') throw error; }
+      }
+      if (!fs.lstatSync(folder).isDirectory()) throw new Error('Registry provenance directory cannot be redirected');
+    }
+    return path.join(registryDir, createHash('sha256').update(name).digest('hex') + '.json');
+  }
+
+  function validRegistry(registry) {
+    if (registry === null) return true;
+    if (typeof registry !== 'string') return false;
+    try {
+      const url = new URL(registry);
+      return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password && !url.search && !url.hash;
+    } catch { return false; }
+  }
+
+  function warn(operation, error) {
+    if (error?.code !== 'ENOENT') mark('package-registry-provenance-error', { operation, code: error?.code ?? 'unknown' });
+  }
+
+  return {
+    read(profile, name, version) {
+      if (typeof version !== 'string') return undefined;
+      try {
+        const file = fileFor(profile, name);
+        if (!fs.lstatSync(file).isFile()) return undefined;
+        const record = JSON.parse(fs.readFileSync(file, 'utf8'));
+        if (record.name === name && record.version === version && validRegistry(record.registry)) return record.registry;
+      } catch (error) { warn('read', error); }
+      return undefined;
+    },
+    record(profile, name, version, registry) {
+      if (typeof version !== 'string' || !validRegistry(registry)) return;
+      let temporary;
+      try {
+        const file = fileFor(profile, name, true);
+        temporary = file + '.' + randomUUID() + '.tmp';
+        fs.writeFileSync(temporary, JSON.stringify({ name, version, registry }) + '\n', { flag: 'wx', mode: 0o600, flush: true });
+        fs.renameSync(temporary, file);
+      } catch (error) {
+        warn('record', error);
+      } finally {
+        if (temporary) {
+          try { fs.rmSync(temporary, { force: true }); } catch (error) { warn('clean', error); }
+        }
+      }
+    },
+    forget(profile, name) {
+      try { fs.rmSync(fileFor(profile, name), { force: true }); }
+      catch (error) { warn('forget', error); }
+    },
+  };
+}
+
+module.exports = { createPackageRunner, createRegistryOrigins };
