@@ -134,3 +134,7 @@ Word、Excel、PPT、实际页面附件、缓存、无效文档、会话取消�
 ## 0.4.42 模拟器 RC.5 回归
 
 覆盖安装保留原配置、默认权限和旧 RC.3 会话的 30 条事件。六组实际检查包含搜索与网页获取、PTC、TypeScript LSP、插件市场生命周期、ArkWeb 确认取消和故障恢复。实际搜索确认官方 Messages 路由，其他模型路由由电脑的受控 provider 检查覆盖。[本轮证据](evidence/emulator-dsh-rc5-0.4.42.json)
+
+## 0.4.44 模拟器 Inspector 回归
+
+Inspector 默认关闭。临时启用并重启后，验证真实 Host 与 ArkWeb 求值、同源鉴权、直接端点拒绝、原生快捷键打开 DevTools 及停用回收。Cordis、LSP 和故障恢复同版通过。最终核对原配置、旧会话摘要、默认权限、普通启动模式和临时凭据清理。[本轮证据](evidence/emulator-inspector-0.4.44.json)

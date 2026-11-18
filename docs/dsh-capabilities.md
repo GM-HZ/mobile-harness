@@ -1,10 +1,12 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.42，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.44，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
 ## 当前验收
+
+0.4.44 提供默认关闭的官方 Inspector。模拟器用快捷键打开 ArkWeb 的 DevTools，实际 ArkWeb 和 Host 均经同源鉴权代理完成 CDP 查询。匿名代理与直接 Worker 请求被拒，跨重启启用和停用释放端口通过。[0.4.44 证据](evidence/emulator-inspector-0.4.44.json)
 
 0.4.42 确认升级前后的会话和配置摘要一致。实际 DeepSeek 模型的 `web_search` 返回来源链接，会话事件确认调用官方 Messages 搜索。电脑通过正式 WebRuntime 的 provider 接口补验 DeepSeek 账号路由、其他模型路由、显式选择和可用性回退。[0.4.42 证据](evidence/emulator-dsh-rc5-0.4.42.json)
 
@@ -30,7 +32,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 模型与工具调用 | 实际 DeepSeek API Key 模型调用，测试凭据退出时清除 |
 | 工作区文件工具 | 通用 PTC 内嵌工具及标准 write／edit／grep／glob／read 均通过 |
 | 原子创建与替代编辑 | 0.4.36 修复 hard-link EACCES，真实 ctx.fs 的竞争发布、取消与清理通过；官方字符串编辑、临时启用的 apply_patch、多文件预检及部分提交报告、越界和只读拒绝通过，保留默认开关。见 [适配](research/harmonyos-file-publication.md) |
-| Cordis 查询与诊断 Inspector | Cordis 预设实际查询 Host Service／Event／Config／Tool 与真实 ArkWeb Service／Event／Builtin／Slots／Theme；分页、准确 schema、完整结果 retention、非法查询拒绝及重启通过。独立诊断 Inspector 启动失败，未提供 CDP 保证 |
+| Cordis 查询与诊断 Inspector | Cordis 查询 Host 与真实 ArkWeb 的 API 分类、分页、schema 和保留结果通过。0.4.44 的独立 Inspector 通过正式 DevTools 代理执行 Host 与 ArkWeb CDP 求值，端点访问控制与停用回收已验 |
 | Bash、Git、Python、pip、venv | 默认无系统沙箱则拒绝；精确命令单次审批后，两套 pip target／venv、Git、Node fetch、curl、SQLite 和时区夹具通过 |
 | 通用 PTC | 普通包默认提供 TypeScript 擦除、工作区文件读写、目录操作、元数据与跨目录相对路径 |
 | PTC 执行模式 | 默认模式、REPL、无持久化 Script、持久化 Script 均通过 |

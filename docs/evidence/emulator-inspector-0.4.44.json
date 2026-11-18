@@ -1,0 +1,406 @@
+{
+  "recordedAt": "2026-11-18T14:10:13.938343+00:00",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "dsh": "0.2.2-rc.5",
+  "baselineCommit": "d6aa558e260282b6ffcd0a4db3c1e5df56cfa19b",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.44-unsigned.hap",
+    "version": "0.4.44",
+    "versionCode": 51,
+    "sha256": "65f055bfffd9f5068f49250cc444bf495439faa922375f6f5eb9ba62adf8ce05",
+    "bytes": 662477680,
+    "layerSha256": "3c4013c6931fb591ee8460ca631d5bf6f208ffc6de5b4a450296577293fd0cf4",
+    "sourceCommit": "1823a4846b87f01f5422d93f0694e5facc4191f7",
+    "compatibilityAssets": {
+      "packages/dsh-host/dsh-native-web.cjs": "38b96a8a68b3bed3d846a19822e986113e13b15d7cbe5f174497062a9fdab8cc",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "build": {
+    "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pinned input directory> ./build.sh --package",
+    "exitCode": 0,
+    "logSha256": "75e05ffcea84182f5f30efcbb6561db7545c0390a34adbcbf980d893ceb0f876"
+  },
+  "install": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.44-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "3b7a4e366d1d76c3d50e7ee0046686f8a857647b8285772b5b8aed311aa8246d"
+  },
+  "commands": [
+    {
+      "suite": "cordis-inspect",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-cordis-inspect.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/cordis-inspect-0.4.44.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 92.108,
+      "log": ".build/diagnostic-inspector/cordis-inspect-0.4.44.log",
+      "testSourceCommit": "1823a4846b87f01f5422d93f0694e5facc4191f7",
+      "resultSha256": "81b5a0481cfa6d8e9dc3aded49108106193c94d7cf4a34e36f077e8f2e0d9aa7",
+      "logSha256": "60e8e0174ff75c47f386a994ae61c32b394e1087ea130ef8001182cc67a4fd7f",
+      "resultKeys": [
+        "actualClientAfterRestart",
+        "actualClientBuiltins",
+        "actualClientEventCatalog",
+        "actualClientServiceCatalog",
+        "actualClientSlotDetail",
+        "actualClientSlots",
+        "actualClientThemeTokens",
+        "businessMethodRefused",
+        "configFirstPage",
+        "configSecondPage",
+        "configurationHashesUnchanged",
+        "effectiveAgentTools",
+        "hostStreamContract",
+        "hostSubprocessContract",
+        "invalidInputRefused",
+        "liveLspConfigEntry",
+        "liveLspConfigSchema",
+        "providerLists",
+        "providerListsAfterRestart",
+        "restartReadyMs",
+        "sameCordisSessionAndRealClientAfterRestart",
+        "sessionId",
+        "temporaryModelCredentialRemoved"
+      ]
+    },
+    {
+      "suite": "lsp-bundle",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-lsp-bundle.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/lsp-bundle-0.4.44.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 20.29,
+      "log": ".build/diagnostic-inspector/lsp-bundle-0.4.44.log",
+      "testSourceCommit": "1823a4846b87f01f5422d93f0694e5facc4191f7",
+      "resultSha256": "a7346425270ce15a606e18ea01a8a82c6815fa480899cd814f20b10520d22026",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "before": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "disable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": false,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "disabledRestartReadyMs": 4957,
+        "afterDisabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": false,
+          "version": "0.1.0"
+        },
+        "defaultMigrationDidNotReenable": true,
+        "enable": {
+          "stage": "enable",
+          "target": "@mobile-harness/lsp",
+          "enabled": true,
+          "changed": true,
+          "application": "applied",
+          "warnings": []
+        },
+        "enabledRestartReadyMs": 4968,
+        "afterEnabledRestart": {
+          "name": "@mobile-harness/lsp",
+          "availability": "installation",
+          "removable": false,
+          "enabled": true,
+          "version": "0.1.0"
+        },
+        "officialProviderActive": true,
+        "restoredReadyMs": 5013,
+        "configurationHashesRestored": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      }
+    },
+    {
+      "suite": "recovery",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/recovery-0.4.44.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 31.268,
+      "log": ".build/diagnostic-inspector/recovery-0.4.44.log",
+      "testSourceCommit": "1823a4846b87f01f5422d93f0694e5facc4191f7",
+      "resultSha256": "5f92046bc619c923ded4fa6861ad81b62cc04ba1e1dc161c59df0fd375b5b169",
+      "logSha256": "9cde63b4fb2f6af2d5c894d84456af36ddc6bae4d31299131f3d6a4a456b6c81",
+      "result": {
+        "fixture": "mobile-harness-crash-392c972b7e",
+        "normalReadyMs": 77,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 4889,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 5286,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      }
+    },
+    {
+      "suite": "inspector-cdp",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-inspector.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/inspector-0.4.44.json"
+      ],
+      "testSourceCommit": "53731e20dd667d265c4552cfa0e7bd7c677ca2ea",
+      "exitCode": 0,
+      "log": ".build/diagnostic-inspector/inspector-0.4.44.log",
+      "resultSha256": "66bd97091324a8d6673bdd7522dbc53bdf2daeda2f6ae1c95b02ef3f8ba53edd",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "enable": "applied",
+        "cdp": {
+          "workerPort": 9230,
+          "anonymousDiscoveryStatus": 403,
+          "targetCount": 1,
+          "devtoolsAssetSha256": "371c96a262a80fcbf7f6bbd8122a06168b7c3de2acfc34bd4a3dd0afce5cb1e1",
+          "anonymousProxyStatus": 401,
+          "directCdpStatus": 403,
+          "hostEvaluation": 42,
+          "arkWeb": {
+            "origin": "http://127.0.0.1:19592",
+            "document": 9
+          }
+        },
+        "disable": "applied",
+        "workerReleasedOnDisable": true,
+        "restoredReadyMs": 4964,
+        "restoredConfiguration": true
+      }
+    },
+    {
+      "suite": "inspector-panel",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-inspector.py",
+        "127.0.0.1:15557",
+        ".build/diagnostic-inspector/inspector-panel-0.4.44.json",
+        "--panel"
+      ],
+      "testSourceCommit": "369b99ac7477efeb7f31216eec188a6bc7cca48a",
+      "exitCode": 0,
+      "log": ".build/diagnostic-inspector/inspector-panel-0.4.44.log",
+      "resultSha256": "bca8b433432b5f068540e810cc64a08a8f8903306a568801c6df3e784e6056c3",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "enable": "applied",
+        "cdp": {
+          "workerPort": 9230,
+          "anonymousDiscoveryStatus": 403,
+          "targetCount": 1,
+          "devtoolsAssetSha256": "371c96a262a80fcbf7f6bbd8122a06168b7c3de2acfc34bd4a3dd0afce5cb1e1",
+          "anonymousProxyStatus": 401,
+          "directCdpStatus": 403,
+          "hostEvaluation": 42,
+          "arkWeb": {
+            "origin": "http://127.0.0.1:19592",
+            "document": 9
+          },
+          "panel": {
+            "visible": true,
+            "path": "/inspector/devtools/devtools_app.html",
+            "ready": true
+          }
+        },
+        "disable": "applied",
+        "workerReleasedOnDisable": true,
+        "restoredReadyMs": 4965,
+        "restoredConfiguration": true
+      }
+    }
+  ],
+  "audit": {
+    "target": "127.0.0.1:15557",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "readyMs": 65,
+    "profileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+    },
+    "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+    "legacySessionEvents": 30,
+    "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "permission": "workspace-write",
+    "testCredentialAbsent": true,
+    "installedRuntime": "0.2.2-rc.5",
+    "installedLayerSha256": "3c4013c6931fb591ee8460ca631d5bf6f208ffc6de5b4a450296577293fd0cf4",
+    "titlesAndBadgeDefaultOff": {
+      "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      }
+    },
+    "fourOptionalBundlesDefaultOff": {
+      "@deepseek-ai/dsh-experimental-ralph-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-session-search": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-tool-worktree": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-forge-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      }
+    },
+    "chatImportDefaultOff": {
+      "availability": "installation",
+      "official": true,
+      "optional": true,
+      "enabled": false,
+      "version": "0.2.2-rc.5"
+    },
+    "inspectorDefaultOff": true
+  },
+  "failedAttempts": [
+    {
+      "version": "0.4.42",
+      "exitCode": 1,
+      "authenticatedBootstrap": 404,
+      "fibers": [
+        {
+          "moduleName": "@deepseek-ai/dsh-experimental-inspector",
+          "fiberPhase": "failed",
+          "diagnostic": "No usable native binding found for node-addon-require-builtin-openharmony-arm64 (auto)"
+        },
+        {
+          "moduleName": "@deepseek-ai/dsh-experimental-session-inspector",
+          "fiberPhase": "active",
+          "diagnostic": null
+        },
+        {
+          "moduleName": "@deepseek-ai/dsh-experimental-client-ui-stats",
+          "fiberPhase": "active",
+          "diagnostic": null
+        }
+      ],
+      "logSha256": "aaa0d493148130cfafc9c42c3806489ea91e16f5afc69f16a1d29189fef4bc92"
+    },
+    {
+      "version": "0.4.43",
+      "stage": "device-install",
+      "deviceCode": 9568288,
+      "status": "insufficient disk memory",
+      "logSha256": "d025d11c5fbaef4ddcd47445feea58df4e75230d247cce492eb60342bd335b7e"
+    },
+    {
+      "version": "0.4.43",
+      "stage": "inspector-enable",
+      "exitCode": 1,
+      "artifact": {
+        "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.43-unsigned.hap",
+        "version": "0.4.43",
+        "versionCode": 50,
+        "sha256": "0849fa62a1db6ed16dd7a3595a7c07eea613c6fbd1137be4c7a04e17d100b557",
+        "bytes": 662477494,
+        "layerSha256": "3c4013c6931fb591ee8460ca631d5bf6f208ffc6de5b4a450296577293fd0cf4",
+        "sourceCommit": "6278ae1b30fa59a9dafe7ed81516adbb683dcc6b",
+        "compatibilityAssets": {
+          "packages/dsh-host/dsh-native-web.cjs": "32cf6472ebc09a2935d2608a9db8f59c545bbf150c7c3d9e23274936793728a1",
+          "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "fb6e6c88816a05887e66deb2c405151429a3702a41d92faddae5a7c82a4b6f33"
+        }
+      },
+      "reason": "Worker preload cannot read process.argv[1] yet; use the entry passed by the Worker creator.",
+      "logSha256": "02fd7a6a3e06bab7512c1d05348e64989923a9d22fbd38bc6d15a38d20248f26",
+      "restoredProfile": true
+    }
+  ],
+  "emulatorStorageRecovery": "Removed only the outdated RC.4 unpacked runtime after checking the exact 0.4.41 HAP and active profile references.",
+  "limits": [
+    "The phone UI check opens the upstream embedded DevTools panel with the native keyboard shortcut.",
+    "Host and the actual ArkWeb page evaluated CDP requests. The optional profile is off after tests.",
+    "The physical Mate 60 and external Chrome on the phone were not tested."
+  ]
+}

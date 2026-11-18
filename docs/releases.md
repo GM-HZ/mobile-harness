@@ -268,3 +268,9 @@ DSH 保持最新官方 RC.4，随包331个 DSH 组件版本一致。补充官方
 官方源码和 npm 同步固定 RC.5。HAP 检查通过 330 个实际随包版本，七个原生输入的字节保持一致。覆盖安装到模拟器后，旧会话 30 条事件、原配置摘要、默认工作区写权限和鉴权结果均保持。升级启动约 24.2 秒。
 
 六组模拟器检查覆盖真实 Messages 搜索和 HTTP 回归、PTC、TypeScript LSP、真实插件市场更新回滚、ArkWeb 安装确认及故障恢复。电脑另经正式 WebRuntime 验证模型路由与显式选择。未签名 HAP 662,474,000 字节，SHA-256 `3ea9d25db0a553732e0c73e3b6398b2ca040b2cd9cc8e4ec3150af494d09c7ce`，生产源 `fa97d2eb281d39370033573122164f8b5e7cb1f5`。Mate 60 实测仍待安排。[制品、命令、原失败及审计](evidence/emulator-dsh-rc5-0.4.42.json)
+
+## 0.4.44 鸿蒙 Inspector
+
+发布官方 Inspector bundle，默认关闭。鸿蒙 Worker 通过 Node 内置解析接口启动。DevTools 使用既有的同源会话鉴权，Worker 的发现和直连 CDP 需要内部令牌。模拟器通过真实 Host 和 ArkWeb 求值、原生快捷键打开 DevTools、停用回收及三组 Cordis／LSP／恢复回归。原配置、旧会话事件与回环鉴权保持。
+
+未签名 HAP 662,477,680 字节，SHA-256 `65f055bfffd9f5068f49250cc444bf495439faa922375f6f5eb9ba62adf8ce05`，生产源 `1823a4846b87f01f5422d93f0694e5facc4191f7`。0.4.43 的安装空间及 Worker 参数初始化失败保留在证据中。本版为模拟器验证。[制品、命令与审计](evidence/emulator-inspector-0.4.44.json)

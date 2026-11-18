@@ -232,6 +232,12 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 独立的 `emulator-inspector-availability.py` 只探测诊断 Worker，要求设备测试 Key 槽为空，临时通过官方 profile bundle 启用，结束恢复原字节。它不验证完整 CDP；当前0.4.36实际失败于 Worker 的 require-builtin 鸿蒙绑定，不属于通过的三组检查。
 
+0.4.44 的下列脚本通过官方插件管理启停 Inspector，经同源鉴权代理完成实际 CDP。验证拒绝匿名直连、Host 和 ArkWeb 求值、原生快捷键打开 DevTools、端口释放及配置恢复。省略 `--panel` 时，仍执行 CDP 和访问控制检查。
+
+```sh
+python3 tests/smoke/emulator-inspector.py <loopback-target> .build/inspector.json --panel
+```
+
 ## 工作树恢复和随包目录
 
 在独立 Phone 模拟器安装 0.4.37 后执行下列命令。使用正式 PluginManager 启停并验证跨重启选择，再经 Forge RPC 还原真实 Git 工作树。测试仅暂停夹具的最终检出阶段，用实际受管进程验证 HTTP 取消。原 profile、锁文件和启动配置在结束后按字节恢复。
