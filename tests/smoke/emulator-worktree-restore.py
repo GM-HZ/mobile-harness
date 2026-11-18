@@ -18,6 +18,12 @@ lsp = runpy.run_path(str(Path(__file__).with_name('emulator-lsp-lifecycle.py')))
 PROFILE = 'alpine/native-benchmark-home/profiles/web'
 PATCH = 'alpine/native-benchmark-home/cordis.patch.yml'
 FORGE = '@deepseek-ai/dsh-experimental-forge-bundle'
+CATALOG = {
+    '@deepseek-ai/dsh-experimental-ralph-bundle': '@deepseek-ai/dsh-tool-ralph',
+    '@deepseek-ai/dsh-experimental-session-search': '@deepseek-ai/dsh-tool-session-query',
+    '@deepseek-ai/dsh-experimental-tool-worktree': '@deepseek-ai/dsh-experimental-worktree',
+    FORGE: '@deepseek-ai/dsh-experimental-client-ui-forge',
+}
 
 
 def wait_until(read, message, timeout=20):
@@ -152,7 +158,41 @@ def check_restore(emulator, folder, repo, evidence, sessions):
     print('Verified cancellation, recreation at base, and restart', flush=True)
 
 
-def run(emulator, output):
+def catalog_state(emulator, enabled):
+    catalog = emulator.rpc('pluginManager/listBundles', {})
+    rows = {}
+    for name in CATALOG:
+        row, = [row for row in catalog if row['name'] == name]
+        assert row['availability'] == 'installation' and row['optional'] and row['official'], row
+        assert not row['installed'] and not row['removable'] and not row.get('error'), row
+        assert row['version'] == '0.2.2-rc.4' and row['enabled'] == (name in enabled), row
+        keys = ['availability', 'optional', 'official', 'installed', 'removable', 'version', 'enabled']
+        rows[name] = {key: row[key] for key in keys}
+    return rows
+
+
+def enable_from_catalog(emulator):
+    enabled = set()
+    evidence = {'default': catalog_state(emulator, enabled), 'switches': []}
+    for name, module in CATALOG.items():
+        for value in ([True] if name == FORGE else [True, False]):
+            change = emulator.rpc('pluginManager/setBundleEnabled', {'name': name, 'enabled': value})
+            assert change['application'] in ['applied', 'restart-required'], change
+            (enabled.add if value else enabled.remove)(name)
+            emulator.stop()
+            emulator.start()
+            ready = emulator.ready('normal')
+            catalog_state(emulator, enabled)
+            active = any(row['moduleName'] == module and row.get('enabled') and row.get('fiberPhase') == 'active'
+                         for row in emulator.rpc('pluginManager/listPlugins', {}))
+            assert active == value, (name, module, active, change)
+            evidence['switches'].append({'bundle': name, 'enabled': value, 'module': module,
+                                         'moduleActive': active, 'readyMs': ready, 'application': change['application']})
+    print('Verified official installation catalog and persisted selections', flush=True)
+    return evidence
+
+
+def run(emulator, output, use_catalog):
     name = 'mh-worktree-restore-' + uuid.uuid4().hex[:10]
     repo = support['WORKSPACE'] + '/' + name
     folder = 'alpine/workspace-native/' + name
@@ -167,7 +207,6 @@ def run(emulator, output):
         manifest = json.loads(originals[original_paths[0]])
         bundles = manifest['dsh']['profile']['bundles']
         assert FORGE not in bundles and '@deepseek-ai/dsh-experimental-tool-worktree' not in bundles
-        bundles.append(FORGE)
         source = Path(__file__).with_name('fixtures').joinpath('worktree-restore-gate.mjs').read_text()
         source = source.replace('__MH_REPOSITORY__', json.dumps(repo))
         source = source.replace('__MH_GUEST_BASH__', json.dumps(support['WORKSPACE'].rsplit('/', 1)[0] + '/bin/bash'))
@@ -176,9 +215,15 @@ def run(emulator, output):
         emulator.app(f'mkdir {folder}')
         lsp['restore_bytes'](emulator, folder + '/restore-gate.mjs', source.encode(), remote + '-module')
         lsp['restore_bytes'](emulator, PATCH, patch.encode(), remote + '-patch')
-        lsp['restore_bytes'](emulator, original_paths[0], json.dumps(manifest).encode(), remote + '-profile')
+        if not use_catalog:
+            bundles.append(FORGE)
+            lsp['restore_bytes'](emulator, original_paths[0], json.dumps(manifest).encode(), remote + '-profile')
         emulator.start()
         evidence['forgeReadyMs'] = emulator.ready('normal')
+        if use_catalog:
+            evidence['catalog'] = enable_from_catalog(emulator)
+            assert agent['read_bytes'](emulator, original_paths[1]) == originals[original_paths[1]]
+            evidence['catalogTogglesDidNotChangeLock'] = True
         sessions = []
         with support['model_key'](emulator):
             try:
@@ -209,6 +254,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output', type=Path)
+    parser.add_argument('--catalog', action='store_true', help='Enable bundles using the 0.4.37 installation catalog')
     options = parser.parse_args()
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('MH_TEST_DEEPSEEK_API_KEY is required')
@@ -216,6 +262,6 @@ if __name__ == '__main__':
     forward = ('tcp:19643', 'tcp:19592')
     emulator.hdc('fport', *forward)
     try:
-        run(emulator, options.output)
+        run(emulator, options.output, options.catalog)
     finally:
         emulator.hdc('fport', 'rm', *forward)
