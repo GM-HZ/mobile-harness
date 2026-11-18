@@ -1,4 +1,4 @@
-"""Exercise the real LiveShare gateway and owner RPCs with a loopback Relay stand-in."""
+"""Exercise the real LiveShare gateway and owner authorization with an isolated Relay."""
 import argparse
 import base64
 from datetime import datetime, timedelta, timezone
@@ -14,6 +14,7 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 flow = runpy.run_path(str(Path(__file__).with_name('emulator-personalized-recommendations.py')))
+translation = runpy.run_path(str(Path(__file__).with_name('emulator-cot-translation.py')))
 support, agent, lsp = (flow[name] for name in ['support', 'agent', 'lsp'])
 ws_module = runpy.run_path(str(Path(__file__).with_name('emulator-ptc-approval.py')))['ws_module']
 NAME = '@deepseek-ai/dsh-experimental-liveshare'
@@ -113,14 +114,42 @@ def verify_reader(device, port, share, shared, outside, evidence, model):
     evidence['ownerAppliedLiveRevocation'] = True
 
 
-def run(device, output, model):
+def verify_owner_login(device, title, evidence):
+    ui = translation['ui']
+    with translation['browser'](device) as browser:
+        translation['open_session'](device, browser, title)
+    ui['tap'](device, ui['wait_control'](device, {'分享', 'Share'}, 'button'))
+    ui['wait_control'](device, {'分享会话', 'Share session'}, 'dialog')
+    ui['tap'](device, ui['wait_control'](device, {'登录', 'Sign in'}, 'button'))
+    limit = time.monotonic() + 15
+    while time.monotonic() < limit:
+        rows = ui['controls'](device)
+        blocked = next((row['text'] for row in rows if '登录地址不受支持' in row['text']), None)
+        if blocked:
+            evidence['nativeNavigationBlocked'] = blocked
+            ui['tap'](device, ui['wait_control'](device, {'返回聊天'}))
+            raise AssertionError('ArkWeb blocked the LiveShare authorization address')
+        approval = ui['find'](rows, {'Authorize fixture owner'}, 'button')
+        if approval:
+            ui['tap'](device, approval)
+            break
+        time.sleep(.25)
+    else:
+        raise AssertionError('ArkWeb did not render the Relay authorization')
+    ui['wait_control'](device, {'Fixture Relay Owner'})
+    identity = owner(device, 'identity', {})
+    assert identity['state'] == 'verified' and identity['displayName'] == 'Fixture Relay Owner', identity
+    evidence['arkwebOwnerVerified'] = True
+
+
+def run(device, output, model, owner_login, host_port):
     node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
     fixture = Path(__file__).with_name('fixtures')/'liveshare-relay.cjs'
     name = 'mh-share-relay-'+uuid.uuid4().hex[:10]
     folder = 'alpine/workspace-native/'+name
     workspace_path = support['WORKSPACE']+'/'+name
     base = 'http://127.0.0.1:19769'
-    bridge = ('tcp:19643', 'tcp:19592')
+    bridge = (f'tcp:{host_port}', 'tcp:19592')
     temp = '/data/local/tmp/'+name
     paths = [flow['PROFILE']+'/'+part for part in ('package.json', 'pnpm-lock.yaml', 'cordis.patch.yml')]
     paths.append('mobile-harness-boot.json')
@@ -133,10 +162,15 @@ def run(device, output, model):
     assert 'Forwardport result:OK' in device.hdc('fport', *bridge)
     try:
         device.ready('normal')
-        saved = {path: agent['read_bytes'](device, path) for path in paths}
+        saved = {path: translation['profile_bytes'](device, path) for path in paths}
         assert not flow['market']['catalog'](device, NAME)['enabled']
         flow['flow']['switch'](device, NAME, True)
-        proc = subprocess.Popen([str(node), str(fixture), str(ws_module())], stdout=subprocess.PIPE,
+        command = [str(node), str(fixture), str(ws_module())]
+        if owner_login:
+            flow['flow']['switch'](device, translation['flow']['BUNDLE'], True)
+            flow['flow']['switch'](device, translation['inspector']['NAME'], True)
+            command.append('--owner-login')
+        proc = subprocess.Popen(command, stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE, text=True)
         assert select.select([proc.stdout], [], [], 5)[0], 'Relay did not report a bound port'
         relay_port = int(proc.stdout.readline())
@@ -145,12 +179,15 @@ def run(device, output, model):
         reverse = candidate
         device.app('mkdir '+folder)
         state = workspace_path+'/owner-shares.json'
-        patch = saved[paths[2]].rstrip() + ('\n- id: liveshare-share-host\n  config: '+
-                                          json.dumps({'ownerStateFile': state})+'\n').encode()
-        expiry = (datetime.now(timezone.utc)+timedelta(hours=1)).isoformat()
-        credential = {'relay': base, 'credential': 'fixture-payload.fixture-signature',
-                      'expiresAt': expiry, 'subjectId': 'owner'}
-        lsp['restore_bytes'](device, folder+'/owner-credential.json', json.dumps(credential).encode(), temp+'-credential')
+        patch = saved[paths[2]].rstrip()
+        if patch == b'[]' or patch.endswith(b'\n[]'):
+            patch = patch[:-2].rstrip()
+        patch += ('\n- id: liveshare-share-host\n  config: ' + json.dumps({'ownerStateFile': state})+'\n').encode()
+        if not owner_login:
+            expiry = (datetime.now(timezone.utc)+timedelta(hours=1)).isoformat()
+            credential = {'relay': base, 'credential': 'fixture-payload.fixture-signature',
+                          'expiresAt': expiry, 'subjectId': 'owner'}
+            lsp['restore_bytes'](device, folder+'/owner-credential.json', json.dumps(credential).encode(), temp+'-credential')
         device.stop()
         lsp['restore_bytes'](device, paths[2], patch, temp+'-patch')
         device.start()
@@ -161,8 +198,22 @@ def run(device, output, model):
         registered = device.rpc('workspace/create', {'request': {'path': workspace_path}})
         assert registered['created']
         workspace = registered['workspace']['workspaceId']
-        for _ in range(3):
+        if owner_login:
+            seed = translation['flow']
+            title = 'LiveShare authorization ' + name
+            archive = seed['archive_bytes'](name, seed['SOURCE_PNG'].read_bytes(), text_title=title)
+            status, uploaded = seed['upload'](device, workspace, archive)
+            assert status == 200 and uploaded[-1]['outcome']['ok'], (status, uploaded[-1])
+            sessions.extend(uploaded[-1]['outcome']['value']['sessionIds'])
+            assert 1 <= len(sessions) <= 2
+        for _ in range(3 - len(sessions)):
             sessions.append(device.rpc('session/create', {'request': {'workspaceId': workspace}})['sessionId'])
+        if owner_login:
+            with support['model_key'](device):
+                device.rpc('session/selectModel', {'request': {'sessionId': sessions[0], 'provider': 'deepseek-official',
+                    'model': 'deepseek-flash', 'reasoningEffort': 'off'}})
+                flow['flow']['restart'](device)
+                verify_owner_login(device, title, evidence)
         evidence['authorized'] = owner(device, 'testPublish', {'sessionId': sessions[0]})
         assert evidence['authorized'] == {'ok': True, 'blocking': False}, evidence['authorized']
         created = owner(device, 'create', {'sessionId': sessions[0], 'sessionTitle': 'Loopback DSH fixture',
@@ -217,10 +268,13 @@ def run(device, output, model):
                     device.stop()
                     device.app('rm -rf '+folder)
                     for i, (path, body) in enumerate(saved.items()):
-                        lsp['restore_bytes'](device, path, body, temp+str(i))
+                        if body is None:
+                            device.app('rm -f '+path)
+                        else:
+                            lsp['restore_bytes'](device, path, body, temp+str(i))
                     device.start()
                     evidence['restoredReadyMs'] = device.ready('normal')
-                    assert all(agent['read_bytes'](device, path) == body for path, body in saved.items())
+                    assert all(translation['profile_bytes'](device, path) == body for path, body in saved.items())
                     evidence['configRestored'] = True
         finally:
             if reverse:
@@ -235,6 +289,9 @@ def run(device, output, model):
             output.write_text(json.dumps(evidence, indent=2)+'\n')
     created_id = evidence['created']['shareId']
     messages = evidence['relayMessages']
+    if owner_login:
+        assert sum(row.get('ownerAuthorizationDisplayed', False) for row in messages) == 1
+        assert sum(row.get('ownerCredentialRedeemed', False) and row.get('pkceMatched', False) for row in messages) == 1
     assert sum(row.get('registered') == created_id for row in messages) >= 2, messages
     assert any(row.get('deleted') == created_id for row in messages), messages
     assert any(row.get('closed') == created_id and row.get('code') == 1000 for row in messages), messages
@@ -245,7 +302,9 @@ if __name__ == '__main__':
     parser.add_argument('target')
     parser.add_argument('output', type=Path)
     parser.add_argument('--model', action='store_true', help='Also send an owned prompt to the actual model')
+    parser.add_argument('--owner-login', action='store_true', help='Complete LiveShare owner authorization in ArkWeb')
+    parser.add_argument('--host-port', type=int, default=19643)
     args = parser.parse_args()
-    if args.model and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
-        parser.error('--model requires MH_TEST_DEEPSEEK_API_KEY')
-    run(support['Emulator'](args.target, 19643), args.output, args.model)
+    if (args.model or args.owner_login) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
+        parser.error('--model and --owner-login require MH_TEST_DEEPSEEK_API_KEY')
+    run(support['Emulator'](args.target, args.host_port), args.output, args.model, args.owner_login, args.host_port)

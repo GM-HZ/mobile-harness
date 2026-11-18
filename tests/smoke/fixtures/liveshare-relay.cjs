@@ -1,8 +1,13 @@
 'use strict';
 const http = require('node:http');
+const { createHash, randomBytes } = require('node:crypto');
 const { WebSocketServer } = require(process.argv[2]);
 
-const credential = 'fixture-payload.fixture-signature';
+const login = process.argv.includes('--owner-login');
+const credential = login ? Buffer.from(JSON.stringify({
+  subjectId: 'owner', displayName: 'Fixture Relay Owner', expiresAt: Date.now() + 60 * 60_000,
+})).toString('base64url') + '.fixture-signature' : 'fixture-payload.fixture-signature';
+const codes = new Map();
 const shares = new Map();
 const actor = {
   providerId: 'fixture', tenantId: 'local', subjectId: 'reader', credential: 'synthetic-reader-claim',
@@ -46,7 +51,47 @@ function forwardViewer(request, response, state) {
 
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, 'http://127.0.0.1');
+  if (login && url.pathname === '/__liveshare/owner-authorize' && request.method === 'GET') {
+    const { origin, state, code_challenge, instance } = Object.fromEntries(url.searchParams);
+    if (origin !== 'http://127.0.0.1:19592' || !/^[\w-]{22}$/.test(state) ||
+        !/^[\w-]{43}$/.test(code_challenge) || !instance) {
+      reply(response, 400, { error: 'fixture-authorization-invalid' });
+      return;
+    }
+    const code = randomBytes(24).toString('base64url');
+    codes.set(code, { challenge: code_challenge, instance });
+    log({ ownerAuthorizationDisplayed: true });
+    response.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+    response.end(`<!doctype html><title>Fixture Relay Owner</title>
+<button id="approve">Authorize fixture owner</button><script>
+const origin = ${JSON.stringify(origin)};
+const completion = ${JSON.stringify({ type: 'liveshare-auth-code', code, state })};
+document.querySelector('#approve').onclick = () => window.opener.postMessage(completion, origin);
+window.addEventListener('message', event => {
+  if (event.origin === origin && event.source === window.opener &&
+      event.data?.type === 'liveshare-auth-ack' && event.data.state === completion.state) window.close();
+});
+</script>`);
+    return;
+  }
   if (url.pathname === '/__liveshare/owner-credential') {
+    if (login && request.method === 'POST') {
+      let body = '';
+      request.on('data', chunk => { body += chunk; });
+      request.on('end', () => {
+        const { code, code_verifier, instanceKey } = JSON.parse(body);
+        const issued = codes.get(code);
+        if (!issued || typeof code_verifier !== 'string' || issued.instance !== instanceKey ||
+            createHash('sha256').update(code_verifier).digest('base64url') !== issued.challenge) {
+          reply(response, 403, { error: 'invalid-code' });
+          return;
+        }
+        codes.delete(code);
+        log({ ownerCredentialRedeemed: true, pkceMatched: true });
+        reply(response, 200, { credential });
+      });
+      return;
+    }
     reply(response, 200, { supported: true });
     return;
   }

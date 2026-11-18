@@ -55,6 +55,12 @@ def cancel(device):
 
 def public_popup(device, evidence):
     assert state(device)['status'] == 'signed-out'
+    def sign_in_entry():
+        rows = ui['controls'](device)
+        return (ui['find'](rows, {'预览版说明', 'Preview Notice'}, 'dialog')
+                or ui['find'](rows, {'登录', 'Sign in'}, 'button'))
+    if wait(sign_in_entry, 'preview notice or account entry')['type'] == 'dialog':
+        ui['tap'](device, ui['wait_control'](device, {'继续', 'Continue'}, 'button'))
     button = ui['wait_control'](device, {'登录', 'Sign in'}, 'button')
     ui['tap'](device, button)
     try:
@@ -146,7 +152,10 @@ def owned_callback(device, evidence):
                  f'- id: deepseek-account\n  config: {json.dumps(config)}\n')
         device.stop()
         patched = True
-        market['lsp']['restore_bytes'](device, profile_patch, original.rstrip() + patch.encode(), '/data/local/tmp/' + name)
+        base = original.rstrip()
+        if base == b'[]' or base.endswith(b'\n[]'):
+            base = base[:-2].rstrip()
+        market['lsp']['restore_bytes'](device, profile_patch, base + patch.encode(), '/data/local/tmp/' + name)
         device.start()
         device.ready('normal')
         assert state(device)['status'] == 'signed-out'
@@ -195,9 +204,9 @@ def owned_callback(device, evidence):
             server.server_close()
 
 
-def run(device, output):
+def run(device, output, host_port=19643):
     evidence = {'public': {}, 'fixture': {}}
-    bridge = ('tcp:19643', 'tcp:19592')
+    bridge = (f'tcp:{host_port}', 'tcp:19592')
     assert 'Forwardport result:OK' in device.hdc('fport', *bridge)
     try:
         device.start()
@@ -213,5 +222,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output', type=Path)
+    parser.add_argument('--host-port', type=int, default=19643)
     args = parser.parse_args()
-    run(support['Emulator'](args.target, 19643), args.output)
+    run(support['Emulator'](args.target, args.host_port), args.output, args.host_port)
