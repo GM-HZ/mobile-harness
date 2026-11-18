@@ -1,0 +1,507 @@
+{
+  "recordedAt": "2026-11-18T15:23:43.946184+00:00",
+  "baselineCommit": "fbd41cd035c2797ca0ae77bee9591aa339b24c3f",
+  "target": "DevEco API26 ARM64 Phone emulator 127.0.0.1:15557",
+  "dsh": "0.2.2-rc.5",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.47-unsigned.hap",
+    "version": "0.4.47",
+    "versionCode": 54,
+    "sha256": "6730145ac50ba15723d56dc8fdbf912cb43173b96dc6f637128060caecefd4e2",
+    "bytes": 662478181,
+    "layerSha256": "ced535a6244e7faab2af0b9b905b1e64171d898fde9e242e957e3f4874fadb55",
+    "sourceCommit": "8cbf4d96d3942231776d49e8dcb2c92a42084663",
+    "compatibilityAssets": {
+      "runtime/harmonyos/compat/dsh-harmony-package.cjs": "1a1fe6e5297ed7f64ec4efcab32ecc362c8ce8e05d2ba05401a73a7a8dab033a",
+      "packages/dsh-host/dsh-native-web.cjs": "38b96a8a68b3bed3d846a19822e986113e13b15d7cbe5f174497062a9fdab8cc",
+      "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335"
+    }
+  },
+  "layerDelta": {
+    "entries": 94347,
+    "changedMembers": [
+      "dsh/package.json"
+    ],
+    "newDefaultOffBundles": {
+      "@deepseek-ai/dsh-experimental-auto-review": "0.2.2-rc.5",
+      "@deepseek-ai/dsh-experimental-liveshare": "0.2.2-rc.5"
+    }
+  },
+  "build": {
+    "command": "npm_config_offline=true HARMONY_UNSIGNED=1 HARMONY_INPUTS_DIR=<pinned input directory> ./build.sh --package",
+    "exitCode": 0,
+    "logSha256": "7262b2912aaa6b9a274586798540d4e44df9bc1e9311e88a02ba4a28b3609513"
+  },
+  "install": {
+    "command": "hdc -t 127.0.0.1:15557 install -r .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.47-unsigned.hap",
+    "exitCode": 0,
+    "logSha256": "55d9e8bba1391fc9046a9fbe6f1d5797f9acc70b9f7e28acd3499e5173ef0e9a"
+  },
+  "absoluteDirectoryRegression": {
+    "applied": true,
+    "specType": "absolute-directory",
+    "packageExitCode": 0,
+    "resultSha256": "6a11b1ec0dacf56ee69546bde22b93bd073b0d48a35138c324b6103acc4ce47f"
+  },
+  "commands": [
+    {
+      "case": "creator",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-personalized-recommendations.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/creator-0.4.47.json",
+        "--create"
+      ],
+      "elapsedSeconds": 221.699,
+      "exitCode": 1,
+      "testSourceCommit": "8cbf4d96d3942231776d49e8dcb2c92a42084663",
+      "log": ".build/optional-batch/creator-0.4.47.log",
+      "result": {
+        "defaultCatalog": {
+          "name": "@deepseek-ai/dsh-personalized-recommendations",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "activeUpstreamRows": {
+          "action-cards": "active",
+          "client-ui-action-cards": "active",
+          "creation-recommendations": "active",
+          "client-ui-creation-recommendations": "active",
+          "plugin-recommendations": "active",
+          "client-ui-plugin-recommendations": "active"
+        },
+        "creatorDecision": {
+          "callId": "call_00_gVauT2bF5nN6348XWJZT0464",
+          "action": "create_personalized_page",
+          "phase": "installed",
+          "data": {
+            "slot": "page",
+            "bundleName": "@dsh-local/view-154d1655-4290-4899-a7ca-0645524e34ed",
+            "application": "applied"
+          }
+        },
+        "restoredReadyMs": 7210,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "resultSha256": "51462182cef46356e6a4f774995769334acb710daa652f48fae0a848d213fdae",
+      "logSha256": "9e6e1d00700a1cb5e5c43020cdb46333c31ecd937a4a6ef441318a7e9da65f01"
+    },
+    {
+      "case": "auto-liveshare",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-auto-review-liveshare.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/auto-liveshare-0.4.47.json"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 42.639,
+      "testSourceCommit": "8d3197d878336ed27e7c451d8f4e345ea68b05fe",
+      "log": ".build/optional-batch/auto-liveshare-0.4.47.log",
+      "result": {
+        "defaultCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "enabledCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": true,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": true,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "defaultPolicyUnchanged": "workspace-write",
+        "shareOwnerHasNoRelayOrShares": true,
+        "selectedAuto": {
+          "commandId": "cmd-d2fd033c-1",
+          "result": {
+            "kind": "success",
+            "text": "preset auto"
+          }
+        },
+        "autoAllowedRead": true,
+        "selectionAfterRestart": {
+          "commandId": "cmd-ab16332e-1",
+          "result": {
+            "kind": "success",
+            "text": "current preset auto (available: read-only, workspace-write, danger-full-access, auto)"
+          }
+        },
+        "disabledCatalog": [
+          {
+            "name": "@deepseek-ai/dsh-experimental-auto-review",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          },
+          {
+            "name": "@deepseek-ai/dsh-experimental-liveshare",
+            "enabled": false,
+            "version": "0.2.2-rc.5",
+            "availability": "installation"
+          }
+        ],
+        "restoredReadyMs": 7493,
+        "originalConfigurationRestored": true
+      },
+      "resultSha256": "570cb0c106c546363e3d6d2a70a95a6fa6f1a920eb12a790163d2119b89be567",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "forge-panel",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-worktree-restore.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/forge-panel-0.4.47.json",
+        "--panel"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 156.203,
+      "testSourceCommit": "8d3197d878336ed27e7c451d8f4e345ea68b05fe",
+      "log": ".build/optional-batch/forge-panel-0.4.47.log",
+      "result": {
+        "fixture": "mh-worktree-restore-8ab1889c4f",
+        "forgeReadyMs": 8329,
+        "sessionId": "session-0691ca06-576b-4160-930c-d7e30548b3ce",
+        "created": {
+          "path": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-8ab1889c4f/.agents/worktrees/dsh-0691ca06-c9d7",
+          "branch": "dsh-0691ca06-c9d7",
+          "baseCommit": "020397905c38f15b296e936ffc06ed56a49cf93a",
+          "repositoryRoot": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/mh-worktree-restore-8ab1889c4f"
+        },
+        "arkWebForgeCheckout": true,
+        "committedTip": "4aff644e924339528bbd8cea5ca81a20055f4003",
+        "existingBranchRestoredAtCommittedTip": true,
+        "gatedCheckoutActivePids": [
+          8075
+        ],
+        "cancelToReapedMs": 104,
+        "cancelledSessionLoggedRestoringWithoutRestored": true,
+        "cancelPreservedBranchAndReportedPartialCheckout": true,
+        "missingBranchRecreatedAtBaseAfterCancellation": true,
+        "forgeActions": [
+          "request",
+          "restoring",
+          "restored",
+          "restoring",
+          "restoring",
+          "restored"
+        ],
+        "restartReadyMs": 10089,
+        "restoredSessionRetainedAcrossRestart": true,
+        "testCredentialRemoved": true,
+        "restoredReadyMs": 6595,
+        "originalConfigurationHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        },
+        "fixtureRemoved": true
+      },
+      "resultSha256": "8ad15e1995b54d6531ce999432a60ecb039ed2851569454e3838061c163b81b4",
+      "logSha256": "25efd3ce695ca62a03c4aa3adb75ba8a1f19a80f4ec78b8142478d2af6ca1af7"
+    },
+    {
+      "case": "creator",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-personalized-recommendations.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/creator-retry-0.4.47.json",
+        "--create"
+      ],
+      "elapsedSeconds": 222.819,
+      "exitCode": 1,
+      "testSourceCommit": "af0d60d6f1350d461a772421c2be2625cc4e68fb",
+      "log": ".build/optional-batch/creator-retry-0.4.47.log",
+      "result": {
+        "defaultCatalog": {
+          "name": "@deepseek-ai/dsh-personalized-recommendations",
+          "enabled": false,
+          "version": "0.2.2-rc.5",
+          "availability": "installation"
+        },
+        "activeUpstreamRows": {
+          "action-cards": "active",
+          "client-ui-action-cards": "active",
+          "creation-recommendations": "active",
+          "client-ui-creation-recommendations": "active",
+          "plugin-recommendations": "active",
+          "client-ui-plugin-recommendations": "active"
+        },
+        "creatorDecision": {
+          "callId": "call_00_F1nLg9nKdXQSwrslNvAR0802",
+          "action": "create_personalized_page",
+          "phase": "failed",
+          "data": {
+            "slot": "page",
+            "bundleName": "@dsh-local/view-5b90dd36-2844-40b9-8f60-13838c57674f"
+          }
+        },
+        "restoredReadyMs": 6240,
+        "restoredHashes": {
+          "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+          "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+          "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060",
+          "mobile-harness-boot.json": "c23a719bf68a5282aa5504b1d8e6615c148682655273565337fee4cac319ff82"
+        }
+      },
+      "resultSha256": "08b86771d683a395b801da4e910df222151493c10bd18fff6bf56962db407002",
+      "logSha256": "2292c2bbe2e9ab1cfb9bf97df4f36a4ac339f4647670062bc810a86b9701aa85"
+    },
+    {
+      "case": "inspector",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-inspector.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/inspector-retry-0.4.47.json",
+        "--panel"
+      ],
+      "elapsedSeconds": 19.646,
+      "exitCode": 0,
+      "testSourceCommit": "af0d60d6f1350d461a772421c2be2625cc4e68fb",
+      "log": ".build/optional-batch/inspector-retry-0.4.47.log",
+      "result": {
+        "defaultCatalog": {
+          "availability": "installation",
+          "enabled": false,
+          "optional": true,
+          "official": true,
+          "version": "0.2.2-rc.5"
+        },
+        "enable": "applied",
+        "cdp": {
+          "workerPort": 9230,
+          "anonymousDiscoveryStatus": 403,
+          "targetCount": 1,
+          "devtoolsAssetSha256": "371c96a262a80fcbf7f6bbd8122a06168b7c3de2acfc34bd4a3dd0afce5cb1e1",
+          "anonymousProxyStatus": 401,
+          "directCdpStatus": 403,
+          "hostEvaluation": 42,
+          "arkWeb": {
+            "origin": "http://127.0.0.1:19592",
+            "document": 9
+          },
+          "panel": {
+            "visible": true,
+            "path": "/inspector/devtools/devtools_app.html",
+            "ready": true
+          }
+        },
+        "disable": "applied",
+        "workerReleasedOnDisable": true,
+        "restoredReadyMs": 5639,
+        "restoredConfiguration": true
+      },
+      "resultSha256": "cf39383879690b1a6d177dd032c568300e547dc78235b291190b7e10347e61f3",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "recovery",
+      "command": [
+        "python3",
+        "tests/smoke/emulator-recovery.py",
+        "127.0.0.1:15557",
+        ".build/optional-batch/recovery-retry-0.4.47.json"
+      ],
+      "elapsedSeconds": 37.783,
+      "exitCode": 0,
+      "testSourceCommit": "af0d60d6f1350d461a772421c2be2625cc4e68fb",
+      "log": ".build/optional-batch/recovery-retry-0.4.47.log",
+      "result": {
+        "fixture": "mobile-harness-crash-6112180987",
+        "normalReadyMs": 112,
+        "anonymousHttp": 401,
+        "manifestBeforeSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockBeforeSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+        "pluginInstalledDisabled": true,
+        "actualPluginCrash": true,
+        "interruptedNormalBoot": {
+          "mode": "normal",
+          "pending": true
+        },
+        "safeReadyMs": 6008,
+        "safeAuthenticatedHttp": 200,
+        "pluginNotLoadedAgain": true,
+        "sameSessionInSafeMode": true,
+        "normalProfileRestored": true,
+        "returnNormalReadyMs": 5962,
+        "manifestAfterSha256": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+        "lockAfterSha256": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e"
+      },
+      "resultSha256": "16b04699c65e6fba5b5c053809f3299b080d2ede2d0038a66474b1fbfc9cfed1",
+      "logSha256": "826ef2df90372077dfdab611fffcda8f19b80d41333a3dcefe830c899712efa4"
+    }
+  ],
+  "audit": {
+    "target": "127.0.0.1:15557",
+    "boot": {
+      "mode": "normal",
+      "pending": false
+    },
+    "readyMs": 70,
+    "profileHashes": {
+      "alpine/native-benchmark-home/profiles/web/package.json": "c5955d33c12dce37f48bbd9f6319bbb6288b19ab49af22898aa337403b4608b8",
+      "alpine/native-benchmark-home/profiles/web/pnpm-lock.yaml": "3e17f9c545e2c97679668286cedc0e0907159ee38a2b457569802b8a320b913e",
+      "alpine/native-benchmark-home/profiles/web/cordis.patch.yml": "36dc6d7818b81638e19ec84b2d83a2f4acbd70a45bfcd9dc8c00b67a39161060"
+    },
+    "legacySessionId": "session-ecf0df3c-47a9-4df4-b71e-6d4261d13419",
+    "legacySessionEvents": 30,
+    "legacySessionSha256": "eb9ca5fe11915b61a7fa273553e0390741b5a2b6bec7da4b94fdc6838a825d7b",
+    "anonymousHttp": 401,
+    "authenticatedHttp": 200,
+    "permission": "workspace-write",
+    "testCredentialAbsent": true,
+    "installedRuntime": "0.2.2-rc.5",
+    "installedLayerSha256": "ced535a6244e7faab2af0b9b905b1e64171d898fde9e242e957e3f4874fadb55",
+    "titlesAndBadgeDefaultOff": {
+      "@deepseek-ai/dsh-experimental-session-titles-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      },
+      "@deepseek-ai/dsh-experimental-badge-skill-bundle": {
+        "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+        "availability": "installation",
+        "official": true,
+        "optional": true,
+        "removable": false,
+        "enabled": false,
+        "version": "0.2.2-rc.5"
+      }
+    },
+    "fourOptionalBundlesDefaultOff": {
+      "@deepseek-ai/dsh-experimental-ralph-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-session-search": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-tool-worktree": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      },
+      "@deepseek-ai/dsh-experimental-forge-bundle": {
+        "availability": "installation",
+        "optional": true,
+        "official": true,
+        "installed": false,
+        "removable": false,
+        "version": "0.2.2-rc.5",
+        "enabled": false
+      }
+    },
+    "chatImportDefaultOff": {
+      "availability": "installation",
+      "official": true,
+      "optional": true,
+      "enabled": false,
+      "version": "0.2.2-rc.5"
+    },
+    "inspectorDefaultOff": true,
+    "translationDefaultOff": true,
+    "recommendationsDefaultOff": {
+      "name": "@deepseek-ai/dsh-personalized-recommendations",
+      "enabled": false,
+      "version": "0.2.2-rc.5",
+      "availability": "installation"
+    },
+    "badgeDefaultOff": {
+      "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+      "enabled": false,
+      "version": "0.2.2-rc.5",
+      "availability": "installation"
+    },
+    "batchDefaultOff": [
+      {
+        "name": "@deepseek-ai/dsh-experimental-auto-review",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      },
+      {
+        "name": "@deepseek-ai/dsh-experimental-liveshare",
+        "enabled": false,
+        "version": "0.2.2-rc.5",
+        "availability": "installation"
+      }
+    ]
+  },
+  "limits": [
+    "Auto review passed a read-only tool, restart persistence and restoration of workspace-write. Denial, cancellation, failure and richer policy tests remain.",
+    "LiveShare was verified only on the authenticated owner surface without a configured relay or published share.",
+    "Forge passed the real ArkWeb panel and the local worktree lifecycle. Hosted forge provider operations were not exercised.",
+    "This is an unsigned emulator HAP. Physical-device and signed-HAP regression remain open.",
+    "The Creator tab or page lifecycle has not been verified end to end. Both attempts are retained."
+  ],
+  "creatorDiagnosis": {
+    "resultSha256": "53a5423cbfccf71bf5256a5676288c46e8c4a37159d556041644c93bbc528905",
+    "observedChildOutcomes": [
+      {
+        "ownedFixture": "59d2b2ae0a",
+        "creator": "0d84942a-b3be-4ea2-adde-204b81c92f54",
+        "ready": [
+          false
+        ],
+        "failedSkill": [
+          "['Error: skill \"cordis-plugin-development\" is unknown or no longer available']"
+        ]
+      },
+      {
+        "ownedFixture": "582f806363",
+        "creator": "fd067934-14a6-458b-847d-cdc106a0ff3d",
+        "ready": [
+          true
+        ],
+        "failedSkill": []
+      }
+    ]
+  }
+}

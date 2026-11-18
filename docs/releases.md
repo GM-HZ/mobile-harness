@@ -286,3 +286,11 @@ DSH 保持最新官方 RC.4，随包331个 DSH 组件版本一致。补充官方
 登记官方推荐 bundle，默认关闭。真实模型发出两类卡片。ArkWeb 通过启用现有插件、选择页面位置、暂不创建、重启复用和关闭后移除推荐技能。Creator 生成了本地包，安装失败。用最小本地包复现 pnpm 对目录创建符号链接时被系统拒绝。页面呈现、撤销与恢复待验。
 
 Inspector 和故障恢复两组回归通过，原配置、权限、旧会话摘要与鉴权保持。未签名 HAP 662,477,712 字节，SHA-256 `6b77237a5cc3ee1a3e59769d7798a2e8294b3dd98b71966b702f4f8755c4e7c0`，生产源 `aa72905bb060b59389dba24b5ca0ba2cf8364217`。本版在模拟器验证。 [制品、运行结果和失败](evidence/emulator-personalized-recommendations-0.4.46.json)
+
+## 0.4.47 本地插件与可选 bundle
+
+鸿蒙包管理器将 pnpm add 的裸绝对目录转换为 `file:` 安装以复制包，其他来源与显式前缀沿用原行为。最小夹具的裸目录安装和 Creator 生成包的正式安装通过。第一次 Creator 测试停在页签查找。第二次生成返回 `ready:false`，子会话确认上游仍引用 RC.5 已移除的 `cordis-plugin-development` 技能。页面操作、撤销和恢复仍待验。
+
+Auto review 与 LiveShare 默认关闭。Auto review 的显式会话选择、实际只读工具、重启保持和默认权限通过。LiveShare 通过本机 Owner 接口，暂未发布 Relay 共享。Forge 面板和真实工作树恢复、Inspector 与故障恢复通过。原配置、权限、鉴权和旧会话摘要已复核。
+
+未签名 HAP 662,478,181 字节，SHA-256 `6730145ac50ba15723d56dc8fdbf912cb43173b96dc6f637128060caecefd4e2`，生产源 `8cbf4d96d3942231776d49e8dcb2c92a42084663`。本版为模拟器验证。 [准确制品和完整结果](evidence/emulator-optional-batch-0.4.47.json)
