@@ -12,7 +12,9 @@ import socket
 import subprocess
 import threading
 import time
+from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlsplit
+from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener, getproxies
 import uuid
 
 flow = runpy.run_path(str(Path(__file__).with_name('emulator-chat-import.py')))
@@ -29,6 +31,31 @@ FIXTURE_TRANSLATIONS = {('bing', 'zh-Hans'): '只搜索归档导出中的上下�
 BODY = '[data-cot-translation="true"]'
 DISCLOSURE = '[data-variant="think"] [data-disclosure-row]'
 SERVER_PORT = 19747
+PUBLIC_ENDPOINTS = {
+    'bing': 'https://edge.microsoft.com/translate/translatetext',
+    'google': 'https://translate.googleapis.com/translate_a/single',
+}
+
+
+class RefuseRedirects(HTTPRedirectHandler):
+    def redirect_request(self, *args):
+        return None
+
+
+def public_proxy():
+    proxy = getproxies().get('https', '')
+    endpoint = urlsplit(proxy)
+    if (endpoint.scheme != 'http' or endpoint.hostname not in {'localhost', '127.0.0.1', '::1'}
+            or endpoint.username is not None or endpoint.password is not None or not endpoint.port
+            or endpoint.path not in {'', '/'} or endpoint.query or endpoint.fragment):
+        raise ValueError('Use an existing unauthenticated HTTP CONNECT proxy on Mac loopback')
+    return build_opener(ProxyHandler({'https': proxy}), RefuseRedirects())
+
+
+def profile_bytes(emulator, file):
+    if file == PROFILE + '/pnpm-lock.yaml' and emulator.app(f'test -e {file} || printf MISSING') == 'MISSING':
+        return None
+    return agent['read_bytes'](emulator, file)
 
 
 class Provider(BaseHTTPRequestHandler):
@@ -38,21 +65,34 @@ class Provider(BaseHTTPRequestHandler):
     def do_POST(self):
         url = urlsplit(self.path)
         provider = url.path.strip('/')
-        body = self.rfile.read(int(self.headers['Content-Length']))
+        length = int(self.headers.get('Content-Length', '0'))
+        if not 0 < length <= 512:
+            self.send_error(400)
+            return
+        body = self.rfile.read(length)
         params = parse_qs(url.query)
         if provider == 'bing':
             text, = json.loads(body)
             target, = params['to']
             shape = params == {'to': [target], 'isEnterpriseClient': ['false']} and self.headers.get_content_type() == 'application/json'
-        else:
-            assert provider == 'google'
+        elif provider == 'google':
             form = parse_qs(body.decode())
             text, = form['q']
             target, = form['tl']
             shape = not params and form == {'q': [SOURCE], 'tl': [target], 'sl': ['auto'], 'client': ['gtx'], 'dt': ['t']}
             shape = shape and self.headers.get_content_type() == 'application/x-www-form-urlencoded'
-        self.server.calls.append({'provider': provider, 'target': target, 'text': text, 'requestShape': shape,
-                                  'authorization': bool(self.headers.get('Authorization')), 'cookie': bool(self.headers.get('Cookie'))})
+        else:
+            self.send_error(404)
+            return
+        record = {'provider': provider, 'target': target, 'text': text, 'requestShape': shape,
+                  'authorization': bool(self.headers.get('Authorization')), 'cookie': bool(self.headers.get('Cookie'))}
+        self.server.calls.append(record)
+        if self.server.public_proxy is not None:
+            if not shape or text != SOURCE or target != {'bing': 'zh-Hans', 'google': 'zh-CN'}[provider] or record['authorization'] or record['cookie']:
+                self.send_error(400)
+                return
+            self.forward_public(provider, url.query, body, record)
+            return
         if self.server.hold:
             self.server.started.set()
             if select.select([self.connection], [], [], 14)[0]:
@@ -70,6 +110,31 @@ class Provider(BaseHTTPRequestHandler):
         result = json.dumps(data, ensure_ascii=False).encode()
         self.send_response(200)
         self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', str(len(result)))
+        self.end_headers()
+        self.wfile.write(result)
+
+    def forward_public(self, provider, query, body, record):
+        url = PUBLIC_ENDPOINTS[provider] + ('?' + query if query else '')
+        request = Request(url, body, {'Content-Type': self.headers.get_content_type()})
+        try:
+            with self.server.public_proxy.open(request, timeout=10) as upstream:
+                record['upstreamStatus'] = upstream.status
+                result = upstream.read(32 * 1024 + 1)
+                content_type = upstream.headers.get('Content-Type', 'application/json')
+        except HTTPError as error:
+            record['upstreamStatus'] = error.code
+            error.close()
+            self.send_error(error.code)
+            return
+        except (URLError, TimeoutError):
+            self.send_error(502)
+            return
+        if len(result) > 32 * 1024:
+            self.send_error(502)
+            return
+        self.send_response(record['upstreamStatus'])
+        self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(result)))
         self.end_headers()
         self.wfile.write(result)
@@ -260,15 +325,17 @@ def run(emulator, output, live, arkweb_live=False):
     try:
         emulator.ready('normal')
         files = [PROFILE+'/'+name for name in ['package.json','pnpm-lock.yaml','cordis.patch.yml']]+['mobile-harness-boot.json']
-        originals = {file:agent['read_bytes'](emulator,file) for file in files}
+        originals = {file:profile_bytes(emulator,file) for file in files}
         catalog = market['catalog'](emulator, NAME)
         assert catalog and catalog['optional'] and catalog['official'] and not catalog['enabled'], catalog
         evidence['defaultCatalog'] = {key:catalog[key] for key in ['enabled','version','availability']}
         for name in [flow['BUNDLE'],inspector['NAME'], NAME]:
             assert not market['catalog'](emulator,name)['enabled']
             switch(emulator,name,True)
-        if not live:
+        if not live or live == 'public-proxy':
+            proxy = public_proxy() if live == 'public-proxy' else None
             server = ThreadingHTTPServer(('127.0.0.1',0),Provider)
+            server.public_proxy = proxy
             server.calls, server.fail, server.hold = [], False, False
             server.started, server.closed = threading.Event(), threading.Event()
             threading.Thread(target=server.serve_forever,daemon=True).start()
@@ -277,7 +344,10 @@ def run(emulator, output, live, arkweb_live=False):
             reverse = candidate
             base = f'http://127.0.0.1:{SERVER_PORT}'
             config = {'bingEndpoint':base+'/bing','googleEndpoint':base+'/google','timeoutMs':30000}
-            patch = originals[PROFILE+'/cordis.patch.yml'].rstrip()+('\n- id: translator\n  config: '+json.dumps(config)+'\n').encode()
+            patch = originals[PROFILE+'/cordis.patch.yml'].rstrip()
+            if patch == b'[]' or patch.endswith(b'\n[]'):
+                patch = patch[:-2].rstrip()
+            patch += ('\n- id: translator\n  config: '+json.dumps(config)+'\n').encode()
             emulator.stop()
             lsp['restore_bytes'](emulator,PROFILE+'/cordis.patch.yml',patch,remote+'-translator')
             emulator.start()
@@ -305,6 +375,25 @@ def run(emulator, output, live, arkweb_live=False):
                 setting(emulator,'deepseek-official','zh')
                 restart(emulator)
                 paid_rows=verify_paid_arkweb(emulator,title,fixture,session,evidence)
+            elif live == 'public-proxy':
+                evidence['publicTranslations'] = {}
+                evidence['publicRequests'] = server.calls
+                for provider in PUBLIC_ENDPOINTS:
+                    assert provider in limits['availableProviders']
+                    setting(emulator, provider, 'zh')
+                    translated = emulator.rpc('cotTranslation/translate', {'request': {
+                        'text': SOURCE, 'sessionId': session, 'provider': provider, 'targetLanguage': 'zh',
+                    }}, timeout=40)
+                    assert translated != SOURCE and any('\u4e00' <= char <= '\u9fff' for char in translated)
+                    evidence['publicTranslations'][provider] = translated
+                assert [(row['provider'], row.get('upstreamStatus')) for row in server.calls] == [('bing', 200), ('google', 200)]
+                rows = [row for row in support['events'](emulator,session) if row['type'].startswith('plugin:translator/')]
+                assert [row['type'].split('/')[-1] for row in rows] == ['request', 'result', 'request', 'result']
+                assert [row['data']['provider'] for row in rows if row['type'].endswith('/request')] == list(PUBLIC_ENDPOINTS)
+                restart(emulator)
+                assert [row for row in support['events'](emulator,session) if row['type'].startswith('plugin:translator/')] == rows
+                assert len(server.calls) == 2
+                evidence['publicTranslationRecordsRestored'] = True
             elif live:
                 assert live in limits['availableProviders'], limits
                 setting(emulator,live,'zh')
@@ -350,11 +439,15 @@ def run(emulator, output, live, arkweb_live=False):
                     emulator.stop()
                     emulator.app('rm -rf '+folder)
                     for i,(file,body) in enumerate(originals.items()):
-                        lsp['restore_bytes'](emulator,file,body,remote+str(i))
+                        if body is None:
+                            emulator.app('rm -f '+file)
+                        else:
+                            lsp['restore_bytes'](emulator,file,body,remote+str(i))
                     emulator.start()
                     evidence['restoredReadyMs'] = emulator.ready('normal')
-                    assert all(agent['read_bytes'](emulator,file)==body for file,body in originals.items())
-                    evidence['restoredHashes']={file:hashlib.sha256(body).hexdigest() for file,body in originals.items()}
+                    assert all(profile_bytes(emulator,file)==body for file,body in originals.items())
+                    evidence['restoredHashes']={file:hashlib.sha256(body).hexdigest() if body is not None else None
+                                                for file,body in originals.items()}
             finally:
                 if reverse:
                     emulator.hdc('fport','rm',*reverse)
@@ -368,15 +461,17 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
-    parser.add_argument('--live',choices=['bing','google','deepseek-official'],help='Use a real provider with the synthetic fixture')
+    parser.add_argument('--live',choices=['bing','google','deepseek-official','public-proxy'],
+                        help='Use a real provider with the synthetic fixture. public-proxy tests Bing and Google through an existing Mac loopback proxy.')
     parser.add_argument('--arkweb-live',action='store_true',help='Drive the selected DeepSeek Flash provider through ArkWeb')
+    parser.add_argument('--host-port', type=int, default=19643)
     args = parser.parse_args()
     if args.arkweb_live and args.live!='deepseek-official':
         parser.error('--arkweb-live requires --live deepseek-official')
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('MH_TEST_DEEPSEEK_API_KEY is required for the configured ArkWeb fixture')
-    emulator = support['Emulator'](args.target,19643)
-    forward = ('tcp:19643','tcp:19592')
+    emulator = support['Emulator'](args.target,args.host_port)
+    forward = (f'tcp:{args.host_port}','tcp:19592')
     assert 'Forwardport result:OK' in emulator.hdc('fport',*forward)
     try:
         run(emulator,args.output,args.live,args.arkweb_live)

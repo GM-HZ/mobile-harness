@@ -276,6 +276,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-background-schedule.py <loopback-target> .build/background-schedule.json
 ```
 
+`--soak` 将七次投递分布在两小时内，并在第 105 秒后安排一次应用强停重启。检查旧事件前缀、重启前尚未投递的任务以及回到桌面后的真实模型回复。每次投递更新 JSON 检查点，`finished` 为真时表示最终回忆和清理已通过。长测占用该模拟器和临时模型密钥槽。
+
 ## Cordis 与替代编辑回归
 
 0.4.36 修复独占创建发布后，以下检查使用真实模型和正式插件。Cordis 要求真实 ArkWeb 客户端已连接；超出 inline 上限时验证正式保留文件和实际 read。编辑测试仅临时启用官方字符串编辑器与 apply_patch；权限、完整字节、多文件预检及部分提交报告均保留检查。文件发布检查通过标准测试 bundle 验证实际 ctx.fs，包含真实暂存后的竞争创建和取消。
@@ -350,6 +352,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 在独立 Phone 模拟器执行。脚本通过正式导入接口创建合成会话，并用内嵌 ArkWeb 检查展开、原译文、跨重启复用、重试及取消。正常模式使用回环服务，`--live` 显式使用指定提供者。`--arkweb-live` 从页面触发真实 DeepSeek Flash 请求，并在移除测试密钥后重开已保存的译文。只提交合成文本，结束后恢复测试配置。
 
+`--live public-proxy` 在同一次模拟器回归调用 Bing 和 Google 公网端点。需已有 macOS 回环 HTTP CONNECT 代理，临时服务只转发本夹具的固定合成文本。单独使用 `--live bing` 或 `--live google` 验证模拟器默认网络路径。
+
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-translation.json
@@ -358,6 +362,9 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-flash-arkweb.json \
   --live deepseek-official --arkweb-live
+MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
+  python3 tests/smoke/emulator-cot-translation.py <loopback-target> .build/cot-public-proxy.json \
+  --live public-proxy
 ```
 
 ## 个性化推荐

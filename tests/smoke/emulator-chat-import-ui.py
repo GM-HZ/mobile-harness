@@ -61,6 +61,9 @@ def tap(emulator, row):
 
 def open_sidebar(emulator):
     rows = controls(emulator)
+    if find(rows, {'预览版说明', 'Preview Notice'}, 'dialog'):
+        tap(emulator, wait_control(emulator, {'继续', 'Continue'}, 'button'))
+        rows = controls(emulator)
     if find(rows, {'开始使用', 'Get started'}, 'dialog'):
         tap(emulator, wait_control(emulator, {'关闭', 'Close'}, 'button'))
     rows = controls(emulator)
