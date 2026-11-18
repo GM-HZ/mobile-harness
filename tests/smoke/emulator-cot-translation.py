@@ -119,18 +119,20 @@ def click(selector):
         button.click(); return true;}})()'''
 
 
-def open_reasoning(emulator, run, workspace, session):
+def open_reasoning(emulator, run, title):
     ui['open_sidebar'](emulator)
-    group = '[data-row-key="workspace:'+workspace+'"]'
-    row = '[data-row-key="session:'+session+'"]'
     wait(run, f'''(() => {{
-        const session=document.querySelector({json.dumps(row)});
-        if (session && session.getClientRects().length) {{
-          if (session.getAttribute('aria-selected') !== 'true') session.click();
-          return true;
+        const field=document.querySelector('[data-sidebar-workspace-header] input[type=text]');
+        if (!field?.getClientRects().length) return false;
+        const search=field.parentElement.querySelector('button[aria-expanded]');
+        if (search?.getAttribute('aria-expanded') === 'false') search.click();
+        if (field.value !== {json.dumps(title)}) {{
+          Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(field, {json.dumps(title)});
+          field.dispatchEvent(new Event('input',{{bubbles:true}}));
         }}
-        const workspace=document.querySelector({json.dumps(group)});
-        if (workspace?.getAttribute('aria-expanded') === 'false') workspace.click();
+        const item=[...document.querySelectorAll('[role=treeitem]')].find(el =>
+          el.getClientRects().length && el.textContent.includes({json.dumps(title)}));
+        if (item) {{ item.click(); return true; }}
         return false;
     }})()''', 'the fixture session')
     wait(run, f'''(() => {{
@@ -172,11 +174,11 @@ def restart(emulator):
     return emulator.ready('normal')
 
 
-def verify_fixture(emulator, server, workspace, session, evidence):
+def verify_fixture(emulator, server, title, session, evidence):
     original = support['events'](emulator, session)
     with browser(emulator) as run:
         assert not server.calls
-        open_reasoning(emulator, run, workspace, session)
+        open_reasoning(emulator, run, title)
         check_body(run, 'ready', FIXTURE_TRANSLATIONS['bing', 'zh-Hans'], 'translated')
         wait(run, click(BODY+' button'), 'show original')
         check_body(run, 'ready', SOURCE, 'original')
@@ -186,7 +188,7 @@ def verify_fixture(emulator, server, workspace, session, evidence):
     evidence['originalAndTranslatedViews'] = True
     restart(emulator)
     with browser(emulator) as run:
-        open_reasoning(emulator, run, workspace, session)
+        open_reasoning(emulator, run, title)
         check_body(run, 'ready', FIXTURE_TRANSLATIONS['bing', 'zh-Hans'], 'translated')
         assert len(server.calls) == 1, server.calls
         server.fail = True
@@ -254,7 +256,8 @@ def run(emulator, output, live):
             item = emulator.rpc('workspace/create',{'request':{'path':support['WORKSPACE']+'/'+fixture}})
             assert item['created'], item
             workspace = item['workspace']['workspaceId']
-            status, lines = flow['upload'](emulator, workspace, flow['archive_bytes'](fixture,flow['SOURCE_PNG'].read_bytes()))
+            archive = flow['archive_bytes'](fixture,flow['SOURCE_PNG'].read_bytes(),text_title=fixture)
+            status, lines = flow['upload'](emulator, workspace, archive)
             assert status == 200 and lines[-1]['outcome']['ok'], (status,lines)
             sessions.extend(lines[-1]['outcome']['value']['sessionIds'])
             session = sessions[0]
@@ -263,11 +266,23 @@ def run(emulator, output, live):
             evidence['availableProviders'] = limits['availableProviders']
             setting(emulator,'bing','zh')
             if live:
-                translation = emulator.rpc('cotTranslation/translate',{'request':{'text':SOURCE,'sessionId':session,'provider':'bing','targetLanguage':'zh'}},timeout=25)
-                assert translation != SOURCE and any('\u4e00' <= char <= '\u9fff' for char in translation), translation
-                evidence['liveDefaultBing'] = translation
+                evidence['liveTranslations'] = {}
+                for provider in ['bing', 'deepseek-official']:
+                    assert provider in limits['availableProviders'], limits
+                    setting(emulator,provider,'zh')
+                    translation = emulator.rpc('cotTranslation/translate',{
+                        'request':{'text':SOURCE,'sessionId':session,'provider':provider,'targetLanguage':'zh'},
+                    },timeout=70)
+                    assert translation != SOURCE and any('\u4e00' <= char <= '\u9fff' for char in translation), translation
+                    evidence['liveTranslations'][provider] = translation
+                paid, = [row['data']['metadata']['modelRequest'] for row in support['events'](emulator,session)
+                         if row['type']=='plugin:translator/request' and row['data']['provider']=='deepseek-official']
+                assert paid['config']['model']=='deepseek-flash' and paid['config']['reasoningEffort']=='off', paid['config']
+                assert paid['messages']==[{'role':'user','content':[{'type':'text','text':SOURCE}]}]
+                evidence['isolatedFlashRequest'] = {'model':'deepseek-flash','reasoningEffort':'off','messages':1}
             else:
-                verify_fixture(emulator,server,workspace,session,evidence)
+                restart(emulator)
+                verify_fixture(emulator,server,fixture,session,evidence)
     finally:
         try:
             for session in sessions:
@@ -298,7 +313,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('target')
     parser.add_argument('output',type=Path)
-    parser.add_argument('--live',action='store_true',help='Translate the synthetic fixture with the real default Bing endpoint')
+    parser.add_argument('--live',action='store_true',help='Use real Bing and configured DeepSeek Flash with the synthetic fixture')
     args = parser.parse_args()
     if not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('MH_TEST_DEEPSEEK_API_KEY is required for the configured ArkWeb fixture')

@@ -30,7 +30,7 @@ FILENAMES = ['fixture.png', 'report.pdf']
 SOURCE_PNG = Path('vendor/repos/dsh/packages/experimental/skill-badge/assets/dsh-badge.png')
 
 
-def archive_bytes(marker, png, *, version=3, manifest=True):
+def archive_bytes(marker, png, *, version=3, manifest=True, text_title='导入：存档核对'):
     image_id = str(uuid.uuid4())
     path = f'chat_sessions/picture_files/{image_id}_{FILENAMES[0]}'
     text_content = [
@@ -57,7 +57,7 @@ def archive_bytes(marker, png, *, version=3, manifest=True):
              'inserted_at': ANSWER_TIME, 'fragments': [{'type': 'RESPONSE', 'content': 'DISCARDED_BRANCH'}]},
         ]}
 
-    text = conversation('text', '导入：存档核对', [{'type': 'REQUEST', 'content': 'Keep the archive verification code.'}], text_content)
+    text = conversation('text', text_title, [{'type': 'REQUEST', 'content': 'Keep the archive verification code.'}], text_content)
     picture = conversation('picture', '图片与文件卡片',
                            [{'type': 'FILE', 'files': files}, {'type': 'REQUEST', 'content': 'Describe the attached picture.'}],
                            [{'type': 'RESPONSE', 'content': 'This is the archived DSH badge.'}])
