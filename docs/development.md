@@ -517,6 +517,13 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 
 可选 `--native-mic` 使用独立的调试模拟器和未授权的初始麦克风状态。测试触屏点击 DSH 录音按钮，通过系统弹窗授予权限，核对真实 ArkWeb 音轨进入 live、取消后进入 ended，结束时恢复系统权限。该步骤仅保留状态证据。可与 `--arkweb` 一起运行。
 
+`--native-mic-transcribe` 用模拟器原生麦克风做真实声学采集：测试在录音期间用宿主 `afplay` 外放已知的合成普通话，通过 Web Audio 分析器记录采集时长、RMS 与峰值，再点官方「停止并识别」并核对草稿文本。前置条件是宿主有可用的音频输出与输入（外放可被麦克风拾取），结果会记录宿主音量；真机麦克风与真人说话另行验收。
+
+```sh
+python3 tests/smoke/emulator-voice-input.py <loopback-target> .build/voice-native-capture.json \
+  --model-root <fixture-model-dir> --audio <16k-mono-pcm16-wav> --native-mic-transcribe
+```
+
 ```sh
 python3 tests/smoke/emulator-voice-input.py <loopback-target> .build/voice-api.json \
   --model-root <fixture-model-dir> --audio <16k-mono-pcm16-wav>

@@ -21,6 +21,7 @@
 | `tests/smoke/emulator-ptc-boundary.py` | PTC 自建链接／改写打开被拒；临时宿主插件按门控把程序父目录移出授权根后读写全部拒绝且不写到根外 |
 | `tests/smoke/emulator-liveshare-relay.py --cross-device` | 自建 Relay 向第二台模拟器的真实华为浏览器提供官方 viewer 页面，owner 实际 ArkWeb 授权后读取共享会话标题与历史 |
 | `tests/smoke/emulator-native-addon-location.py` | 用随包 Inspector 在 Host 进程内测量原生 addon 的加载位置限制 |
+| `tests/smoke/emulator-voice-input.py --native-mic-transcribe` | 模拟器原生麦克风真实声学采集：宿主外放合成普通话，设备录制并转写回同一句中文 |
 
 夹具更新：`tests/smoke/fixtures/liveshare-relay.cjs`（viewer 页面组装、cookie 会话、context/health/资源转发、admin 配置与日志）、`tests/smoke/fixtures/inspector-host-eval.cjs`（Host 内表达式求值 CDP 客户端）。
 
@@ -32,13 +33,14 @@
 - [Forge 公开读](../evidence/emulator-forge-public-read-0.4.69.json)：宿主已认证 `gh` 经白名单网关读取公开 PR 的固定提交文件与提交列表。
 - [账号入口](../evidence/emulator-account-fresh-0.4.69.json)：全新应用数据下打开公网 DeepSeek 授权页、取消、回环 PKCE 与登出撤销。
 - [addon 加载位置](../evidence/emulator-native-addon-location-0.4.69.json)：同一库字节按安装目录 soname 加载成功，应用数据副本 `ERR_DLOPEN_FAILED`。
+- [原生麦克风采集](../evidence/emulator-voice-native-capture-0.4.69.json)：模拟器原生麦克风录到宿主外放的已知语句（RMS 0.036、峰值 0.29）并由 SenseVoice 转写正确。
 
 ## 仍受外部条件阻塞
 
 | 项 | 完成所需条件 |
 | --- | --- |
 | Forge 真实账号同意与托管仓库写 | 账号所有者在 `github.com/login/device` 输入一次设备码；提供一个可写测试仓库或 PR 用于真实副作用 |
-| 语音真机采集与真人说话 | 真机（Mate 60 当前 HDC 离线）、正式签名 HAP、设备麦克风 |
+| 语音真机采集与真人说话 | 模拟器已通过原生麦克风真实采集合成语句；真机（Mate 60 当前 HDC 离线）、正式签名 HAP、设备麦克风与真人说话仍待验 |
 | 公网 LiveShare Relay、真实身份提供方、公网跨设备 | 官方 Relay 服务端不在上游包或本仓库内；需要外部部署、公网 CA/HTTPS 与真实 OAuth/OIDC client |
 | 外部鸿蒙 addon 运行时装入主 Host | 平台限制：动态链接器只允许安装目录 `libs/arm64`；已给出替代路径（Alpine ARM64 musl addon、纯 JS、随 HAP 打包） |
 | PTC 根内链接指向根外读取 | 应用数据视图拒绝创建链接，夹具不可得；读取侧已按单链接加固，拿到夹具即可复跑 |
