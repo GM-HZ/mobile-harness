@@ -294,6 +294,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-compaction-auto.py <loopback-target> .build/compaction-auto.json
 ```
 
+## 原生 addon 加载位置实测
+
+通过随包 Inspector 在 Host 主进程内评估加载结果：同一份 `libdshshell.so` 字节按安装目录 soname 加载成功，复制到应用数据目录后按绝对路径加载失败。测试会临时启用 Inspector、结束后停用并恢复 profile 与启动文件，不需要模型凭据。
+
+```sh
+python3 tests/smoke/emulator-native-addon-location.py <loopback-target> .build/native-addon-location.json
+```
+
 ## 后台定时任务回归
 
 模拟器从应用进入系统桌面，持续通过 AbilityManager 核对应用处于 `BACKGROUND`，在同一会话等待计划任务投递和真实模型回复。回到前台核对 Host 启动身份、历史完整性和最初消息的准确回忆。

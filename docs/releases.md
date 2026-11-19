@@ -417,4 +417,6 @@ LiveShare 跨设备：owner 在真实 ArkWeb 中完成对测试 Relay 的分享�
 
 同一制品在全新应用数据的第二台模拟器上复验账号入口：实际 ArkWeb 打开公网 DeepSeek 授权页并返回，取消后保持登出；回环夹具完成 PKCE 交换、跨重启保持与登出撤销，profile 恢复一致。
 
-未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json) · [Forge 公开读](evidence/emulator-forge-public-read-0.4.69.json) · [账号入口](evidence/emulator-account-fresh-0.4.69.json)
+外部原生 addon 的位置限制:0.4.69 用随包 Inspector 在 Host 主进程内测量同一份 `libdshshell.so` 字节：按安装目录 soname 从 `libs/arm64` 加载成功，复制到应用数据目录后绝对路径加载返回 `ERR_DLOPEN_FAILED`（`Error loading shared library …: No error information`）。因此外部插件携带的鸿蒙原生 addon 无法在运行时装入主 Host，插件应提供 Alpine ARM64 musl addon、纯 JS 或随 HAP 打包。探测器在结束时停用 Inspector 并恢复 profile。
+
+未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json) · [Forge 公开读](evidence/emulator-forge-public-read-0.4.69.json) · [账号入口](evidence/emulator-account-fresh-0.4.69.json) · [addon 位置实测](evidence/emulator-native-addon-location-0.4.69.json)
