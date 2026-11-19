@@ -1,0 +1,96 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "84e48c48892f1b21e4d1bc1deaeeaa6eba248b39"
+  },
+  "target": {
+    "connection": "127.0.0.1:5555",
+    "kind": "DevEco API 26 ARM64 Phone emulator"
+  },
+  "command": "python3 tests/smoke/emulator-voice-input.py 127.0.0.1:5555 .build/batch-006/voice-native-capture.json --model-root <fixture-model-dir> --audio <16k-mono-pcm16-wav> --native-mic-transcribe",
+  "playback": {
+    "clip": "synthesized Mandarin TTS of the expected sentence (16 kHz mono PCM16)",
+    "hostOutput": "afplay on the host speakers for 4.5 s while the device recorded",
+    "hostVolume": {
+      "outputPercent": 31,
+      "inputPercent": 42
+    }
+  },
+  "observed": {
+    "defaultCatalog": {
+      "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+      "enabled": false,
+      "version": "0.2.2-rc.5",
+      "availability": "installation"
+    },
+    "cachePreparation": {
+      "phase": "standby",
+      "steps": [
+        {
+          "kind": "check",
+          "status": "complete"
+        },
+        {
+          "kind": "model",
+          "status": "complete"
+        },
+        {
+          "kind": "vad",
+          "status": "complete"
+        },
+        {
+          "kind": "verify",
+          "status": "complete"
+        },
+        {
+          "kind": "load",
+          "status": "pending"
+        }
+      ]
+    },
+    "firstTranscript": {
+      "text": "今天我们测试语音输入。",
+      "audioSeconds": 2.3916875,
+      "inferenceSeconds": 0.06761974999999984
+    },
+    "repeatTranscript": {
+      "text": "今天我们测试语音输入。",
+      "audioSeconds": 2.3916875,
+      "inferenceSeconds": 0.06370108399999935
+    },
+    "invalidAudioRejected": true,
+    "nativeMicCapture": {
+      "nativePermissionDialog": true,
+      "draftMatched": true,
+      "draft": "今天我们测试语音输入。",
+      "capture": {
+        "samples": 272384,
+        "durationSeconds": 5.674666666666667,
+        "rms": 0.03634685224952364,
+        "peak": 0.2906177341938019,
+        "sampleRate": 48000
+      },
+      "audioPlayoutSeconds": 4.5,
+      "permissionRestored": true
+    },
+    "workerReusedAndStopped": true,
+    "restoreReadyMs": 5851,
+    "originalConfigurationRestored": true
+  },
+  "scope": {
+    "verified": [
+      "the DSH recording button grants the HarmonyOS microphone permission and the ArkWeb audio track is live",
+      "the emulator's native microphone captures real acoustic audio from the host (5.67 s at 48 kHz, RMS 0.036, peak 0.29)",
+      "the official recorder converts the capture and the SenseVoice worker transcribes it to the expected Mandarin sentence",
+      "the transcription is inserted into the composer draft and the permission is restored afterwards"
+    ],
+    "pending": [
+      "physical device microphone capture and human speech",
+      "signature-package regression on the device"
+    ],
+    "notClaimed": "the captured speech is synthesized and reaches the emulator through host speakers and the host microphone, not a person speaking into a phone"
+  }
+}
