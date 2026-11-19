@@ -93,15 +93,17 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 ## 平台限制与未验项
 
 - **Bash 隔离**：PRoot 不提供内核隔离。普通 Bash 继续拒绝没有系统沙箱的默认执行，仅经具体审批扩大权限。不能把它称为已实现 bwrap／Landlock。
-- **PTC 范围**：独立进程和 seccomp 文件代理向上游报告 `partial` enforcement。它不是任意 Node／Linux API 执行环境；网络与子进程能力应调用 Host 暴露的工具。符号链接／硬链接攻击及并发移动父目录的完整压力回归尚未完成。
+- **PTC 范围**：独立进程和 seccomp 文件代理向上游报告 `partial` enforcement。它不是任意 Node／Linux API 执行环境；网络与子进程能力应调用 Host 暴露的工具。0.4.69 对普通文件的读取与 stat 补充单链接校验，与既有写规则一致；路径解析每次从预打开根描述符以 `RESOLVE_NO_SYMLINKS` 重新解析，并发移动父目录不会重定向到根外。应用数据视图拒绝创建符号链接和硬链接，工作区普通文件链接数为 1，因此符号链接／硬链接端到端压力场景仍缺夹具，完整压力回归尚未完成。 [0.4.69 边界记录](evidence/emulator-capability-parity-0.4.69.json)
 - **JIT／WASM**：主 Host 保持 jitless，Office 使用独立进程执行官方 WASM，PTC 使用同版本 Amaro 的 JS 产物处理 TypeScript。0.4.57 已在模拟器的 Alpine 子进程中验证默认设置下无 WASM，显式启用后可执行 WASM、TypeScript 文件并用 Node 自带的 fetch 取得 HTTP 200。真机 JIT 能力待复验。
-- **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包和公网 CPython 3.12 ARM64 musllinux `xxhash`。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。其他 wheel、addon、APK 和安装脚本需按具体包验收。 [Node 补验](evidence/emulator-node-extensions-0.4.57.json) · [Python 补验](evidence/emulator-account-python-wheel-0.4.57.json)
+- **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包和公网 CPython 3.12 ARM64 musllinux `xxhash`。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。后续核对确认根因是鸿蒙动态链接器只允许从应用安装目录的 `libs/arm64` 加载原生库；插件解包在应用数据目录，绝对路径 `dlopen` 被拒绝，与 JIT 和 N-API 版本无关。宿主可加载随 HAP 打包的 addon，外部插件应提供 Alpine ARM64 musl addon（在 guest 中加载）或纯 JavaScript 实现。其他 wheel、addon、APK 和安装脚本需按具体包验收。 [Node 补验](evidence/emulator-node-extensions-0.4.57.json) · [Python 补验](evidence/emulator-account-python-wheel-0.4.57.json) · [0.4.69 边界记录](evidence/emulator-capability-parity-0.4.69.json)
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
-- **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权和 DeepSeek 之外的供应商端点待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
+- **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。0.4.69 经标准设置接入本机 Ollama，`openai-completions` 与 `openai-responses` 两种协议完成模型发现、流式请求、工具目录、图片附件和重启保持；本机小模型不具备稳定的工具调用与视觉问答能力，该轮只证明非 DeepSeek 端点接入。真实账号授权仍待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json) · [本地模型路由](evidence/emulator-capability-parity-0.4.69.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
-- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的真实 GitHub 账号授权及托管仓库写操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
+- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的真实 GitHub 账号授权及托管仓库写操作待验。LiveShare 的公网 Relay、真实身份提供方和公网跨设备受外部条件阻塞：官方 Relay 服务端不随仓库交付。语音的真机采集与真人说话转写待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。
 
 0.4.68 修复 pnpm 在 profile 安装含命令行入口的依赖失败。DSH 实际安装公开的多平台 Node 包并通过子进程使用 ARM64 musl addon，验证 CRC32、inotify 订阅和普通 `.bin` 脚本。Bash 单次审批下的隔离 venv 也通过 NumPy/OpenBLAS 与 orjson。 [本轮证据](evidence/emulator-native-package-compat-0.4.68.json)
+
+0.4.69 加固 PTC 单链接读取，记录应用数据视图无法创建符号链接／硬链接，并回归崩溃恢复、语音转写和本机 Ollama 路由。本机模型不具备稳定工具调用，非 DeepSeek 端点只按接入语义记录。 [本轮证据](evidence/emulator-capability-parity-0.4.69.json)

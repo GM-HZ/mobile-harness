@@ -1,0 +1,372 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "versionCode": 76,
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "5ce5689cd68fe793ca63ec4e9755711f7e373c1c",
+    "sourceChanges": [
+      "apps/harmonyos/AppScope/app.json5 (version 0.4.69/76)",
+      "runtime/harmonyos/native/ptc-supervisor.c (single-link reads and stats for granted roots)",
+      "runtime/harmonyos/native/ptc-supervisor.h (nlink_strict)",
+      "tests/smoke/emulator-ollama.py (new provider regression)",
+      "tests/smoke/emulator-ptc-link-fixture.py (new link precondition probe)"
+    ]
+  },
+  "target": {
+    "connection": "127.0.0.1:5555",
+    "kind": "DevEco API 26 ARM64 Phone emulator",
+    "install": "unsigned debug HAP, preserved app data"
+  },
+  "commands": {
+    "build": "HARMONY_UNSIGNED=1 ./build.sh --package",
+    "recovery": "python3 tests/smoke/emulator-recovery.py 127.0.0.1:5555 .build/batch-001/recovery.json",
+    "voiceInput": "python3 tests/smoke/emulator-voice-input.py 127.0.0.1:5555 .build/batch-001/voice.json --model-root <fixture-model-dir> --audio <16k-mono-pcm16-wav> --arkweb --native-mic",
+    "ptcLinkFixture": "python3 tests/smoke/emulator-ptc-link-fixture.py 127.0.0.1:5555 .build/batch-001/ptc-link-fixture.json",
+    "ollamaProvider": "python3 tests/smoke/emulator-ollama.py 127.0.0.1:5555 .build/batch-001/ollama-0.4.69.json --model mh-smoke-ollama-079:latest --context-window 16384 --max-tokens 4096"
+  },
+  "recovery": {
+    "fixture": "mobile-harness-crash-ea27f1b436",
+    "normalReadyMs": 64,
+    "anonymousHttp": 401,
+    "manifestBeforeSha256": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+    "lockBeforeSha256": null,
+    "pluginInstalledDisabled": true,
+    "actualPluginCrash": true,
+    "interruptedNormalBoot": {
+      "mode": "normal",
+      "pending": true
+    },
+    "safeReadyMs": 5243,
+    "safeAuthenticatedHttp": 200,
+    "pluginNotLoadedAgain": true,
+    "sameSessionInSafeMode": true,
+    "normalProfileRestored": true,
+    "returnNormalReadyMs": 5211,
+    "manifestAfterSha256": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+    "lockAfterSha256": null
+  },
+  "voiceInput": {
+    "defaultCatalog": {
+      "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+      "enabled": false,
+      "version": "0.2.2-rc.5",
+      "availability": "installation"
+    },
+    "cachePreparation": {
+      "phase": "standby",
+      "steps": [
+        {
+          "kind": "check",
+          "status": "complete"
+        },
+        {
+          "kind": "model",
+          "status": "complete"
+        },
+        {
+          "kind": "vad",
+          "status": "complete"
+        },
+        {
+          "kind": "verify",
+          "status": "complete"
+        },
+        {
+          "kind": "load",
+          "status": "pending"
+        }
+      ]
+    },
+    "firstTranscript": {
+      "text": "今天我们测试语音输入。",
+      "audioSeconds": 2.3916875,
+      "inferenceSeconds": 0.0734399999999996
+    },
+    "repeatTranscript": {
+      "text": "今天我们测试语音输入。",
+      "audioSeconds": 2.3916875,
+      "inferenceSeconds": 0.06939145900000039
+    },
+    "invalidAudioRejected": true,
+    "arkWebStartControl": [
+      {
+        "disabled": false,
+        "visible": true,
+        "ariaDisabled": null
+      }
+    ],
+    "arkWebStartHit": {
+      "dom": {
+        "hit": true,
+        "hitLabel": "开始录音",
+        "x": 339,
+        "y": 408.5,
+        "width": 28,
+        "height": 28,
+        "dpr": 3,
+        "viewport": [
+          440,
+          677
+        ]
+      },
+      "nativeBounds": "[1017,1342][1101,1427]"
+    },
+    "arkWebSyntheticDraft": true,
+    "arkWebRecordingCancelled": true,
+    "nativeMicrophone": {
+      "nativePermissionDialog": true,
+      "liveAudioTrack": {
+        "kind": "audio",
+        "state": "live",
+        "muted": false
+      },
+      "trackEndedOnCancel": true,
+      "permissionRestored": true
+    },
+    "workerReusedAndStopped": true,
+    "restoreReadyMs": 5904,
+    "originalConfigurationRestored": true
+  },
+  "ptcLinkFixture": {
+    "target": "127.0.0.1:5555",
+    "fixture": "mh-ptc-link-5e08685dc8",
+    "app": {
+      "versionName": "0.4.69",
+      "versionCode": 0
+    },
+    "readyMs": 60,
+    "fixtureCreated": true,
+    "appContextAttempts": {
+      "symlinkRelative": {
+        "command": "ln -s ../mh-ptc-link-5e08685dc8-outside.txt alpine/workspace-native/mh-ptc-link-5e08685dc8/link-rel",
+        "output": "ln: cannot create symbolic link from '../mh-ptc-link-5e08685dc8-outside.txt' to 'alpine/workspace-native/mh-ptc-link-5e08685dc8/link-rel': Operation not permitted\nMH_LINK_FAIL",
+        "created": false,
+        "isLink": false
+      },
+      "symlinkAbsolute": {
+        "command": "ln -s /data/storage/el2/base/haps/entry/files/alpine/mh-ptc-link-5e08685dc8-outside.txt alpine/workspace-native/mh-ptc-link-5e08685dc8/link-abs",
+        "output": "ln: cannot create symbolic link from '/data/storage/el2/base/haps/entry/files/alpine/mh-ptc-link-5e08685dc8-outside.txt' to 'alpine/workspace-native/mh-ptc-link-5e08685dc8/link-abs': Operation not permitted\nMH_LINK_FAIL",
+        "created": false,
+        "isLink": false
+      },
+      "hardlinkRelative": {
+        "command": "ln ../mh-ptc-link-5e08685dc8-outside.txt alpine/workspace-native/mh-ptc-link-5e08685dc8/hard-rel",
+        "output": "ln: cannot create hard link from '../mh-ptc-link-5e08685dc8-outside.txt' to 'alpine/workspace-native/mh-ptc-link-5e08685dc8/hard-rel': No such file or directory\nMH_LINK_FAIL",
+        "created": false,
+        "isLink": false
+      },
+      "hardlinkAbsolute": {
+        "command": "ln /data/storage/el2/base/haps/entry/files/alpine/mh-ptc-link-5e08685dc8-outside.txt alpine/workspace-native/mh-ptc-link-5e08685dc8/hard-abs",
+        "output": "ln: cannot create hard link from '/data/storage/el2/base/haps/entry/files/alpine/mh-ptc-link-5e08685dc8-outside.txt' to 'alpine/workspace-native/mh-ptc-link-5e08685dc8/hard-abs': Permission denied\nMH_LINK_FAIL",
+        "created": false,
+        "isLink": false
+      },
+      "symlinkDirectory": {
+        "command": "ln -s alpine/workspace-native/mh-ptc-link-5e08685dc8/sub alpine/workspace-native/mh-ptc-link-5e08685dc8/dirlink",
+        "output": "ln: cannot create symbolic link from 'alpine/workspace-native/mh-ptc-link-5e08685dc8/sub' to 'alpine/workspace-native/mh-ptc-link-5e08685dc8/dirlink': Operation not permitted\nMH_LINK_FAIL",
+        "created": false,
+        "isLink": false
+      }
+    },
+    "appCanSeeShellSymlink": false,
+    "links": {
+      "symlinksInWorkspace": "0",
+      "multiLinkFilesInWorkspace": "",
+      "fixtureHardLinks": "1"
+    },
+    "shellContext": {
+      "symlink": "created",
+      "hardlink": "ln: cannot create hard link from '/data/local/tmp/mh-ptc-link-5e08685dc8-outside.txt' to '/data/local/tmp/mh-ptc-link-5e08685dc8-hard': Permission denied\ndenied"
+    },
+    "platformLinkCreation": "denied",
+    "createdLinks": [],
+    "linkStressRunnable": false
+  },
+  "ollamaProvider": {
+    "model": "mh-smoke-ollama-079:latest",
+    "protocols": {
+      "openai-completions": {
+        "session": "session-a904168f-2200-492a-a8c5-89c763278601",
+        "modelDiscovered": true,
+        "toolRoundTrip": false,
+        "toolTurnEnd": "max-tokens",
+        "toolNames": [],
+        "plainTurnEnd": "max-tokens",
+        "modelReply": "The",
+        "postRestartTurn": true,
+        "recalledAfterRestart": false,
+        "recallReply": "The"
+      },
+      "openai-responses": {
+        "session": "session-72396ee8-e039-42e3-9b8a-9bfcf0e56f90",
+        "modelDiscovered": true,
+        "toolRoundTrip": false,
+        "toolTurnEnd": "completed",
+        "toolNames": [],
+        "plainTurnEnd": "completed",
+        "modelReply": "<think>\n\nThe user wants to respond with the exact word \"READY\"",
+        "postRestartTurn": true,
+        "recalledAfterRestart": false,
+        "recallReply": "The user is asking for the exact number that was read from answer.txt, but"
+      }
+    },
+    "vision": {
+      "model": "mh-smoke-ollama-079:latest",
+      "reply": "The",
+      "colorsMatched": false,
+      "turnEnd": "max-tokens",
+      "attachmentId": "sha256:85a429620d4dce966944598ca033f6d2e4847d0a7de8cd2d1862d288420c5503"
+    },
+    "routesActivatedWithoutRestart": true,
+    "restartReadyMs": 5319,
+    "placeholderRemoved": true,
+    "profileRestored": true,
+    "actualOllamaRequests": [
+      {
+        "method": "GET",
+        "path": "/v1/models",
+        "status": 200,
+        "responseType": "application/json",
+        "elapsedMs": 4
+      },
+      {
+        "method": "POST",
+        "path": "/v1/chat/completions",
+        "hasTools": false,
+        "hasToolResult": false,
+        "hasImage": false,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 19837
+      },
+      {
+        "method": "POST",
+        "path": "/v1/chat/completions",
+        "hasTools": true,
+        "hasToolResult": false,
+        "hasImage": false,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 33002
+      },
+      {
+        "method": "POST",
+        "path": "/v1/chat/completions",
+        "hasTools": true,
+        "hasToolResult": false,
+        "hasImage": false,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 518
+      },
+      {
+        "method": "GET",
+        "path": "/v1/models",
+        "status": 200,
+        "responseType": "application/json",
+        "elapsedMs": 4
+      },
+      {
+        "method": "POST",
+        "path": "/v1/responses",
+        "hasTools": false,
+        "hasToolResult": false,
+        "hasImage": false,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 6913
+      },
+      {
+        "method": "POST",
+        "path": "/v1/responses",
+        "hasTools": true,
+        "hasToolResult": false,
+        "hasImage": false,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 19986
+      },
+      {
+        "method": "POST",
+        "path": "/v1/responses",
+        "hasTools": true,
+        "hasToolResult": false,
+        "hasImage": false,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 768
+      },
+      {
+        "method": "POST",
+        "path": "/v1/chat/completions",
+        "hasTools": true,
+        "hasToolResult": false,
+        "hasImage": true,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 2567
+      },
+      {
+        "method": "POST",
+        "path": "/v1/chat/completions",
+        "hasTools": true,
+        "hasToolResult": false,
+        "hasImage": true,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 552
+      },
+      {
+        "method": "POST",
+        "path": "/v1/responses",
+        "hasTools": true,
+        "hasToolResult": false,
+        "hasImage": false,
+        "stream": true,
+        "status": 200,
+        "responseType": "text/event-stream",
+        "elapsedMs": 908
+      }
+    ]
+  },
+  "ptcHardLinkReadHardening": {
+    "change": "grant_path and stat_path now require st_nlink == 1 for regular files unless the launch grants the namespace root",
+    "previousBehaviour": "reads and stats of a multi-link regular file inside a granted root were allowed; writes and truncation already refused st_nlink != 1",
+    "symbolicLinks": "every resolution uses a pre-opened root descriptor with RESOLVE_NO_SYMLINKS, so a link cannot redirect a granted path outside the root",
+    "concurrentParentMoves": "each request resolves again from the root descriptor; there is no path-to-descriptor cache, so a moved parent degrades to ENOENT/ELOOP instead of escaping",
+    "runtimeFixture": "unavailable: the app data view refuses both symbolic and hard link creation (see ptcLinkFixture.appContextAttempts); the shell-owned /data/local/tmp symlink is not visible to the app",
+    "verification": "compiled and packaged into the 0.4.69 HAP; end-to-end read of a multi-link file remains unverified until a fixture can be created"
+  },
+  "accountLogin": {
+    "status": "not rerun on this artifact",
+    "reason": "the emulator profile holds a stored DeepSeek account credential; the verification starts from signed-out and would revoke it",
+    "previousEvidence": "docs/evidence/emulator-forge-account-0.4.65.json and the 0.4.68 batch results"
+  },
+  "scope": {
+    "verified": [
+      "crash recovery, safe mode, anonymous 401 and profile restoration",
+      "SenseVoice transcription, ArkWeb draft, system microphone permission lifecycle",
+      "two OpenAI-compatible protocols through a real local Ollama endpoint, streaming, tool catalog, image attachment and restart",
+      "platform link creation refusal in the app data view",
+      "PTC single-link reads compiled into the artifact"
+    ],
+    "modelLimitation": "the 752M local model does not produce tool calls or answer image questions; tool and vision semantics remain covered by the DeepSeek routes",
+    "pending": [
+      "end-to-end symbolic-link and hard-link PTC fixtures (platform refuses link creation)",
+      "concurrent parent rename stress driven by a real model tool call",
+      "physical-device microphone capture and spoken-audio recognition",
+      "public LiveShare Relay, real identity provider and cross-network device",
+      "real GitHub account consent and hosted-repository writes"
+    ]
+  }
+}

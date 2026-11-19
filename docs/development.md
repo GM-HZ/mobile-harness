@@ -119,6 +119,21 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-ptc-approval.py <loopback-target> .build/ptc-approval.json
 ```
 
+应用数据视图的链接能力是 PTC 链接压力场景的前置条件。下列脚本只读记录应用上下文与 shell 域的符号链接、硬链接创建结果，并扫描工作区现有链接和链接数，用于判断端到端夹具能否运行。
+
+```sh
+python3 tests/smoke/emulator-ptc-link-fixture.py <loopback-target> .build/ptc-link-fixture.json
+```
+
+## 本地模型路由回归
+
+本机 Ollama 经标准 provider 设置接入，测试用回环夹具把设备请求转发到宿主模型服务。两条 OpenAI 兼容协议分别验证模型发现、流式请求、工具目录、图片附件、重启保持与配置恢复。测试使用本机模型，无外部 API 凭据；小模型的工具调用与视觉问答质量只记录不断言。
+
+```sh
+python3 tests/smoke/emulator-ollama.py <loopback-target> .build/ollama-provider.json \
+  --model <ollama-model> --context-window <tokens> --max-tokens <tokens>
+```
+
 ## Host 进程探针
 
 ```sh
