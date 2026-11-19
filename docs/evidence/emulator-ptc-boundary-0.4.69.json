@@ -1,0 +1,131 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "271a5512bb11ff32145745e3b40b67adc2ec6609",
+    "sourceChanges": [
+      "runtime/harmonyos/native/ptc-supervisor.c single-link reads (committed in this batch)"
+    ]
+  },
+  "target": {
+    "connection": "127.0.0.1:5555",
+    "kind": "DevEco API 26 ARM64 Phone emulator"
+  },
+  "commands": {
+    "build": "HARMONY_UNSIGNED=1 ./build.sh --package",
+    "ptcBoundary": "python3 tests/smoke/emulator-ptc-boundary.py 127.0.0.1:5555 .build/batch-002/ptc-boundary.json"
+  },
+  "observed": {
+    "target": "127.0.0.1:5555",
+    "readyMs": 60,
+    "manifestBeforeSha256": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47",
+    "actuatorReadyMs": 4348,
+    "model": {
+      "provider": "deepseek-account",
+      "model": "deepseek-flash"
+    },
+    "selfPrivilege": {
+      "turnEnd": "completed",
+      "outcome": {
+        "symlink": "EPERM",
+        "hardlink": "EPERM",
+        "readlink": "EPERM",
+        "chmod": "EPERM",
+        "utimes": "EPERM",
+        "readWrite": "EACCES",
+        "truncate": "EACCES",
+        "read": "OK",
+        "write": "OK"
+      }
+    },
+    "selfPrivilegeContained": true,
+    "concurrentParentRename": {
+      "rounds": 4,
+      "errorCodes": [
+        "ENOENT"
+      ],
+      "contained": true,
+      "movedContentUnchanged": true,
+      "renames": [
+        {
+          "index": 0,
+          "forward": {
+            "id": 1,
+            "ok": true
+          },
+          "back": {
+            "id": 2,
+            "ok": true
+          },
+          "before": "base",
+          "after": "base"
+        },
+        {
+          "index": 1,
+          "forward": {
+            "id": 3,
+            "ok": true
+          },
+          "back": {
+            "id": 4,
+            "ok": true
+          },
+          "before": "base",
+          "after": "base"
+        },
+        {
+          "index": 2,
+          "forward": {
+            "id": 5,
+            "ok": true
+          },
+          "back": {
+            "id": 6,
+            "ok": true
+          },
+          "before": "base",
+          "after": "base"
+        },
+        {
+          "index": 3,
+          "forward": {
+            "id": 7,
+            "ok": true
+          },
+          "back": {
+            "id": 8,
+            "ok": true
+          },
+          "before": "base",
+          "after": "base"
+        }
+      ]
+    },
+    "workspaceDeleted": {
+      "deleted": true
+    },
+    "actuatorRemoved": true,
+    "manifestAfterSha256": "9432ab0d260c9a8b69c6efdef67fe464eea712a0706c69a6a3296131938e8a47"
+  },
+  "hostActuator": {
+    "purpose": "move the program's parent out of and back into the granted root while the program reads and writes",
+    "implementation": "temporary bundle installed through pluginManager; its apply() polls a command file and renames inside the Host process, then the test removes the bundle and restores the profile manifest bytes",
+    "profileManifestRestored": true,
+    "bundleRemoved": true
+  },
+  "scope": {
+    "verified": [
+      "the program cannot create symbolic or hard links, read link targets, change metadata, or open a file read-write",
+      "a Host rename of the program's parent out of the granted root makes every read and write fail with ENOENT and never writes into the moved directory",
+      "the moved directory keeps the content written before the move; after the rename returns, the program keeps its granted paths",
+      "the temporary actuator bundle leaves the profile manifest byte-identical after removal"
+    ],
+    "platformLimit": "the application data view refuses symbolic and hard link creation, so an end-to-end read through a link that points outside the root stays unavailable as a fixture; the supervisor now refuses multi-link reads and stats as well",
+    "pending": [
+      "physical device regression",
+      "multi-link read fixture once a supported filesystem can create links"
+    ]
+  }
+}

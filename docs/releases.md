@@ -409,6 +409,6 @@ Minimal 预设通过官方持久 Bash 工具复用一个受管 Alpine Shell。�
 
 PTC 文件代理对普通文件的读取与 stat 补充单链接校验，与既有写路径规则一致；显式命名空间根授权保持原有范围。模拟器上应用数据视图无法创建符号链接和硬链接（应用上下文 `ln` 返回 `Operation not permitted`／`Permission denied`），工作区没有符号链接且普通文件链接数为 1，因此符号链接／硬链接端到端压力场景仍缺可用夹具。代理的路径解析每次从预打开根描述符用 `RESOLVE_NO_SYMLINKS` 重新解析，并发移动父目录只会退化为 `ENOENT`／`ELOOP`。
 
-同一制品通过崩溃恢复、语音转写与本机 Ollama 路由回归。故障插件注入后自动进入安全模式，5.2 秒就绪，匿名请求 401，故障插件未再次加载；SenseVoice 两次转写与 ArkWeb 草稿通过；本机 Ollama 的 `openai-completions` 与 `openai-responses` 两种协议完成模型发现、真实流式请求、工具目录、图片附件与重启保持。本机小模型不具备稳定的工具调用和视觉问答能力，工具与视觉语义仍由 DeepSeek 路由证据覆盖。
+同一制品通过 PTC 边界压力：临时宿主插件按门控把程序父目录移出授权根，4 轮读写全部以 `ENOENT` 拒绝、被移出目录未被写入，恢复后原路径继续可用；程序自建符号链接／硬链接、读链接目标、改元数据与改写打开均被拒绝。该插件随后移除，profile manifest 字节恢复一致。同一制品通过崩溃恢复、语音转写与本机 Ollama 路由回归。故障插件注入后自动进入安全模式，5.2 秒就绪，匿名请求 401，故障插件未再次加载；SenseVoice 两次转写与 ArkWeb 草稿通过；本机 Ollama 的 `openai-completions` 与 `openai-responses` 两种协议完成模型发现、真实流式请求、工具目录、图片附件与重启保持。本机小模型不具备稳定的工具调用和视觉问答能力，工具与视觉语义仍由 DeepSeek 路由证据覆盖。
 
-未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json)
+未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json)

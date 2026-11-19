@@ -16,7 +16,7 @@
 
 ## 4 组补充验收
 
-1. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。0.4.69 对普通文件读取与 stat 补充单链接校验，与写路径一致；路径解析每次从预打开根描述符用 `RESOLVE_NO_SYMLINKS` 重新解析，并发移动父目录只会退化为 `ENOENT`／`ELOOP`。模拟器实测应用数据视图拒绝创建符号链接和硬链接，工作区无符号链接、普通文件链接数为 1，因此端到端链接压力场景仍缺夹具；脚本 `tests/smoke/emulator-ptc-link-fixture.py` 可在每次验收时复跑该前置条件。
+1. PTC 边界压力包括符号链接、硬链接与并发移动父目录。0.4.57 已复验基础文件授权、越界拒绝、目录操作和取消回收。执行限制继续报告 partial。0.4.69 对普通文件读取与 stat 补充单链接校验，与写路径一致；路径解析每次从预打开根描述符用 `RESOLVE_NO_SYMLINKS` 重新解析。同一制品实测程序不能自建符号链接或硬链接、不能读链接目标、不能改元数据或改写打开（`EPERM`／`EACCES`）；宿主进程按门控把程序的父目录移出授权根再移回，4 轮中每次读写都以 `ENOENT` 拒绝、被移出目录内容保持不变，恢复后原路径继续可用。应用数据视图拒绝创建链接，因此「根内链接指向根外后读取」仍缺夹具；`tests/smoke/emulator-ptc-link-fixture.py` 复跑该前置条件。 [边界实测](../evidence/emulator-ptc-boundary-0.4.69.json)
 2. 插件扩展兼容已通过固定 Git 提交、npm 下载中取消、升级、回滚与卸载。0.4.57 通过公网 npm 的 ESM、CommonJS、传递、可选依赖和包内 DSH peer。公网 ARM64 musl addon 已由 DSH 工具在 Alpine 子进程中加载。0.4.66 通过 DSH 配置的 HTTPS 代理加载公开社区索引，实测 6,112 条目、搜索、分页缓存和重启恢复。模拟器无代理直连超时。0.4.68 补验常见包自动选择 Alpine ARM64 musl addon、命令入口和 NumPy/OpenBLAS、orjson。外部鸿蒙 addon 在主 Host 加载失败的原因是鸿蒙动态链接器只允许从应用安装目录 `libs/arm64` 加载原生库，插件解包在应用数据目录的绝对路径 `dlopen` 被拒（与 jitless 和 N-API 版本无关）。宿主可加载随 HAP 打包的 addon；外部插件应提供 Alpine ARM64 musl addon 或纯 JavaScript。用户运行时安装鸿蒙 addon 到主 Host 属平台限制，不作为支持承诺。
 3. 账号与提供者已验证真实 DeepSeek Flash 识别会话附带的两张随机图片，重启后附件可回读。0.4.57 已从 ArkWeb 打开 DeepSeek 官方登录页，隔离回环服务通过授权回调、重启保留与登出撤销。0.4.58 经标准设置添加 pi-ai 路由，使用 DeepSeek 公网通过 Chat Completions 和 Responses 两种协议的模型发现、工具往返与重启续接。0.4.69 经标准设置接入本机 Ollama，两种 OpenAI 兼容协议完成模型发现、流式请求、工具目录、图片附件和重启保持；本机 752M 模型不具备稳定工具调用与视觉问答能力，该轮只证明非 DeepSeek 端点的接入语义，工具和视觉语义仍由 DeepSeek 路由覆盖。真实账号授权仍待验。
 4. 0.4.58 两小时模拟器后台长测已完成 7 次真实模型投递。第 106 秒强停后会话和四个未投递任务保留，回前台准确回忆，测试凭据已移除。Mate 60 当前离线，设备 UDID 匹配、覆盖安装、主流程、长运行、前后台、网络切换与性能仍待实测。 [两小时实测](../evidence/emulator-schedule-soak-0.4.58.json)
@@ -85,4 +85,4 @@ Forge 经包内 gh 验证评审、邀请评审和跨重启合并，以及旧提�
 
 0.4.68 修复带命令入口的 npm 插件安装，验证公开 npm 原生依赖组合、PyPI 原生 wheel、插件启用与升级回滚。同一制品复验了公网插件索引、Forge 公共 PR 读取、PTC 附加目录、Node／Python MCP、LiveShare 访客附件和 ArkWeb 重启。 [本轮证据](../evidence/emulator-native-package-compat-0.4.68.json)
 
-0.4.69 记录本轮收口：PTC 单链接读取加固与链接夹具前置条件（`tests/smoke/emulator-ptc-link-fixture.py`），崩溃恢复、语音转写、本机 Ollama 路由回归，证据见 [能力矩阵](../dsh-capabilities.md) 与 [本轮实测](../evidence/emulator-capability-parity-0.4.69.json)。仍未完成的三项（公网 Relay／真实身份提供方、真实 GitHub 账号授权与托管仓库写、真机麦克风与真人说话）均由外部条件阻塞，不是本仓库可独立闭环的代码项。
+0.4.69 记录本轮收口：PTC 单链接读取加固、链接夹具前置条件（`tests/smoke/emulator-ptc-link-fixture.py`）与宿主并发移动父目录压力回归（`tests/smoke/emulator-ptc-boundary.py`），崩溃恢复、语音转写、本机 Ollama 路由回归，证据见 [能力矩阵](../dsh-capabilities.md) 与 [本轮实测](../evidence/emulator-capability-parity-0.4.69.json)。仍未完成的三项（公网 Relay／真实身份提供方、真实 GitHub 账号授权与托管仓库写、真机麦克风与真人说话）均由外部条件阻塞，不是本仓库可独立闭环的代码项。

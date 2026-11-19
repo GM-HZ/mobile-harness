@@ -134,6 +134,12 @@ python3 tests/smoke/emulator-ollama.py <loopback-target> .build/ollama-provider.
   --model <ollama-model> --context-window <tokens> --max-tokens <tokens>
 ```
 
+边界压力回归在真实 PTC 会话里检查程序无法自建链接、读链接目标、改元数据或改写打开，并临时安装一个宿主插件按门控把程序父目录移出授权根再移回。每轮读写都应在根外拒绝，且被移出目录不被写入。测试结束移除插件并把 profile manifest 恢复为原字节。需要已登录的模型路由，或 `MH_TEST_DEEPSEEK_API_KEY`。
+
+```sh
+python3 tests/smoke/emulator-ptc-boundary.py <loopback-target> .build/ptc-boundary.json
+```
+
 ## Host 进程探针
 
 ```sh
