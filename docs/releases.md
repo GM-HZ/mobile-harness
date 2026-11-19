@@ -413,4 +413,6 @@ PTC 文件代理对普通文件的读取与 stat 补充单链接校验，与既�
 
 LiveShare 跨设备：owner 在真实 ArkWeb 中完成对测试 Relay 的分享授权与 PKCE 交换；测试 Relay 取回 index 资源并注入官方 `viewerCarrierScript`，在第二台模拟器的真实华为浏览器打开 viewer 页面。页面读取 `/__liveshare/context`、加载 10 个资源、经会话 cookie 完成 viewer RPC，并渲染共享会话的标题、历史消息与时间戳；界面显示只读观看者与锁定模型，且未调用所有者管理接口。第一台设备的 profile、启动配置与分享状态清理一致。该验收使用自建 Relay 与本机回环端口转发，官方 Relay 服务、真实身份提供方与公网部署仍未验证。
 
-未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json)
+同一制品的 Forge 公开读回归经宿主已认证的桌面 `gh` 重新验证：包内 GitHub CLI 通过白名单网关读取 GM-HZ/omnix PR #9 的固定提交文件与提交列表，文件 SHA-256 与 GitHub 参考一致；设备端仍使用一次性夹具凭据。真实账号同意与托管仓库写操作仍待外部授权。
+
+未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json) · [Forge 公开读](evidence/emulator-forge-public-read-0.4.69.json)

@@ -99,7 +99,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。0.4.69 经标准设置接入本机 Ollama，`openai-completions` 与 `openai-responses` 两种协议完成模型发现、流式请求、工具目录、图片附件和重启保持；本机小模型不具备稳定的工具调用与视觉问答能力，该轮只证明非 DeepSeek 端点接入。真实账号授权仍待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json) · [本地模型路由](evidence/emulator-capability-parity-0.4.69.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
-- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的真实 GitHub 账号授权及托管仓库写操作待验。LiveShare 已在两台本机模拟器间通过真实华为浏览器完成 viewer 页面读取；公网 Relay、真实身份提供方和公网跨设备仍受外部条件阻塞：官方 Relay 服务端不随仓库交付。语音的真机采集与真人说话转写待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
+- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 已在本制品复验公开 PR 只读；真实 GitHub 账号授权及托管仓库写操作待验。LiveShare 已在两台本机模拟器间通过真实华为浏览器完成 viewer 页面读取；公网 Relay、真实身份提供方和公网跨设备仍受外部条件阻塞：官方 Relay 服务端不随仓库交付。语音的真机采集与真人说话转写待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。
