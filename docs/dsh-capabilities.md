@@ -1,6 +1,6 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.68，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.69，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
