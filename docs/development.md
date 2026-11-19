@@ -472,6 +472,13 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   --guest-uploads --attachments
 ```
 
+加 `--cross-device <second-loopback-target>` 时，测试 Relay 会把 owner 的 index 资源取回并注入官方 `viewerCarrierScript`，再在第二台模拟器的系统浏览器打开 viewer 页面。测试检查浏览器 UA、`/__liveshare/context`、页面资源与会话 cookie 的 `session/list` 调用，并核对界面出现观看者只读提示。owner 侧的已有 reader 回归会先撤销访问再经夹具 admin 恢复，第二台设备因此是真实读者。该链路使用自建 Relay 与本机 `hdc rport`，不是官方公网 Relay。
+
+```sh
+python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-cross-device.json \
+  --cross-device <second-loopback-target>
+```
+
 桌面装有 Chrome 和 Playwright CLI 时，可以打开实际分享页面，从对话框选择文件并发送。下列测试通过回环 Relay 转发真实页面资源，按 Viewer 身份核对模型回合。
 
 ```sh

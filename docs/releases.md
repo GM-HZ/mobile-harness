@@ -411,4 +411,6 @@ PTC 文件代理对普通文件的读取与 stat 补充单链接校验，与既�
 
 同一制品通过 PTC 边界压力：临时宿主插件按门控把程序父目录移出授权根，4 轮读写全部以 `ENOENT` 拒绝、被移出目录未被写入，恢复后原路径继续可用；程序自建符号链接／硬链接、读链接目标、改元数据与改写打开均被拒绝。该插件随后移除，profile manifest 字节恢复一致。同一制品通过崩溃恢复、语音转写与本机 Ollama 路由回归。故障插件注入后自动进入安全模式，5.2 秒就绪，匿名请求 401，故障插件未再次加载；SenseVoice 两次转写与 ArkWeb 草稿通过；本机 Ollama 的 `openai-completions` 与 `openai-responses` 两种协议完成模型发现、真实流式请求、工具目录、图片附件与重启保持。本机小模型不具备稳定的工具调用和视觉问答能力，工具与视觉语义仍由 DeepSeek 路由证据覆盖。
 
-未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json)
+LiveShare 跨设备：测试 Relay 从 owner 取回 index 资源并注入官方 `viewerCarrierScript`，在第二台模拟器的真实华为浏览器打开 viewer 页面。页面读取 `/__liveshare/context`、加载 9 个资源、经会话 cookie 调用 `session/list`，界面显示只读观看者与锁定模型，且未调用所有者管理接口；第一台设备的 profile 与启动配置恢复一致。该验收使用自建 Relay 与本机回环端口转发，官方 Relay 服务、真实身份提供方与公网部署仍未验证。
+
+未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json)

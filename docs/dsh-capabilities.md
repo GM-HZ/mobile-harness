@@ -72,7 +72,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 自定义模型提供者 | 0.4.58 经标准设置热添加 pi-ai 路由，在 DeepSeek 公网验证 Chat Completions 和 Responses 的模型发现、文件读取工具往返与重启续接。 [模型路由证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
 | 定时任务 | 0.4.58 在模拟器跨两小时完成七次真实模型投递，第 106 秒强停重启保留已有会话和四个待执行任务。回前台精确回忆首轮，清理通过。 [两小时实测](evidence/emulator-schedule-soak-0.4.58.json) |
-| LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。0.4.66 验证真实模型处理两张图片后，访客可读共享图片且重启后字节一致。0.4.67 补齐访客附件接入，在隔离 Relay 通过文本和图片上传、模型回合、取消和未共享会话拒绝。公网 Relay 及真实身份提供方待验。 [访客上传证据](evidence/emulator-liveshare-guest-uploads-0.4.67.json) |
+| LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。0.4.66 验证真实模型处理两张图片后，访客可读共享图片且重启后字节一致。0.4.67 补齐访客附件接入，在隔离 Relay 通过文本和图片上传、模型回合、取消和未共享会话拒绝。0.4.69 由自建 Relay 把官方 viewer 页面与 carrier 提供给第二台模拟器上的真实华为浏览器：页面读取 context、加载 9 个资源、经会话 cookie 调用 `session/list`，界面显示只读观看者与锁定模型，且未调用所有者管理接口。公网 Relay、真实身份提供方和公网跨设备仍待验。 [访客上传证据](evidence/emulator-liveshare-guest-uploads-0.4.67.json) · [跨设备证据](evidence/emulator-liveshare-cross-device-0.4.69.json) |
 | LiveShare 访客程序 | 0.4.64 将具体链接和派生会话的权限传入鸿蒙 PTC 文件代理。普通会话继续使用其原权限；访客程序使用独立 worker，保留限制内的读写和内置工具。文件代理仍报告 `partial`。 [实测证据](evidence/emulator-liveshare-ptc-0.4.64.json) |
 | 麦克风与语音输入 | 0.4.62 从 DSH 录音按钮触发鸿蒙模拟器的系统授权，ArkWeb 音轨进入 live，取消后进入 ended。合成普通话回填及语音 worker 回收同包通过。真机说话转写待验。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
 | Forge 托管仓库 | 0.4.62 经包内 gh 和只读桌面认证代理读取公开 PR 文件与提交，文件逐字相同，提交及其父提交和官网 REST 结果一致。写操作经隔离服务验证。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
@@ -99,7 +99,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
 - **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。0.4.69 经标准设置接入本机 Ollama，`openai-completions` 与 `openai-responses` 两种协议完成模型发现、流式请求、工具目录、图片附件和重启保持；本机小模型不具备稳定的工具调用与视觉问答能力，该轮只证明非 DeepSeek 端点接入。真实账号授权仍待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json) · [本地模型路由](evidence/emulator-capability-parity-0.4.69.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
-- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的真实 GitHub 账号授权及托管仓库写操作待验。LiveShare 的公网 Relay、真实身份提供方和公网跨设备受外部条件阻塞：官方 Relay 服务端不随仓库交付。语音的真机采集与真人说话转写待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
+- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的真实 GitHub 账号授权及托管仓库写操作待验。LiveShare 已在两台本机模拟器间通过真实华为浏览器完成 viewer 页面读取；公网 Relay、真实身份提供方和公网跨设备仍受外部条件阻塞：官方 Relay 服务端不随仓库交付。语音的真机采集与真人说话转写待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
 - **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。

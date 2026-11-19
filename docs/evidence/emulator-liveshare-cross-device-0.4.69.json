@@ -1,0 +1,520 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "31932cd9142c218cce9cf9637f2d7ba9f451a4e4",
+    "sourceChanges": []
+  },
+  "targets": {
+    "owner": "127.0.0.1:5555 (DevEco API 26 ARM64 Phone emulator)",
+    "viewer": "127.0.0.1:5557 (second DevEco API 26 ARM64 Phone emulator, real Huawei browser)"
+  },
+  "commands": {
+    "build": "HARMONY_UNSIGNED=1 ./build.sh --package",
+    "crossDevice": "python3 tests/smoke/emulator-liveshare-relay.py 127.0.0.1:5555 .build/batch-003/liveshare-cross-device.json --cross-device 127.0.0.1:5557"
+  },
+  "relayFixture": {
+    "kind": "self-built minimal Relay fixture, not the official LiveShare service",
+    "viewerPage": "owner index asset fetched through share-rpc, official viewerCarrierScript injected in the head",
+    "viewerSession": "top-level page sets viewer and share cookies; share-rpc, context, health and page assets are served from those cookies",
+    "identity": "synthetic viewer principal (fixture:local:reader); owner credential is a fixture credential",
+    "revocation": "the reader regression revokes viewer access first, then the test re-authorizes through the fixture admin route to present the second device viewer"
+  },
+  "observed": {
+    "reachable": {
+      "ok": true,
+      "httpReachable": true,
+      "blocking": false
+    },
+    "authorized": {
+      "ok": true,
+      "blocking": false
+    },
+    "created": {
+      "link": "http://127.0.0.1:19769/?shareId=Usgj35FHcoSE",
+      "shareId": "Usgj35FHcoSE",
+      "sessionId": "session-01199c62-37a0-4217-b906-1fb6f07d95b8",
+      "sessionIds": [
+        "session-01199c62-37a0-4217-b906-1fb6f07d95b8"
+      ],
+      "sessionMode": "view",
+      "access": {
+        "mode": "selected",
+        "selected": [],
+        "deploymentAllowedSubjectIds": [],
+        "shareAllowedSubjectIds": [
+          "fixture:local:reader"
+        ],
+        "broadenedByDeploymentSubjects": false,
+        "identityKeyAcl": true
+      }
+    },
+    "addedSecondSource": true,
+    "restoredOnlineSources": [
+      "session-01199c62-37a0-4217-b906-1fb6f07d95b8",
+      "session-3e0ca8e8-9827-44d1-956d-668f87cdd985"
+    ],
+    "readerBeforeRevocation": {
+      "anonymousRefused": true,
+      "htmlBytes": 44599,
+      "visibleSessionIds": [
+        "session-01199c62-37a0-4217-b906-1fb6f07d95b8",
+        "session-3e0ca8e8-9827-44d1-956d-668f87cdd985"
+      ],
+      "accessRefusalCodes": {
+        "outsideSession": "remote-access/denied",
+        "ownerManagement": "remote-access/denied"
+      },
+      "sharedHistoryReadable": true
+    },
+    "ownerAppliedLiveRevocation": true,
+    "crossDeviceViewer": {
+      "target": "127.0.0.1:5557",
+      "pageUserAgent": "Mozilla/5.0 (Phone; OpenHarmony 7.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36  ArkWeb/7.0.0.105 Mobile HuaweiBrowser/5.1.9.315",
+      "viewerContextRequests": 1,
+      "viewerAsset200": 9,
+      "viewerSessionListCalls": 1,
+      "visibleTexts": [
+        "打开右侧边栏",
+        "探索未至之境",
+        "预览版",
+        "选择工作区",
+        "添加文件或调用指令",
+        "仅可查看观看者不能自行更改",
+        "DeepSeek-V4.1-Flash · Off观看者不能切换模型",
+        "发送消息",
+        "打开侧边栏",
+        "127.0.0.1:19769",
+        "11, :, 41",
+        "11",
+        ":",
+        "41",
+        "100"
+      ],
+      "ownerManagementAttempted": false
+    },
+    "stop": {
+      "ok": true
+    },
+    "stoppedShareUnavailable": true,
+    "gatewayThreadStopped": true,
+    "restoredReadyMs": 5031,
+    "configRestored": true,
+    "relayMessages": [
+      {
+        "registered": "test-fx0F-kIc",
+        "probe": true
+      },
+      {
+        "closed": "test-fx0F-kIc",
+        "code": 1000
+      },
+      {
+        "registered": "Usgj35FHcoSE",
+        "probe": false
+      },
+      {
+        "closed": "Usgj35FHcoSE",
+        "code": 1006
+      },
+      {
+        "registered": "Usgj35FHcoSE",
+        "probe": false
+      },
+      {
+        "unhandled": "POST /__liveshare/share/claim",
+        "share": "Usgj35FHcoSE",
+        "hasState": true
+      },
+      {
+        "viewerRpc": "asset:",
+        "viaCookie": false
+      },
+      {
+        "viewerRpc": "call:/api/session/list",
+        "viaCookie": false
+      },
+      {
+        "viewerRpc": "call:/api/session/events",
+        "viaCookie": false
+      },
+      {
+        "viewerRpc": "call:/api/session/events",
+        "viaCookie": false
+      },
+      {
+        "viewerRpc": "call:/api/liveshareShares/list",
+        "viaCookie": false
+      },
+      {
+        "viewerRpc": "asset:",
+        "viaCookie": false
+      },
+      {
+        "viewerConfigured": true,
+        "sessionId": "session-01199c62-37a0-4217-b906-1fb6f07d95b8"
+      },
+      {
+        "viewerReauthorized": "Usgj35FHcoSE"
+      },
+      {
+        "viewerPageServed": true,
+        "share": "Usgj35FHcoSE",
+        "sessionId": "session-01199c62-37a0-4217-b906-1fb6f07d95b8",
+        "userAgent": "Mozilla/5.0 (Phone; OpenHarmony 7.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36  ArkWeb/7.0.0.105 Mobile HuaweiBrowser/5.1.9.315",
+        "elapsedMs": 22
+      },
+      {
+        "viewerAsset": "plugins/??@deepseek-ai/dsh-api-gateway/client.js,@deepseek-ai/dsh-client-ui-file-actions/client.js,@deepseek-ai/dsh-client-ui-context-menu/client.js,@deepseek-a",
+        "status": 200,
+        "elapsedMs": 352
+      },
+      {
+        "viewerAsset": "plugins/??@deepseek-ai/dsh-client-ui-settings-subagent/client.js,@deepseek-ai/dsh-client-ui-settings-web-search/client.js,@deepseek-ai/dsh-client-ui-plan/client",
+        "status": 200,
+        "elapsedMs": 476
+      },
+      {
+        "viewerAsset": "plugins/??@deepseek-ai/dsh-client-modules/client.js&rev=1bafe5bf49aa",
+        "status": 200,
+        "elapsedMs": 485
+      },
+      {
+        "viewerAsset": "assets/vendor-DV2921Zo.css",
+        "status": 200,
+        "elapsedMs": 485
+      },
+      {
+        "viewerAsset": "assets/index-CSAdOBx6.css",
+        "status": 200,
+        "elapsedMs": 489
+      },
+      {
+        "viewerAsset": "assets/index-Ciz7DZxv.js",
+        "status": 200,
+        "elapsedMs": 526
+      },
+      {
+        "viewerAsset": "assets/vendor-BUMdD3V7.js",
+        "status": 200,
+        "elapsedMs": 195
+      },
+      {
+        "viewerRpc": "call:/plugins/events",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/settings/describe",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/dynamicCordisRunner/syncInspectManifest",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/dynamicCordisRunner/inventory",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/session/modelCatalog",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerContext": true,
+        "share": "Usgj35FHcoSE",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/open-in-app/apps",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/credentials/describe",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/web/listProviders",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/agentPresets/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerAsset": "favicon.svg",
+        "status": 200,
+        "elapsedMs": 30
+      },
+      {
+        "viewerAsset": "favicon.svg",
+        "status": 200,
+        "elapsedMs": 8
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/session/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/permissionPresets/catalog",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/dynamicCordisRunner/inventory",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/agentPresets/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/agentPresets/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/session/modelCatalog",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/web/listProviders",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/settings/describe",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/dynamicCordisRunner/syncInspectManifest",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/session/create",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/agentPresets/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/session/modelCatalog",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/commands/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/skills/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-cancel:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-cancel:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-cancel:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-cancel:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-cancel:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/session/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/permissionPresets/catalog",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/dynamicCordisRunner/inventory",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/agentPresets/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/agentPresets/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/agentPresets/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/session/modelCatalog",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/web/listProviders",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/settings/describe",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-open:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/dynamicCordisRunner/syncInspectManifest",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "call:/api/commands/list",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "viewerRpc": "stream-next:",
+        "viaCookie": true
+      },
+      {
+        "closed": "Usgj35FHcoSE",
+        "code": 1000
+      },
+      {
+        "deleted": "Usgj35FHcoSE"
+      }
+    ]
+  },
+  "scope": {
+    "verified": [
+      "the second device's real Huawei browser loads the official viewer page from the Relay fixture and renders the DSH viewer UI",
+      "the page reads /__liveshare/context and 9 page assets through cookie-authorized Relay requests",
+      "the viewer calls session/list through the Relay with its cookie session and shows the read-only viewer notice with a locked model",
+      "the viewer never calls the owner management endpoint, and the owner-side reader regression still refuses unshared sessions",
+      "the first device profile and boot configuration are restored after the run"
+    ],
+    "pending": [
+      "the official LiveShare Relay service, which is not delivered by the upstream package or this repository",
+      "a real identity provider and OAuth/OIDC session exchange",
+      "public-network cross-device operation and public CA TLS/WSS",
+      "physical device (Mate 60) viewer regression"
+    ],
+    "notClaimed": "this is cross-device between two local emulators over the host loopback port forward, not public deployment"
+  }
+}
