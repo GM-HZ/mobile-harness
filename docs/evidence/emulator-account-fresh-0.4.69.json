@@ -1,0 +1,43 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "a0a393fba3229721bcf02c318724ba6885df7120"
+  },
+  "target": {
+    "connection": "127.0.0.1:5557",
+    "kind": "second DevEco API 26 ARM64 Phone emulator, fresh app data with the 0.4.69 HAP installed"
+  },
+  "command": "python3 tests/smoke/emulator-account.py 127.0.0.1:5557 .build/batch-004/account-fresh.json",
+  "observed": {
+    "public": {
+      "popupOpened": true,
+      "platformPageVisible": true,
+      "publicPath": "/dsh/authorize",
+      "returnedToDsh": true,
+      "finalPhase": "cancelled"
+    },
+    "fixture": {
+      "pkceExchangeAndCommit": true,
+      "persistedAcrossRestart": true,
+      "signedOutAndRevoked": true,
+      "originalProfileRestored": true
+    },
+    "originalProfileRestored": true
+  },
+  "scope": {
+    "verified": [
+      "the actual ArkWeb sign-in entry opens the public DeepSeek platform authorization page and returns to the app",
+      "cancelling the authorization leaves the app signed out",
+      "the loopback account fixture completes the PKCE exchange and commit, persists the credential across a restart, and signs out with revocation",
+      "the original profile is restored after the run"
+    ],
+    "pending": [
+      "consenting with a real DeepSeek account (requires the account owner)",
+      "sign-in on the physical device and the final signature package"
+    ],
+    "notClaimed": "the fixture half uses a loopback authorization service; only the public page opening and cancellation are real external steps"
+  }
+}

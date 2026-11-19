@@ -415,4 +415,6 @@ LiveShare 跨设备：owner 在真实 ArkWeb 中完成对测试 Relay 的分享�
 
 同一制品的 Forge 公开读回归经宿主已认证的桌面 `gh` 重新验证：包内 GitHub CLI 通过白名单网关读取 GM-HZ/omnix PR #9 的固定提交文件与提交列表，文件 SHA-256 与 GitHub 参考一致；设备端仍使用一次性夹具凭据。真实账号同意与托管仓库写操作仍待外部授权。
 
-未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json) · [Forge 公开读](evidence/emulator-forge-public-read-0.4.69.json)
+同一制品在全新应用数据的第二台模拟器上复验账号入口：实际 ArkWeb 打开公网 DeepSeek 授权页并返回，取消后保持登出；回环夹具完成 PKCE 交换、跨重启保持与登出撤销，profile 恢复一致。
+
+未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json) · [Forge 公开读](evidence/emulator-forge-public-read-0.4.69.json) · [账号入口](evidence/emulator-account-fresh-0.4.69.json)
