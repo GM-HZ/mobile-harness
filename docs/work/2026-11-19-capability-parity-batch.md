@@ -35,6 +35,7 @@
 - [addon 加载位置](../evidence/emulator-native-addon-location-0.4.69.json)：同一库字节按安装目录 soname 加载成功，应用数据副本 `ERR_DLOPEN_FAILED`。
 - [原生麦克风采集](../evidence/emulator-voice-native-capture-0.4.69.json)：模拟器原生麦克风录到宿主外放的已知语句（RMS 0.036、峰值 0.29）并由 SenseVoice 转写正确。
 - [Forge 真实账号](../evidence/emulator-forge-real-account-0.4.69.json)：设备端真实 GitHub 设备授权、公开 PR 真实读取，以及临时私有仓库上的评审与 squash 合并写操作（仓库已删除）。
+- [公网 Relay 预检自测](../evidence/relay-preflight-self-test-0.4.69.json)：HTTPS 证书、`/health` 与匿名 WSS 升级检查在本机自签反代上正负向通过。
 
 ## 仍受外部条件阻塞
 

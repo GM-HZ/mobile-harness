@@ -455,6 +455,15 @@ python3 tests/smoke/emulator-forge-account.py <loopback-target> .build/forge-acc
 
 `--public-read` 使用已登录的桌面 gh 查询 GM-HZ/omnix 的公开 PR #9。测试代理仅转发该 PR 的固定只读 GraphQL 查询和一个固定提交的文件读取。模拟器使用一次性夹具凭据，GitHub 账号凭据由桌面 gh 持有。文件逐字核对，提交和父提交与 GitHub REST 结果比对。
 
+## 公网 Relay 预检
+
+公网 LiveShare Relay 上线后，先用预检确认 HTTPS 证书、`/health` 与匿名 WSS 升级行为；本机可用自签 TLS 反代 + Relay 夹具做正负向自测（`--self-test`），不需要设备。
+
+```sh
+python3 tests/smoke/relay-preflight.py https://<domain>/ .build/relay-preflight.json
+python3 tests/smoke/relay-preflight.py --self-test .build/relay-preflight-self-test.json
+```
+
 ## LiveShare
 
 独立 Phone 模拟器使用仅回环可达的测试 Relay 和一次性会话。独立查看者读取已共享的页面和历史，同工作区未共享会话及 Owner 管理接口会拒绝访问。验收也覆盖 Host 重启重连、撤销查看者授权、删除共享及停用网关。加 `--model` 可验证查看者通过真实 DeepSeek Flash 完成一轮对话，并在历史中核对其身份。脚本在结束时恢复 profile，移除测试凭据和转发。

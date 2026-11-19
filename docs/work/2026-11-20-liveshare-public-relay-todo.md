@@ -19,6 +19,22 @@
    - 第二台设备（或第二网络）用真实浏览器打开公网分享页；记录公网时延下的读预算/重连/心跳。
 5. **验收证据命名**：`docs/evidence/emulator-liveshare-public-<version>.json`，明确区分自建 Relay 与官方 Relay。
 
+## 预检工具（已实现并在本机验证）
+
+公网 Relay 就绪后先跑：
+
+```sh
+python3 tests/smoke/relay-preflight.py https://<域名>/ --output .build/relay-preflight.json
+```
+
+检查项：HTTPS 证书链与主机名、`/health` 返回 200、匿名 WSS 升级 `/__tunnel_gateway__` 必须被 Relay 以 401/403 拒绝。工具在本机用「自签 TLS 反代 + Relay 夹具」做了正/负向自测（健康 200、匿名 WSS 401 通过；自签在系统信任下被拒；不可达地址被拒），证据见 [relay-preflight-self-test](../evidence/relay-preflight-self-test-0.4.69.json)。
+
+本机自测命令：
+
+```sh
+python3 tests/smoke/relay-preflight.py --self-test --output .build/relay-preflight-self-test.json
+```
+
 ## 复现基线命令（本机）
 
 ```sh
