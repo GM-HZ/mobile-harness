@@ -1,0 +1,87 @@
+{
+  "kind": "host-side deployment recipe validation (no device flow)",
+  "artifactContext": {
+    "expectedVersion": "0.4.69",
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "f1974aa96c2c94c0a6975fe794a772a18f02fc10"
+  },
+  "checkedAt": "2026-11-20T07:59:42+0800",
+  "recipe": {
+    "directory": "deploy/liveshare-acceptance-relay",
+    "files": [
+      "Dockerfile",
+      "docker-compose.yml",
+      "nginx/liveshare-acceptance.conf",
+      "README.md",
+      ".env.example"
+    ],
+    "purpose": "run the repository's LiveShare Relay fixture behind a public HTTPS domain with WebSocket upgrade, for cross-network acceptance only"
+  },
+  "validated": {
+    "health": {
+      "status": 200,
+      "body": "{\"release_id\":\"mobile-harness-test-relay\"}"
+    },
+    "tokenGating": {
+      "anonymousRpc": {
+        "status": 401,
+        "body": "{\"error\":\"viewer-login-required\"}"
+      },
+      "oldViewerToken": {
+        "status": 401,
+        "body": "{\"error\":\"viewer-login-required\"}"
+      },
+      "configuredViewerToken": {
+        "status": 404,
+        "body": "{\"error\":\"unknown-share\"}"
+      },
+      "adminLogWithConfiguredToken": {
+        "status": 200,
+        "records": 0
+      },
+      "adminLogWithOldToken": {
+        "status": 404
+      }
+    },
+    "ownerLoginEnvMode": {
+      "status": 200,
+      "containsButton": true
+    },
+    "ownerLoginArgvMode": {
+      "status": 200,
+      "containsButton": true
+    },
+    "preflightOverTlsProxy": {
+      "exit": 0,
+      "ok": true,
+      "tls": "TLSv1.3 with the generated certificate",
+      "wssStatus": 401
+    },
+    "composeYaml": {
+      "services": [
+        "relay"
+      ],
+      "parsed": true
+    },
+    "nginxConfig": {
+      "hasUpgradeMapping": true,
+      "hasWebsocketHeaders": true,
+      "hasLongReadTimeout": true,
+      "hasBodyLimit": true
+    }
+  },
+  "notValidated": [
+    "the Docker image build itself: the Docker daemon is not running on this machine; the server runs `docker compose up -d --build` and then the preflight and device acceptance"
+  ],
+  "scope": {
+    "verified": [
+      "the deployment env knobs enforce the configured viewer and admin tokens (old fixture tokens are rejected)",
+      "the owner login page is served in both env mode and legacy argv mode",
+      "a TLS reverse proxy in front of the Relay passes the preflight: health 200 and anonymous WSS upgrade 401 over TLS 1.3",
+      "the compose file parses and the nginx sample carries the upgrade mapping, WebSocket headers, long read timeout and body limit"
+    ],
+    "pending": [
+      "deploying the container on the user's public server and running the preflight against the real domain"
+    ]
+  }
+}

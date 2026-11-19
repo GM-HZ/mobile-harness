@@ -1,0 +1,23 @@
+services:
+  relay:
+    build:
+      context: ../..
+      dockerfile: deploy/liveshare-acceptance-relay/Dockerfile
+    image: mobile-harness-liveshare-acceptance-relay:0.4.69
+    restart: unless-stopped
+    ports:
+      # Only the local reverse proxy (nginx/Caddy) exposes TLS on the public IP.
+      - "127.0.0.1:8080:8080"
+    environment:
+      MH_RELAY_HOST: 0.0.0.0
+      MH_RELAY_PORT: "8080"
+      # Acceptance-only owner login page and viewer cookie redirect.
+      MH_RELAY_OWNER_LOGIN: "1"
+      MH_RELAY_LOGIN_REDIRECT: "1"
+      MH_RELAY_VIEWER_TOKEN: ${MH_RELAY_VIEWER_TOKEN:?set MH_RELAY_VIEWER_TOKEN}
+      MH_RELAY_ADMIN_TOKEN: ${MH_RELAY_ADMIN_TOKEN:?set MH_RELAY_ADMIN_TOKEN}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

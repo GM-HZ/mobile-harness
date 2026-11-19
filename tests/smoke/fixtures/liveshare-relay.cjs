@@ -4,7 +4,7 @@ const http = require('node:http');
 const { createHash, randomBytes } = require('node:crypto');
 const { WebSocketServer } = require(process.argv[2]);
 
-const login = process.argv.includes('--owner-login');
+const login = process.argv.includes('--owner-login') || process.env.MH_RELAY_OWNER_LOGIN === '1';
 // Deployment knobs: the acceptance Relay is the same fixture served on a public
 // host behind TLS. Defaults keep the local test behaviour unchanged.
 const listenHost = process.env.MH_RELAY_HOST || '127.0.0.1';
