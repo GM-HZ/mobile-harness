@@ -37,6 +37,7 @@
 - [Forge 真实账号](../evidence/emulator-forge-real-account-0.4.69.json)：设备端真实 GitHub 设备授权、公开 PR 真实读取，以及临时私有仓库上的评审与 squash 合并写操作（仓库已删除）。
 - [公网 Relay 预检自测](../evidence/relay-preflight-self-test-0.4.69.json)：HTTPS 证书、`/health` 与匿名 WSS 升级检查在本机自签反代上正负向通过。
 - [外部 Relay URL 验证](../evidence/relay-external-url-validation-0.4.69.json)：验收脚本以外部启动的 Relay + 回环转发跑通 owner 授权、reader 拒绝/撤销、stop 与网关回收；第二设备经外部 URL 渲染共享会话。
+- [公网 Relay 部署配方](../evidence/relay-deployment-recipe-0.4.69.json)：Docker/Compose + nginx（WebSocket Upgrade/长超时/上传上限）+ certbot 步骤；本机验证 token 门禁、owner 登录页两种模式、TLS 反代预检与 compose/nginx 配置项。
 
 ## 仍受外部条件阻塞
 

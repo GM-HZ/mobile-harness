@@ -8,6 +8,10 @@
 - Owner 实际 ArkWeb 分享授权与 PKCE、reader 侧未共享/管理接口拒绝、实时撤销与停止均通过。
 - 公网必须 HTTPS：`apps/harmonyos/entry/src/main/ets/pages/Index.ets` 只接受 `https` 或 `http://127.0.0.1` 的 Relay 地址；WSS 在 owner gateway 中走裸 `WebSocket`，不经 DSH 代理。
 
+## 部署配方（已实现并在本机验证）
+
+仓库新增 [deploy/liveshare-acceptance-relay](../../deploy/liveshare-acceptance-relay/README.md)：Dockerfile + docker-compose + nginx（含 WebSocket Upgrade、3600s 超时、32m 上传上限）+ certbot 步骤 + .env 模板。本机已验证：token 生效（旧夹具 token 被拒）、owner 登录页（env 与 argv 两种模式）、TLS 反代下预检通过（health 200、匿名 WSS 401、TLS 1.3）、compose YAML 可解析、nginx 关键指令齐全。证据：[relay-deployment-recipe](../evidence/relay-deployment-recipe-0.4.69.json)。Docker 镜像构建未在本机验证（本机 Docker daemon 未运行），需在服务器 `docker compose up -d --build` 后立即跑预检。
+
 ## 服务器就绪后要做的事
 
 1. **部署 Relay**：官方 Relay 服务端不随上游包或本仓库交付，需要在服务器上部署可用的 LiveShare Relay 实现（或继续用自建 Relay 作替代，并在证据里明确写「替代 Relay」）。
