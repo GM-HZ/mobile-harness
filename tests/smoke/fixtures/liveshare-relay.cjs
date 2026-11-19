@@ -5,6 +5,14 @@ const { createHash, randomBytes } = require('node:crypto');
 const { WebSocketServer } = require(process.argv[2]);
 
 const login = process.argv.includes('--owner-login');
+// Deployment knobs: the acceptance Relay is the same fixture served on a public
+// host behind TLS. Defaults keep the local test behaviour unchanged.
+const listenHost = process.env.MH_RELAY_HOST || '127.0.0.1';
+const listenPort = Number(process.env.MH_RELAY_PORT || 0);
+const viewerToken = process.env.MH_RELAY_VIEWER_TOKEN || 'fixture-viewer';
+const adminToken = process.env.MH_RELAY_ADMIN_TOKEN || 'fixture-admin';
+const loginRedirect = process.env.MH_RELAY_LOGIN_REDIRECT === '1';
+const viewerConfigFile = process.env.MH_RELAY_VIEWER_CONFIG || '';
 const credential = login ? Buffer.from(JSON.stringify({
   subjectId: 'owner', displayName: 'Fixture Relay Owner', expiresAt: Date.now() + 60 * 60_000,
 })).toString('base64url') + '.fixture-signature' : 'fixture-payload.fixture-signature';
@@ -14,12 +22,16 @@ const actor = {
   providerId: 'fixture', tenantId: 'local', subjectId: 'reader', credential: 'synthetic-reader-claim',
 };
 let requestId = 0;
-let viewerConfig = null;
+let viewerConfig = viewerConfigFile ? JSON.parse(fs.readFileSync(viewerConfigFile, 'utf8')) : null;
 const logRecords = [];
 const log = record => { logRecords.push(record); console.log(JSON.stringify(record)); };
 function viewerAuthorized(request) {
-  return request.headers.authorization === 'Bearer fixture-viewer' ||
-    /(?:^|;\s*)mh_viewer=fixture-viewer(?:;|$)/.test(request.headers.cookie || '');
+  return request.headers.authorization === 'Bearer ' + viewerToken ||
+    new RegExp('(?:^|;\\s*)mh_viewer=' + viewerToken.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:;|$)')
+      .test(request.headers.cookie || '');
+}
+function viewerCookiePresent(request) {
+  return viewerAuthorized(request);
 }
 function shareFor(request, url) {
   const explicit = url.searchParams.get('shareId');
@@ -66,7 +78,7 @@ function forwardViewer(request, response, state) {
   request.on('data', chunk => chunks.push(chunk));
   request.on('end', () => {
     const body = JSON.parse(Buffer.concat(chunks));
-    const cookieViewer = !request.headers.authorization && /mh_viewer=fixture-viewer/.test(request.headers.cookie || '');
+    const cookieViewer = !request.headers.authorization && viewerCookiePresent(request);
     const id = ++requestId;
     const channel = state.channel;
     const upload = body.op === 'call' && body.path === '/api/fileUploads/upload';
@@ -143,12 +155,12 @@ window.addEventListener('message', event => {
     return;
   }
   if (url.pathname === '/__fixture/log' && request.method === 'GET' &&
-      request.headers.authorization === 'Bearer fixture-admin') {
+      request.headers.authorization === 'Bearer ' + adminToken) {
     reply(response, 200, { records: logRecords });
     return;
   }
   if (url.pathname === '/__fixture/viewer' && request.method === 'POST' &&
-      request.headers.authorization === 'Bearer fixture-admin') {
+      request.headers.authorization === 'Bearer ' + adminToken) {
     const chunks = [];
     request.on('data', chunk => chunks.push(chunk));
     request.on('end', () => {
@@ -164,6 +176,18 @@ window.addEventListener('message', event => {
   }
   const share = shareFor(request, url);
   const state = shares.get(share);
+  if (url.pathname === '/__liveshare/auth/start' && request.method === 'GET' && state) {
+    const next = url.searchParams.get('next') || ('/?shareId=' + encodeURIComponent(share));
+    const safe = next.startsWith('/') && !next.startsWith('//') ? next : ('/?shareId=' + encodeURIComponent(share));
+    log({ viewerLoginGranted: true, share });
+    response.writeHead(302, {
+      location: safe,
+      'set-cookie': ['mh_viewer=' + viewerToken + '; Path=/; HttpOnly',
+                     'mh_share=' + encodeURIComponent(share) + '; Path=/'],
+    });
+    response.end();
+    return;
+  }
   if (url.pathname === '/__liveshare/context' && request.method === 'GET' && state) {
     log({ viewerContext: true, share, viaCookie: /mh_viewer=fixture-viewer/.test(request.headers.cookie || '') });
     reply(response, 200, {
@@ -177,6 +201,13 @@ window.addEventListener('message', event => {
     return;
   }
   if (url.pathname === '/' && request.method === 'GET' && state && viewerConfig?.carrier) {
+    if (loginRedirect && !viewerCookiePresent(request)) {
+      const next = request.url === '/' ? ('/?shareId=' + encodeURIComponent(share)) : request.url;
+      response.writeHead(302, { location: '/__liveshare/auth/start?shareId=' + encodeURIComponent(share) +
+        '&next=' + encodeURIComponent(next) });
+      response.end();
+      return;
+    }
     void (async () => {
       try {
         const asset = await askOwner(state, { op: 'asset', path: '' }, 20000);
@@ -201,7 +232,7 @@ window.addEventListener('message', event => {
               userAgent: request.headers['user-agent'] || '', elapsedMs: asset.elapsedMs });
         response.writeHead(200, {
           'content-type': 'text/html; charset=utf-8',
-          'set-cookie': ['mh_viewer=fixture-viewer; Path=/; HttpOnly',
+          'set-cookie': ['mh_viewer=' + viewerToken + '; Path=/; HttpOnly',
                          'mh_share=' + encodeURIComponent(share) + '; Path=/'],
         });
         response.end(injected);
@@ -232,13 +263,13 @@ window.addEventListener('message', event => {
     return;
   }
   if (url.pathname === '/__fixture/revoke' && request.method === 'POST' &&
-      request.headers.authorization === 'Bearer fixture-admin' && state) {
+      request.headers.authorization === 'Bearer ' + adminToken && state) {
     state.authority = { ...state.authority, version: 2, allowedSubjectIds: ['fixture:local:other'] };
     reply(response, 200, { revoked: true });
     return;
   }
   if (url.pathname === '/__fixture/authorize' && request.method === 'POST' &&
-      request.headers.authorization === 'Bearer fixture-admin' && state) {
+      request.headers.authorization === 'Bearer ' + adminToken && state) {
     state.authority = { ...state.authority, version: 3, allowedSubjectIds: ['fixture:local:reader'] };
     log({ viewerReauthorized: share });
     reply(response, 200, { authorized: true });
@@ -295,4 +326,4 @@ server.on('upgrade', (request, socket, head) => {
     });
   });
 });
-server.listen(0, '127.0.0.1', () => console.log(server.address().port));
+server.listen(listenPort, listenHost, () => console.log(server.address().port));
