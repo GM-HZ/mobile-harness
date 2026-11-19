@@ -605,8 +605,11 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
             sessions.append(device.rpc('session/create', {'request': args})['sessionId'])
         if owner_login:
             with support['model_key'](device):
-                device.rpc('session/selectModel', {'request': {'sessionId': sessions[0], 'provider': 'deepseek-official',
-                    'model': 'deepseek-flash', 'reasoningEffort': 'off'}})
+                catalog = device.rpc('session/modelCatalog', {})
+                default = catalog['default']
+                assert default['provider'] in catalog.get('routableProviders', [default['provider']]), catalog
+                device.rpc('session/selectModel', {'request': {'sessionId': sessions[0], 'provider': default['provider'],
+                    'model': default['model'], 'reasoningEffort': default.get('reasoningEffort') or 'off'}})
                 flow['flow']['restart'](device)
                 verify_owner_login(device, title, evidence)
         evidence['authorized'] = owner(device, 'testPublish', {'sessionId': sessions[0]})
@@ -710,7 +713,7 @@ if __name__ == '__main__':
     parser.add_argument('--host-port', type=int, default=19643)
     parser.add_argument('--cross-device', help='Second loopback emulator target that presents the viewer page')
     args = parser.parse_args()
-    if (args.model or args.owner_login or args.program_policy or args.attachments or args.guest_uploads) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
+    if (args.model or args.program_policy or args.attachments or args.guest_uploads) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('The selected live model scenario requires MH_TEST_DEEPSEEK_API_KEY')
     if args.program_policy and args.owner_login:
         parser.error('--program-policy requires the program preset; run the native login test separately')

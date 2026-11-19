@@ -77,6 +77,12 @@ function forwardViewer(request, response, state) {
       clearTimeout(timer);
       channel.off('message', done);
       log({ viewerRpc: body.op + ':' + (body.path || ''), status: frame.status, viaCookie: cookieViewer });
+      if (body.path === '/api/session/list' && frame.status === 200) {
+        const items = frame.body?.result?.value?.items;
+        if (Array.isArray(items)) {
+          log({ viewerSessionList: items.map(item => ({ sessionId: item.sessionId, title: item.title ?? null })) });
+        }
+      }
       if (upload) log({ attachmentCall: id, status: frame.status, elapsedMs: Math.round(performance.now() - started) });
       reply(response, frame.status, frame.body);
     };
