@@ -1,0 +1,73 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "bf3004b3d3c4fd2a5eb2376ed1d8ebe510b56996"
+  },
+  "target": {
+    "connection": "127.0.0.1:5555",
+    "kind": "DevEco API 26 ARM64 Phone emulator"
+  },
+  "accountConsent": {
+    "method": "device code through the packaged GitHub CLI on the device (`gh auth login --web`), completed by the account owner at github.com/login/device",
+    "account": "GM-HZ",
+    "scopes": [
+      "delete_repo",
+      "gist",
+      "read:org",
+      "repo"
+    ],
+    "scopeRefresh": "a second device code (`gh auth refresh -s delete_repo`) added repository deletion for the temporary write target",
+    "firstAttempt": "the first device code expired before consent and `gh auth login` exited with failure; the flow was re-run with the new code"
+  },
+  "realRead": {
+    "pullRequest": "https://github.com/GM-HZ/omnix/pull/9",
+    "headSha": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+    "path": "codex-rs/codex-api/src/chat_completions/types.rs",
+    "deviceTextBytes": 4614,
+    "deviceTextSha256": "e4b3139871bb25c0609532df9f3fb1bab5e03e638b7bc1874f68ef553e7c86ae",
+    "hostRawBytes": 4615,
+    "hostRawSha256": "e0cf3690bf168f227a106a51bf8beda7e8e38cc8fafb4b5b14a7461bd169a3f9",
+    "equivalence": "the device text plus one trailing newline hashes to the host raw content hash; the provider trims the trailing newline",
+    "commitsMatched": true,
+    "network": "the device contacted github.com directly; no host proxy or TLS fixture was used"
+  },
+  "realWrite": {
+    "repository": "GM-HZ/mh-forge-write-56eef723 (temporary private repository)",
+    "setup": "repository, probe branch, probe.txt commit and pull request #1 were created with the device GitHub credential",
+    "pullRequest": "https://github.com/GM-HZ/mh-forge-write-56eef723/pull/1",
+    "headSha": "794d78328fc00f67be10b3f66552f7b101e6468d",
+    "text": "Mobile Harness Forge write probe.",
+    "review": {
+      "ok": true,
+      "url": "https://github.com/GM-HZ/mh-forge-write-56eef723/pull/1#pullrequestreview-5985232783"
+    },
+    "merge": {
+      "method": "squash",
+      "verified": {
+        "state": "closed",
+        "merged": true,
+        "mergeCommitSha": "4a808311dd51770605f136012845e93f2ab90951",
+        "mergedBy": "GM-HZ"
+      }
+    },
+    "mergedContentOnMain": "Mobile Harness Forge write probe.\n",
+    "cleanup": "the repository was deleted with the device credential and a follow-up API read returned HTTP 404"
+  },
+  "tooling": "the shipped Inspector drove the device GitHub CLI runner during the consent and cleanup steps and captured the full output; the Inspector and Forge bundles were disabled and the profile files were restored byte-identically afterwards",
+  "scope": {
+    "verified": [
+      "real account consent through the device GitHub CLI",
+      "real-account pull request read with byte-equivalent file content",
+      "real-account review and squash merge on a temporary private repository",
+      "merge result and merged content verified through the GitHub API",
+      "temporary repository deleted and absence verified",
+      "temporary bundles disabled and profile restored byte-identically"
+    ],
+    "pending": [
+      "writes to the project's own repositories were not performed; the acceptance used a disposable private repository"
+    ]
+  }
+}

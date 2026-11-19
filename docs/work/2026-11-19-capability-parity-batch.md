@@ -34,13 +34,15 @@
 - [账号入口](../evidence/emulator-account-fresh-0.4.69.json)：全新应用数据下打开公网 DeepSeek 授权页、取消、回环 PKCE 与登出撤销。
 - [addon 加载位置](../evidence/emulator-native-addon-location-0.4.69.json)：同一库字节按安装目录 soname 加载成功，应用数据副本 `ERR_DLOPEN_FAILED`。
 - [原生麦克风采集](../evidence/emulator-voice-native-capture-0.4.69.json)：模拟器原生麦克风录到宿主外放的已知语句（RMS 0.036、峰值 0.29）并由 SenseVoice 转写正确。
+- [Forge 真实账号](../evidence/emulator-forge-real-account-0.4.69.json)：设备端真实 GitHub 设备授权、公开 PR 真实读取，以及临时私有仓库上的评审与 squash 合并写操作（仓库已删除）。
 
 ## 仍受外部条件阻塞
 
 | 项 | 完成所需条件 |
 | --- | --- |
-| Forge 真实账号同意与托管仓库写 | 账号所有者在 `github.com/login/device` 输入一次设备码；提供一个可写测试仓库或 PR 用于真实副作用 |
+| ~~Forge 真实账号同意与托管仓库写~~ | 已完成：真实账号 GM-HZ 授权、公开读取、临时私有仓库评审/合并，仓库已删除 |
 | 语音真机采集与真人说话 | 模拟器已通过原生麦克风真实采集合成语句；真机（Mate 60 当前 HDC 离线）、正式签名 HAP、设备麦克风与真人说话仍待验 |
+| 公网 LiveShare Relay | 用户已确认有域名、服务器稍后配置；待办见 [公网 Relay TODO](2026-11-20-liveshare-public-relay-todo.md) |
 | 公网 LiveShare Relay、真实身份提供方、公网跨设备 | 官方 Relay 服务端不在上游包或本仓库内；需要外部部署、公网 CA/HTTPS 与真实 OAuth/OIDC client |
 | 外部鸿蒙 addon 运行时装入主 Host | 平台限制：动态链接器只允许安装目录 `libs/arm64`；已给出替代路径（Alpine ARM64 musl addon、纯 JS、随 HAP 打包） |
 | PTC 根内链接指向根外读取 | 应用数据视图拒绝创建链接，夹具不可得；读取侧已按单链接加固，拿到夹具即可复跑 |
