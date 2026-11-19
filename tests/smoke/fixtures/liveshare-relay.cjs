@@ -67,7 +67,6 @@ function forwardViewer(request, response, state) {
   request.on('end', () => {
     const body = JSON.parse(Buffer.concat(chunks));
     const cookieViewer = !request.headers.authorization && /mh_viewer=fixture-viewer/.test(request.headers.cookie || '');
-    log({ viewerRpc: body.op + ':' + (body.path || ''), viaCookie: cookieViewer });
     const id = ++requestId;
     const channel = state.channel;
     const upload = body.op === 'call' && body.path === '/api/fileUploads/upload';
@@ -77,6 +76,7 @@ function forwardViewer(request, response, state) {
       if (frame.type !== 'share-rpc-res' || frame.id !== id) return;
       clearTimeout(timer);
       channel.off('message', done);
+      log({ viewerRpc: body.op + ':' + (body.path || ''), status: frame.status, viaCookie: cookieViewer });
       if (upload) log({ attachmentCall: id, status: frame.status, elapsedMs: Math.round(performance.now() - started) });
       reply(response, frame.status, frame.body);
     };

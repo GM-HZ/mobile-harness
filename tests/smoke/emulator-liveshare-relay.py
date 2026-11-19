@@ -379,8 +379,8 @@ def fixture_log(port):
         return []
 
 
-def browser_tap(target):
-    """Open the system browser when the URI chooser is on screen."""
+def browser_tap(target, labels=('浏览器', '极简浏览')):
+    """Tap the first clickable node whose text is one of the given labels."""
     dump = 'cat /data/local/tmp/mh-liveshare-ui.json'
     subprocess.run([HDC, '-t', target, 'shell',
                     'uitest dumpLayout -p /data/local/tmp/mh-liveshare-ui.json >/dev/null 2>&1'],
@@ -392,7 +392,7 @@ def browser_tap(target):
     nodes = []
     def walk(node):
         attributes = node.get('attributes', {})
-        if attributes.get('text') in ('浏览器', '极简浏览'):
+        if attributes.get('text') in labels:
             nodes.append(attributes.get('bounds'))
         for child in node.get('children', []):
             walk(child)
@@ -432,10 +432,21 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
     assert 'Forwardport result:OK' in hdc('rport', *reverse)
     # The reader regression revoked viewer access right before this call; grant it
     # back through the fixture admin route so the second device is an actual reader.
+    title = 'MH cross-device viewer ' + uuid.uuid4().hex[:6]
+    assert device.rpc('session/rename', {'request': {'sessionId': sessions[0], 'title': title}})['title'] == title
     request = Request(f'http://127.0.0.1:{relay_port}/__fixture/authorize?shareId={share}', data=b'{}',
                       headers={'Authorization': 'Bearer fixture-admin', 'Content-Type': 'application/json'})
     with urlopen(request, timeout=8) as response:
         assert json.load(response) == {'authorized': True}
+    # The owner applies the fixture revocation live; wait until the reader can list again.
+    deadline = time.monotonic() + 25
+    while time.monotonic() < deadline:
+        status, body = reader_rpc(relay_port, share, 'session/list', {'_request': {}})
+        if status == 200 and body.get('result', {}).get('ok'):
+            break
+        time.sleep(0.5)
+    else:
+        raise AssertionError('The fixture re-authorization did not restore viewer reads')
     try:
         page = None
         for attempt in range(3):
@@ -480,17 +491,38 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
         subprocess.run([HDC, '-t', target, 'shell',
                         'uitest dumpLayout -p /data/local/tmp/mh-liveshare-viewer.json >/dev/null 2>&1'],
                        check=False, timeout=60)
-        raw = hdc('shell', 'cat /data/local/tmp/mh-liveshare-viewer.json')
-        texts = [text for text in re.findall(r'"text":"([^"]*)"', raw) if text]
+        deadline = time.monotonic() + 60
+        texts = []
+        collected = []
+        tapped = set()
+        while time.monotonic() < deadline:
+            subprocess.run([HDC, '-t', target, 'shell',
+                            'uitest dumpLayout -p /data/local/tmp/mh-liveshare-viewer.json >/dev/null 2>&1'],
+                           check=False, timeout=60)
+            raw = hdc('shell', 'cat /data/local/tmp/mh-liveshare-viewer.json 2>/dev/null || true')
+            texts = [text for text in re.findall(r'"text":"([^"]*)"', raw) if text]
+            collected.extend(text for text in texts if text not in collected)
+            if title in collected or any('新会话' in text for text in collected):
+                break
+            for label in ('打开侧边栏', '打开右侧边栏', '选择工作区'):
+                if label in texts and label not in tapped:
+                    browser_tap(target, (label,))
+                    tapped.add(label)
+                    time.sleep(2)
+                    break
+            time.sleep(2)
         evidence['crossDeviceViewer'] = {
             'target': target, 'pageUserAgent': page['userAgent'],
             'viewerContextRequests': len(context), 'viewerAsset200': len(assets),
-            'viewerSessionListCalls': len(rpc), 'visibleTexts': texts[:24],
+            'viewerSessionListCalls': len(rpc), 'visibleTexts': collected[:24],
             'ownerManagementAttempted': any(row.get('viewerRpc') == 'call:/api/liveshareShares/list'
                                             and row.get('viaCookie') for row in records),
+            'sharedTitle': title, 'sharedTitleVisible': title in collected,
         }
-        assert texts, 'The viewer page rendered no text on the second device'
-        assert any('观看者' in text or '仅可查看' in text for text in texts), texts
+        assert collected, 'The viewer page rendered no text on the second device'
+        assert any('观看者' in text or '仅可查看' in text for text in collected), collected
+        assert any('新会话' in text or title == text for text in collected), \
+            ['the viewer sidebar shows no session row', collected[:24]]
         assert not evidence['crossDeviceViewer']['ownerManagementAttempted'], evidence['crossDeviceViewer']
     finally:
         subprocess.run([HDC, '-t', target, 'shell', 'aa force-stop com.huawei.hmos.browser'],
