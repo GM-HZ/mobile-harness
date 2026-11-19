@@ -35,6 +35,23 @@ python3 tests/smoke/relay-preflight.py https://<域名>/ --output .build/relay-p
 python3 tests/smoke/relay-preflight.py --self-test --output .build/relay-preflight-self-test.json
 ```
 
+## 外部 Relay 模式（已实现并在本机验证）
+
+验收脚本已支持外部 Relay：`--relay-url`（设备可见地址）、`--relay-call-url`（宿主调用地址，缺省同 `--relay-url`）、`--relay-host-port`（本机转发校验用）、`--admin-token`、`--viewer-token`。Relay 夹具新增部署环境变量：`MH_RELAY_HOST`、`MH_RELAY_PORT`、`MH_RELAY_VIEWER_TOKEN`、`MH_RELAY_ADMIN_TOKEN`、`MH_RELAY_OWNER_LOGIN`、`MH_RELAY_LOGIN_REDIRECT`、`MH_RELAY_VIEWER_CONFIG`。
+
+本机用「独立启动的 Relay 夹具 + hdc rport 回环」验证了该路径（owner 授权、分享创建/扩源/重连、reader 拒绝与撤销、stop、网关回收、配置恢复全部通过；第二设备通过外部 URL 渲染出共享会话标题）。证据：[relay-external-url-validation](../evidence/relay-external-url-validation-0.4.69.json)。
+
+公网地址就绪后，命令只需换成公网 URL（不再需要 `--relay-call-url`/`--relay-host-port`）：
+
+```sh
+python3 tests/smoke/relay-preflight.py https://<域名>/ --output .build/relay-preflight.json
+python3 tests/smoke/emulator-liveshare-relay.py <target> .build/liveshare-public.json \
+  --owner-login --relay-url https://<域名>/ --cross-device <second-target> \
+  --admin-token <admin-token> --viewer-token <viewer-token>
+```
+
+已知待处理：本机 rport 回环下的跨设备组合出现过 `liveshareShares/stop → relay:unreachable` 的传输抖动（第二设备页面本身正常）；公网直连部署应改用真实网络路径再验收该断言。
+
 ## 复现基线命令（本机）
 
 ```sh
