@@ -479,6 +479,13 @@ python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/livesha
   --cross-device <second-loopback-target>
 ```
 
+加 `--owner-login` 时先用实际 ArkWeb 完成分享授权（测试 Relay 的 PKCE 交换），再让第二台设备读取带历史消息的共享会话；viewer 页面会显示共享会话标题、消息和时间戳。该组合不需要 `MH_TEST_DEEPSEEK_API_KEY`，模型路由取本机 `session/modelCatalog` 的默认项。
+
+```sh
+python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-owner-cross-device.json \
+  --owner-login --cross-device <second-loopback-target>
+```
+
 桌面装有 Chrome 和 Playwright CLI 时，可以打开实际分享页面，从对话框选择文件并发送。下列测试通过回环 Relay 转发真实页面资源，按 Viewer 身份核对模型回合。
 
 ```sh
