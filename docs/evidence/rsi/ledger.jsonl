@@ -43,3 +43,6 @@
 {"commit": "8356cf1b96477955ec53303eda6e8128595954ba", "tiers": ["G0"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0/8356cf1b96477955ec53303eda6e8128595954ba.json", "note": "", "at": "2026-11-20T23:46:37+0800"}
 {"commit": "8356cf1b96477955ec53303eda6e8128595954ba", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/8356cf1b96477955ec53303eda6e8128595954ba.json", "note": "", "at": "2026-11-20T23:46:39+0800"}
 {"commit": "8356cf1b96477955ec53303eda6e8128595954ba", "tiers": ["G2"], "ok": true, "flakes": 0, "evidence": ".build/gate-evidence/G2", "note": "full model-free nightly subset 7/7 PASS", "at": "2026-11-20T23:46:39+0800"}
+{"commit": "b997be634f744b524068945817fd856f042b4354", "tiers": ["G0"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0/b997be634f744b524068945817fd856f042b4354.json", "note": "", "at": "2026-11-20T23:47:05+0800"}
+{"commit": "b997be634f744b524068945817fd856f042b4354", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/b997be634f744b524068945817fd856f042b4354.json", "note": "", "at": "2026-11-20T23:47:07+0800"}
+{"commit": "b997be634f744b524068945817fd856f042b4354", "tiers": ["G4"], "ok": true, "flakes": 0, "evidence": "docs/evidence/release/0.4.69-b997be634f744b524068945817fd856f042b4354.json", "note": "", "at": "2026-11-20T23:49:43+0800"}

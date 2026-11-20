@@ -12,6 +12,7 @@ and how a change is proven before it reaches `main`.
 - `docs/architecture/seams/` — contracts for each fragile upstream touchpoint (see [seams README](seams/README.md)).
 - [compat-layer.md](compat-layer.md) — inventory and decisions for the HarmonyOS compatibility modules.
 - [release-runbook.md](release-runbook.md) — local dry run and the CI tag release flow.
+- [../work/2026-11-20-architecture-delivery.md](../work/2026-11-20-architecture-delivery.md) — delivery summary, evidence links and known gaps.
 
 Rules of thumb:
 

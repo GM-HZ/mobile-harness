@@ -445,3 +445,15 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
   recovery 30.0s / native-addon 14.8s / inspector 14.5s / inspector-availability 13.5s /
   lsp-bundle 20.4s / mcp-stdio 6.5s / ptc-link-fixture 1.0s —— **7/7 PASS**。
 - compat.json / compat-layer.md 同步 speech seam 结论；证据写入 gate evidence 与 RSI 台账。
+
+
+### 2026-11-20（第 19 轮：最终综合验证与交付文档）
+
+- 最终验证全绿：
+  - G0/G1 通过（manifest 73 条、anchors 7、patches 5、compat 10）；
+  - nightly 7 项 **7/7 PASS**（recovery/native-addon/inspector/availability/lsp-bundle/mcp-stdio/ptc-link）；
+  - `release_dry_run.sh` → **G4 release gate OK: 0.4.69 @ b997be6**（store 768,499,205 B / self 773,562,910 B）。
+- 新增 [2026-11-20-architecture-delivery.md](../work/2026-11-20-architecture-delivery.md)：目标-交付对照、
+  当前数字、证据位置、环境阻塞的遗留项（真机锁屏、测试密钥、forge fixture、CI 未在 runner 实跑、
+  运行时任意 dlopen）与恢复步骤。
+- 架构 README 加入交付文档入口。
