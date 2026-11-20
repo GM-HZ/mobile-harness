@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
 RUNTIME = ROOT / "runtime/harmonyos"
 EXPERIMENTAL = os.environ.get("HARMONY_EXPERIMENTAL_HOST_PROCESS") == "1"
+SELF_BUILD = os.environ.get("HARMONY_SELF_BUILD") == "1"
 STAGE = ROOT / ".build/stage" / ("harmonyos-process-probe" if EXPERIMENTAL else "harmonyos")
 RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
@@ -163,6 +164,17 @@ def main():
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
     )
     stage_settings_client()
+    (RAW / "dsh-self-build.json").write_text(json.dumps({
+        "selfBuild": SELF_BUILD,
+        "signedExecBypass": SELF_BUILD,
+        "note": "Self-built HAPs include the in-memory ELF runner at /usr/bin/mh-exec; store builds never include it.",
+    }) + "\n")
+    loader = RAW / "mh-exec.py"
+    if SELF_BUILD:
+        copy(RUNTIME / "tools" / "mh-exec.py", loader)
+    else:
+        loader.unlink(missing_ok=True)
+    print(f"Self-build signed-exec bypass: {'enabled' if SELF_BUILD else 'disabled'}")
     signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
     profile = Path(signing_profile or ROOT / "build-profile.json5")
     unsigned = os.environ.get("HARMONY_UNSIGNED") == "1"

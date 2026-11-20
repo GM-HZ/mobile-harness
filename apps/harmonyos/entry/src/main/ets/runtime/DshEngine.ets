@@ -1,5 +1,6 @@
 import { common, childProcessManager } from '@kit.AbilityKit';
 import { fileIo } from '@kit.CoreFileKit';
+import fileIO from '@ohos.fileio';
 import zlib from '@ohos.zlib';
 import { connection } from '@kit.NetworkKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -267,6 +268,7 @@ class DshEngine {
         'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {
         this.copyGuest(context, name, root + '/' + name);
       }
+      if (mode !== 'safe') this.prepareSelfBuildTools(context, root);
       if (mode === 'safe' || !fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
         await this.prepareResolver(root);
         this.runNative(context, root, started, mode);
@@ -356,6 +358,41 @@ class DshEngine {
       return true;
     } finally { fileIo.unlinkSync(archive); }
   }
+  private prepareSelfBuildTools(context: common.UIAbilityContext, root: string): void {
+    try {
+      let enabled = false;
+      try {
+        const raw = context.resourceManager.getRawFileContentSync('dsh-self-build.json');
+        let text = '';
+        for (const byte of raw) text += String.fromCharCode(byte);
+        enabled = text.includes('"signedExecBypass": true');
+      } catch (error) {
+        enabled = false;
+      }
+      if (!enabled) {
+        try {
+          fileIo.unlinkSync(root + '/usr/bin/mh-exec');
+        } catch (error) {
+          // Not present: nothing to clean up.
+        }
+        hilog.info(0xD005, 'DSHClient', 'signed exec bypass disabled: store build');
+        return;
+      }
+      const target = root + '/usr/bin/mh-exec';
+      const bytes = context.resourceManager.getRawFileContentSync('mh-exec.py');
+      // POSIX-style create with an executable mode: 0o755, O_WRONLY|O_CREAT|O_TRUNC.
+      const fd = fileIO.openSync(target, 1 | 64 | 512, 0o755);
+      try {
+        fileIo.writeSync(fd, bytes.buffer);
+      } finally {
+        fileIo.closeSync(fd);
+      }
+      hilog.info(0xD005, 'DSHClient', 'signed exec bypass enabled: /usr/bin/mh-exec');
+    } catch (error) {
+      hilog.warn(0xD005, 'DSHClient', 'self-build tool setup failed: %{public}s', String(error));
+    }
+  }
+
   private copyGuest(context: common.UIAbilityContext, asset: string, path: string): void {
     const bytes = context.resourceManager.getRawFileContentSync(asset);
     const file = fileIo.openSync(path, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);

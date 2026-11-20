@@ -2,6 +2,11 @@ name: Build HarmonyOS HAP
 
 on:
   workflow_dispatch:
+    inputs:
+      self_build_bypass:
+        description: 'Include /usr/bin/mh-exec in-memory ELF runner (self-built only; never for store builds)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -15,6 +20,7 @@ jobs:
       DEVECO_HOME: ${{ vars.DEVECO_HOME }}
       HARMONY_INPUTS_DIR: ${{ vars.HARMONY_INPUTS_DIR }}
       HARMONY_UNSIGNED: '1'
+      HARMONY_SELF_BUILD: ${{ inputs.self_build_bypass == true && '1' || '0' }}
     steps:
       - uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
         with:

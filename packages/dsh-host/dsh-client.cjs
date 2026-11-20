@@ -48,7 +48,27 @@ function replacePinned(source, original, replacement, url) {
   return source.replace(original, replacement);
 }
 
+function activateSelfBuildTools() {
+  const target = '/usr/bin/mh-exec';
+  try {
+    if (!fs.existsSync(target)) return;
+    const mode = fs.statSync(target).mode & 0o777;
+    if ((mode & 0o111) === 0o111) {
+      console.log('DSH_CLIENT_SELF_BUILD_TOOLS', JSON.stringify({ target, mode: mode.toString(8) }));
+      return;
+    }
+    const result = spawnSync('/bin/chmod', ['0755', target], { encoding: 'utf8', timeout: 5000 });
+    console.log('DSH_CLIENT_SELF_BUILD_TOOLS', JSON.stringify({
+      target, status: result.status, error: result.error?.code ?? null,
+      mode: (fs.statSync(target).mode & 0o777).toString(8),
+    }));
+  } catch (error) {
+    console.log('DSH_CLIENT_SELF_BUILD_TOOLS', JSON.stringify({ target, error: error.code ?? error.name }));
+  }
+}
+
 async function probeBash() {
+  activateSelfBuildTools();
   const args = ['-c', 'printf DSH_BASH_SPAWN_OK'];
   const options = { cwd: '/workspace', encoding: 'utf8', timeout: 5000 };
   const synchronous = spawnSync(bashPath, args, options);

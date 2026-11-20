@@ -1,0 +1,43 @@
+{
+  "kind": "in-memory ELF runner gated behind a self-build switch (emulator verified)",
+  "builds": {
+    "default": {
+      "hap": "dsh-mh-harmonyos-arm64-v0.4.69-default-unsigned.hap",
+      "sha256": "004bdd07383509e79ef6188b6734668a6c21bb96b4265f7d57684b0418300cde",
+      "command": "HARMONY_UNSIGNED=1 ./build.sh --package",
+      "stageFlag": {
+        "selfBuild": false,
+        "signedExecBypass": false
+      },
+      "stageRawfileContainsLoader": false
+    },
+    "selfbuild": {
+      "hap": "dsh-mh-harmonyos-arm64-v0.4.69-selfbuild-unsigned.hap",
+      "sha256": "5c20fee994f5110258b6830ce0528efa1f677b6d9f4e0f4490826327a76f087a",
+      "command": "HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package",
+      "stageFlag": {
+        "selfBuild": true,
+        "signedExecBypass": true
+      },
+      "stageRawfileContainsLoader": true
+    }
+  },
+  "runtimeBehavior": {
+    "defaultBuild": "DshEngine reads dsh-self-build.json, deletes any stale /usr/bin/mh-exec and logs 'signed exec bypass disabled: store build'",
+    "selfBuild": "DshEngine writes mh-exec.py to /usr/bin/mh-exec as an executable file; the Host startup hook also chmods it 0755 as a fallback",
+    "verifiedOnEmulator": {
+      "default": "mh-exec ABSENT after installing the default HAP over a previous self-build install",
+      "selfbuild": "mh-exec PRESENT with mode -rwxr-xr-x"
+    }
+  },
+  "selfBuildRun": {
+    "command": "curl busybox-static apk -> gzip -> tar -> MH_ELF_ARGV0=busybox mh-exec ./bbx/bin/busybox.static echo MH_EXEC_SWITCH_OK",
+    "resultText": "--- mh-exec availability ---\n-rwxr-xr-x    1 mobile-harness 20020074      8442 Nov 20 20:49 /usr/bin/mh-exec\n--- download and run a static tool through mh-exec ---\nCURL_OK\nGZIP_OK\nTAR_OK\n-rwxr-xr-x    1 mobile-harness 20020074   1115944 Nov 23  2025 ./bbx/bin/busybox.static\nMH_EXEC_SWITCH_OK\nLOADED segments=2 base=0x0 entry=0x404400\nCHILD_EXIT 0\nMH_EXEC_PROBE_DONE\n",
+    "observed": true
+  },
+  "distributionPolicy": {
+    "storeBuilds": "HARMONY_SELF_BUILD is unset/false; the loader script is not packaged and any stale copy is removed at launch",
+    "selfBuilt": "opt-in with HARMONY_SELF_BUILD=1 or the GitHub workflow dispatch input self_build_bypass",
+    "notes": "the in-memory runner deliberately bypasses the platform code-signing boundary and must not be used for store distribution"
+  }
+}
