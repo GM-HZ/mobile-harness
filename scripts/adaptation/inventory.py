@@ -142,7 +142,9 @@ def switches():
     for name, description in patterns.items():
         result = subprocess.run(["git", "grep", "-l", name], cwd=ROOT,
                                 stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
-        places = [line for line in result.stdout.splitlines() if line][:10]
+        code_prefixes = ("scripts/", "runtime/", "apps/", "packages/", ".github/", "tests/")
+        places = [line for line in result.stdout.splitlines()
+                  if line.startswith(code_prefixes)][:10]
         rows.append({"id": f"switch:{name}", "layer": "variant", "kind": "switch",
                      "source": name, "role": description, "places": places,
                      "gates": ["G0", "G4"]})
@@ -191,12 +193,19 @@ def main():
     if args.check:
         current = json.loads(MANIFEST.read_text()) if MANIFEST.is_file() else None
         current_versions = json.loads(VERSIONS.read_text()) if VERSIONS.is_file() else None
-        if current != manifest or current_versions != versions:
+
+        def stable(value):
+            if isinstance(value, dict):
+                return {key: stable(item) for key, item in value.items() if key != "generatedFrom"}
+            return value
+
+        if stable(current) != stable(manifest) or current_versions != versions:
             print("adaptation manifest is stale; run scripts/adaptation/inventory.py", file=sys.stderr)
             return 1
         print("adaptation manifest is up to date")
         return 0
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
+    manifest["generatedFrom"] = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n")
     VERSIONS.write_text(json.dumps(versions, indent=2) + "\n")
     by_layer = {}

@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "description": "Literal upstream anchors our runtime hooks depend on. Checked by scripts/adaptation/anchors.py; contracts live in docs/architecture/seams/.",
+  "anchors": [
+    {
+      "id": "bash-local-command",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-bash-local/lib/index.js",
+      "pattern": "\"bash\",\n\t\t\t\"-c\",",
+      "count": 1,
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "bash-sandbox-command",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-bash-sandbox/lib/index.js",
+      "pattern": "\"bash\",\n\t\t\t\"-c\",",
+      "count": 1,
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "session-persistence-link",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js",
+      "pattern": "await link(tmp, finalPath);",
+      "count": 1,
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "settings-client-apply",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js",
+      "pattern": "function apply(ctx){",
+      "count": 1,
+      "contract": "docs/architecture/seams/web-settings-injection.md"
+    },
+    {
+      "id": "native-system-addon",
+      "file": "dsh/node_modules/@deepseek-ai/node-addon-system-linux-arm64/bin/musl/system.node",
+      "exists": true,
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "ripgrep-binary",
+      "file": "dsh/node_modules/@vscode/ripgrep-linux-arm64/bin/rg",
+      "exists": true,
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    }
+  ]
+}

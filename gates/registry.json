@@ -21,14 +21,34 @@
           "id": "relay-preflight-self-test",
           "command": "python3 tests/smoke/relay-preflight.py --self-test",
           "covers": "public Relay preflight tooling",
+          "requires": [
+            "pinned DSH runtime cache"
+          ],
+          "optional": true,
           "timeout": 180
         }
       ]
     },
     "G1": {
       "name": "host contracts",
-      "entries": [],
-      "note": "P1: add host overlay/compat module contract tests and anchor snapshots"
+      "entries": [
+        {
+          "id": "host-syntax",
+          "command": "python3 scripts/adaptation/host_checks.py",
+          "covers": "node --check for host/compat overlays",
+          "timeout": 180
+        },
+        {
+          "id": "upstream-anchors",
+          "command": "python3 scripts/adaptation/anchors.py",
+          "covers": "literal upstream anchors used by runtime hooks",
+          "requires": [
+            "assembled dsh-layer.zip"
+          ],
+          "timeout": 300
+        }
+      ],
+      "note": "anchor checks need the assembled DSH layer (build machine)"
     },
     "G2": {
       "name": "emulator capability",

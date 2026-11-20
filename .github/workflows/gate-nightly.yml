@@ -1,0 +1,46 @@
+# Nightly capability gate on the self-hosted macOS/DevEco lab.
+# Builds the current commit, installs it on an API 26 ARM64 Phone emulator and
+# runs the consolidated G2 capability gate, uploading evidence.
+name: Gate Nightly
+
+on:
+  schedule:
+    - cron: '0 10 * * *'   # 18:00 Asia/Shanghai
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  emulator-gate:
+    runs-on: [self-hosted, macOS, ARM64, deveco]
+    timeout-minutes: 60
+    env:
+      DEVECO_HOME: ${{ vars.DEVECO_HOME }}
+      HARMONY_INPUTS_DIR: ${{ vars.HARMONY_INPUTS_DIR }}
+      HARMONY_UNSIGNED: '1'
+      MH_EMULATOR: ${{ vars.MH_EMULATOR || '127.0.0.1:5555' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - name: G0 static/consistency
+        run: python3 gates/run.py --tier G0 --evidence-dir .build/gate-evidence
+      - name: Build the emulator package
+        run: ./build.sh --package
+      - name: Install on the emulator
+        run: |
+          HDC="$DEVECO_HOME/sdk/default/openharmony/toolchains/hdc"
+          "$HDC" -t "$MH_EMULATOR" install -r .build/artifacts/harmonyos/*-unsigned.hap
+          "$HDC" -t "$MH_EMULATOR" shell aa force-stop org.sayact.nodepoc
+          "$HDC" -t "$MH_EMULATOR" shell aa start -a EntryAbility -b org.sayact.nodepoc
+          sleep 10
+      - name: G2 capability gate
+        run: python3 gates/run.py --tier G2 --only capability-parity-gate --evidence-dir .build/gate-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate-evidence-nightly
+          path: .build/gate-evidence
+          if-no-files-found: ignore

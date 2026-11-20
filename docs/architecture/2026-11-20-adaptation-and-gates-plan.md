@@ -130,3 +130,29 @@ G4 对每个变体做构建断言（例如 store 不得包含 `/usr/bin/mh-exec`
 - dsh-Go：`runtime/patches/series` 用一个序列文件管理 20+ 上游补丁（含应用顺序与
   TARGETS.md），配合 `docs/maintenance/*-contract.md`（每个行为合同一个文档）与
   `tooling/ohos/run-gates.sh` 门禁矩阵；CI 分 pr-gate/ci/goldens/runtime/ohos-compile。
+
+
+## 6. 实施进度
+
+### 2026-11-20（P0 完成，P1 进行中）
+
+已落地：
+
+- `adaptation/manifest.json`（60 条，自动生成）+ `versions.lock.json` + `scripts/adaptation/{inventory,verify}.py`
+  —— `python3 gates/run.py --tier G0` 为绿；
+- `adaptation/anchors.json` + `scripts/adaptation/anchors.py`（bash-local/bash-sandbox 命令锚点、
+  session-persistence 锚点、settings client 锚点、native addon/ripgrep 存在性）；
+  `scripts/adaptation/host_checks.py`（23 个 host/compat overlay 的 `node --check`）
+  —— `python3 gates/run.py --tier G1` 为绿（本地用能力分支组装的 dsh-layer.zip 校验 6 个锚点通过）；
+- `gates/run.py`（按 registry 运行、占位符跳过、exit 2 视为环境不可用、逐 commit 证据）；
+- CI：`.github/workflows/gate-pr.yml`（PR 跑 G0+G1，ubuntu）与
+  `.github/workflows/gate-nightly.yml`（self-hosted macOS 构建+安装+跑 G2 capability gate）；
+- G4 增加 `scripts/adaptation/store_build_check.py`（store HAP 不得包含 mh-exec/exec shim/overlay 库）。
+
+未完成（下一轮继续）：
+
+- G1 的 host 合同测试（overlay 行为级断言，锚点快照 diff）；
+- `scripts/adaptation/bump.py` 上游 bump 排练（先对 0.2.2-rc.5 → 下一 RC dry-run）；
+- store/self/lab 变体矩阵（`variants/*.json`）与 G4 尺寸/特性预算；
+- 真机 G3 的 CI 调度（等设备可用性协议）；
+- RSI 闭环：flake 台账、失败自动 issue、发布闸门与周报。

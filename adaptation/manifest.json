@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "8d3f22ee351c8041674c9ef5e9691469a450223a",
+  "generatedFrom": "99ae56f610aae2640a3b3b45b131a51bc609895d",
   "layers": [
     "host",
     "web",
@@ -859,13 +859,10 @@
       "role": "self-built variant: exec shim, mh-exec, native overlay, self signed-exec bypass",
       "places": [
         ".github/workflows/harmonyos.yml",
-        "docs/development.md",
-        "docs/evidence/emulator-exec-bypass-switch-0.4.69.json",
-        "docs/evidence/emulator-loader-fallback-attempt-0.4.69.json",
-        "docs/evidence/native-overlay-0.4.69.json",
-        "docs/research/harmonyos-proot-exec.md",
         "runtime/harmonyos/packaging/build-native-shell.sh",
         "runtime/harmonyos/tools/mh-exec.py",
+        "scripts/adaptation/inventory.py",
+        "scripts/adaptation/registry.py",
         "scripts/build/harmonyos_guest_extras.py",
         "scripts/build/stage-harmonyos.py"
       ],
@@ -881,9 +878,7 @@
       "source": "HARMONY_GUEST_LIB_GROUPS",
       "role": "signed native library/extension groups (common,media,extensions)",
       "places": [
-        "docs/evidence/native-overlay-0.4.69.json",
-        "docs/research/harmonyos-proot-exec.md",
-        "docs/work/2026-11-20-signed-lib-size.md",
+        "scripts/adaptation/inventory.py",
         "scripts/build/harmonyos_guest_extras.py",
         "scripts/build/stage-harmonyos.py"
       ],
@@ -900,15 +895,9 @@
       "role": "unsigned emulator build",
       "places": [
         ".github/workflows/harmonyos.yml",
-        "docs/development.md",
-        "docs/evidence/emulator-capability-parity-0.4.69.json",
-        "docs/evidence/emulator-chat-import-0.4.39.json",
-        "docs/evidence/emulator-cot-translation-0.4.45.json",
-        "docs/evidence/emulator-creator-and-voice-0.4.53.json",
-        "docs/evidence/emulator-creator-liveshare-0.4.55.json",
-        "docs/evidence/emulator-dsh-rc4-0.4.31.json",
-        "docs/evidence/emulator-dsh-rc5-0.4.42.json",
-        "docs/evidence/emulator-exec-bypass-switch-0.4.69.json"
+        "scripts/adaptation/inventory.py",
+        "scripts/adaptation/registry.py",
+        "scripts/build/stage-harmonyos.py"
       ],
       "gates": [
         "G0",
@@ -922,7 +911,7 @@
       "source": "HARMONY_SIGNING_PROFILE",
       "role": "real-device signing profile",
       "places": [
-        "docs/development.md",
+        "scripts/adaptation/inventory.py",
         "scripts/build/stage-harmonyos.py"
       ],
       "gates": [
@@ -937,8 +926,7 @@
       "source": "HARMONY_EXPERIMENTAL_HOST_PROCESS",
       "role": "experimental host-process build",
       "places": [
-        "docs/development.md",
-        "docs/evidence/emulator-restructure-0.4.25.json",
+        "scripts/adaptation/inventory.py",
         "scripts/build/harmonyos.sh",
         "scripts/build/stage-harmonyos.py"
       ],

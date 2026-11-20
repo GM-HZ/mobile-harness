@@ -19,7 +19,8 @@ G0 = [
     {"id": "manifest-fresh", "command": "python3 scripts/adaptation/inventory.py --check",
      "covers": "checked-in manifest matches the tree", "timeout": 120},
     {"id": "relay-preflight-self-test", "command": "python3 tests/smoke/relay-preflight.py --self-test",
-     "covers": "public Relay preflight tooling", "timeout": 180},
+     "covers": "public Relay preflight tooling", "requires": ["pinned DSH runtime cache"],
+     "optional": True, "timeout": 180},
 ]
 G4 = [
     {"id": "build-unsigned", "command": "HARMONY_UNSIGNED=1 ./build.sh --package",
@@ -76,8 +77,13 @@ def main():
         "source": "scripts/adaptation/registry.py",
         "tiers": {
             "G0": {"name": "static/consistency", "entries": G0},
-            "G1": {"name": "host contracts", "entries": [],
-                   "note": "P1: add host overlay/compat module contract tests and anchor snapshots"},
+            "G1": {"name": "host contracts", "entries": [
+                {"id": "host-syntax", "command": "python3 scripts/adaptation/host_checks.py",
+                 "covers": "node --check for host/compat overlays", "timeout": 180},
+                {"id": "upstream-anchors", "command": "python3 scripts/adaptation/anchors.py",
+                 "covers": "literal upstream anchors used by runtime hooks",
+                 "requires": ["assembled dsh-layer.zip"], "timeout": 300},
+            ], "note": "anchor checks need the assembled DSH layer (build machine)"},
             "G2": {"name": "emulator capability", "entries": g2,
                    "note": "requires two API 26 ARM64 emulators for cross-device cases"},
             "G3": {"name": "real-device lab", "entries": g3,
