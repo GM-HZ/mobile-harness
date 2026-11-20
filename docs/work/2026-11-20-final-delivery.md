@@ -46,6 +46,15 @@ python3 tests/smoke/emulator-liveshare-relay.py 127.0.0.1:5555 .build/liveshare-
   --admin-token <ADMIN> --viewer-token <VIEWER>
 ```
 
+## 真机验证（2026-11-20 补充）
+
+Mate 60（BRA-AL00，HarmonyOS 7.0.0.111，API 26）通过 USB 连接后完成：
+
+- 真机签名构建（`build-profile.json5` 使用本机签名配置）并通过 `hdc install -r` 从 0.4.26(33) 覆盖升级到 **0.4.69(76)**，应用数据与 DeepSeek 账号保留；
+- 真机只读验证：启动后 Host web 200、状态 normal、20 个 bundle 可见、剩余存储 155G，证据 [mate60-verify](evidence/mate60-verify-0.4.69.json)；
+- 真机 PRoot `exec` 语义实测：随包签名命令（`/bin/sh`、`/bin/bash`、`/bin/node`、`/usr/bin/python3`、`/usr/bin/git`）与 `#!/bin/sh` 脚本可 `exec`；未打包 applet 缺失（exit 127）；复制或伪造的任意 ELF 被 `HARMONY_PRELOAD` 拒绝（exit 182/126），结论见 [真机 PRoot exec 语义](../research/harmonyos-proot-exec.md) 与 [证据](evidence/mate60-proot-exec-0.4.69.json)；
+- 真机语音（麦克风+真人说话）按用户选择暂缓，仍待验。
+
 ## 仍待外部条件（非代码缺口）
 
 1. 公网 Relay 服务器与域名/token（用户晚上配置）。

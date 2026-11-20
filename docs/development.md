@@ -98,6 +98,10 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-pi-ai-protocols.py <loopback-target> .build/emulator-pi-ai.json
 ```
 
+## 真机（USB）验证脚本
+
+`tests/smoke/mate60-verify.py --target <usb-serial>` 做只读真机检查：设备参数、已安装版本、启动状态、web、账号状态、bundle 列表、存储与麦克风 token 信息，并写证据 JSON。`tests/smoke/mate60-proot-exec.py --target <usb-serial>` 在真实会话里让模型调用一次 `bash` 工具执行固定探针，记录 PRoot `exec` 的可用范围与任意 ELF 的拒绝行为。真机需先解锁屏幕（开发者模式下 `aa start` 不会自动解锁）；构建真机包时把签名配置放在仓库根目录 `build-profile.json5`，`./build.sh --package` 会同时产出 unsigned 与 signed HAP。
+
 ## 通用 PTC 回归
 
 0.4.31 起普通构建默认包含通用 PTC。构建机将锁定 Node 子模块中的 Amaro 用固定 Binaryen 132.0.0 转为纯 JavaScript，校验下载包与两个生成文件的摘要并缓存到 `.build/portable-amaro/`；手机无需 WASM 或编译器。恢复模式跳过 PTC。`HARMONY_PTC_AMARO_DIR` 仍可提供相同摘要的预生成文件。安装普通包并通过 HDC 启动后，冒烟测试经真实 DSH 会话触发 `run_code`，检查工作区文件授权、嵌套工具和取消，退出时清除临时文件与凭据。

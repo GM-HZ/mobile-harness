@@ -100,7 +100,7 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 - **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。0.4.69 经标准设置接入本机 Ollama，`openai-completions` 与 `openai-responses` 两种协议完成模型发现、流式请求、工具目录、图片附件和重启保持；本机小模型不具备稳定的工具调用与视觉问答能力，该轮只证明非 DeepSeek 端点接入。0.4.69 另在全新应用数据的模拟器上复验账号入口：实际 ArkWeb 打开公网 DeepSeek 授权页并返回、取消后保持登出，回环夹具完成 PKCE、重启保持与登出撤销。真实账号同意仍待账号所有者完成。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json) · [本地模型路由](evidence/emulator-capability-parity-0.4.69.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
 - **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。Forge 真实账号授权与托管仓库写操作已在临时私有仓库完成。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 已在本制品完成真实账号授权、公开 PR 读取，以及临时私有仓库的评审/合并写操作（仓库已删除）。LiveShare 已在两台本机模拟器间通过真实华为浏览器完成 viewer 页面读取；公网 Relay、真实身份提供方和公网跨设备仍受外部条件阻塞：官方 Relay 服务端不随仓库交付。语音已在模拟器上通过原生麦克风完成真实声学采集与转写；真机麦克风与真人说话仍待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
-- **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
+- **设备**：2026-11-20 Mate 60（BRA-AL00，HarmonyOS 7.0.0.111，API 26）已通过 USB 连接并完成 0.4.69 真机升级验证：0.4.26(33)→0.4.69(76) 覆盖安装保留应用数据与 DeepSeek 账号，应用冷启动后 Host 正常（web 200）、bundle 列表正常、剩余存储 155G。真机 PRoot `exec` 语义已实测：随包签名命令（sh/bash/node/python3/git 等）与脚本可 `exec`，复制/伪造的任意 ELF 被 `HARMONY_PRELOAD` 加载器拒绝（见[真机 PRoot exec 语义](research/harmonyos-proot-exec.md)）。真机麦克风+真人说话、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。
 
