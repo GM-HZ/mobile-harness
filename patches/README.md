@@ -24,3 +24,7 @@ patch must be rehearsed with `python3 scripts/adaptation/patch_rehearsal.py`
 - `bash-local-shell-path.patch`, `bash-sandbox-shell-path.patch` — the guest shell is
   `/bin/bash`; replaced the argv literal so no boot-time module rewriting remains
   (converged).
+
+- `settings-client-recovery.patch` — inserts the Mobile Harness recovery row into
+  the General Settings client bundle; replaces the former stage-time injection and
+  the DshEngine guest-file override (converged).

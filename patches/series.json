@@ -23,6 +23,13 @@
       "marker": "\"/bin/bash\",\n\t\t\t\"-c\",",
       "removed": "\"bash\",\n\t\t\t\"-c\",",
       "reason": "The guest shell is /bin/bash; patch the argv literal instead of rewriting the module at boot."
+    },
+    {
+      "file": "settings-client-recovery.patch",
+      "package": "@deepseek-ai/dsh-client-ui-settings-general",
+      "path": "lib/client.js",
+      "marker": "registerMobileHarnessRecovery(ctx);",
+      "reason": "Mount the Mobile Harness recovery row inside the General Settings client instead of rewriting the file at stage time."
     }
   ]
 }

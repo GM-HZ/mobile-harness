@@ -261,9 +261,6 @@ class DshEngine {
       const unpackedDsh = await this.unpack(context, 'dsh-layer.zip', dshRelease, runtimeId);
       hilog.info(0xD005, 'DSHClient', 'startup archive dsh-layer.zip extracted=%{public}s ms=%{public}d',
         String(unpackedDsh), Date.now() - dshUnpackStarted);
-      const settingsClient = dshRelease + '/dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js';
-      this.copyGuest(context, 'dsh-settings-client.js', settingsClient + '.tmp');
-      fileIo.renameSync(settingsClient + '.tmp', settingsClient);
       for (const name of ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
         'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {
         this.copyGuest(context, name, root + '/' + name);

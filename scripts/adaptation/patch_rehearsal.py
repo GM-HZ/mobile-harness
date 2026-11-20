@@ -63,7 +63,8 @@ def main():
             ok = result.returncode == 0 and entry["marker"] in text
             if entry.get("removed"):
                 ok = ok and entry["removed"] not in text
-            syntax = subprocess.run(["node", "--check", str(target)], capture_output=True, text=True)
+            syntax = (subprocess.run(["node", "--check", str(target)], capture_output=True, text=True)
+                      if entry.get("syntax", True) else subprocess.CompletedProcess([], 0, "", ""))
             ok = ok and syntax.returncode == 0
             checked.append({"file": entry["file"], "package": entry["package"], "ok": ok})
             if not ok:

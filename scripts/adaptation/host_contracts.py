@@ -61,17 +61,25 @@ def main():
     checked = []
     with zipfile.ZipFile(layer) as archive:
         settings = archive.read(SETTINGS).decode()
-        entry = "function apply(ctx){"
-        if settings.count(entry) != 1:
-            failures.append(f"settings client entry count {settings.count(entry)} != 1")
-        else:
-            injection = (ROOT / "runtime/harmonyos/web/settings-recovery.js").read_text().rstrip()
-            injected = settings.replace(entry, "\n" + injection + "\n" + entry + "\n\t\t\tregisterMobileHarnessRecovery(ctx);", 1)
-            result = node_check(injected)
-            ok = result.returncode == 0 and "registerMobileHarnessRecovery(ctx);" in injected
-            checked.append({"id": "settings-client-injection", "ok": ok})
-            if not ok:
-                failures.append("settings injection breaks the client: " + result.stderr.strip()[:300])
+        marker = "registerMobileHarnessRecovery(ctx);"
+        stage = (ROOT / "scripts/build/stage-harmonyos.py").read_text()
+        engine = (ROOT / "apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets").read_text()
+        no_stage_override = ('dsh-settings-client.js").write_text' not in stage
+                             and "copyGuest(context, 'dsh-settings-client.js'" not in engine)
+        with tempfile.NamedTemporaryFile("w", suffix=".mjs", delete=False) as handle:
+            handle.write(settings)
+            probe = handle.name
+        try:
+            syntax = subprocess.run(["node", "--check", probe], capture_output=True, text=True)
+        finally:
+            Path(probe).unlink(missing_ok=True)
+        ok = marker in settings and no_stage_override and syntax.returncode == 0
+        checked.append({"id": "settings-client-patch", "ok": ok,
+                        "marker": marker in settings, "noStageOverride": no_stage_override})
+        if not ok:
+            failures.append(f"settings client contract: marker={marker in settings} "
+                            f"noStageOverride={no_stage_override} syntax={syntax.returncode} "
+                            f"{syntax.stderr.strip()[:200]}")
         boot_no_replacement = ANCHOR not in (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         for module in BASH_MODULES:
             source = archive.read(module).decode()

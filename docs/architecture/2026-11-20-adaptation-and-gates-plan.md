@@ -254,3 +254,19 @@ G2 夜间矩阵接线（把 ad-hoc smoke 子集纳入 gate-nightly），G4 构�
 
 下一轮：settings client 注入向 client plugin/上游 seam 迁移（或 pnpm patch 试验）；
 把 G4 构建矩阵结果写入 release/RSI 台账；补一次真实模型 turn 的 session 写入回归。
+
+
+### 2026-11-20（第 7 轮：第三个收敛，build-time 注入清零）
+
+- 新增 `patches/settings-client-recovery.patch`（git-style diff，含 no-newline 处理），
+  在 DSH 装配时把 recovery 行插入 `dsh-client-ui-settings-general/lib/client.js`；
+- 删除 `stage_settings_client()` 的 stage 期改写、DshEngine 的
+  `dsh-settings-client.js` guest 覆盖，stage 会清理旧 rawfile；HAP 中不再有该 override；
+- 真实 self 构建：layer 含 marker、HAP 无 override；G1 contracts 通过；
+  模拟器 5555 安装后 **G2 nightly-recovery PASS（71.9s）**、exec 探针全绿；
+- `settings-client-injection` 在 convergence.json 标记 **converged**。
+- 结果：三个高脆弱面（session-persistence、bash 命令、settings client）全部收敛；
+  boot/stage 期已无字符串改写，剩余适配集中在 compat 模块替换层与 native overlay 绑定。
+
+下一轮：compat 模块层与 native binding 的清单化收敛（不追求一次性迁移，先给每个面建立
+upstream seam 判断与 gate）；G4 release 构建结果写入证据/RSI；补真实模型 turn 的 session 写入回归。

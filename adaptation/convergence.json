@@ -37,12 +37,13 @@
       "upstream": [
         "@deepseek-ai/dsh-client-ui-settings-general"
       ],
-      "current": "build-time string injection into apply(ctx)",
+      "current": "patches/settings-client-recovery.patch; stage-time injection and engine override removed",
       "target": "client plugin/slot if upstream exposes one; otherwise pnpm patch",
       "priority": "P1",
       "risk": "high",
       "gate": "G1 host contracts + G0 stage check",
-      "status": "keep-with-gate"
+      "status": "converged",
+      "note": "The recovery row is inserted by a package patch applied while assembling dsh-layer.zip; stage-harmonyos.py no longer rewrites the client and DshEngine no longer copies an override. Validated by real build (layer marker, no raw override), G1 contract, and G2 recovery PASS 71.9s."
     },
     {
       "id": "compat-module-replacement",

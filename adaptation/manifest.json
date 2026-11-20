@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "679d2e90e32ae23e194440493e16adb5e213b3ca",
+  "generatedFrom": "34536fd28611cd111ab2034b262570a0bbbfa0a5",
   "layers": [
     "host",
     "web",
@@ -894,10 +894,44 @@
       "kind": "file",
       "source": "patches/README.md",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "eb5a919b85e0cfeb47b87aeb180fafb8a6f9eb58636805482919f28d6848e54e",
-      "bytes": 1125,
+      "sha256": "207113cfbbe932aab2c8336485f3a292ca6320d507bff0cdb6fe427609c9f1e2",
+      "bytes": 1342,
       "fragility": "low",
       "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "patches:patches/bash-local-shell-path.patch",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/bash-local-shell-path.patch",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "2aba39c40dddf3947ef7a428bcc6e5243680914f435583bf1bd640221af357b7",
+      "bytes": 351,
+      "fragility": "low",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-bash-local",
+        "dsh-bash-local/lib/index.js"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "patches:patches/bash-sandbox-shell-path.patch",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/bash-sandbox-shell-path.patch",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "92f63cd6cdee6cee16c8b3bedf18fe656dc5df15f4d7457e673e0be689321dbf",
+      "bytes": 488,
+      "fragility": "low",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-bash-sandbox",
+        "dsh-bash-sandbox/lib/index.js"
+      ],
       "gates": [
         "G0"
       ]
@@ -908,12 +942,13 @@
       "kind": "file",
       "source": "patches/series.json",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "9791013a60898b58eb6b962ce72ac195d3616b4a261b3ca9ad8ba65a20dadc41",
-      "bytes": 1128,
+      "sha256": "2ffbecd0f428ec418f41aa6f6bf61367135e8a930ef00f94de34cf583ebf1ba1",
+      "bytes": 1475,
       "fragility": "high",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-local",
         "@deepseek-ai/dsh-bash-sandbox",
+        "@deepseek-ai/dsh-client-ui-settings-general",
         "@deepseek-ai/dsh-session-persistence-jsonl"
       ],
       "gates": [
@@ -943,7 +978,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "b30fda1ec3403a369d62356dde11f778ae3d5c735cb883ed47f7865c610fba8c",
+      "sha256": "cc66ba19ebd40b35fc194f9a3ed078a02d3bc69ca8b6c3937d5aad900516c9a6",
       "files": 26,
       "fragility": "medium",
       "upstreamTouchpoints": [],
