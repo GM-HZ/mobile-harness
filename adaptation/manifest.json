@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "e2ba16a07bd99f93c2bd0bfaaf9da92aa3046992",
+  "generatedFrom": "c920d11cc25dd1e1131facfe22e116780a267d14",
   "layers": [
     "host",
     "web",
@@ -210,14 +210,12 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-native-web.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "973d01c370883943cabe42f1abcabb59f701e20f16f5a4ec837aff9bd9972f2a",
-      "bytes": 46708,
+      "sha256": "231e8e16db03a0e944c4b41a3d971b84681bd5439f50ab35983e5bc121dfe9b5",
+      "bytes": 47294,
       "fragility": "high",
       "upstreamTouchpoints": [
         "\"darwin-arm64\",",
-        "(await import(\"@vscode/ripgrep\")).rgPath",
         "...exec.agent === void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },",
-        "...getDefaultEnvironment(),",
         "...loadOptionalPatches(binName, join(context.home, \"cordis.patch.yml\")) ?? [],",
         "@deepseek-ai/dsh-experimental-liveshare",
         "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice",
@@ -225,7 +223,9 @@
         "@deepseek-ai/dsh-tool-bash-persistent",
         "Build and export all runtime entry points before reporting ready.",
         "Read and use the cordis-plugin-development skill.",
-        "This does not change PATH or package-manager settings."
+        "This does not change PATH or package-manager settings.",
+        "case \"context-overflow\": {\\n\\t\\t\\t\\tthis.ctx.get(\"toolResultPruner\")?.pruneSession(agent.session);\\n\\t\\t\\t\\tconst measurement = this.ctx.tokenMeter.measure(agent.session);\\n\\t\\t\\t\\tconst range = selectCompactableRange(agent.session, measurement, 0);",
+        "console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);"
       ],
       "gates": [
         "G0",
@@ -908,13 +908,14 @@
       "kind": "file",
       "source": "patches/TARGETS.md",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "e9d30a00c027a074d0963d25cecabe21054d3c0fd8f46f58e41b0fc1018a99e7",
-      "bytes": 1881,
+      "sha256": "48c190e757fdc3d4df589937de4fc430bc57849b655793211449c7fe83543bb3",
+      "bytes": 2268,
       "fragility": "low",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-local",
         "@deepseek-ai/dsh-bash-sandbox",
         "@deepseek-ai/dsh-client-ui-settings-general",
+        "@deepseek-ai/dsh-experimental-forge-github",
         "@deepseek-ai/dsh-session-persistence-jsonl"
       ],
       "gates": [
@@ -961,13 +962,14 @@
       "kind": "file",
       "source": "patches/series.json",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "2ffbecd0f428ec418f41aa6f6bf61367135e8a930ef00f94de34cf583ebf1ba1",
-      "bytes": 1475,
+      "sha256": "813dc0bacb9314229fbbac9c94add873d8e248f6ce735a14de0495296bc9580a",
+      "bytes": 1826,
       "fragility": "high",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-local",
         "@deepseek-ai/dsh-bash-sandbox",
         "@deepseek-ai/dsh-client-ui-settings-general",
+        "@deepseek-ai/dsh-experimental-forge-github",
         "@deepseek-ai/dsh-session-persistence-jsonl"
       ],
       "gates": [
@@ -1014,13 +1016,14 @@
       "kind": "file",
       "source": "patches/targets.json",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "ecaaa226762619572a4d92309386080f1ece26b989e10c6dc71410542bd04d54",
-      "bytes": 1896,
+      "sha256": "bc149bc8552576fb0d82ff475679b4f0ac1e52bb45a8c1c010bef6277c0cee52",
+      "bytes": 2351,
       "fragility": "high",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-local",
         "@deepseek-ai/dsh-bash-sandbox",
         "@deepseek-ai/dsh-client-ui-settings-general",
+        "@deepseek-ai/dsh-experimental-forge-github",
         "@deepseek-ai/dsh-session-persistence-jsonl"
       ],
       "gates": [

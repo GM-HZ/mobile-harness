@@ -35,3 +35,6 @@
 {"commit": "74a1072dd291e6c1eb8e3ba2812d09a704496a55", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/74a1072dd291e6c1eb8e3ba2812d09a704496a55.json", "note": "", "at": "2026-11-20T23:26:53+0800"}
 {"commit": "e2ba16a07bd99f93c2bd0bfaaf9da92aa3046992", "tiers": ["G0"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0/e2ba16a07bd99f93c2bd0bfaaf9da92aa3046992.json", "note": "", "at": "2026-11-20T23:28:07+0800"}
 {"commit": "e2ba16a07bd99f93c2bd0bfaaf9da92aa3046992", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/e2ba16a07bd99f93c2bd0bfaaf9da92aa3046992.json", "note": "", "at": "2026-11-20T23:28:09+0800"}
+{"commit": "c920d11cc25dd1e1131facfe22e116780a267d14", "tiers": ["G0"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0/c920d11cc25dd1e1131facfe22e116780a267d14.json", "note": "", "at": "2026-11-20T23:36:01+0800"}
+{"commit": "c920d11cc25dd1e1131facfe22e116780a267d14", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/c920d11cc25dd1e1131facfe22e116780a267d14.json", "note": "", "at": "2026-11-20T23:36:03+0800"}
+{"commit": "c920d11cc25dd1e1131facfe22e116780a267d14", "tiers": ["G2"], "ok": true, "flakes": 0, "evidence": ".build/gate-evidence/G2", "note": "forge patch build: recovery 49.9s", "at": "2026-11-20T23:36:05+0800"}

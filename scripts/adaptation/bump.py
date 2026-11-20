@@ -31,6 +31,7 @@ WATCH = [
     "@deepseek-ai/dsh-bash-sandbox",
     "@deepseek-ai/dsh-session-persistence-jsonl",
     "@deepseek-ai/dsh-client-ui-settings-general",
+    "@deepseek-ai/dsh-experimental-forge-github",
 ]
 CACHE = ROOT / ".build/upstream-bump"
 EVIDENCE = ROOT / "docs/evidence/upstream-bump"
@@ -176,6 +177,9 @@ def main():
                     payload = tarball.extractfile(member).read()
                 if anchor.get("exists"):
                     row.update({"ok": True, "kind": "exists"})
+                elif "pattern" not in anchor:
+                    row.update({"ok": True, "kind": "patch",
+                                "note": "package patch; patch_rehearsal verifies application"})
                 else:
                     actual = payload.decode("utf-8", "replace").count(anchor["pattern"])
                     row.update({"ok": actual == anchor["count"], "expected": anchor["count"], "actual": actual})

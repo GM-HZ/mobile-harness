@@ -49,6 +49,18 @@
       "gates": [
         "G1 patch-rehearsal"
       ]
+    },
+    {
+      "file": "forge-github-guest-runner.patch",
+      "package": "@deepseek-ai/dsh-experimental-forge-github",
+      "path": "lib/index.js",
+      "marker": "globalThis.__harmonyGhRunner ?? ghRunner(resolved)",
+      "removed": null,
+      "reason": "Inject the guest gh runner at the provider registration site instead of rewriting the execa import at boot.",
+      "documented": true,
+      "gates": [
+        "G1 patch-rehearsal"
+      ]
     }
   ]
 }

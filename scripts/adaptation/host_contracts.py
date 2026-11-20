@@ -91,6 +91,13 @@ def main():
             if not ok:
                 failures.append(f"{module}: patched={patched} bootNoReplacement={boot_no_replacement} "
                                 f"syntax={syntax.returncode} {syntax.stderr.strip()[:200]}")
+        forge = archive.read("dsh/node_modules/@deepseek-ai/dsh-experimental-forge-github/lib/index.js").decode()
+        host = (ROOT / "packages/dsh-host/dsh-native-web.cjs").read_text()
+        forge_marker = "globalThis.__harmonyGhRunner ?? ghRunner(resolved)"
+        ok = forge_marker in forge and "__harmonyGhRunner" in host and "const execa = globalThis.__harmonyGh;" not in host
+        checked.append({"id": "forge-guest-runner", "ok": ok})
+        if not ok:
+            failures.append("forge contract: patched registration + guest runner adapter + no boot rewrite")
         session = archive.read(SESSION).decode()
         boot = (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         replacement = "globalThis.__dshClientRenameNoReplace(tmp, finalPath)"

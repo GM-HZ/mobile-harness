@@ -10,6 +10,7 @@ build can use it.
 | `bash-local-shell-path.patch` | `@deepseek-ai/dsh-bash-local` · `lib/index.js` | `"bash"` → `"/bin/bash"` in the `-c` argv | guest shell is `/bin/bash`; keeps boot free of module rewriting | bash tool spawn fails (`ENOENT`) or falls back to a different shell | G1 anchors/contracts, G2 exec/recovery |
 | `bash-sandbox-shell-path.patch` | `@deepseek-ai/dsh-bash-sandbox` · `lib/index.js` | `"bash"` → `"/bin/bash"` in the `-c` argv | same as above for the confined path | sandboxed bash commands fail to spawn | G1 anchors/contracts, G2 capabilities |
 | `settings-client-recovery.patch` | `@deepseek-ai/dsh-client-ui-settings-general` · `lib/client.js` | inserts the recovery row before `function apply(ctx){`; marker `registerMobileHarnessRecovery(ctx);` | phone recovery entry in General Settings without stage-time file rewriting | settings page loses the recovery row or fails to register (module error on settings open) | G1 host-contracts, G2 recovery |
+| `forge-github-guest-runner.patch` | `@deepseek-ai/dsh-experimental-forge-github` · `lib/index.js` | `ghRunner(resolved)` → `globalThis.__harmonyGhRunner ?? ghRunner(resolved)` at `ctx.forge.register` | run `gh` inside the guest instead of rewriting the execa import at boot | forge panel/GitHub status fails or falls back to host gh (unavailable) | G1 anchors/contracts, G2 forge |
 
 Each row corresponds to a section in `docs/architecture/seams/` or a compat
 decision; if upstream changes the anchor, `scripts/adaptation/bump.py` and the

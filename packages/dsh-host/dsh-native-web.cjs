@@ -459,7 +459,6 @@ async function main() {
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
   const fileUploadsUrl = paths('dsh-client-file-upload/lib/index.js');
   const fileUploadSchemasUrl = paths('dsh-client-file-upload/lib/typert.host.js');
-  const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
   const pluginMarketUrl = paths('dsh-plugin-market/lib/index.js');
   const workspaceDependenciesUrl = paths('dsh-tool-workspace-dependencies/lib/index.js');
@@ -487,6 +486,19 @@ async function main() {
   globalThis.__harmonyGh = safeMode
     ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
     : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(launchGuest, quoteShellArgument);
+  globalThis.__harmonyGhRunner = safeMode
+    ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
+    : async (args, signal, input) => {
+      const result = await globalThis.__harmonyGh('gh', Array.from(args), {
+        env: {}, timeout: 120000, maxBuffer: 32 * 1024 * 1024, cancelSignal: signal,
+        ...(input === undefined ? {} : { input }),
+      });
+      if (result.isCanceled) throw signal.reason ?? new Error('gh invocation canceled');
+      if (result.timedOut) throw Object.assign(new Error('gh invocation timed out'), { name: 'GhTimeoutError' });
+      if (result.isMaxBuffer) throw Object.assign(new Error('gh output exceeds maxBuffer'), { name: 'GhOutputLimitError' });
+      if (result.exitCode === undefined) throw Object.assign(new Error('gh could not start: ' + String(result.shortMessage)), { name: 'GhUnavailableError' });
+      return { exitCode: result.exitCode, stdout: result.stdout, stderr: result.stderr };
+    };
   if (!safeMode) {
     require(path.join(root, 'dsh-harmony-forge.cjs')).startForgeAccountBridge(root, globalThis.__harmonyGh, mark);
   }
@@ -566,11 +578,6 @@ async function main() {
         patched = replacePinned(patched, 'console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);',
           'console.log("dsh inspector: /inspector/devtools/");');
         return { ...result, source: patched };
-      }
-      if (url === forgeGithubUrl) {
-        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
-        return { ...result, source: replacePinned(source, 'import { execa } from "execa";',
-          'const execa = globalThis.__harmonyGh;') };
       }
       if (url === translatorUrl || url === pluginMarketUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();

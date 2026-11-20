@@ -1,6 +1,10 @@
 # Seam: forge upstream provider (GitHub) vs our forge compat
 
-Status: **feasible — migration planned** (read-only research, 2026-11-20).
+Status: **migration A implemented (2026-11-20)** — guest runner injected by
+`patches/forge-github-guest-runner.patch`, the load-time `import { execa }`
+rewrite is gone. Validated by a real build (layer marker), G1 `host-contracts`
+and G2 `nightly-recovery`; full forge flows still need a clean GitHub account
+fixture on the emulator (`emulator-forge-account`/`-github`).
 
 ## Upstream structure (0.2.2-rc.5)
 

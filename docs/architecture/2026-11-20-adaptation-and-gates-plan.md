@@ -403,3 +403,20 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 - 迁移选项 A（package patch，推荐先做）与 B（自定义 Cordis plugin，待上游导出类）已记录；
   风险：forge bundle 的 worktree/forge-session、账号桥、取消语义映射。
 - 下一轮实施 A：adapter + patch + rehearsal + 构建/forge 门禁验证，然后删除 load-time 改写。
+
+
+### 2026-11-20（第 16 轮：forge 迁移 A 落地）
+
+- `packages/dsh-host/dsh-native-web.cjs`：新增 `globalThis.__harmonyGhRunner`（把 guest gh 结果映射为上游
+  `GhRunner` 语义：cancel/timeout/maxBuffer/exitCode，含 stdin input）；删除 forge-github 的
+  load-time 源码改写分支。
+- 新增 `patches/forge-github-guest-runner.patch`（注册点注入 `__harmonyGhRunner ?? ghRunner(resolved)`），
+  已加入 series/TARGETS/anchors/targets.json；`patch_rehearsal` 5/5 通过。
+- 真实 self 构建：layer 含 patch marker；G1 `host-contracts` 5/5 通过（含 forge 合同：patched 注册 +
+  adapter + 无 boot 改写）；模拟器 5555 安装后 **G2 nightly-recovery PASS（49.9s）**。
+- forge 全链路验收（`emulator-forge-account`/`-github`）在现有模拟器上受"干净 GitHub 账号/UI fixture"
+  前置条件影响未通过（非构建失败），已记录为后续 G2 工作。
+- `convergence.json` compat 面标记 in-progress（forge 已迁移；liveshare/speech/sharp 待评估）。
+
+下一轮：补 forge 干净 fixture 或在该前置条件下复测；评估 liveshare 的 provider seam 迁移；
+真机解锁后跑 G3。

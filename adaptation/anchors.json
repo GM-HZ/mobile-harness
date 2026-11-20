@@ -41,6 +41,13 @@
       "file": "dsh/node_modules/@vscode/ripgrep-linux-arm64/bin/rg",
       "exists": true,
       "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "forge-github-guest-runner",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-experimental-forge-github/lib/index.js",
+      "replacement": "globalThis.__harmonyGhRunner ?? ghRunner(resolved)",
+      "patch": "patches/forge-github-guest-runner.patch",
+      "contract": "docs/architecture/seams/forge-upstream-seam.md"
     }
   ]
 }

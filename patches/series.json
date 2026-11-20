@@ -30,6 +30,13 @@
       "path": "lib/client.js",
       "marker": "registerMobileHarnessRecovery(ctx);",
       "reason": "Mount the Mobile Harness recovery row inside the General Settings client instead of rewriting the file at stage time."
+    },
+    {
+      "file": "forge-github-guest-runner.patch",
+      "package": "@deepseek-ai/dsh-experimental-forge-github",
+      "path": "lib/index.js",
+      "marker": "globalThis.__harmonyGhRunner ?? ghRunner(resolved)",
+      "reason": "Inject the guest gh runner at the provider registration site instead of rewriting the execa import at boot."
     }
   ]
 }

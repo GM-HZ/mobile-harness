@@ -35,7 +35,7 @@
         "packages/dsh-host/dsh-native-web.cjs"
       ],
       "upstream": "forge/GitHub runner account bridge",
-      "decision": "upstream-seam-candidate",
+      "decision": "keep-compat",
       "gates": [
         "emulator-forge-account",
         "emulator-forge-github"
@@ -51,7 +51,8 @@
         ],
         "note": "Upstream GitHubProvider accepts any GhRunner. execa is present in the DSH layer, so a package patch can inject our guest runner at the registration site; planned migration in docs/architecture/seams/forge-upstream-seam.md.",
         "seamDoc": "docs/architecture/seams/forge-upstream-seam.md"
-      }
+      },
+      "current": "guest gh transport + account bridge; upstream GitHubProvider/session/UI with patches/forge-github-guest-runner.patch; no load-time source rewrite"
     },
     {
       "file": "dsh-harmony-inspector-worker.cjs",

@@ -59,8 +59,8 @@
       "priority": "P2",
       "risk": "medium",
       "gate": "G1 host-syntax + G2 feature gates",
-      "status": "inventoried",
-      "note": "10 modules mapped to consumers, upstream capabilities, gate ids and decisions (keep-compat / upstream-seam-candidate). G1 compat-inventory enforces the mapping."
+      "status": "in-progress",
+      "note": "10 modules inventoried; forge migrated to the upstream provider seam (guest runner injected by package patch; runtime source rewrite removed). Remaining candidates: liveshare, speech, sharp."
     },
     {
       "id": "native-overlay-bindings",

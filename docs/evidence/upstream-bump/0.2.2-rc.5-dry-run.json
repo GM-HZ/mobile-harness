@@ -2,7 +2,7 @@
   "pinned": "0.2.2-rc.5",
   "target": "0.2.2-rc.5",
   "newerThanPinned": false,
-  "startedAt": "2026-11-20T22:39:32+0800",
+  "startedAt": "2026-11-20T23:29:23+0800",
   "packages": {
     "@deepseek-ai/dsh-bash-local": {
       "locked": "0.2.2-rc.5",
@@ -37,31 +37,31 @@
   },
   "anchors": [
     {
-      "id": "bash-local-command",
+      "id": "bash-local-patch",
       "package": "@deepseek-ai/dsh-bash-local",
       "member": "package/lib/index.js",
       "version": "0.2.2-rc.5",
       "ok": true,
-      "expected": 1,
-      "actual": 1
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
     },
     {
-      "id": "bash-sandbox-command",
+      "id": "bash-sandbox-patch",
       "package": "@deepseek-ai/dsh-bash-sandbox",
       "member": "package/lib/index.js",
       "version": "0.2.2-rc.5",
       "ok": true,
-      "expected": 1,
-      "actual": 1
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
     },
     {
-      "id": "session-persistence-link",
+      "id": "session-persistence-patch",
       "package": "@deepseek-ai/dsh-session-persistence-jsonl",
       "member": "package/lib/index.js",
       "version": "0.2.2-rc.5",
       "ok": true,
-      "expected": 1,
-      "actual": 1
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
     },
     {
       "id": "settings-client-apply",
@@ -86,7 +86,14 @@
     }
   ],
   "affected": [
-    "diagnostics:runtime/harmonyos/diagnostics/dsh-probe.cjs"
+    "diagnostics:runtime/harmonyos/diagnostics/dsh-probe.cjs",
+    "patches:patches/TARGETS.md",
+    "patches:patches/bash-local-shell-path.patch",
+    "patches:patches/bash-sandbox-shell-path.patch",
+    "patches:patches/series.json",
+    "patches:patches/session-persistence-eacces-fallback.patch",
+    "patches:patches/settings-client-recovery.patch",
+    "patches:patches/targets.json"
   ],
   "failures": 0,
   "ok": true
