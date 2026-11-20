@@ -308,7 +308,11 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         { "libguest_sharp.so", "/dsh/node_modules/@img/sharp-linuxmusl-arm64/lib/sharp-linuxmusl-arm64-0.35.5.node" },
         { "libguest_vips.so", "/usr/lib/libvips-cpp.so.8.18.7" },
         { "libguest_vips.so", "/dsh/node_modules/@img/sharp-libvips-linuxmusl-arm64/lib/libvips-cpp.so.8.18.7" },
+#if defined(MH_SELF_BUILD)
+        { "libguest_mh_exec_shim.so", "/usr/lib/libmh-exec-shim.so" },
+#endif
 #include "guest-tools.inc"
+#include "guest-libs.inc"
     };
     enum { packaged_count = sizeof(packaged) / sizeof(*packaged) };
     /* Host subprocesses keep native file URLs/cwd, while legacy Bash/MCP keep
@@ -481,6 +485,10 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
             setenv("NO_COLOR", "1", 1);
             setenv("PAGER", "cat", 1);
             setenv("NODE_OPTIONS", "--jitless --require=/fetch-shim-boot.cjs", 1);
+#if defined(MH_SELF_BUILD)
+            /* Transparent exec of unsigned downloaded ELF files (self builds only). */
+            setenv("LD_PRELOAD", "/usr/lib/libmh-exec-shim.so", 1);
+#endif
             setenv("GIT_EXEC_PATH", "/usr/libexec/git-core", 1);
             setenv("GIT_TEMPLATE_DIR", "/usr/share/git-core/templates", 1);
             if (streaming) {

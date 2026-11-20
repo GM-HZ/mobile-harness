@@ -1,0 +1,141 @@
+{
+  "kind": "real-device runtime native-code bypass assessment",
+  "artifact": {
+    "signedHap": "dsh-mh-harmonyos-arm64-v0.4.69-signed.hap",
+    "signedSha256": "5b3a306ba4dfc6269a4ad8ef5a8a1f2ad75bc2e670ff03fce058ea867a43d24a",
+    "sourceCommit": "ac31655a095f2621a1d74b40bb8c597a20977396"
+  },
+  "device": "HUAWEI Mate 60 (BRA-AL00), HarmonyOS 7.0.0.111, API 26",
+  "probes": {
+    "dlopenCopiedLibrary": {
+      "command": "cp /usr/lib/libstdc++.so.6 ./copied-libstdc++.so; python3 ctypes.CDLL('./copied-libstdc++.so')",
+      "result": "OSError: Error loading shared library ./copied-libstdc++.so: Permission denied",
+      "exit": "1"
+    },
+    "dlopenBoundLibrary": {
+      "command": "python3 ctypes.CDLL('/usr/lib/libstdc++.so.6')",
+      "result": "OK",
+      "exit": "0"
+    },
+    "copiedElfExec": {
+      "command": "cp /bin/busybox ./proot-bx; chmod +x; exec ./proot-bx",
+      "result": "exit 182, HARMONY_PRELOAD loader file mmap failed"
+    },
+    "memfdFexecve": {
+      "command": "libc fexecve on an anonymous memfd holding /bin/busybox bytes",
+      "raw": "PWD=/workspace-native/proot-exec-91c636c4\n--- memfd + libc fexecve ---\nFEXECVE_RC -1 ERRNO 9 Bad file descriptor\nFEXECVE_EXIT=0\n--- memfd via /proc/self/fd execve ---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nFileNotFoundError: [Errno 2] No such file or directory: '/proc/self/fd/3'\nPROCFD_EXIT=1\n--- copied binary via /proc fd ---\nTraceback (most recent call last):\n ",
+      "result": "fexecve returned -1/EBADF or PRoot rejected execveat"
+    },
+    "procSelfFdExec": {
+      "command": "os.execve('/proc/self/fd/<n>', ...)",
+      "result": "guest has no /proc, FileNotFoundError"
+    },
+    "prootExecveatMessage": "proot error: execveat() with non-AT_FDCWD fd is not currently supported: Interrupted system call",
+    "interpreters": {
+      "python": "3.12.16 (pip 25.0.1 present)",
+      "node": "v24.14.1",
+      "npmOnPath": false
+    },
+    "pureRuntimeExecution": {
+      "python": "PY_RUNTIME_OK",
+      "node": "NODE_RUNTIME_OK"
+    }
+  },
+  "conclusion": {
+    "supportedToday": "shell commands, packaged signed executables, scripts interpreted by them, pure Python/Node runtime code",
+    "blockedToday": "runtime-copied or downloaded ELF execution, dlopen of app-data native libraries, memfd/execveat tricks (PRoot does not implement them)",
+    "possibleResearchPaths": [
+      "extend PRoot's syscall handler to support execveat/memfd and extend the HARMONY_PRELOAD loader to map arbitrary ELF; kernel W^X policy may still reject PROT_EXEC mmap of unsigned app-data memory",
+      "package the needed tools into the signed overlay at build time (current sanctioned path; sh/node/python3/git/gh/curl/ripgrep/sqlite3 arrived this way)",
+      "use interpreter/WASM runtime paths for logic (Python, Node, or a WASI-compatible engine) instead of native binaries"
+    ]
+  },
+  "rawProbes": {
+    "native": {
+      "kind": "real-device native execution bypass probe",
+      "target": "37R0224115035605",
+      "checkedAt": "2026-11-20T20:03:15+0800",
+      "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-fe5c8083",
+      "model": {
+        "default": {
+          "provider": "deepseek-account",
+          "model": "deepseek-flash",
+          "reasoningEffort": "off"
+        }
+      },
+      "permissionMode": "danger-full-access",
+      "toolCalls": [
+        {
+          "turn": 1,
+          "step": 1,
+          "callId": "call_00_jUBkb5uy2AjU5xWqabYr8537",
+          "name": "bash",
+          "arguments": "{\"command\": \"set +e\\necho \\\"PWD=$PWD\\\"\\necho \\\"--- dlopen a copied guest library ---\\\"\\ncp /usr/lib/libstdc++.so.6 ./copied-libstdc++.so 2>&1\\npython3 -c \\\"import ctypes; ctypes.CDLL('./copied-libstdc++.so'); print('DLOPEN_COPY_OK')\\\" 2>&1; echo \\\"DLOPEN_COPY_EXIT=$?\\\"\\necho \\\"--- dlopen the bound guest library path ---\\\"\\npython3 -c \\\"import ctypes; ctypes.CDLL('/usr/lib/libstdc++.so.6'); print('DLOPEN_BOUND_OK')\\\" 2>&1; echo \\\"DLOPEN_BOUND_EXIT=$?\\\"\\necho \\\"--- memfd + fexecve of a copied guest binary ---\\\"\\npython3 -c \\\"import os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); os.fexecve(fd,['busybox','echo','MEMFD_EXEC_OK'],os.environ)\\\" 2>&1; echo \\\"MEMFD_EXIT=$?\\\"\\necho \\\"--- interpreters and package managers ---\\\"\\npython3 --version 2>&1\\nnode --version 2>&1\\ncommand -v npm pnpm pip pip3 2>&1\\npython3 -m pip --version 2>&1 | head -1\\necho NATIVE_PROBE_DONE\\n\", \"description\": \"Probe PRoot exec semantics\"}"
+        }
+      ],
+      "bashCallCount": 1,
+      "commandMatched": true,
+      "command": "set +e\necho \"PWD=$PWD\"\necho \"--- dlopen a copied guest library ---\"\ncp /usr/lib/libstdc++.so.6 ./copied-libstdc++.so 2>&1\npython3 -c \"import ctypes; ctypes.CDLL('./copied-libstdc++.so'); print('DLOPEN_COPY_OK')\" 2>&1; echo \"DLOPEN_COPY_EXIT=$?\"\necho \"--- dlopen the bound guest library path ---\"\npython3 -c \"import ctypes; ctypes.CDLL('/usr/lib/libstdc++.so.6'); print('DLOPEN_BOUND_OK')\" 2>&1; echo \"DLOPEN_BOUND_EXIT=$?\"\necho \"--- memfd + fexecve of a copied guest binary ---\"\npython3 -c \"import os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); os.fexecve(fd,['busybox','echo','MEMFD_EXEC_OK'],os.environ)\" 2>&1; echo \"MEMFD_EXIT=$?\"\necho \"--- interpreters and package managers ---\"\npython3 --version 2>&1\nnode --version 2>&1\ncommand -v npm pnpm pip pip3 2>&1\npython3 -m pip --version 2>&1 | head -1\necho NATIVE_PROBE_DONE\n",
+      "resultText": "PWD=/workspace-native/proot-exec-fe5c8083\n--- dlopen a copied guest library ---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/usr/lib/python3.12/ctypes/__init__.py\", line 379, in __init__\n    self._handle = _dlopen(self._name, mode)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^\nOSError: Error loading shared library ./copied-libstdc++.so: Permission denied\nDLOPEN_COPY_EXIT=1\n--- dlopen the bound guest library path ---\nDLOPEN_BOUND_OK\nDLOPEN_BOUND_EXIT=0\n--- memfd + fexecve of a copied guest binary ---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nAttributeError: module 'os' has no attribute 'fexecve'. Did you mean: 'execve'?\nMEMFD_EXIT=1\n--- interpreters and package managers ---\nPython 3.12.16\nv24.14.1\npip 25.0.1 from /usr/lib/python3.12/ensurepip/_bundled/pip-25.0.1-py3-none-any.whl/pip (python 3.12)\nNATIVE_PROBE_DONE\n",
+      "markers": {
+        "EXEC_SH_OK": false,
+        "EXEC_BASH_OK": false,
+        "EXEC_NODE_OK": false,
+        "EXEC_PY_OK": false,
+        "EXEC_SCRIPT_OK": false,
+        "COPY_NODE_OK": false,
+        "PROOT_EXEC_PROBE_DONE": false
+      },
+      "exits": {
+        "DLOPEN_COPY_EXIT": "1",
+        "DLOPEN_BOUND_EXIT": "0",
+        "MEMFD_EXIT": "1"
+      },
+      "ok": false
+    },
+    "bypass": {
+      "kind": "real-device runtime native-code bypass probe",
+      "target": "37R0224115035605",
+      "checkedAt": "2026-11-20T20:03:49+0800",
+      "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-91c636c4",
+      "model": {
+        "default": {
+          "provider": "deepseek-account",
+          "model": "deepseek-flash",
+          "reasoningEffort": "off"
+        }
+      },
+      "permissionMode": "danger-full-access",
+      "toolCalls": [
+        {
+          "turn": 1,
+          "step": 1,
+          "callId": "call_00_9EobSpTBRnQXsd2HrHMO3124",
+          "name": "bash",
+          "arguments": "{\"command\": \"set +e\\necho \\\"PWD=$PWD\\\"\\necho \\\"--- memfd + libc fexecve ---\\\"\\n( python3 -c \\\"import ctypes, os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); libc=ctypes.CDLL(None, use_errno=True); argv=(ctypes.c_char_p*3)(b'busybox', b'echo', b'MEMFD_FEXECVE_OK'); envp=(ctypes.c_char_p*1)(None); rc=libc.fexecve(fd, argv, envp); errno=ctypes.get_errno(); print('FEXECVE_RC', rc, 'ERRNO', errno, os.strerror(errno))\\\" 2>&1 ); echo \\\"FEXECVE_EXIT=$?\\\"\\necho \\\"--- memfd via /proc/self/fd execve ---\\\"\\n( python3 -c \\\"import os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); os.execve('/proc/self/fd/%d' % fd, ['busybox','echo','MEMFD_PROCFD_OK'], os.environ)\\\" 2>&1 ); echo \\\"PROCFD_EXIT=$?\\\"\\necho \\\"--- copied binary via /proc fd ---\\\"\\n( python3 -c \\\"import os; os.execve('/proc/self/fd/%d' % os.open('./proot-bx', os.O_RDONLY), ['bx','echo','COPIED_PROCFD_OK'], os.environ)\\\" 2>&1 ); echo \\\"COPIED_PROCFD_EXIT=$?\\\"\\necho \\\"--- pure interpreter paths ---\\\"\\npython3 -c \\\"print('PY_RUNTIME_OK')\\\" 2>&1; echo \\\"PY_RUNTIME_EXIT=$?\\\"\\nnode -e \\\"console.log('NODE_RUNTIME_OK')\\\" 2>&1; echo \\\"NODE_RUNTIME_EXIT=$?\\\"\\npython3 -m pip --version 2>&1 | head -1\\necho BYPASS_PROBE_DONE\\n\", \"description\": \"Probe PRoot exec semantics\"}"
+        }
+      ],
+      "bashCallCount": 1,
+      "commandMatched": true,
+      "command": "set +e\necho \"PWD=$PWD\"\necho \"--- memfd + libc fexecve ---\"\n( python3 -c \"import ctypes, os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); libc=ctypes.CDLL(None, use_errno=True); argv=(ctypes.c_char_p*3)(b'busybox', b'echo', b'MEMFD_FEXECVE_OK'); envp=(ctypes.c_char_p*1)(None); rc=libc.fexecve(fd, argv, envp); errno=ctypes.get_errno(); print('FEXECVE_RC', rc, 'ERRNO', errno, os.strerror(errno))\" 2>&1 ); echo \"FEXECVE_EXIT=$?\"\necho \"--- memfd via /proc/self/fd execve ---\"\n( python3 -c \"import os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); os.execve('/proc/self/fd/%d' % fd, ['busybox','echo','MEMFD_PROCFD_OK'], os.environ)\" 2>&1 ); echo \"PROCFD_EXIT=$?\"\necho \"--- copied binary via /proc fd ---\"\n( python3 -c \"import os; os.execve('/proc/self/fd/%d' % os.open('./proot-bx', os.O_RDONLY), ['bx','echo','COPIED_PROCFD_OK'], os.environ)\" 2>&1 ); echo \"COPIED_PROCFD_EXIT=$?\"\necho \"--- pure interpreter paths ---\"\npython3 -c \"print('PY_RUNTIME_OK')\" 2>&1; echo \"PY_RUNTIME_EXIT=$?\"\nnode -e \"console.log('NODE_RUNTIME_OK')\" 2>&1; echo \"NODE_RUNTIME_EXIT=$?\"\npython3 -m pip --version 2>&1 | head -1\necho BYPASS_PROBE_DONE\n",
+      "resultText": "PWD=/workspace-native/proot-exec-91c636c4\n--- memfd + libc fexecve ---\nFEXECVE_RC -1 ERRNO 9 Bad file descriptor\nFEXECVE_EXIT=0\n--- memfd via /proc/self/fd execve ---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nFileNotFoundError: [Errno 2] No such file or directory: '/proc/self/fd/3'\nPROCFD_EXIT=1\n--- copied binary via /proc fd ---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nFileNotFoundError: [Errno 2] No such file or directory: './proot-bx'\nCOPIED_PROCFD_EXIT=1\n--- pure interpreter paths ---\nPY_RUNTIME_OK\nPY_RUNTIME_EXIT=0\nNODE_RUNTIME_OK\nNODE_RUNTIME_EXIT=0\npip 25.0.1 from /usr/lib/python3.12/ensurepip/_bundled/pip-25.0.1-py3-none-any.whl/pip (python 3.12)\nBYPASS_PROBE_DONE\n[stderr]\nproot error: execveat() with non-AT_FDCWD fd is not currently supported: Interrupted system call\n",
+      "markers": {
+        "EXEC_SH_OK": false,
+        "EXEC_BASH_OK": false,
+        "EXEC_NODE_OK": false,
+        "EXEC_PY_OK": false,
+        "EXEC_SCRIPT_OK": false,
+        "COPY_NODE_OK": false,
+        "PROOT_EXEC_PROBE_DONE": false
+      },
+      "exits": {
+        "FEXECVE_EXIT": "0",
+        "PROCFD_EXIT": "1",
+        "COPIED_PROCFD_EXIT": "1",
+        "PY_RUNTIME_EXIT": "0",
+        "NODE_RUNTIME_EXIT": "0"
+      },
+      "ok": false
+    }
+  }
+}

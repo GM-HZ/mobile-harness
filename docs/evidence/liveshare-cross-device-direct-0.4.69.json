@@ -1,0 +1,78 @@
+{
+  "kind": "internal cross-device LiveShare viewer over the emulator direct host route (no hdc reverse forwarding)",
+  "artifactContext": {
+    "expectedVersion": "0.4.69",
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "546054f33aa8a2151d79f3c0233917792c6bbf4b"
+  },
+  "command": "python3 tests/smoke/emulator-liveshare-relay.py 127.0.0.1:5555 out.json --cross-device 127.0.0.1:5557 --device-host 10.0.2.2",
+  "route": {
+    "deviceBase": "http://10.0.2.2:<fixture-port> (QEMU user networking maps this to the host)",
+    "fixtureBinding": "0.0.0.0 (MH_RELAY_HOST) for the duration of the test only",
+    "hdcForwarding": "none; the hdc 19769 reverse rule is skipped"
+  },
+  "observed": {
+    "reachable": {
+      "ok": true,
+      "httpReachable": true,
+      "blocking": false
+    },
+    "crossDeviceViewer": {
+      "target": "127.0.0.1:5557",
+      "pageUserAgent": "Mozilla/5.0 (Phone; OpenHarmony 7.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36  ArkWeb/7.0.0.105 Mobile HuaweiBrowser/5.1.9.315",
+      "viewerContextRequests": 1,
+      "viewerAsset200": 9,
+      "viewerSessionListCalls": 1,
+      "visibleTexts": [
+        "打开右侧边栏",
+        "探索未至之境",
+        "预览版",
+        "选择工作区",
+        "添加文件或调用指令",
+        "仅可查看观看者不能自行更改",
+        "DeepSeek-V4.1-Flash · Off观看者不能切换模型",
+        "发送消息",
+        "打开侧边栏",
+        "10.0.2.2:62914",
+        "DSH 手机试用",
+        "09, :, 54",
+        "09",
+        ":",
+        "54",
+        "100",
+        "导航",
+        "收起侧边栏",
+        "工作区",
+        "搜索会话",
+        "视图选项",
+        "添加工作区",
+        "会话",
+        "mh-share-relay-3849de0f3b"
+      ],
+      "ownerManagementAttempted": false,
+      "sharedTitle": "MH cross-device viewer e76f2f",
+      "sharedTitleVisible": false
+    },
+    "stop": {
+      "ok": true
+    },
+    "stoppedShareUnavailable": true,
+    "gatewayThreadStopped": true,
+    "configRestored": true
+  },
+  "finding": {
+    "symptom": "with hdc reverse forwarding the owner gateway WebSocket closes with code 1006 a few seconds after the reader checks and does not reconnect, so the viewer page gets 404 for the index asset",
+    "isolation": "the same flow over the emulator direct route completes: page served in 16 ms, 9 viewer assets, viewer renders the read-only notice and the session list, stop returns ok",
+    "conclusion": "the reverse-forwarded long-lived WebSocket is the unstable component, not the LiveShare bundle or the viewer page"
+  },
+  "scope": {
+    "verified": [
+      "the second device reaches the host fixture directly and renders the shared session read-only",
+      "share creation, reader refusal/revocation, re-authorization, stop and gateway shutdown pass in this route"
+    ],
+    "caveats": [
+      "the fixture listens on 0.0.0.0 for the duration of the test (test-only, synthetic identity, random port)",
+      "the owner login page still uses the hdc loopback route because ArkWeb only accepts https or 127.0.0.1"
+    ]
+  }
+}

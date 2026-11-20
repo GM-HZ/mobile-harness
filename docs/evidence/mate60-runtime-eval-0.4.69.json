@@ -1,0 +1,20 @@
+{
+  "kind": "real-device evaluation of Node JIT and PTY/terminal support",
+  "artifact": {
+    "signedSelfBuildHap": "dsh-mh-harmonyos-arm64-v0.4.69-selfbuild-signed.hap",
+    "sha256": "8f626779155d263397d21791aa74493f03cf1456d0d210f26b3ed1ee2f966b46",
+    "sourceCommit": "c9812f0dbb5d9c20ea273fbc546dfb37cbd68709"
+  },
+  "node": {
+    "v8Options": "the runtime reports '--jitless (Disable runtime allocation of executable memory.) type: bool default: --jitless', i.e. this Node build defaults to jitless",
+    "withoutNodeOptions": "env -u NODE_OPTIONS node -e ... still runs, but the default jitless flag remains",
+    "observation": "re-enabling JIT needs a Node build whose default is not jitless (or a supported --no-jitless); the current packaged Node is compiled/configured jitless even though anonymous executable memory is available"
+  },
+  "pty": {
+    "probe": "python3 -c 'import pty; pty.openpty()'",
+    "result": "OSError: out of pty devices",
+    "deviceNodes": "/dev/ptmx and /dev/pts are absent in the guest rootfs",
+    "observation": "PTY/terminal remains unsupported at the device-node level; this is not fixable by a pure user-space loader and stays deferred"
+  },
+  "rawResultText": "--- node jitless options ---\n  --jitless (Disable runtime allocation of executable memory.)\n        type: bool  default: --jitless\n  --wasm-jitless (execute all Wasm code in the Wasm interpreter)\n--- node without NODE_OPTIONS ---\nNODE_NO_JITLESS_OK\nNODE_EXIT=0\n--- pty support ---\nTraceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n  File \"/usr/lib/python3.12/pty.py\", line 34, in openpty\n    master_fd, slave_name = _open_terminal()\n                            ^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/pty.py\", line 67, in _open_terminal\n    raise OSError('out of pty devices')\nOSError: out of pty devices\nPTY_EXIT=1\nls: /dev/ptmx: No such file or directory\nls: /dev/pts: No such file or directory\nRUNTIME_EVAL_DONE\n"
+}

@@ -1,0 +1,29 @@
+{
+  "kind": "mh-install: download a static tool and run it by name (emulator and real device)",
+  "artifact": {
+    "signedSelfBuildHap": "dsh-mh-harmonyos-arm64-v0.4.69-selfbuild-signed.hap",
+    "sha256": "8f626779155d263397d21791aa74493f03cf1456d0d210f26b3ed1ee2f966b46",
+    "sourceCommit": "c9812f0dbb5d9c20ea273fbc546dfb37cbd68709"
+  },
+  "usage": "mh-install <name> <url> [member] [argv0]   (self-build HAPs only; /usr/bin/mh-install)",
+  "mechanism": "download with curl, extract tar.gz/apk with gzip+tar, store under /usr/lib/mh-tools/<name>/tool, write /usr/bin/<name> python shim that runs mh-exec through /usr/bin/python3",
+  "shimFinding": "shell shims (both exec and non-exec) crashed with SIGSEGV at exit after a successful run because the PRoot loader state does not survive nesting sh -> python3; a python-shebang shim that runs mh-exec in-process exits cleanly (0)",
+  "emulator": {
+    "command": "mh-install busybox https://.../busybox-static-1.36.1-r31.apk bin/busybox.static busybox",
+    "result": "--- install a static tool by name ---\nMH_INSTALL_OK /usr/bin/busybox\nMH_INSTALL_TOOL /usr/lib/mh-tools/busybox/tool\nMH_INSTALL_EXIT=0\n-rwxr-xr-x    1 mobile-harness 20020074       260 Nov 20 21:11 /usr/bin/busybox\n-rwxr-xr-x    1 mobile-harness 20020074   1115944 Nov 23  2025 /usr/lib/mh-tools/busybox/tool\n--- run by name ---\nMH_INSTALL_RUN_OK\nCHILD_EXIT 0\nRUN_EXIT=0\naarch64\nCHILD_EXIT 0\nUNAME_EXIT=0\nMH_INSTALL_PROBE_DONE\n",
+    "exitCodes": {
+      "MH_INSTALL_EXIT": "0",
+      "RUN_EXIT": "0",
+      "UNAME_EXIT": "0"
+    }
+  },
+  "realDevice": {
+    "device": "HUAWEI Mate 60 (BRA-AL00), HarmonyOS 7.0.0.111, API 26",
+    "result": "--- install a static tool by name ---\nMH_INSTALL_OK /usr/bin/busybox\nMH_INSTALL_TOOL /usr/lib/mh-tools/busybox/tool\nMH_INSTALL_EXIT=0\n-rwxr-xr-x    1 mobile-harness 20020306       260 Nov 20 21:14 /usr/bin/busybox\n-rwxr-xr-x    1 mobile-harness 20020306   1115944 Nov 23  2025 /usr/lib/mh-tools/busybox/tool\n--- run by name ---\nMH_INSTALL_RUN_OK\nCHILD_EXIT 0\nRUN_EXIT=0\naarch64\nCHILD_EXIT 0\nUNAME_EXIT=0\nMH_INSTALL_PROBE_DONE\n",
+    "exitCodes": {
+      "MH_INSTALL_EXIT": "0",
+      "RUN_EXIT": "0",
+      "UNAME_EXIT": "0"
+    }
+  }
+}

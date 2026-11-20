@@ -1,0 +1,44 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "613a973103ef9c6dc300f0ce86017fceef953791"
+  },
+  "target": {
+    "connection": "127.0.0.1:5555",
+    "kind": "DevEco API 26 ARM64 Phone emulator"
+  },
+  "command": "python3 tests/smoke/emulator-forge-github.py 127.0.0.1:5555 .build/batch-004/forge-public.json --public-read",
+  "observed": {
+    "pullRequest": "https://github.com/GM-HZ/omnix/pull/9",
+    "headSha": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+    "path": "codex-rs/codex-api/src/chat_completions/types.rs",
+    "contentSha256": "e0cf3690bf168f227a106a51bf8beda7e8e38cc8fafb4b5b14a7461bd169a3f9",
+    "commits": [
+      {
+        "sha": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+        "parent": "66279c6a1be5d4fb2f6f1a3d2a2560215f6b146d",
+        "title": "feat(omnix-sdk): add structured DeepSeek runs",
+        "author": "MengGong92",
+        "authoredAt": "2026-07-15T02:02:02Z"
+      }
+    ],
+    "authorization": "Authenticated host gh; disposable fixture credential on the emulator"
+  },
+  "firstAttempt": {
+    "result": "called-process-failure",
+    "cause": "the host gh call exited once with status 1 (transient GitHub API response); the rerun completed"
+  },
+  "scope": {
+    "verified": [
+      "the packaged GitHub CLI reads a fixed public pull request commit and file through the allowlisted authenticated desktop gateway",
+      "the file bytes hash matches the GitHub reference and the fixed GraphQL commit query returns the expected commit"
+    ],
+    "pending": [
+      "real GitHub account consent on the device (the device still uses a disposable fixture credential)",
+      "review, review-request and merge against a hosted repository"
+    ]
+  }
+}

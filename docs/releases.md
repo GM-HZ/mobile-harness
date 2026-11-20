@@ -404,3 +404,27 @@ Minimal 预设通过官方持久 Bash 工具复用一个受管 Alpine Shell。�
 「设置 → 通用设置 → Forge GitHub 账号」使用包内 GitHub CLI 申请设备码，通过系统浏览器完成授权。CLI 保存设备账号供 Forge 读取。模拟器通过真实 GitHub 公网设备码签发与取消。隔离 TLS 服务通过原生授权、重启后读回账号、Forge 使用设备凭据读取仓库及退出登录。
 
 调试签名 HAP SHA-256 `b8c88cee23beedcd36c3b6ed768d8c14b2eeffaa7c556fc750d819c00eb973a0`，离线验签及 209 个 payload 条目比对通过。仍待真实账号完成授权以及在 Mate 60 复验。 [制品与实测](evidence/emulator-forge-account-0.4.65.json)
+
+## 0.4.69 PTC 单链接读取加固与本地模型路由回归
+
+PTC 文件代理对普通文件的读取与 stat 补充单链接校验，与既有写路径规则一致；显式命名空间根授权保持原有范围。模拟器上应用数据视图无法创建符号链接和硬链接（应用上下文 `ln` 返回 `Operation not permitted`／`Permission denied`），工作区没有符号链接且普通文件链接数为 1，因此符号链接／硬链接端到端压力场景仍缺可用夹具。代理的路径解析每次从预打开根描述符用 `RESOLVE_NO_SYMLINKS` 重新解析，并发移动父目录只会退化为 `ENOENT`／`ELOOP`。
+
+同一制品通过 PTC 边界压力：临时宿主插件按门控把程序父目录移出授权根，4 轮读写全部以 `ENOENT` 拒绝、被移出目录未被写入，恢复后原路径继续可用；程序自建符号链接／硬链接、读链接目标、改元数据与改写打开均被拒绝。该插件随后移除，profile manifest 字节恢复一致。同一制品通过崩溃恢复、语音转写与本机 Ollama 路由回归。故障插件注入后自动进入安全模式，5.2 秒就绪，匿名请求 401，故障插件未再次加载；SenseVoice 两次转写与 ArkWeb 草稿通过；本机 Ollama 的 `openai-completions` 与 `openai-responses` 两种协议完成模型发现、真实流式请求、工具目录、图片附件与重启保持。本机小模型不具备稳定的工具调用和视觉问答能力，工具与视觉语义仍由 DeepSeek 路由证据覆盖。
+
+LiveShare 跨设备：owner 在真实 ArkWeb 中完成对测试 Relay 的分享授权与 PKCE 交换；测试 Relay 取回 index 资源并注入官方 `viewerCarrierScript`，在第二台模拟器的真实华为浏览器打开 viewer 页面。页面读取 `/__liveshare/context`、加载 10 个资源、经会话 cookie 完成 viewer RPC，并渲染共享会话的标题、历史消息与时间戳；界面显示只读观看者与锁定模型，且未调用所有者管理接口。第一台设备的 profile、启动配置与分享状态清理一致。该验收使用自建 Relay 与本机回环端口转发，官方 Relay 服务、真实身份提供方与公网部署仍未验证。
+
+同一制品的 Forge 公开读回归经宿主已认证的桌面 `gh` 重新验证：包内 GitHub CLI 通过白名单网关读取 GM-HZ/omnix PR #9 的固定提交文件与提交列表，文件 SHA-256 与 GitHub 参考一致；设备端仍使用一次性夹具凭据。真实账号同意与托管仓库写操作仍待外部授权。
+
+同一制品在全新应用数据的第二台模拟器上复验账号入口：实际 ArkWeb 打开公网 DeepSeek 授权页并返回，取消后保持登出；回环夹具完成 PKCE 交换、跨重启保持与登出撤销，profile 恢复一致。
+
+外部原生 addon 的位置限制:0.4.69 用随包 Inspector 在 Host 主进程内测量同一份 `libdshshell.so` 字节：按安装目录 soname 从 `libs/arm64` 加载成功，复制到应用数据目录后绝对路径加载返回 `ERR_DLOPEN_FAILED`（`Error loading shared library …: No error information`）。因此外部插件携带的鸿蒙原生 addon 无法在运行时装入主 Host，插件应提供 Alpine ARM64 musl addon、纯 JS 或随 HAP 打包。探测器在结束时停用 Inspector 并恢复 profile。
+
+语音麦克风:0.4.69 用模拟器原生麦克风完成真实声学采集——宿主外放已知的合成普通话，设备在 ArkWeb 真实录音状态下录到 5.67 秒 48 kHz 音频（RMS 0.036、峰值 0.29），官方录音器与 SenseVoice worker 转写回同一句中文并写入草稿；系统麦克风授权在结束后恢复。真机麦克风与真人说话仍待验。
+
+Forge 真实账号:0.4.69 在设备端完成 GitHub 设备授权（账号 GM-HZ，scope 含 `repo`、`delete_repo`）。用真实凭据读取 GM-HZ/omnix PR #9 的固定提交文件，内容与宿主参考字节一致（provider 去掉末尾换行）；在临时私有仓库 `mh-forge-write-56eef723` 上创建分支/提交/PR，经 Forge 面板提交评审并 squash 合并（合并提交 `4a808311…`，merged_by GM-HZ），核对 main 内容后删除仓库并确认 API 返回 404。Inspector 与 Forge 临时启用后已停用，profile 按字节恢复。项目自有仓库未被写入。
+
+公网 LiveShare 预演:0.4.69 用 Cloudflare 临时隧道把自建 Relay 暴露为公网 HTTPS 端点。预检通过（TLS 1.3、公共 CA、health 200、匿名 WSS 401）；owner 在 ArkWeb 对公网 URL 完成分享授权，分享创建/扩源/重连、reader 拒绝与撤销、stop、网关回收与配置恢复通过；第二台设备真实浏览器经公网 URL 加载 viewer 页面并渲染共享会话标题与只读提示。该 Relay 仍是替代实现、设备在同一局域网、隧道已关闭；官方 Relay 与用户域名/异地网络仍待验。被拒绝的 WebSocket Upgrade 响应补充了 `Content-Length: 0` 以兼容 Cloudflare 隧道。
+
+能力对齐回归闸门:0.4.69 的 10 步闸门（恢复、语音含原生采集、Ollama 路由、PTC 链接/边界、LiveShare owner 流、直连跨设备 viewer、账号入口、addon 位置）连续两次全绿（约 6–7 分钟/次）；LiveShare 内部跨设备改用模拟器直连宿主路由（`--device-host 10.0.2.2`）规避 hdc 反向转发长连接断开。完整交付总结见 [2026-11-20 交付总结](work/2026-11-20-final-delivery.md)。真机：Mate 60 由 0.4.26(33) 覆盖升级到 0.4.69(76) 并完成启动/账号/bundle 验证；PRoot `exec` 实测确认仅随包签名命令与脚本可执行、任意新 ELF 被加载器拒绝（[PRoot exec 语义](research/harmonyos-proot-exec.md)）。
+
+未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json) · [Forge 公开读](evidence/emulator-forge-public-read-0.4.69.json) · [账号入口](evidence/emulator-account-fresh-0.4.69.json) · [addon 位置实测](evidence/emulator-native-addon-location-0.4.69.json) · [原生麦克风采集](evidence/emulator-voice-native-capture-0.4.69.json) · [Forge 真实账号](evidence/emulator-forge-real-account-0.4.69.json) · [公网隧道预演](evidence/relay-public-tunnel-acceptance-0.4.69.json)

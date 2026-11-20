@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "apps/harmonyos"
 RUNTIME = ROOT / "runtime/harmonyos"
 EXPERIMENTAL = os.environ.get("HARMONY_EXPERIMENTAL_HOST_PROCESS") == "1"
+SELF_BUILD = os.environ.get("HARMONY_SELF_BUILD") == "1"
 STAGE = ROOT / ".build/stage" / ("harmonyos-process-probe" if EXPERIMENTAL else "harmonyos")
 RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
@@ -138,7 +139,10 @@ def main():
         cmake = CPP / "CMakeLists.txt"
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
+    if SELF_BUILD:
+        os.environ.setdefault("HARMONY_GUEST_LIB_GROUPS", "common,media,extensions")
     stage_assets(inputs)
+
     stage_speech(ROOT, STAGE, RAW)
     subprocess.run(
         ["bash", str(RUNTIME / "packaging/build-native-shell.sh")],
@@ -162,7 +166,25 @@ def main():
         ["python3", str(RUNTIME / "packaging/build-startup-sources.py")],
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
     )
+    if SELF_BUILD:
+        cmake = CPP / "CMakeLists.txt"
+        with cmake.open("a") as stream:
+            stream.write("\ntarget_compile_definitions(poc PRIVATE MH_SELF_BUILD=1)\n")
     stage_settings_client()
+    (RAW / "dsh-self-build.json").write_text(json.dumps({
+        "selfBuild": SELF_BUILD,
+        "signedExecBypass": SELF_BUILD,
+        "note": "Self-built HAPs include the in-memory ELF runner at /usr/bin/mh-exec; store builds never include it.",
+    }) + "\n")
+    loader = RAW / "mh-exec.py"
+    installer = RAW / "mh-install.py"
+    if SELF_BUILD:
+        copy(RUNTIME / "tools" / "mh-exec.py", loader)
+        copy(RUNTIME / "tools" / "mh-install.py", installer)
+    else:
+        loader.unlink(missing_ok=True)
+        installer.unlink(missing_ok=True)
+    print(f"Self-build signed-exec bypass: {'enabled' if SELF_BUILD else 'disabled'}")
     signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
     profile = Path(signing_profile or ROOT / "build-profile.json5")
     unsigned = os.environ.get("HARMONY_UNSIGNED") == "1"

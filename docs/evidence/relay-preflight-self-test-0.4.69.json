@@ -1,0 +1,117 @@
+{
+  "kind": "host-side preflight validation, no device flow",
+  "artifactContext": {
+    "expectedVersion": "0.4.69",
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "306ff80d10a816c81efbe156cee241caca74626d"
+  },
+  "checkedAt": "2026-11-20T07:48:47+0800",
+  "command": "python3 tests/smoke/relay-preflight.py --self-test --output .build/batch-007/relay-preflight-self-test.json",
+  "selfTest": {
+    "insecureLocalProxy": {
+      "url": "https://127.0.0.1:61127",
+      "host": "127.0.0.1",
+      "port": 61127,
+      "checkedAt": "2026-11-20T07:48:37+0800",
+      "tls": {
+        "verified": true,
+        "insecure": true,
+        "protocol": "TLSv1.3",
+        "cipher": "TLS_AES_256_GCM_SHA384",
+        "subject": "CN=127.0.0.1",
+        "issuer": "CN=127.0.0.1",
+        "notBefore": "Nov 19 23:48:37 2026 GMT",
+        "notAfter": "Nov 20 23:48:37 2026 GMT",
+        "subjectAltName": "IP Address:127.0.0.1"
+      },
+      "health": {
+        "status": 200,
+        "body": "{\"release_id\":\"mobile-harness-test-relay\"}"
+      },
+      "wss": {
+        "outcome": "http",
+        "status": 401,
+        "headers": {
+          "server": null
+        },
+        "elapsedMs": 8
+      },
+      "failures": [],
+      "ok": true
+    },
+    "verifiedSelfSigned": {
+      "url": "https://127.0.0.1:61127",
+      "host": "127.0.0.1",
+      "port": 61127,
+      "checkedAt": "2026-11-20T07:48:38+0800",
+      "tls": {
+        "verified": false,
+        "insecure": false,
+        "verifyError": "self-signed certificate",
+        "protocol": "TLSv1.3",
+        "subject": "CN=127.0.0.1",
+        "issuer": "CN=127.0.0.1",
+        "notBefore": "Nov 19 23:48:37 2026 GMT",
+        "notAfter": "Nov 20 23:48:37 2026 GMT",
+        "subjectAltName": "IP Address:127.0.0.1"
+      },
+      "health": {
+        "status": null,
+        "error": "<urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1028)>"
+      },
+      "wss": {
+        "outcome": "error",
+        "message": "self-signed certificate; if the root CA is installed locally, try running Node.js with --use-system-ca",
+        "elapsedMs": 8
+      },
+      "failures": [
+        "tls-verification:self-signed certificate",
+        "health-status:None",
+        "wss-anonymous-handling:{'outcome': 'error', 'status': None}"
+      ],
+      "ok": false
+    },
+    "refused": {
+      "url": "https://127.0.0.1:1",
+      "host": "127.0.0.1",
+      "port": 1,
+      "checkedAt": "2026-11-20T07:48:38+0800",
+      "tls": {
+        "verified": false,
+        "insecure": true,
+        "error": "[Errno 61] Connection refused"
+      },
+      "health": {
+        "status": null,
+        "error": "<urlopen error [Errno 61] Connection refused>"
+      },
+      "wss": {
+        "outcome": "error",
+        "message": "connect ECONNREFUSED 127.0.0.1:1",
+        "elapsedMs": 4
+      },
+      "failures": [
+        "health-status:None",
+        "wss-anonymous-handling:{'outcome': 'error', 'status': None}"
+      ],
+      "ok": false
+    },
+    "relayPort": 61126,
+    "proxyPort": 61127
+  },
+  "checks": {
+    "tls": "handshake verification with the system trust store, fallback to certificate identity extraction",
+    "health": "HTTPS GET <relay>/health expects 200 with a JSON body",
+    "wss": "WebSocket upgrade to <relay>/__tunnel_gateway__ without credentials must be answered over TLS with 401/403"
+  },
+  "scope": {
+    "verified": [
+      "the preflight accepts a local HTTPS proxy in front of the Relay fixture: health 200 and the anonymous upgrade returns 401 over WSS",
+      "the preflight rejects the same deployment under system trust when the certificate is self-signed",
+      "the preflight rejects an unreachable address"
+    ],
+    "pending": [
+      "running the same preflight against the user's public domain once the server and certificate exist"
+    ]
+  }
+}

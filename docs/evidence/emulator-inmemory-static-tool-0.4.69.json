@@ -1,0 +1,34 @@
+{
+  "kind": "downloaded static tools executed through the in-memory ELF loader (emulator)",
+  "artifact": {
+    "unsignedHap": "dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "sha256": "50b830ab695a353c5cae6028a801c4334a6e83ab6d1934ad5515af62063c8edc",
+    "sourceCommit": "9af659196b3104a3f23d1de64bc4c506976c4a04"
+  },
+  "device": "127.0.0.1:5555 API 26 ARM64 Phone emulator",
+  "loader": {
+    "runner": "tests/smoke/fixtures/inmemory-elf-runner.py",
+    "mechanism": "parse phdrs -> mmap(PROT_READ|WRITE, MAP_PRIVATE|MAP_ANON|MAP_FIXED) each PT_LOAD -> memmove -> mprotect segment prot -> build argc/argv/envp/auxv stack -> fork -> trampoline (mov sp,x1; br x0) -> waitpid",
+    "guestTool": "Alpine busybox-static 1.36.1-r31 aarch64, 1,115,944 bytes, ET_EXEC"
+  },
+  "hostUploadRun": {
+    "command": "MH_ELF_ARGV0=busybox python3 inmemory-elf-runner.py ./guest-tool echo INMEM_BUSYBOX_OK",
+    "uploadedPayloadBytes": 1115944,
+    "resultText": "INMEM_BUSYBOX_OK\nLOADED segments=2 base=0x0 entry=0x404400\nCHILD_EXIT 0\n"
+  },
+  "guestDownloadRun": {
+    "command": "curl Alpine apk -> gzip -dc -> tar -xf -> inmemory-elf-runner.py ./bbx/bin/busybox.static echo DOWNLOADED_INMEM_OK",
+    "resultText": "CURL_OK\nGZIP_OK\nTAR_OK\n-rwxr-xr-x    1 mobile-harness 20020074   1115944 Nov 23  2025 ./bbx/bin/busybox.static\nDOWNLOADED_INMEM_OK\nLOADED segments=2 base=0x0 entry=0x404400\nCHILD_EXIT 0\nELF_DOWNLOAD_PROBE_DONE\n"
+  },
+  "observed": {
+    "hostUploadedBinaryRan": false,
+    "downloadExtractRun": true
+  },
+  "realDeviceStatus": "not yet run: the Mate 60 screen was locked during this round; previous real-device probes already confirmed anonymous RWX/RX mmap and code execution",
+  "nextSteps": [
+    "run the same download-and-run probe on the Mate 60 while the screen stays on",
+    "port the loader into a signed native helper and wire it into bash/subprocess so any downloaded static tool runs transparently",
+    "add static PIE (ET_DYN) relocation handling and dynamic ELF support with the signed musl interpreter",
+    "evaluate re-enabling V8 JIT (anonymous RWX is available) and re-evaluate PTY/terminal"
+  ]
+}

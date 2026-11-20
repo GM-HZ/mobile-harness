@@ -1,0 +1,76 @@
+{
+  "kind": "external Relay URL validation with loopback forwarding as a public-network stand-in",
+  "artifactContext": {
+    "expectedVersion": "0.4.69",
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "671601334e46e1ad5c4ec445f04ca6d46179eeac"
+  },
+  "setup": {
+    "relay": "the Relay fixture started as a standalone process on the host at 127.0.0.1:18080 with deployment env knobs (MH_RELAY_PORT, MH_RELAY_OWNER_LOGIN)",
+    "deviceView": "the owner device reaches it as http://127.0.0.1:19769 through an hdc rport, standing in for a public HTTPS URL",
+    "hostCalls": "the test host calls the same Relay at http://127.0.0.1:18080"
+  },
+  "commands": {
+    "externalRun": "python3 tests/smoke/emulator-liveshare-relay.py 127.0.0.1:5555 out.json --owner-login --relay-url http://127.0.0.1:19769 --relay-call-url http://127.0.0.1:18080 --relay-host-port 18080",
+    "crossDeviceRun": "the same plus --cross-device 127.0.0.1:5557"
+  },
+  "passed": {
+    "externalRelay": {
+      "device": "http://127.0.0.1:19769",
+      "hostCalls": "http://127.0.0.1:18080"
+    },
+    "arkwebOwnerVerified": true,
+    "reachable": {
+      "ok": true,
+      "httpReachable": true,
+      "blocking": false
+    },
+    "addedSecondSource": true,
+    "restoredOnlineSources": [
+      "19721eb3-daae-4b53-8029-53eaffbedead",
+      "88af5a6d-1adb-46c7-9e47-4fc2352856e7"
+    ],
+    "readerBeforeRevocation": {
+      "anonymousRefused": true,
+      "htmlBytes": 46926,
+      "visibleSessionIds": [
+        "19721eb3-daae-4b53-8029-53eaffbedead",
+        "88af5a6d-1adb-46c7-9e47-4fc2352856e7"
+      ],
+      "accessRefusalCodes": {
+        "outsideSession": "remote-access/denied",
+        "ownerManagement": "remote-access/denied"
+      },
+      "sharedHistoryReadable": true
+    },
+    "ownerAppliedLiveRevocation": true,
+    "stop": {
+      "ok": true
+    },
+    "stoppedShareUnavailable": true,
+    "gatewayThreadStopped": true,
+    "configRestored": true
+  },
+  "crossDeviceAttempt": {
+    "viewerPageServed": true,
+    "sharedTitleVisible": true,
+    "sharedTitle": "MH cross-device viewer eaaf5f",
+    "viewerRpc": null,
+    "stop": {
+      "ok": true,
+      "relay": "unreachable"
+    },
+    "outcome": "the second device rendered the shared session over the external Relay URL, but the owner stop returned relay:unreachable over the loopback rport; the direct-network deployment is expected to avoid that transport artifact"
+  },
+  "scope": {
+    "verified": [
+      "the acceptance test can run against an externally started Relay through --relay-url/--relay-call-url instead of spawning the fixture",
+      "owner ArkWeb login, share creation, second source, reconnect, reader checks, live revocation, stop and gateway shutdown pass in external mode",
+      "the second-device viewer renders the shared session from the external URL",
+      "the deployment env knobs (host/port, tokens, owner-login mode, login redirect, viewer config file) are supported by the Relay fixture"
+    ],
+    "pending": [
+      "the same command against the user's public HTTPS URL once the server and certificate exist"
+    ]
+  }
+}

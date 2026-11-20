@@ -197,9 +197,16 @@ static int grant_path(const struct PtcRoots *roots, pid_t worker, const struct s
     int file = (int)syscall(SYS_openat2, root, relative, &how, sizeof(how));
     if (file >= 0) {
         struct stat stat;
-        if (fstat(file, &stat) < 0 ||
-            (writes ? !S_ISREG(stat.st_mode) || stat.st_nlink != 1
-                    : !S_ISDIR(stat.st_mode) && !S_ISREG(stat.st_mode))) {
+        int allowed = 0;
+        if (fstat(file, &stat) == 0) {
+            if (writes) allowed = S_ISREG(stat.st_mode) && stat.st_nlink == 1;
+            else if (S_ISDIR(stat.st_mode)) allowed = 1;
+            // A hard link into the workspace could expose an external inode to a
+            // read that the write rule already refuses. HarmonyOS app data cannot
+            // create links, so refusing multi-link reads costs no supported file.
+            else allowed = S_ISREG(stat.st_mode) && (!launch->nlink_strict || stat.st_nlink == 1);
+        }
+        if (!allowed) {
             close(file);
             errno = EACCES;
             return -1;
@@ -294,6 +301,7 @@ static int stat_path(int listener, const struct PtcRoots *roots, pid_t worker, c
     if (error) return error;
     if (!S_ISREG(metadata.st_mode) && !S_ISDIR(metadata.st_mode) &&
         !(nofollow && S_ISLNK(metadata.st_mode))) return EACCES;
+    if (S_ISREG(metadata.st_mode) && launch->nlink_strict && metadata.st_nlink != 1) return EACCES;
     if (ioctl(listener, SECCOMP_IOCTL_NOTIF_ID_VALID, &request->id) < 0) return errno;
     struct iovec local = {.iov_base = &metadata, .iov_len = sizeof(metadata)};
     struct iovec remote = {.iov_base = (void *)(uintptr_t)call->args[2], .iov_len = sizeof(metadata)};
@@ -368,6 +376,8 @@ void harmony_ptc_supervise(const char *entry, int channel, pid_t parent, const s
 {
     if (!follow(parent)) _exit(125);
     struct PtcLaunch current = *launch;
+    // Explicit namespace-root grants keep their widened file authority.
+    current.nlink_strict = strcmp(current.root, "/") != 0;
     const struct sigaction handler = {.sa_handler = request_stop};
     if (sigaction(SIGTERM, &handler, NULL) < 0) _exit(125);
     struct open_how how = {.flags = O_PATH | O_DIRECTORY | O_CLOEXEC, .resolve = RESOLVE_NO_SYMLINKS};

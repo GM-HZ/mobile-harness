@@ -174,5 +174,211 @@
       "archive": "tzdata-2026f-r0.apk",
       "sha256": "fd7af789d78e23cc7b9781e13b058b74c947255f37da4edf4229efb4ee948080"
     }
+  ],
+  "libraries": [
+    {
+      "name": "jq",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "jq-1.8.2-r0.apk",
+      "sha256": "20e3b54393eecb2ee3c41a2f54e2401fadadf493b4de58a69fa09fa654c37ab5",
+      "bytes": 151861,
+      "files": [
+        {
+          "member": "usr/lib/libjq.so.1.0.4",
+          "guestPath": "/usr/lib/libjq.so.1"
+        }
+      ]
+    },
+    {
+      "name": "oniguruma",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "oniguruma-6.9.10-r0.apk",
+      "sha256": "486a30ba898571f8f391958494ef3982494dffbc56d368d477293c5159c5c192",
+      "bytes": 186698,
+      "files": [
+        {
+          "member": "usr/lib/libonig.so.5.5.0",
+          "guestPath": "/usr/lib/libonig.so.5"
+        }
+      ]
+    },
+    {
+      "name": "lz4-libs",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "lz4-libs-1.10.0-r0.apk",
+      "sha256": "0470509674470528eeba694d256066006d628dcab7b77de1be9ba8a186493bab",
+      "bytes": 72093,
+      "files": [
+        {
+          "member": "usr/lib/liblz4.so.1.10.0",
+          "guestPath": "/usr/lib/liblz4.so.1"
+        }
+      ]
+    },
+    {
+      "name": "lzo",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "lzo-2.10-r5.apk",
+      "sha256": "4a031a091b2c2756df771678fc20469ff1ace0512124117cc7c2cc6d4d92f0f2",
+      "bytes": 73932,
+      "files": [
+        {
+          "member": "usr/lib/liblzo2.so.2.0.0",
+          "guestPath": "/usr/lib/liblzo2.so.2"
+        }
+      ]
+    },
+    {
+      "name": "libarchive",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "libarchive-3.8.11-r0.apk",
+      "sha256": "b8dae0329e607ea7d1aa4e0f271edb2ef8aeb3912a1b66dad2c3dbfcd6b6997b",
+      "bytes": 330106,
+      "files": [
+        {
+          "member": "usr/lib/libarchive.so.13.8.11",
+          "guestPath": "/usr/lib/libarchive.so.13"
+        }
+      ]
+    },
+    {
+      "name": "acl-libs",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "acl-libs-2.3.2-r1.apk",
+      "sha256": "373be0917b78687e94e813ad1a5afdddb798fed414e23566eb237effdcecaeea",
+      "bytes": 15322,
+      "files": [
+        {
+          "member": "usr/lib/libacl.so.1.1.2302",
+          "guestPath": "/usr/lib/libacl.so.1"
+        }
+      ]
+    },
+    {
+      "name": "libattr",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "libattr-2.5.2-r2.apk",
+      "sha256": "8183dcc2924677e78ce1e25e087fc71113c66801939fdbfcbc36e2811242a4dd",
+      "bytes": 8702,
+      "files": [
+        {
+          "member": "usr/lib/libattr.so.1.1.2502",
+          "guestPath": "/usr/lib/libattr.so.1"
+        }
+      ]
+    },
+    {
+      "name": "yaml",
+      "group": "common",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "yaml-0.2.5-r2.apk",
+      "sha256": "738ca180c93b3d0180d4aa1b6afb1915407c449db443f6763fd6cead69e3712c",
+      "bytes": 45836,
+      "files": [
+        {
+          "member": "usr/lib/libyaml-0.so.2.0.9",
+          "guestPath": "/usr/lib/libyaml-0.so.2"
+        }
+      ]
+    },
+    {
+      "name": "libpng",
+      "group": "media",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "libpng-1.6.59-r0.apk",
+      "sha256": "93132da4155e062e12347aca01a761491b8fc40a1ffa955bd588d911550f2bdf",
+      "bytes": 97807,
+      "files": [
+        {
+          "member": "usr/lib/libpng16.so.16.59.0",
+          "guestPath": "/usr/lib/libpng16.so.16"
+        }
+      ]
+    },
+    {
+      "name": "libjpeg-turbo",
+      "group": "media",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "libjpeg-turbo-3.1.0-r0.apk",
+      "sha256": "166c4fd2b1e1df9ed757b3edadb9cb1c6e5c6dc93a1fe6bc4546bc88d0834a91",
+      "bytes": 257837,
+      "files": [
+        {
+          "member": "usr/lib/libjpeg.so.8.3.2",
+          "guestPath": "/usr/lib/libjpeg.so.8"
+        }
+      ]
+    },
+    {
+      "name": "libwebp",
+      "group": "media",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "libwebp-1.5.0-r0.apk",
+      "sha256": "57239c394ae80d0dae20f06ed81c22bcbeebacd08f035465f03a952eeea6e285",
+      "bytes": 196958,
+      "files": [
+        {
+          "member": "usr/lib/libwebp.so.7.1.10",
+          "guestPath": "/usr/lib/libwebp.so.7"
+        }
+      ]
+    },
+    {
+      "name": "libsharpyuv",
+      "group": "media",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "libsharpyuv-1.5.0-r0.apk",
+      "sha256": "62bedf76d27899d323a198f07d07246f67da7fbcdb3e31b606063f47c0063d3b",
+      "bytes": 11543,
+      "files": [
+        {
+          "member": "usr/lib/libsharpyuv.so.0.1.1",
+          "guestPath": "/usr/lib/libsharpyuv.so.0"
+        }
+      ]
+    },
+    {
+      "name": "tiff",
+      "group": "media",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "tiff-4.7.2-r0.apk",
+      "sha256": "567df2067d5006e79fa3f25769c3861c8a630faba4eba73004a765085ece4ab5",
+      "bytes": 167100,
+      "files": [
+        {
+          "member": "usr/lib/libtiff.so.6.3.0",
+          "guestPath": "/usr/lib/libtiff.so.6"
+        }
+      ]
+    },
+    {
+      "name": "libxml2",
+      "group": "media",
+      "base": "https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/",
+      "archive": "libxml2-2.13.9-r1.apk",
+      "sha256": "e358e1c32ba6923386263dd641a6e4bcb56a0345fecadef9ef1103892cf3d81d",
+      "bytes": 497173,
+      "files": [
+        {
+          "member": "usr/lib/libxml2.so.2.13.9",
+          "guestPath": "/usr/lib/libxml2.so.2"
+        }
+      ]
+    }
+  ],
+  "extensions": [
+    {
+      "name": "mh-native-demo",
+      "group": "extensions",
+      "source": "{stage}/entry/libs/arm64-v8a/libguest_mh_native_demo.so",
+      "guestPath": "/usr/lib/mh-demo.node"
+    }
   ]
 }

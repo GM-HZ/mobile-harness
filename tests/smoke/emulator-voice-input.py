@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import runpy
 import threading
+import subprocess
 import time
 import urllib.request
 from urllib.parse import urlsplit
@@ -272,6 +273,105 @@ def verify_native_arkweb(emulator, evidence):
         result['permissionRestored'] = True
 
 
+
+CAPTURE_HOOK = """(() => {
+  const devices = navigator.mediaDevices;
+  const original = devices.getUserMedia.bind(devices);
+  Object.defineProperty(devices, 'getUserMedia', { configurable: true, value: async (constraints) => {
+    const stream = await original(constraints);
+    globalThis.__mhNativeTracks = stream.getAudioTracks();
+    const context = new AudioContext();
+    const source = context.createMediaStreamSource(stream);
+    const analyser = context.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+    const buffer = new Float32Array(analyser.fftSize);
+    const state = { samples: 0, sumSquares: 0, peak: 0, context, analyser };
+    state.timer = setInterval(() => {
+      analyser.getFloatTimeDomainData(buffer);
+      let sum = 0, peak = 0;
+      for (const value of buffer) { sum += value * value; peak = Math.max(peak, Math.abs(value)); }
+      state.samples += buffer.length;
+      state.sumSquares += sum;
+      state.peak = Math.max(state.peak, peak);
+    }, 40);
+    globalThis.__mhNativeCapture = state;
+    return stream;
+  } });
+  return true;
+})()"""
+
+CAPTURE_STATS = """(() => {
+  const state = globalThis.__mhNativeCapture;
+  if (!state) return null;
+  clearInterval(state.timer);
+  const rms = state.samples ? Math.sqrt(state.sumSquares / state.samples) : 0;
+  return { samples: state.samples, durationSeconds: state.samples / state.context.sampleRate,
+           rms, peak: state.peak, sampleRate: state.context.sampleRate };
+})()"""
+
+
+def verify_native_capture(emulator, audio_path, evidence):
+    """Record through the native microphone while the host plays a known clip."""
+    assert microphone_permission(emulator) == {'status': -1, 'flag': 0}, 'Expected an unused test permission state'
+    ui = browser['ui']
+    result = evidence['nativeMicCapture'] = {}
+    playback = None
+    try:
+        with browser['browser'](emulator) as run:
+            open_voice_composer(emulator, run)
+            assert run(CAPTURE_HOOK)
+            try:
+                ui['tap'](emulator, ui['wait_control'](emulator, START, 'button'))
+                deadline = time.monotonic() + 15
+                while time.monotonic() < deadline:
+                    rows = ui['controls'](emulator, bundle=None)
+                    dialog = next((row for row in rows if '麦克风' in row['text'] and '访问' in row['text']
+                                   or 'access your microphone' in row['text'].lower()), None)
+                    allow = ui['find'](rows, {'允许', 'Allow', 'While using the app', 'Allow while using the app'})
+                    if dialog and allow:
+                        break
+                    time.sleep(.2)
+                else:
+                    raise AssertionError('HarmonyOS did not present the native microphone permission dialog')
+                ui['tap'](emulator, allow)
+                result['nativePermissionDialog'] = True
+                browser['wait'](run, "Boolean(document.querySelector('[data-voice-activity=recording]'))",
+                                'official recorder using the native microphone')
+                playback = subprocess.Popen(['afplay', str(audio_path)])
+                time.sleep(4.5)
+                playback.terminate()
+                playback.wait(timeout=5)
+                playback = None
+                flow['button'](run, 'button', ['停止并识别', 'Stop and transcribe'])
+                try:
+                    browser['wait'](run, f'''[...document.querySelectorAll('textarea,[contenteditable=true]')].some(
+                      node=>(node.value||node.textContent||'').includes({json.dumps(EXPECTED)}))''',
+                                    'native capture transcribed')
+                    result['draftMatched'] = True
+                except AssertionError:
+                    result['draftMatched'] = False
+                result['draft'] = run("(() => { const node=document.querySelector('textarea,[contenteditable=true]');"
+                                      " return (node?.value||node?.textContent||'').trim(); })()")
+                result['capture'] = run(CAPTURE_STATS)
+                result['audioPlayoutSeconds'] = 4.5
+                capture = result['capture'] or {}
+                assert capture.get('samples', 0) > capture.get('sampleRate', 48000), capture
+                assert capture.get('rms', 0) > 0.005, ['silent native capture', capture]
+                assert result['draftMatched'] is True, result
+            finally:
+                if playback:
+                    playback.terminate()
+                    playback.wait(timeout=5)
+                run('globalThis.__mhNativeCapture?.context?.close(); delete globalThis.__mhNativeCapture; '
+                    'globalThis.__mhNativeTracks?.forEach(t => t.stop()); delete globalThis.__mhNativeTracks; '
+                    'delete navigator.mediaDevices.getUserMedia; true')
+    finally:
+        emulator.hdc('shell', 'atm', 'perm', '-r', '-b', APP_ID)
+        result['permissionRestored'] = microphone_permission(emulator) == {'status': -1, 'flag': 0}
+        assert result['permissionRestored']
+
+
 def run(emulator,args):
     run_name='mh-voice-'+uuid.uuid4().hex[:10]
     remote='/data/local/tmp/'+run_name
@@ -344,13 +444,15 @@ def run(emulator,args):
             evidence['invalidAudioRejected']=True
         else:
             raise AssertionError('Invalid audio reached the provider')
-        if args.arkweb or args.native_mic:
+        if args.arkweb or args.native_mic or args.native_mic_transcribe:
             emulator.hdc('shell','power-shell','wakeup')
             emulator.start()
         if args.arkweb:
             verify_arkweb(emulator,audio,evidence)
         if args.native_mic:
             verify_native_arkweb(emulator,evidence)
+        if args.native_mic_transcribe:
+            verify_native_capture(emulator,args.audio,evidence)
         browser['switch'](emulator,VOICE,False)
         rows=[json.loads(line) for line in emulator.app('cat alpine/tmp/dsh-native-timeline.log').splitlines()]
         assert sum(row['event']=='speech-worker-started' for row in rows)==1
@@ -398,6 +500,7 @@ if __name__=='__main__':
     parser.add_argument('--audio',type=Path,required=True)
     parser.add_argument('--arkweb',action='store_true')
     parser.add_argument('--native-mic',action='store_true',help='Grant the real emulator microphone through the system dialog, then verify cancellation')
+    parser.add_argument('--native-mic-transcribe',action='store_true',help='Record through the native microphone while the host plays a clip, then transcribe it')
     parser.add_argument('--port',type=int,default=19643)
     source=parser.add_mutually_exclusive_group()
     source.add_argument('--download',action='store_true',help='Prepare the pinned models via an isolated mirror')

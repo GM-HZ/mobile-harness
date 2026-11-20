@@ -1,0 +1,1 @@
+../../../runtime/harmonyos/tools/mh-exec.py

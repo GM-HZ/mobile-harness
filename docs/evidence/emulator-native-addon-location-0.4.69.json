@@ -1,0 +1,120 @@
+{
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "version": "0.4.69",
+    "bytes": 768585397,
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "17992fb3660e5b5f893aedf414f381607d5db7d1"
+  },
+  "target": {
+    "connection": "127.0.0.1:5555",
+    "kind": "DevEco API 26 ARM64 Phone emulator"
+  },
+  "command": "python3 tests/smoke/emulator-native-addon-location.py 127.0.0.1:5555 .build/batch-005/native-addon-location.json",
+  "method": "the shipped Inspector CDP proxy evaluates in the Host main process; no model route is used",
+  "observed": {
+    "readyMs": 60,
+    "inspectorReadyMs": 4452,
+    "inspector": {
+      "workerPort": 9230,
+      "targetCount": 1,
+      "pagePath": "/devtools/page/9990062f-46d0-40fc-9216-0575245fa9c9"
+    },
+    "evaluations": [
+      {
+        "label": "hostGlobal",
+        "value": 42,
+        "description": "42",
+        "exception": null
+      },
+      {
+        "label": "builtinModule",
+        "value": "function",
+        "description": null,
+        "exception": null
+      },
+      {
+        "label": "installedSoname",
+        "value": {
+          "ok": true,
+          "exports": []
+        },
+        "description": null,
+        "exception": null
+      },
+      {
+        "label": "dataViewCopy",
+        "value": {
+          "ok": false,
+          "bytes": 8832,
+          "code": "ERR_DLOPEN_FAILED",
+          "message": "Error loading shared library /data/storage/el2/base/haps/entry/files/alpine/tmp/mh-addon-location-2d686fba9d.so: No error information"
+        },
+        "description": null,
+        "exception": null
+      },
+      {
+        "label": "sameBytes",
+        "value": {
+          "equal": true,
+          "sha256": "3f7a666c999de19b579494dbb98aefa27dd14bf060104de8aba383731e28dc7a"
+        },
+        "description": null,
+        "exception": null
+      },
+      {
+        "label": "installedSonameAgain",
+        "value": {
+          "ok": true
+        },
+        "description": null,
+        "exception": null
+      }
+    ],
+    "dataViewCopy": {
+      "ok": false,
+      "bytes": 8832,
+      "code": "ERR_DLOPEN_FAILED",
+      "message": "Error loading shared library /data/storage/el2/base/haps/entry/files/alpine/tmp/mh-addon-location-2d686fba9d.so: No error information"
+    },
+    "sameBytes": {
+      "equal": true,
+      "sha256": "3f7a666c999de19b579494dbb98aefa27dd14bf060104de8aba383731e28dc7a"
+    },
+    "addonLocation": {
+      "installedSonameLoads": true,
+      "sameBytesFromAppDataFail": true,
+      "errorCode": "ERR_DLOPEN_FAILED",
+      "errorMessage": "Error loading shared library /data/storage/el2/base/haps/entry/files/alpine/tmp/mh-addon-location-2d686fba9d.so: No error information"
+    },
+    "restoredReadyMs": 4724,
+    "restoredConfiguration": true
+  },
+  "conclusion": {
+    "measured": "the identical library bytes load from the installed soname in /data/storage/el1/bundle/libs/arm64 and fail with ERR_DLOPEN_FAILED from a copy in the application data view",
+    "errorText": "Error loading shared library <app-data copy>: No error information",
+    "rootCause": "the HarmonyOS dynamic linker refuses app-data libraries for this process; the error text matches the 0.4.57 extension failure",
+    "notTheCause": [
+      "jitless mode (the same Host loads bundled addons)",
+      "N-API version or symbol export",
+      "the Node addon loader",
+      "cross-build ABI of the copied bytes"
+    ],
+    "supportedPaths": [
+      "bundle the addon into the HAP libs/arm64 at build time",
+      "deliver Alpine ARM64 musl addons to the guest subprocess",
+      "ship pure JavaScript or WASM where the runtime supports it"
+    ]
+  },
+  "scope": {
+    "verified": [
+      "direct in-process measurement of both load locations",
+      "the copied bytes hash equals the installed library hash",
+      "Inspector enable/disable and profile restoration"
+    ],
+    "pending": [
+      "physical device confirmation",
+      "an external plugin that ships an OHOS addon (platform limit, not planned)"
+    ]
+  }
+}

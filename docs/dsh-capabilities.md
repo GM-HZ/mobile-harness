@@ -1,6 +1,6 @@
 # 鸿蒙 DSH 能力与验收边界
 
-当前应用 0.4.68，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
+当前应用 0.4.69，运行时为鸿蒙原生 Node 24.14.1 和官方 npm DSH `0.2.2-rc.5`。锁文件固定 331 个 RC.5 组件，HAP 包含适用的 330 个，macOS 专用可选组件由平台条件排除。Linux 工具按需通过 Alpine／PRoot 执行。
 
 Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87787bb`，与 npm 精确版本配套。[官方发布说明](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.2-rc.5)
 
@@ -72,9 +72,9 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 | 自定义模型提供者 | 0.4.58 经标准设置热添加 pi-ai 路由，在 DeepSeek 公网验证 Chat Completions 和 Responses 的模型发现、文件读取工具往返与重启续接。 [模型路由证据](evidence/emulator-pi-ai-workflow-0.4.58.json) |
 | MCP | Node 和 Python stdio 的初始化、工具列表、真实模型调用、进程关闭；Streamable HTTP 工具调用通过 |
 | 定时任务 | 0.4.58 在模拟器跨两小时完成七次真实模型投递，第 106 秒强停重启保留已有会话和四个待执行任务。回前台精确回忆首轮，清理通过。 [两小时实测](evidence/emulator-schedule-soak-0.4.58.json) |
-| LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。0.4.66 验证真实模型处理两张图片后，访客可读共享图片且重启后字节一致。0.4.67 补齐访客附件接入，在隔离 Relay 通过文本和图片上传、模型回合、取消和未共享会话拒绝。公网 Relay 及真实身份提供方待验。 [访客上传证据](evidence/emulator-liveshare-guest-uploads-0.4.67.json) |
+| LiveShare | 0.4.60 在实际 ArkWeb 完成隔离 Relay 所有者授权和 PKCE，重启恢复分享。独立查看者通过真实模型回合、范围拒绝、撤销和停止。0.4.66 验证真实模型处理两张图片后，访客可读共享图片且重启后字节一致。0.4.67 补齐访客附件接入，在隔离 Relay 通过文本和图片上传、模型回合、取消和未共享会话拒绝。0.4.69 另用 Cloudflare 临时隧道把自建 Relay 暴露为公网 HTTPS 端点，预检（TLS 1.3/公共 CA/health/匿名 WSS 401）与完整公网路径通过：owner 在 ArkWeb 对公网 URL 完成授权，第二台设备真实浏览器渲染共享会话标题与只读提示；该次 Relay 仍是替代实现、设备在同一局域网且隧道 URL 已关闭，官方 Relay 与你的域名/异地网络仍待验。原自建 Relay 本机跨设备记录：由自建 Relay 把官方 viewer 页面与 carrier 提供给第二台模拟器上的真实华为浏览器：在 owner 实际 ArkWeb 授权并完成 PKCE 后，第二台设备的浏览器渲染共享会话的标题、历史消息与时间戳，读取 context、加载 10 个页面资源、经会话 cookie 完成 viewer RPC；界面显示只读观看者与锁定模型，且未调用所有者管理接口。公网 Relay、真实身份提供方和公网跨设备仍待验。 [访客上传证据](evidence/emulator-liveshare-guest-uploads-0.4.67.json) · [跨设备证据](evidence/emulator-liveshare-cross-device-0.4.69.json) |
 | LiveShare 访客程序 | 0.4.64 将具体链接和派生会话的权限传入鸿蒙 PTC 文件代理。普通会话继续使用其原权限；访客程序使用独立 worker，保留限制内的读写和内置工具。文件代理仍报告 `partial`。 [实测证据](evidence/emulator-liveshare-ptc-0.4.64.json) |
-| 麦克风与语音输入 | 0.4.62 从 DSH 录音按钮触发鸿蒙模拟器的系统授权，ArkWeb 音轨进入 live，取消后进入 ended。合成普通话回填及语音 worker 回收同包通过。真机说话转写待验。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
+| 麦克风与语音输入 | 0.4.62 从 DSH 录音按钮触发鸿蒙模拟器的系统授权，ArkWeb 音轨进入 live，取消后进入 ended。合成普通话回填及语音 worker 回收同包通过。0.4.69 用模拟器原生麦克风做了真实声学采集：宿主外放已知的合成普通话，设备录制 5.67 秒 48 kHz 音频（RMS 0.036、峰值 0.29），官方录音器与 SenseVoice 转写回同一句中文并写入草稿。真机麦克风与真人说话仍待验。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) · [原生采集](evidence/emulator-voice-native-capture-0.4.69.json) |
 | Forge 托管仓库 | 0.4.62 经包内 gh 和只读桌面认证代理读取公开 PR 文件与提交，文件逐字相同，提交及其父提交和官网 REST 结果一致。写操作经隔离服务验证。 [实测证据](evidence/emulator-voice-forge-workflow-0.4.62.json) |
 | Forge 设备账号 | 0.4.65 设置页复用随包 GitHub CLI 的设备流程。公开 GitHub 签发一次性代码并验证取消。隔离服务通过原生登录、重启恢复、Forge 使用同一设备账号读取及退出。真实账号授权待验。 [实测证据](evidence/emulator-forge-account-0.4.65.json) |
 | 思考内容翻译 | 0.4.59 通过应用私有 `HTTPS_PROXY` 访问 Bing 和 Google 的官方默认地址，真实译文和记录可跨重启回读。ArkWeb 的 DeepSeek Flash、切换原译文、拒绝后保留原文和停用取消均通过。模拟器直连仍有 Bing 400 和 Google 超时。 [公网与 ArkWeb 证据](evidence/emulator-translation-proxy-0.4.59.json) |
@@ -93,15 +93,17 @@ Git 子模块固定官方 RC.5 标签提交 `9c2670d3bce5275e0d1610272958121af87
 ## 平台限制与未验项
 
 - **Bash 隔离**：PRoot 不提供内核隔离。普通 Bash 继续拒绝没有系统沙箱的默认执行，仅经具体审批扩大权限。不能把它称为已实现 bwrap／Landlock。
-- **PTC 范围**：独立进程和 seccomp 文件代理向上游报告 `partial` enforcement。它不是任意 Node／Linux API 执行环境；网络与子进程能力应调用 Host 暴露的工具。符号链接／硬链接攻击及并发移动父目录的完整压力回归尚未完成。
+- **PTC 范围**：独立进程和 seccomp 文件代理向上游报告 `partial` enforcement。它不是任意 Node／Linux API 执行环境；网络与子进程能力应调用 Host 暴露的工具。0.4.69 对普通文件的读取与 stat 补充单链接校验，与既有写规则一致；路径解析每次从预打开根描述符以 `RESOLVE_NO_SYMLINKS` 重新解析。同一制品实测程序无法自建符号链接／硬链接、读链接目标、改元数据或改写打开；宿主进程把程序父目录移出授权根后，所有读写均以 `ENOENT` 拒绝且被移出目录未被写入，恢复后原路径继续可用。应用数据视图拒绝创建链接，根内链接指向根外的端到端读取仍缺夹具。 [0.4.69 边界记录](evidence/emulator-ptc-boundary-0.4.69.json)
 - **JIT／WASM**：主 Host 保持 jitless，Office 使用独立进程执行官方 WASM，PTC 使用同版本 Amaro 的 JS 产物处理 TypeScript。0.4.57 已在模拟器的 Alpine 子进程中验证默认设置下无 WASM，显式启用后可执行 WASM、TypeScript 文件并用 Node 自带的 fetch 取得 HTTP 200。真机 JIT 能力待复验。
-- **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包和公网 CPython 3.12 ARM64 musllinux `xxhash`。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。其他 wheel、addon、APK 和安装脚本需按具体包验收。 [Node 补验](evidence/emulator-node-extensions-0.4.57.json) · [Python 补验](evidence/emulator-account-python-wheel-0.4.57.json)
+- **系统工具**：共享库和 ELF 需匹配 ABI 和鸿蒙加载条件。pip 已验证纯 Python 包和公网 CPython 3.12 ARM64 musllinux `xxhash`。0.4.57 经 DSH 工具把实际 npm ARM64 musl addon 交给 Alpine Node 执行，主 Host 能加载 HAP 内置语音 addon，测试中的外部鸿蒙 addon 返回 `ERR_DLOPEN_FAILED`。0.4.69 经随包 Inspector 在 Host 进程内直接测量：同一份库字节（SHA-256 相同）按安装目录 soname 加载成功，从应用数据目录副本加载返回 `ERR_DLOPEN_FAILED`（`Error loading shared library …: No error information`），确认根因是动态链接器的加载位置限制，与 JIT 和 N-API 版本无关。宿主可加载随 HAP 打包的 addon，外部插件应提供 Alpine ARM64 musl addon（在 guest 中加载）或纯 JavaScript 实现。其他 wheel、addon、APK 和安装脚本需按具体包验收。 [Node 补验](evidence/emulator-node-extensions-0.4.57.json) · [加载位置实测](evidence/emulator-native-addon-location-0.4.69.json) · [Python 补验](evidence/emulator-account-python-wheel-0.4.57.json) · [0.4.69 边界记录](evidence/emulator-capability-parity-0.4.69.json)
 - **系统视图与终端**：没有补造完整 `/proc`、`/sys` 或内核 namespace。系统 PTY、全屏交互终端和 Phone Use 沿用此前明确的暂缓范围。
-- **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。真实账号授权和 DeepSeek 之外的供应商端点待验。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json)
+- **浏览器与账号**：ArkWeb 用于应用界面。0.4.57 已从页面打开官方登录并返回聊天，回环账号服务验证 PKCE 交换、授权记录恢复及登出撤销。0.4.69 经标准设置接入本机 Ollama，`openai-completions` 与 `openai-responses` 两种协议完成模型发现、流式请求、工具目录、图片附件和重启保持；本机小模型不具备稳定的工具调用与视觉问答能力，该轮只证明非 DeepSeek 端点接入。0.4.69 另在全新应用数据的模拟器上复验账号入口：实际 ArkWeb 打开公网 DeepSeek 授权页并返回、取消后保持登出，回环夹具完成 PKCE、重启保持与登出撤销。真实账号同意仍待账号所有者完成。 [账号补验](evidence/emulator-account-python-wheel-0.4.57.json) · [本地模型路由](evidence/emulator-capability-parity-0.4.69.json)
 - **后台**：模拟器后台约 81 秒实测三次定时投递和真实模型回复，返回前台准确回忆原消息。系统终止后的唤醒、真机保活与跨进程状态待验证。 [前后台证据](evidence/emulator-context-background-0.4.57.json)
-- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 的真实 GitHub 账号授权及托管仓库写操作待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
-- **设备**：Mate 60 当前没有在线 HDC 连接；本版真机表现、后台保活、长时间高并发与网络切换仍待验证。
+- **剩余能力清点**：Ralph、会话搜索、工作树、真实公网溢出恢复和两次受控重复溢出通过。Forge 真实账号授权与托管仓库写操作已在临时私有仓库完成。多小时 Workflow 与剩余可选 bundle 待验。LSP 当前通过 TypeScript 和 Python 的相应场景。Forge 已在本制品完成真实账号授权、公开 PR 读取，以及临时私有仓库的评审/合并写操作（仓库已删除）。LiveShare 已在两台本机模拟器间通过真实华为浏览器完成 viewer 页面读取；公网 Relay、真实身份提供方和公网跨设备仍受外部条件阻塞：官方 Relay 服务端不随仓库交付。语音已在模拟器上通过原生麦克风完成真实声学采集与转写；真机麦克风与真人说话仍待验。公共 subprocess provider 支持标准输入输出，进程范围沿用上游 fallback 的观测限制。 [剩余清单](work/2026-11-18-remaining-capabilities.md)
+- **设备**：2026-11-20 Mate 60（BRA-AL00，HarmonyOS 7.0.0.111，API 26）已通过 USB 连接并完成 0.4.69 真机升级验证：0.4.26(33)→0.4.69(76) 覆盖安装保留应用数据与 DeepSeek 账号，应用冷启动后 Host 正常（web 200）、bundle 列表正常、剩余存储 155G。真机 PRoot `exec` 语义已实测：随包签名命令（sh/bash/node/python3/git 等）与脚本可 `exec`，复制/伪造的任意 ELF 被 `HARMONY_PRELOAD` 加载器拒绝（见[真机 PRoot exec 语义](research/harmonyos-proot-exec.md)）。真机麦克风+真人说话、后台保活、长时间高并发与网络切换仍待验证。
 
 随包保留官方 DSH 运行时和扩展体系。能力补齐范围以表中实测与限制为准，尚未达到桌面全功能等价。
 
 0.4.68 修复 pnpm 在 profile 安装含命令行入口的依赖失败。DSH 实际安装公开的多平台 Node 包并通过子进程使用 ARM64 musl addon，验证 CRC32、inotify 订阅和普通 `.bin` 脚本。Bash 单次审批下的隔离 venv 也通过 NumPy/OpenBLAS 与 orjson。 [本轮证据](evidence/emulator-native-package-compat-0.4.68.json)
+
+0.4.69 加固 PTC 单链接读取，记录应用数据视图无法创建符号链接／硬链接，并回归崩溃恢复、语音转写和本机 Ollama 路由。本机模型不具备稳定工具调用，非 DeepSeek 端点只按接入语义记录。 [本轮证据](evidence/emulator-capability-parity-0.4.69.json)

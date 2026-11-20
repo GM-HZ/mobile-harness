@@ -1,0 +1,135 @@
+{
+  "kind": "real-device runtime tool acquisition probe (pure Python)",
+  "artifact": {
+    "signedHap": "dsh-mh-harmonyos-arm64-v0.4.69-signed.hap",
+    "signedSha256": "5b3a306ba4dfc6269a4ad8ef5a8a1f2ad75bc2e670ff03fce058ea867a43d24a",
+    "sourceCommit": "2119054df8c9dccbeb25dd370e9acb732e21c026"
+  },
+  "device": "HUAWEI Mate 60 (BRA-AL00), HarmonyOS 7.0.0.111, API 26",
+  "baseEnvironment": {
+    "pip": "25.0.1",
+    "pep668": "python3 -m pip install --user is refused: the base Python is externally managed; the message directs users to python3 -m venv or python3 -m pip install --target",
+    "rawFirstAttempt": "PWD=/workspace-native/proot-exec-c93152a3\n--- pip install a pure-python tool at runtime ---\n[still running after 60000ms; moved to background job bash-53d4c8e6bec64cb3]\nPIP_INSTALL_EXIT=1\n╰─> The base Python is supplied by Mobile Harness. Create a virtual environment with python3 -m venv .venv, or use python3 -m pip install --target <project-directory>.\n\nnote: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.\nhint: See PEP 668 f"
+  },
+  "projectDirectoryInstall": {
+    "command": "python3 -m pip install --no-cache-dir --target ./pylibs pyfiglet",
+    "exit": "0",
+    "result": "Successfully installed pyfiglet-1.0.4 (downloaded 1.8 MB from PyPI)",
+    "runCommand": "PYTHONPATH=./pylibs python3 -m pyfiglet -f small MH",
+    "runExit": "0",
+    "output": "ASCII art rendered"
+  },
+  "network": {
+    "pypiSimpleStatus": 200,
+    "throughputObserved": "about 73 kB/s for this small wheel"
+  },
+  "nodeRuntime": {
+    "node": "v24.14.1",
+    "nodeJsExecution": "NODE_JS_RUNTIME_OK"
+  },
+  "conclusion": {
+    "prepackagedNeeded": "native CLI binaries and native shared libraries/extensions (signature-bound)",
+    "runtimeAcquirable": "pure-Python packages via pip --target/venv, pure-JS code via node, shell/Python/Node scripts",
+    "notVerified": "native wheels / packages with compiled extensions (expected to hit the same dlopen permission error), WASI/wasm tooling"
+  },
+  "rawProbes": {
+    "runtime": {
+      "kind": "real-device runtime package acquisition probe",
+      "target": "37R0224115035605",
+      "checkedAt": "2026-11-20T20:09:47+0800",
+      "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-c93152a3",
+      "model": {
+        "default": {
+          "provider": "deepseek-account",
+          "model": "deepseek-flash",
+          "reasoningEffort": "off"
+        }
+      },
+      "permissionMode": "danger-full-access",
+      "toolCalls": [
+        {
+          "turn": 1,
+          "step": 1,
+          "callId": "call_00_RBgqEnk70XkLqMEa4i8U4552",
+          "name": "bash",
+          "arguments": "{\"command\": \"set +e\\necho \\\"PWD=$PWD\\\"\\necho \\\"--- pip install a pure-python tool at runtime ---\\\"\\npython3 -m pip install --no-cache-dir --user pyfiglet > ./pip-install.log 2>&1; echo \\\"PIP_INSTALL_EXIT=$?\\\"\\ntail -4 ./pip-install.log\\npython3 -m pyfiglet -f small MH 2>&1 | head -6; echo \\\"PYFIGLET_EXIT=$?\\\"\\necho \\\"--- node js runtime ---\\\"\\nnode -e \\\"console.log('NODE_JS_RUNTIME_OK')\\\" 2>&1; echo \\\"NODE_JS_EXIT=$?\\\"\\necho RUNTIME_PROBE_DONE\\n\", \"description\": \"Probe PRoot exec semantics\"}"
+        },
+        {
+          "turn": 1,
+          "step": 2,
+          "callId": "call_00_tulgQaqi5KY6lHdsIiG94738",
+          "name": "job_output",
+          "arguments": "{\"job_id\": \"bash-53d4c8e6bec64cb3\", \"wait\": true, \"timeout_ms\": 240000}"
+        }
+      ],
+      "bashCallCount": 1,
+      "commandMatched": true,
+      "command": "set +e\necho \"PWD=$PWD\"\necho \"--- pip install a pure-python tool at runtime ---\"\npython3 -m pip install --no-cache-dir --user pyfiglet > ./pip-install.log 2>&1; echo \"PIP_INSTALL_EXIT=$?\"\ntail -4 ./pip-install.log\npython3 -m pyfiglet -f small MH 2>&1 | head -6; echo \"PYFIGLET_EXIT=$?\"\necho \"--- node js runtime ---\"\nnode -e \"console.log('NODE_JS_RUNTIME_OK')\" 2>&1; echo \"NODE_JS_EXIT=$?\"\necho RUNTIME_PROBE_DONE\n",
+      "resultText": "PWD=/workspace-native/proot-exec-c93152a3\n--- pip install a pure-python tool at runtime ---\n[still running after 60000ms; moved to background job bash-53d4c8e6bec64cb3]\nPIP_INSTALL_EXIT=1\n╰─> The base Python is supplied by Mobile Harness. Create a virtual environment with python3 -m venv .venv, or use python3 -m pip install --target <project-directory>.\n\nnote: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.\nhint: See PEP 668 for the detailed specification.\n/usr/bin/python3: No module named pyfiglet\nPYFIGLET_EXIT=0\n--- node js runtime ---\nNODE_JS_RUNTIME_OK\nNODE_JS_EXIT=0\nRUNTIME_PROBE_DONE\n[status: completed, exit code: 0]",
+      "markers": {
+        "EXEC_SH_OK": false,
+        "EXEC_BASH_OK": false,
+        "EXEC_NODE_OK": false,
+        "EXEC_PY_OK": false,
+        "EXEC_SCRIPT_OK": false,
+        "COPY_NODE_OK": false,
+        "PROOT_EXEC_PROBE_DONE": false
+      },
+      "exits": {
+        "PIP_INSTALL_EXIT": "1",
+        "PYFIGLET_EXIT": "0",
+        "NODE_JS_EXIT": "0"
+      },
+      "ok": false
+    },
+    "runtimeTarget": {
+      "kind": "real-device runtime pure-python install probe",
+      "target": "37R0224115035605",
+      "checkedAt": "2026-11-20T20:11:18+0800",
+      "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-22730bec",
+      "model": {
+        "default": {
+          "provider": "deepseek-account",
+          "model": "deepseek-flash",
+          "reasoningEffort": "off"
+        }
+      },
+      "permissionMode": "danger-full-access",
+      "toolCalls": [
+        {
+          "turn": 1,
+          "step": 1,
+          "callId": "call_00_Z1GwGk81gWQ61YkpK8u03743",
+          "name": "bash",
+          "arguments": "{\"command\": \"set +e\\necho \\\"PWD=$PWD\\\"\\necho \\\"--- pip install into a project directory ---\\\"\\npython3 -m pip install --no-cache-dir --target ./pylibs pyfiglet > ./pip-target.log 2>&1; echo \\\"PIP_TARGET_EXIT=$?\\\"\\ntail -3 ./pip-target.log\\nPYTHONPATH=./pylibs python3 -m pyfiglet -f small MH 2>&1 | head -6; echo \\\"PYFIGLET_TARGET_EXIT=$?\\\"\\necho \\\"--- direct network check ---\\\"\\npython3 -c \\\"import urllib.request; print(urllib.request.urlopen('https://pypi.org/simple/pyfiglet/', timeout=15).status)\\\" 2>&1; echo \\\"PYPI_HTTP_EXIT=$?\\\"\\necho RUNTIME_TARGET_PROBE_DONE\\n\", \"description\": \"Probe PRoot exec semantics\"}"
+        },
+        {
+          "turn": 1,
+          "step": 2,
+          "callId": "call_00_fJsnHJ7JEUSUsJiWQpPE5471",
+          "name": "job_output",
+          "arguments": "{\"job_id\": \"bash-222c7d903bcd410a\", \"wait\": true, \"timeout_ms\": 240000}"
+        }
+      ],
+      "bashCallCount": 1,
+      "commandMatched": true,
+      "command": "set +e\necho \"PWD=$PWD\"\necho \"--- pip install into a project directory ---\"\npython3 -m pip install --no-cache-dir --target ./pylibs pyfiglet > ./pip-target.log 2>&1; echo \"PIP_TARGET_EXIT=$?\"\ntail -3 ./pip-target.log\nPYTHONPATH=./pylibs python3 -m pyfiglet -f small MH 2>&1 | head -6; echo \"PYFIGLET_TARGET_EXIT=$?\"\necho \"--- direct network check ---\"\npython3 -c \"import urllib.request; print(urllib.request.urlopen('https://pypi.org/simple/pyfiglet/', timeout=15).status)\" 2>&1; echo \"PYPI_HTTP_EXIT=$?\"\necho RUNTIME_TARGET_PROBE_DONE\n",
+      "resultText": "PWD=/workspace-native/proot-exec-22730bec\n--- pip install into a project directory ---\n[still running after 60000ms; moved to background job bash-222c7d903bcd410a]\nPIP_TARGET_EXIT=0\n   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 73.6 kB/s eta 0:00:00\nInstalling collected packages: pyfiglet\nSuccessfully installed pyfiglet-1.0.4\n __  __ _  _ \n|  \\/  | || |\n| |\\/| | __ |\n|_|  |_|_||_|\n             \n\nPYFIGLET_TARGET_EXIT=0\n--- direct network check ---\n200\nPYPI_HTTP_EXIT=0\nRUNTIME_TARGET_PROBE_DONE\n[status: completed, exit code: 0]",
+      "markers": {
+        "EXEC_SH_OK": false,
+        "EXEC_BASH_OK": false,
+        "EXEC_NODE_OK": false,
+        "EXEC_PY_OK": false,
+        "EXEC_SCRIPT_OK": false,
+        "COPY_NODE_OK": false,
+        "PROOT_EXEC_PROBE_DONE": false
+      },
+      "exits": {
+        "PIP_TARGET_EXIT": "0",
+        "PYFIGLET_TARGET_EXIT": "0",
+        "PYPI_HTTP_EXIT": "0"
+      },
+      "ok": false
+    }
+  }
+}

@@ -32,6 +32,8 @@ HARMONY_SIGNING_PROFILE=/absolute/path/to/build-profile.json5 ./build.sh --packa
 
 `--package` 在 `.build/artifacts/harmonyos/` 生成带版本的 ARM64 HAP 及各自的 `.sha256` 文件。未签名包供 Phone 模拟器使用。普通调试签名包适用于签名配置覆盖的真机，可以在同包名、同签名且版本号更高时覆盖安装。
 
+自建构建可选开启"内存 ELF 运行器"（`/usr/bin/mh-exec`）：`HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package`。它让 guest 可以运行运行时下载的静态 ELF（绕过鸿蒙文件代码签名边界），**只用于自用/自编译构建**；默认构建与上架构建不得开启（默认构建不打包该脚本，且启动时会删除残留副本）。GitHub Actions 的 Build HarmonyOS HAP 通过 workflow dispatch 输入 `self_build_bypass: true` 开启并记录为自建变体。
+
 GitHub Actions 的 **Build HarmonyOS HAP** 可在 `main` 上手动触发。注册带 `deveco` 标签的 ARM64 macOS runner，并预装 DevEco Studio SDK 26。将校验清单中的运行时输入存放在 runner 检出目录之外。通过仓库 Actions 变量 `DEVECO_HOME` 和 `HARMONY_INPUTS_DIR` 指定绝对路径。工作流调用同一个打包命令并上传未签名 HAP 和校验文件。
 
 在模拟器通过回归后，从对应的 Git 提交创建 Release。发布包名中的版本号来自 `apps/harmonyos/AppScope/app.json5`，例如以下命令上传 0.4.26 的模拟器包。需要分发真机调试包时，将 `signed.hap` 及其校验文件一同附到该私有仓库的 Release。
@@ -56,6 +58,17 @@ python3 tests/smoke/emulator-recovery.py <loopback-target> .build/emulator-recov
 启动计时的 `fresh` 模式会清空目标 App 数据，仅用于独立模拟器。恢复测试要求正常模式已启动，并会记录匿名鉴权、插件崩溃、安全模式和旧会话续接。
 
 启动计时可通过第三个参数指定观测次数，默认 60。需要观察并行负载下的慢启动时可指定 120，并从设备日志分别核对解包、Host 就绪和 ArkWeb 就绪。应用的 60 秒 Host 看门狗从启动 Host 时起算。
+
+## 能力对齐回归闸门
+
+`tests/bench/capability-parity-regression.py` 在同一制品上按固定顺序跑 9 个验收步骤（恢复、语音、原生采集、Ollama 路由、PTC 链接前置与边界、LiveShare owner 流、账号入口、addon 位置），输出单一 gate JSON。需要两台模拟器、宿主 Ollama 与语音夹具；语音步骤前重置麦克风权限，账号步骤前清空第二台设备应用数据。
+
+```sh
+python3 tests/bench/capability-parity-regression.py --target <primary> --second-target <second> \
+  --output .build/capability-parity-gate.json
+```
+
+跨设备 LiveShare 与 Forge 公开读/真实账号为独立证据，不放入闸门（原因见 [回归闸门记录](work/2026-11-20-capability-parity-gate.md)）。
 
 ## MCP 模拟器回归
 
@@ -87,6 +100,10 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-pi-ai-protocols.py <loopback-target> .build/emulator-pi-ai.json
 ```
 
+## 真机（USB）验证脚本
+
+`tests/smoke/mate60-verify.py --target <usb-serial>` 做只读真机检查：设备参数、已安装版本、启动状态、web、账号状态、bundle 列表、存储与麦克风 token 信息，并写证据 JSON。`tests/smoke/mate60-proot-exec.py --target <usb-serial>` 在真实会话里让模型调用一次 `bash` 工具执行固定探针，记录 PRoot `exec` 的可用范围与任意 ELF 的拒绝行为。真机需先解锁屏幕（开发者模式下 `aa start` 不会自动解锁）；构建真机包时把签名配置放在仓库根目录 `build-profile.json5`，`./build.sh --package` 会同时产出 unsigned 与 signed HAP。
+
 ## 通用 PTC 回归
 
 0.4.31 起普通构建默认包含通用 PTC。构建机将锁定 Node 子模块中的 Amaro 用固定 Binaryen 132.0.0 转为纯 JavaScript，校验下载包与两个生成文件的摘要并缓存到 `.build/portable-amaro/`；手机无需 WASM 或编译器。恢复模式跳过 PTC。`HARMONY_PTC_AMARO_DIR` 仍可提供相同摘要的预生成文件。安装普通包并通过 HDC 启动后，冒烟测试经真实 DSH 会话触发 `run_code`，检查工作区文件授权、嵌套工具和取消，退出时清除临时文件与凭据。
@@ -117,6 +134,27 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 ```sh
 MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-ptc-approval.py <loopback-target> .build/ptc-approval.json
+```
+
+应用数据视图的链接能力是 PTC 链接压力场景的前置条件。下列脚本只读记录应用上下文与 shell 域的符号链接、硬链接创建结果，并扫描工作区现有链接和链接数，用于判断端到端夹具能否运行。
+
+```sh
+python3 tests/smoke/emulator-ptc-link-fixture.py <loopback-target> .build/ptc-link-fixture.json
+```
+
+## 本地模型路由回归
+
+本机 Ollama 经标准 provider 设置接入，测试用回环夹具把设备请求转发到宿主模型服务。两条 OpenAI 兼容协议分别验证模型发现、流式请求、工具目录、图片附件、重启保持与配置恢复。测试使用本机模型，无外部 API 凭据；小模型的工具调用与视觉问答质量只记录不断言。
+
+```sh
+python3 tests/smoke/emulator-ollama.py <loopback-target> .build/ollama-provider.json \
+  --model <ollama-model> --context-window <tokens> --max-tokens <tokens>
+```
+
+边界压力回归在真实 PTC 会话里检查程序无法自建链接、读链接目标、改元数据或改写打开，并临时安装一个宿主插件按门控把程序父目录移出授权根再移回。每轮读写都应在根外拒绝，且被移出目录不被写入。测试结束移除插件并把 profile manifest 恢复为原字节。需要已登录的模型路由，或 `MH_TEST_DEEPSEEK_API_KEY`。
+
+```sh
+python3 tests/smoke/emulator-ptc-boundary.py <loopback-target> .build/ptc-boundary.json
 ```
 
 ## Host 进程探针
@@ -273,6 +311,14 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   python3 tests/smoke/emulator-compaction-auto.py <loopback-target> .build/compaction-auto.json
 ```
 
+## 原生 addon 加载位置实测
+
+通过随包 Inspector 在 Host 主进程内评估加载结果：同一份 `libdshshell.so` 字节按安装目录 soname 加载成功，复制到应用数据目录后按绝对路径加载失败。测试会临时启用 Inspector、结束后停用并恢复 profile 与启动文件，不需要模型凭据。
+
+```sh
+python3 tests/smoke/emulator-native-addon-location.py <loopback-target> .build/native-addon-location.json
+```
+
 ## 后台定时任务回归
 
 模拟器从应用进入系统桌面，持续通过 AbilityManager 核对应用处于 `BACKGROUND`，在同一会话等待计划任务投递和真实模型回复。回到前台核对 Host 启动身份、历史完整性和最初消息的准确回忆。
@@ -426,6 +472,15 @@ python3 tests/smoke/emulator-forge-account.py <loopback-target> .build/forge-acc
 
 `--public-read` 使用已登录的桌面 gh 查询 GM-HZ/omnix 的公开 PR #9。测试代理仅转发该 PR 的固定只读 GraphQL 查询和一个固定提交的文件读取。模拟器使用一次性夹具凭据，GitHub 账号凭据由桌面 gh 持有。文件逐字核对，提交和父提交与 GitHub REST 结果比对。
 
+## 公网 Relay 预检
+
+公网 LiveShare Relay 上线后，先用预检确认 HTTPS 证书、`/health` 与匿名 WSS 升级行为；本机可用自签 TLS 反代 + Relay 夹具做正负向自测（`--self-test`），不需要设备。
+
+```sh
+python3 tests/smoke/relay-preflight.py https://<domain>/ .build/relay-preflight.json
+python3 tests/smoke/relay-preflight.py --self-test .build/relay-preflight-self-test.json
+```
+
 ## LiveShare
 
 独立 Phone 模拟器使用仅回环可达的测试 Relay 和一次性会话。独立查看者读取已共享的页面和历史，同工作区未共享会话及 Owner 管理接口会拒绝访问。验收也覆盖 Host 重启重连、撤销查看者授权、删除共享及停用网关。加 `--model` 可验证查看者通过真实 DeepSeek Flash 完成一轮对话，并在历史中核对其身份。脚本在结束时恢复 profile，移除测试凭据和转发。
@@ -451,6 +506,24 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   --guest-uploads --attachments
 ```
 
+加 `--device-host 10.0.2.2` 时夹具临时监听 `0.0.0.0`，设备经模拟器 QEMU 用户网络直连宿主（不做 hdc 反向转发），用于跨设备 viewer；owner 登录页仍需要回环/HTTPS 地址，因此 owner 登录与跨设备 viewer 分开跑。
+
+加 `--relay-url <url>` 可对独立启动的 Relay（或公网 HTTPS Relay）运行同一套验收，不再在测试内启动夹具；`--relay-call-url` 用于宿主调用地址与设备可见地址不同的本机转发验证，`--relay-host-port` 会为设备建立回环转发。公网地址就绪先用 `relay-preflight.py` 检查证书、`/health` 与匿名 WSS 升级。
+
+加 `--cross-device <second-loopback-target>` 时，测试 Relay 会把 owner 的 index 资源取回并注入官方 `viewerCarrierScript`，再在第二台模拟器的系统浏览器打开 viewer 页面。测试检查浏览器 UA、`/__liveshare/context`、页面资源与会话 cookie 的 `session/list` 调用，并核对界面出现观看者只读提示。owner 侧的已有 reader 回归会先撤销访问再经夹具 admin 恢复，第二台设备因此是真实读者。该链路使用自建 Relay 与本机 `hdc rport`，不是官方公网 Relay。
+
+```sh
+python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-cross-device.json \
+  --cross-device <second-loopback-target>
+```
+
+加 `--owner-login` 时先用实际 ArkWeb 完成分享授权（测试 Relay 的 PKCE 交换），再让第二台设备读取带历史消息的共享会话；viewer 页面会显示共享会话标题、消息和时间戳。该组合不需要 `MH_TEST_DEEPSEEK_API_KEY`，模型路由取本机 `session/modelCatalog` 的默认项。
+
+```sh
+python3 tests/smoke/emulator-liveshare-relay.py <loopback-target> .build/liveshare-owner-cross-device.json \
+  --owner-login --cross-device <second-loopback-target>
+```
+
 桌面装有 Chrome 和 Playwright CLI 时，可以打开实际分享页面，从对话框选择文件并发送。下列测试通过回环 Relay 转发真实页面资源，按 Viewer 身份核对模型回合。
 
 ```sh
@@ -473,6 +546,13 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
 在独立 Phone 模拟器安装对应 HAP。先准备上游 RC.5 锁定的 SenseVoice int8 模型、词表及 Silero VAD，放在同一测试输入目录。官方模型清单位于锁定 DSH 的 `packages/experimental/speech-to-text-sensevoice/runtime/assets.json`。测试临时填充 App 私有模型缓存，校验后加载，再验证普通话转写、无效音频与关闭回收。退出后移除测试缓存并恢复原配置。可选 `--arkweb` 使用真实模拟器触屏启动 ArkWeb 录音，采集合成音频并验证草稿和取消。使用 `--download` 可从空缓存经独立限速镜像准备原始模型。真机麦克风单独验收。使用 `--public-download auto` 会从空缓存走应用默认公网来源，并核对下载文件的原始 SHA-256。
 
 可选 `--native-mic` 使用独立的调试模拟器和未授权的初始麦克风状态。测试触屏点击 DSH 录音按钮，通过系统弹窗授予权限，核对真实 ArkWeb 音轨进入 live、取消后进入 ended，结束时恢复系统权限。该步骤仅保留状态证据。可与 `--arkweb` 一起运行。
+
+`--native-mic-transcribe` 用模拟器原生麦克风做真实声学采集：测试在录音期间用宿主 `afplay` 外放已知的合成普通话，通过 Web Audio 分析器记录采集时长、RMS 与峰值，再点官方「停止并识别」并核对草稿文本。前置条件是宿主有可用的音频输出与输入（外放可被麦克风拾取），结果会记录宿主音量；真机麦克风与真人说话另行验收。
+
+```sh
+python3 tests/smoke/emulator-voice-input.py <loopback-target> .build/voice-native-capture.json \
+  --model-root <fixture-model-dir> --audio <16k-mono-pcm16-wav> --native-mic-transcribe
+```
 
 ```sh
 python3 tests/smoke/emulator-voice-input.py <loopback-target> .build/voice-api.json \

@@ -1,0 +1,46 @@
+{
+  "kind": "transparent execution of downloaded static and dynamic ELF binaries (self-build exec shim)",
+  "artifacts": {
+    "selfBuildUnsignedSha256": "d80c696c4d5c2b47503128549646c9997fb3bfa948a412299ed176badd98e242",
+    "selfBuildSignedSha256": "c135a01a913be6dc862112f4f42577528b96076b48880bba627315e70da0e039",
+    "sourceCommit": "7b9fd8d4a43cbafab223d24eabefb65bb417aad9"
+  },
+  "mechanism": {
+    "shim": "runtime/harmonyos/native/mh-exec-shim.c compiled freestanding (-nostdlib, raw syscalls, no NEEDED libs) into libguest_mh_exec_shim.so, bound at /usr/lib/libmh-exec-shim.so",
+    "activation": "poc.c sets LD_PRELOAD=/usr/lib/libmh-exec-shim.so for the managed shell child only when MH_SELF_BUILD is defined",
+    "behavior": "execve() probes the target: ELF files whose file-backed PROT_EXEC mapping succeeds (signed bindings) pass through; unsigned ELFs are redirected to /usr/bin/python3 /usr/bin/mh-exec <path> <args>; scripts/non-ELF pass through; MH_EXEC_REDIRECT guards recursion"
+  },
+  "emulator": {
+    "device": "127.0.0.1:5555 API 26 ARM64 Phone emulator (self build)",
+    "shimEnvironment": "LD_PRELOAD=[/usr/lib/libmh-exec-shim.so]\n-rw-r--r--    1 3060     3060          2520 Nov 20 21:27 /usr/lib/libmh-exec-shim.so\n-rwxr-xr-x    1 mobile-harness 20020074      9723 Nov 20 21:27 /usr/bin/mh-exec\n-rwxr--r--    1 3060     3060         67224 Nov 20 21:27 /usr/bin/python3\nMH_EXEC_REDIRECT=[]\nSHIM_ENV_DONE\n",
+    "transparentRun": "--- prepare a downloaded static tool ---\nCURL_OK\nGZIP_OK\nTAR_OK\n-rwxr-xr-x    1 mobile-harness 20020074   1115944 Nov 23  2025 ./tr/bin/busybox.static\n--- transparent direct execution (no mh-exec) ---\nTRANSPARENT_EXEC_OK\nTRANSPARENT_EXIT=0\naarch64\nUNAME_EXIT=0\n--- transparent dynamic ELF ---\nDYN_CURL_OK\nDYN_TAR_OK\nDYN_TRANSPARENT_OK\nDYN_TRANSPARENT_EXIT=0\n--- signed tool health under the preload ---\ngit version 2.49.1\nGIT_EXIT=0\nNODE_OK\nNODE_EXIT=0\ncurl 8.14.1 (aarch64-alpine-linux-musl) libcurl/8.14.1 OpenSSL/3.5.9 zlib/1.4 brotli/1.1.1 zstd/1.5.7 c-ares/1.34.9 libidn2/2.3.7 libpsl/0.21.5 nghttp2/1.69.0\nCURL_EXIT=0\nTRANSPARENT_PROBE_DONE\n",
+    "exitCodes": {
+      "TRANSPARENT_EXIT": "0",
+      "UNAME_EXIT": "0",
+      "DYN_TRANSPARENT_EXIT": "0",
+      "GIT_EXIT": "0",
+      "NODE_EXIT": "0",
+      "CURL_EXIT": "0"
+    },
+    "observed": "download -> ./busybox (static) and ./dynx/bin/busybox (dynamic, PT_INTERP) run directly with exit 0; git/node/curl still work under the preload"
+  },
+  "storeBuildGating": {
+    "shimEnvironment": "LD_PRELOAD=[]\n----------    1 mobile-harness 20020074         0 Nov 20 21:27 /usr/lib/libmh-exec-shim.so\nls: /usr/bin/mh-exec: No such file or directory\n-rwxr--r--    1 3060     3060         67224 Nov 20 21:44 /usr/bin/python3\nMH_EXEC_REDIRECT=[]\nSHIM_ENV_DONE\n",
+    "observed": "default build: LD_PRELOAD empty, /usr/lib/libmh-exec-shim.so is an unbound 0-byte placeholder, /usr/bin/mh-exec absent; transparent exec remains unavailable"
+  },
+  "realDevice": {
+    "device": "HUAWEI Mate 60 (BRA-AL00), HarmonyOS 7.0.0.111, API 26 (self signed build)",
+    "shimEnvironment": "LD_PRELOAD=/usr/lib/libmh-exec-shim.so; /usr/bin/mh-exec and /usr/bin/mh-install present",
+    "transparentRun": "--- prepare a downloaded static tool ---\nCURL_OK\nGZIP_OK\nTAR_OK\n-rwxr-xr-x    1 mobile-harness 20020306   1115944 Nov 23  2025 ./tr/bin/busybox.static\n--- transparent direct execution (no mh-exec) ---\nTRANSPARENT_EXEC_OK\nCHILD_EXIT 0\nTRANSPARENT_EXIT=0\naarch64\nCHILD_EXIT 0\nUNAME_EXIT=0\n--- transparent dynamic ELF ---\nDYN_CURL_OK\nDYN_TAR_OK\nDYN_TRANSPARENT_OK\nCHILD_EXIT 0\nDYN_TRANSPARENT_EXIT=0\n--- signed tool health under the preload ---\ngit version 2.49.1\nGIT_EXIT=0\nNODE_OK\nNODE_EXIT=0\ncurl 8.14.1 (aarch64-alpine-linux-musl) libcurl/8.14.1 OpenSSL/3.5.9 zlib/1.4 brotli/1.1.1 zstd/1.5.7 c-ares/1.34.9 libidn2/2.3.7 libpsl/0.21.5 nghttp2/1.69.0\nCURL_EXIT=0\nTRANSPARENT_PROBE_DONE\n",
+    "exitCodes": {
+      "TRANSPARENT_EXIT": "0",
+      "UNAME_EXIT": "0",
+      "DYN_TRANSPARENT_EXIT": "0",
+      "GIT_EXIT": "0",
+      "NODE_EXIT": "0",
+      "CURL_EXIT": "0"
+    },
+    "observed": "downloaded static busybox and downloaded dynamic busybox (PT_INTERP) both run directly with exit 0; git/node/curl unaffected",
+    "note": "relative paths (./tool) are handled too: the shim probes/redirects relative targets, mh-exec opens them from the inherited cwd"
+  }
+}

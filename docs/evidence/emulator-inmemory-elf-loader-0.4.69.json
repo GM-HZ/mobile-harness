@@ -1,0 +1,24 @@
+{
+  "kind": "in-memory ELF loader prototype on the API 26 emulator",
+  "artifact": {
+    "unsignedHap": "dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "sha256": "50b830ab695a353c5cae6028a801c4334a6e83ab6d1934ad5515af62063c8edc",
+    "sourceCommit": "2e687a92a4a1eea417db4507f65312fa176ba777"
+  },
+  "device": "127.0.0.1:5555 API 26 ARM64 Phone emulator",
+  "loader": {
+    "fixture": "tests/smoke/fixtures/inmemory-elf-loader.py",
+    "mechanism": "embedded aarch64 ET_EXEC (write syscall; ret) -> write to ./probe.elf in the app workspace -> parse phdrs -> mmap(PROT_READ|WRITE, MAP_PRIVATE|MAP_ANON|MAP_FIXED, vaddr=0x400000) -> memmove -> mprotect(PROT_READ|EXEC) -> CFUNCTYPE jump to entry",
+    "uploadedBytes": 3260
+  },
+  "observed": {
+    "commandMatched": true,
+    "resultText": "EMORY-ELF-OK\n\u0000\u0000\u0000\u0000ELF_WRITTEN_TO_DISK 544\nELF_HEADER_OK entry=0x400100 phnum=1\nSEGMENT_MAPPED 0x400000 size 4096 prot 5\nENTER_ENTRY 0x400100\nRETURNED_FROM_ELF (no exit_group called)\nINMEM_ELF_PROBE_DONE\n"
+  },
+  "realDeviceStatus": "not yet re-run: the Mate 60 screen is locked again (Host suspended); the same loader ran in the emulator. The real device previously confirmed anonymous RWX/RX mmap and arbitrary machine-code execution (docs/evidence/mate60-executable-memory-probe-0.4.69.json).",
+  "nextSteps": [
+    "set up a real stack (argc/argv/envp/auxv), fork and waitpid so real static binaries can call exit_group",
+    "load a downloaded statically-linked busybox/fd/ripgrep image through the loader",
+    "port the loader into a signed native helper and wire it into the bash/subprocess provider"
+  ]
+}

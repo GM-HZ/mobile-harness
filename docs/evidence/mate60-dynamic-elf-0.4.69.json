@@ -1,0 +1,44 @@
+{
+  "kind": "dynamically linked ELF execution through the in-memory loader (emulator and real device)",
+  "artifact": {
+    "signedSelfBuildHap": "dsh-mh-harmonyos-arm64-v0.4.69-selfbuild-signed.hap",
+    "sha256": "b4e22709fd3498c334e21a6bd10dcd82f7eb1739c3362a7ca5a73028f3ef2518",
+    "sourceCommit": "4c1a6163fbc3500c5e2c5916405170c39aa147f7"
+  },
+  "target": {
+    "package": "Alpine busybox 1.36.1-r31 (main/aarch64)",
+    "class": "ELF64 ET_DYN (PIE), dynamically linked",
+    "interpreter": "/lib/ld-musl-aarch64.so.1",
+    "size": 919232
+  },
+  "mechanism": {
+    "main": "PT_LOAD segments mapped anonymously at base 0x1000000000 with MAP_FIXED",
+    "interpreter": "the signed guest /lib/ld-musl-aarch64.so.1 is read and its segments mapped anonymously at base 0x2000000000",
+    "auxv": "AT_PHDR/AT_ENTRY point at the main image; AT_BASE = interpreter base; execution starts at the interpreter entry",
+    "dynamicLinking": "musl ld performs the main PIE relocation and loads libc.musl-aarch64.so.1 through the signed guest bindings"
+  },
+  "emulator": {
+    "device": "127.0.0.1:5555 API 26 ARM64 Phone emulator",
+    "result": "--- install a dynamically linked static-package tool ---\nMH_INSTALL_OK /usr/bin/busybox-dyn\nMH_INSTALL_TOOL /usr/lib/mh-tools/busybox-dyn/tool\nMH_INSTALL_DYN_EXIT=0\n-rwxr-xr-x    1 mobile-harness 20020074    919232 Nov 23  2025 /usr/lib/mh-tools/busybox-dyn/tool\n--- run the dynamic tool ---\nDYN_EXEC_OK\nCHILD_EXIT 0\nDYN_EXIT=0\naarch64\nCHILD_EXIT 0\nDYN_UNAME_EXIT=0\nDYN_HELP_EXIT=0\nDYNAMIC_PROBE_DONE\n",
+    "exitCodes": {
+      "MH_INSTALL_DYN_EXIT": "0",
+      "DYN_EXIT": "0",
+      "DYN_UNAME_EXIT": "0",
+      "DYN_HELP_EXIT": "0"
+    }
+  },
+  "realDevice": {
+    "device": "HUAWEI Mate 60 (BRA-AL00), HarmonyOS 7.0.0.111, API 26",
+    "result": "--- install a dynamically linked static-package tool ---\nMH_INSTALL_OK /usr/bin/busybox-dyn\nMH_INSTALL_TOOL /usr/lib/mh-tools/busybox-dyn/tool\nMH_INSTALL_DYN_EXIT=0\n-rwxr-xr-x    1 mobile-harness 20020306    919232 Nov 23  2025 /usr/lib/mh-tools/busybox-dyn/tool\n--- run the dynamic tool ---\nDYN_EXEC_OK\nCHILD_EXIT 0\nDYN_EXIT=0\naarch64\nCHILD_EXIT 0\nDYN_UNAME_EXIT=0\nDYN_HELP_EXIT=0\nDYNAMIC_PROBE_DONE\n",
+    "exitCodes": {
+      "MH_INSTALL_DYN_EXIT": "0",
+      "DYN_EXIT": "0",
+      "DYN_UNAME_EXIT": "0",
+      "DYN_HELP_EXIT": "0"
+    }
+  },
+  "limitations": [
+    "shared libraries must be signed HAP bindings (musl/libc/libstdc++ are; arbitrary extra .so files are not)",
+    "invocation is still explicit through mh-exec/mh-install until transparent exec integration lands"
+  ]
+}

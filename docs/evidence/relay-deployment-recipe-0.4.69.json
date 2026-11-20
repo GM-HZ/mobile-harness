@@ -1,0 +1,130 @@
+{
+  "kind": "host-side deployment recipe validation (no device flow)",
+  "artifactContext": {
+    "expectedVersion": "0.4.69",
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "f1974aa96c2c94c0a6975fe794a772a18f02fc10"
+  },
+  "checkedAt": "2026-11-20T07:59:42+0800",
+  "recipe": {
+    "directory": "deploy/liveshare-acceptance-relay",
+    "files": [
+      "Dockerfile",
+      "docker-compose.yml",
+      "nginx/liveshare-acceptance.conf",
+      "README.md",
+      ".env.example"
+    ],
+    "purpose": "run the repository's LiveShare Relay fixture behind a public HTTPS domain with WebSocket upgrade, for cross-network acceptance only"
+  },
+  "validated": {
+    "health": {
+      "status": 200,
+      "body": "{\"release_id\":\"mobile-harness-test-relay\"}"
+    },
+    "tokenGating": {
+      "anonymousRpc": {
+        "status": 401,
+        "body": "{\"error\":\"viewer-login-required\"}"
+      },
+      "oldViewerToken": {
+        "status": 401,
+        "body": "{\"error\":\"viewer-login-required\"}"
+      },
+      "configuredViewerToken": {
+        "status": 404,
+        "body": "{\"error\":\"unknown-share\"}"
+      },
+      "adminLogWithConfiguredToken": {
+        "status": 200,
+        "records": 0
+      },
+      "adminLogWithOldToken": {
+        "status": 404
+      }
+    },
+    "ownerLoginEnvMode": {
+      "status": 200,
+      "containsButton": true
+    },
+    "ownerLoginArgvMode": {
+      "status": 200,
+      "containsButton": true
+    },
+    "preflightOverTlsProxy": {
+      "exit": 0,
+      "ok": true,
+      "tls": "TLSv1.3 with the generated certificate",
+      "wssStatus": 401
+    },
+    "composeYaml": {
+      "services": [
+        "relay"
+      ],
+      "parsed": true
+    },
+    "nginxConfig": {
+      "hasUpgradeMapping": true,
+      "hasWebsocketHeaders": true,
+      "hasLongReadTimeout": true,
+      "hasBodyLimit": true
+    }
+  },
+  "notValidated": [
+    "nginx/certbot on the real server (configuration reviewed and key directives checked; executed on the user's server)"
+  ],
+  "scope": {
+    "verified": [
+      "the deployment env knobs enforce the configured viewer and admin tokens (old fixture tokens are rejected)",
+      "the owner login page is served in both env mode and legacy argv mode",
+      "a TLS reverse proxy in front of the Relay passes the preflight: health 200 and anonymous WSS upgrade 401 over TLS 1.3",
+      "the compose file parses and the nginx sample carries the upgrade mapping, WebSocket headers, long read timeout and body limit"
+    ],
+    "pending": [
+      "deploying the container on the user's public server and running the preflight against the real domain"
+    ]
+  },
+  "dockerValidation": {
+    "build": {
+      "command": "docker build -f deploy/liveshare-acceptance-relay/Dockerfile -t mh-relay-acceptance:0.4.69 .",
+      "exit": 0,
+      "imageId": "sha256:c1ed59618c1ac6c94ca21c16bae5c7dca70d447ef85b7a739ae0121a5d121e50",
+      "base": "node:22-alpine",
+      "dependency": "ws@8.18.0"
+    },
+    "container": {
+      "command": "docker run --rm -p 127.0.0.1:18083:8080 -e MH_RELAY_VIEWER_TOKEN=... -e MH_RELAY_ADMIN_TOKEN=... -e MH_RELAY_OWNER_LOGIN=1 -e MH_RELAY_LOGIN_REDIRECT=1 mh-relay-acceptance:0.4.69",
+      "healthStatus": "healthy",
+      "healthEndpoint": {
+        "status": 200,
+        "body": {
+          "release_id": "mobile-harness-test-relay"
+        }
+      },
+      "anonymousRpc": 401,
+      "configuredViewerToken": {
+        "status": 404,
+        "body": {
+          "error": "unknown-share"
+        }
+      },
+      "ownerLoginPage": {
+        "status": 200,
+        "containsButton": true
+      },
+      "logs": [
+        "8080",
+        "{\"ownerAuthorizationDisplayed\":true}"
+      ]
+    },
+    "preflightThroughTlsProxy": {
+      "ok": true,
+      "tls": "TLSv1.3",
+      "health": 200,
+      "wss": {
+        "outcome": "http",
+        "status": 401
+      }
+    }
+  }
+}

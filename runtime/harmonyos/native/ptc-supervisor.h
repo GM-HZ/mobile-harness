@@ -11,6 +11,8 @@ struct PtcLaunch {
     char extra_roots[MH_PTC_EXTRA_ROOTS][1024];
     int extra_count;
     int writable;
+    // Strict single-link reads for granted roots other than the namespace root.
+    int nlink_strict;
     int message_bytes;
     int heap_mb;
 };

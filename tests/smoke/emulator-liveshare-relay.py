@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import random
+import re
 from pathlib import Path
 import runpy
 import select
@@ -20,17 +21,56 @@ translation = runpy.run_path(str(Path(__file__).with_name('emulator-cot-translat
 support, agent, lsp = (flow[name] for name in ['support', 'agent', 'lsp'])
 ws_module = runpy.run_path(str(Path(__file__).with_name('emulator-ptc-approval.py')))['ws_module']
 NAME = '@deepseek-ai/dsh-experimental-liveshare'
+HDC = os.environ.get('HARMONY_HDC', '/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc')
+PROTOCOL_PACKAGE = ('alpine/.dsh-0.2.2-rc.5/dsh/node_modules/@deepseek-ai/'
+                    'dsh-experimental-liveshare-protocol/lib/index.js')
+CARRIER_SCRIPT = """
+import fs from 'node:fs';
+const [source, shareId, sessionId] = JSON.parse(fs.readFileSync(0, 'utf8'));
+const { viewerCarrierScript } = await import('data:text/javascript;base64,' + source);
+console.log(viewerCarrierScript({ basePath: '', shareId, sessionId, readTimeoutMs: 28000 }));
+"""
 
 
 def owner(device, method, request, timeout=25):
     return device.rpc('liveshareShares/'+method, {'request': request}, timeout=timeout)
 
 
-def relay_call(port, share, payload, *, token='fixture-viewer', path='/__share/rpc'):
+BASE_OVERRIDE = None
+DEVICE_BASE = None
+RELAY_HOST_PORT = None
+VIEWER_TOKEN = 'fixture-viewer'
+ADMIN_TOKEN = 'fixture-admin'
+
+
+def clear_forward(hdc_call, listen):
+    """Remove any existing forward ruler with this device listen port."""
+    try:
+        listing = hdc_call('fport', 'ls')
+    except Exception:
+        return
+    for line in listing.splitlines():
+        parts = line.split()
+        if len(parts) >= 3 and parts[1] == listen:
+            try:
+                hdc_call('fport', 'rm', parts[1], parts[2])
+            except Exception:
+                pass
+
+
+def relay_base(port):
+    if BASE_OVERRIDE:
+        return BASE_OVERRIDE
+    return f'http://127.0.0.1:{port}'
+
+
+def relay_call(port, share, payload, *, token='viewer-default', path='/__share/rpc'):
+    if token == 'viewer-default':
+        token = VIEWER_TOKEN
     headers = {'Content-Type': 'application/json'}
     if token:
         headers['Authorization'] = 'Bearer '+token
-    request = Request(f'http://127.0.0.1:{port}{path}?shareId={share}',
+    request = Request(relay_base(port) + path + f'?shareId={share}',
                       data=json.dumps(payload).encode(), headers=headers)
     try:
         with urlopen(request, timeout=8) as response:
@@ -321,7 +361,7 @@ def verify_reader(device, port, share, shared, outside, evidence, model, program
             if program_check:
                 program_check()
         evidence['testModelKeyRemoved'] = True
-    status, body = relay_call(port, share, {}, path='/__fixture/revoke', token='fixture-admin')
+    status, body = relay_call(port, share, {}, path='/__fixture/revoke', token=ADMIN_TOKEN)
     assert status == 200 and body['revoked'] is True
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
     assert (status, body.get('error')) == (403, 'viewer-not-authorized'), (status, body)
@@ -360,7 +400,191 @@ def verify_owner_login(device, title, evidence):
     evidence['arkwebOwnerVerified'] = True
 
 
-def run(device, output, model, owner_login, host_port, program_policy, attachments=False, guest_check=None):
+def fixture_log(port):
+    request = Request(relay_base(port) + '/__fixture/log', headers={'Authorization': 'Bearer ' + ADMIN_TOKEN})
+    try:
+        with urlopen(request, timeout=5) as response:
+            return json.load(response)['records']
+    except Exception:
+        return []
+
+
+def browser_tap(target, labels=('浏览器', '极简浏览')):
+    """Tap the first clickable node whose text is one of the given labels."""
+    dump = 'cat /data/local/tmp/mh-liveshare-ui.json'
+    subprocess.run([HDC, '-t', target, 'shell',
+                    'uitest dumpLayout -p /data/local/tmp/mh-liveshare-ui.json >/dev/null 2>&1'],
+                   check=False, timeout=60)
+    try:
+        raw = subprocess.check_output([HDC, '-t', target, 'shell', dump], text=True, timeout=60)
+    except subprocess.CalledProcessError:
+        return False
+    nodes = []
+    def walk(node):
+        attributes = node.get('attributes', {})
+        if attributes.get('text') in labels:
+            nodes.append(attributes.get('bounds'))
+        for child in node.get('children', []):
+            walk(child)
+    try:
+        walk(json.loads(raw))
+    except ValueError:
+        return False
+    if not nodes:
+        return False
+    values = re.findall(r'-?\d+', nodes[0])
+    x = (int(values[0]) + int(values[2])) // 2
+    y = (int(values[1]) + int(values[3])) // 2
+    subprocess.run([HDC, '-t', target, 'shell', 'uitest', 'uiInput', 'click', str(x), str(y)],
+                   check=False, timeout=60)
+    return True
+
+
+def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
+    """Read the shared session from the official viewer page on a second device."""
+    # Keep the owner device awake while the second device loads the page; the
+    # emulator can suspend the app when the screen is idle and drop the gateway.
+    device.hdc('shell', 'power-shell', 'wakeup')
+    device.start()
+    device.ready('normal')
+    node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
+    source = agent['read_bytes'](device, PROTOCOL_PACKAGE)
+    carrier = subprocess.run([str(node), '--input-type=module', '-e', CARRIER_SCRIPT],
+                             input=json.dumps([base64.b64encode(source).decode(), share, str(sessions[0])]),
+                             text=True, capture_output=True, check=True).stdout.strip()
+    assert 'viewerCarrierScript' not in carrier and '__DSH_LIVESHARE_VIEWER__' in carrier
+    config = json.dumps({'carrier': carrier, 'sessionId': sessions[0],
+                         'ownerDisplayName': 'Fixture Relay Owner'}).encode()
+    request = Request(relay_base(relay_port) + '/__fixture/viewer', data=config,
+                      headers={'Authorization': 'Bearer ' + ADMIN_TOKEN, 'Content-Type': 'application/json'})
+    with urlopen(request, timeout=8) as response:
+        assert json.load(response) == {'ok': True}
+
+    def hdc(*args):
+        return subprocess.check_output([HDC, '-t', target, *args], text=True, timeout=90).strip()
+
+    reverse = None
+    if DEVICE_BASE:
+        reverse = None
+    elif RELAY_HOST_PORT:
+        reverse = ('tcp:19769', f'tcp:{RELAY_HOST_PORT}')
+    elif relay_port:
+        reverse = ('tcp:19769', f'tcp:{relay_port}')
+    if reverse:
+        clear_forward(hdc, reverse[0])
+        assert 'Forwardport result:OK' in hdc('rport', *reverse)
+    title = 'MH cross-device viewer ' + uuid.uuid4().hex[:6]
+    assert device.rpc('session/rename', {'request': {'sessionId': sessions[0], 'title': title}})['title'] == title
+    # The reader regression revoked viewer access just before this call; restore it
+    # through the fixture admin route so the second device is an actual reader.
+    request = Request(relay_base(relay_port) + '/__fixture/authorize?shareId=' + share, data=b'{}',
+                      headers={'Authorization': 'Bearer ' + ADMIN_TOKEN, 'Content-Type': 'application/json'})
+    with urlopen(request, timeout=8) as response:
+        assert json.load(response) == {'authorized': True}
+    deadline = time.monotonic() + 90
+    while time.monotonic() < deadline:
+        status, body = reader_rpc(relay_port, share, 'session/list', {'_request': {}})
+        if status == 200 and body.get('result', {}).get('ok'):
+            break
+        time.sleep(0.5)
+    else:
+        raise AssertionError('The fixture re-authorization did not restore viewer reads')
+    try:
+        page = None
+        for attempt in range(3):
+            # The device reaches the internally spawned fixture through its 19769 rport;
+            # external modes provide their own device-visible base.
+            page_base = DEVICE_BASE or 'http://127.0.0.1:19769'
+            opened = hdc('shell', f"aa start -U '{page_base}/?shareId={share}'")
+            print('cross-device: start ability ->', opened, flush=True)
+            deadline = time.monotonic() + 45
+            while time.monotonic() < deadline:
+                records = fixture_log(relay_port)
+                page = next((row for row in records if row.get('viewerPageServed') and row.get('share') == share), None)
+                if page:
+                    print('cross-device: viewer page served', json.dumps(page, ensure_ascii=False)[:400], flush=True)
+                    break
+                browser_tap(target)
+                time.sleep(1)
+            if page:
+                time.sleep(5)
+                subprocess.run([HDC, '-t', target, 'shell',
+                                'uitest dumpLayout -p /data/local/tmp/mh-liveshare-viewer.json >/dev/null 2>&1'],
+                               check=False, timeout=60)
+                raw = hdc('shell', 'cat /data/local/tmp/mh-liveshare-viewer.json 2>/dev/null || true')
+                texts = [text for text in re.findall(r'"text":"([^"]*)"', raw) if text]
+                print('cross-device: viewer ui after page', texts[:16], flush=True)
+            if page:
+                break
+            hdc('shell', 'aa force-stop com.huawei.hmos.browser')
+            time.sleep(2)
+        assert page, fixture_log(relay_port)[-8:]
+        assert 'HuaweiBrowser' in page['userAgent'] or 'ArkWeb' in page['userAgent'], page
+        deadline = time.monotonic() + 150
+        while time.monotonic() < deadline:
+            records = fixture_log(relay_port)
+            rpc = [row for row in records if row.get('viewerRpc') == 'call:/api/session/list'
+                   and row.get('viaCookie')]
+            assets = [row for row in records if row.get('viewerAsset') and row.get('status') == 200]
+            context = [row for row in records if row.get('viewerContext')]
+            if rpc and len(assets) >= 3 and context:
+                break
+            time.sleep(1)
+        else:
+            raise AssertionError('The second device viewer did not read the share: '
+                                 + json.dumps(records[-10:], ensure_ascii=False)[:1200])
+        subprocess.run([HDC, '-t', target, 'shell',
+                        'uitest dumpLayout -p /data/local/tmp/mh-liveshare-viewer.json >/dev/null 2>&1'],
+                       check=False, timeout=60)
+        deadline = time.monotonic() + 150
+        texts = []
+        collected = []
+        tapped = set()
+        while time.monotonic() < deadline:
+            subprocess.run([HDC, '-t', target, 'shell',
+                            'uitest dumpLayout -p /data/local/tmp/mh-liveshare-viewer.json >/dev/null 2>&1'],
+                           check=False, timeout=60)
+            raw = hdc('shell', 'cat /data/local/tmp/mh-liveshare-viewer.json 2>/dev/null || true')
+            texts = [text for text in re.findall(r'"text":"([^"]*)"', raw) if text]
+            collected.extend(text for text in texts if text not in collected)
+            if title in collected or any('新会话' in text for text in collected):
+                break
+            for label in ('打开侧边栏', '打开右侧边栏', '选择工作区'):
+                if label in texts and label not in tapped:
+                    browser_tap(target, (label,))
+                    tapped.add(label)
+                    time.sleep(2)
+                    break
+            time.sleep(2)
+        evidence['crossDeviceViewer'] = {
+            'target': target, 'pageUserAgent': page['userAgent'],
+            'viewerContextRequests': len(context), 'viewerAsset200': len(assets),
+            'viewerSessionListCalls': len(rpc), 'visibleTexts': collected[:24],
+            'ownerManagementAttempted': any(row.get('viewerRpc') == 'call:/api/liveshareShares/list'
+                                            and row.get('viaCookie') for row in records),
+            'sharedTitle': title, 'sharedTitleVisible': title in collected,
+        }
+        assert collected, 'The viewer page rendered no text on the second device'
+        assert any('观看者' in text or '仅可查看' in text for text in collected), collected
+        assert any('新会话' in text or title == text for text in collected), \
+            ['the viewer sidebar shows no session row', collected[:24]]
+        assert not evidence['crossDeviceViewer']['ownerManagementAttempted'], evidence['crossDeviceViewer']
+    finally:
+        subprocess.run([HDC, '-t', target, 'shell', 'aa force-stop com.huawei.hmos.browser'],
+                       check=False, timeout=60)
+        if reverse:
+            subprocess.run([HDC, '-t', target, 'fport', 'rm', *reverse], check=False, timeout=60)
+
+
+def run(device, output, model, owner_login, host_port, program_policy, attachments=False, guest_check=None,
+        cross_device_target=None, relay_url=None, relay_host_port=None, admin_token=None, viewer_token=None,
+        relay_call_url=None, device_host=None):
+    global BASE_OVERRIDE, DEVICE_BASE, RELAY_HOST_PORT, ADMIN_TOKEN, VIEWER_TOKEN
+    if admin_token:
+        ADMIN_TOKEN = admin_token
+    if viewer_token:
+        VIEWER_TOKEN = viewer_token
+    RELAY_HOST_PORT = relay_host_port
     node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
     fixture = Path(__file__).with_name('fixtures')/'liveshare-relay.cjs'
     name = 'mh-share-relay-'+uuid.uuid4().hex[:10]
@@ -383,18 +607,49 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
         saved = {path: translation['profile_bytes'](device, path) for path in paths}
         assert not flow['market']['catalog'](device, NAME)['enabled']
         flow['flow']['switch'](device, NAME, True)
-        command = [str(node), str(fixture), str(ws_module())]
-        if owner_login:
-            flow['flow']['switch'](device, translation['flow']['BUNDLE'], True)
-            flow['flow']['switch'](device, translation['inspector']['NAME'], True)
-            command.append('--owner-login')
-        proc = subprocess.Popen(command, stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE, text=True)
-        assert select.select([proc.stdout], [], [], 5)[0], 'Relay did not report a bound port'
-        relay_port = int(proc.stdout.readline())
-        candidate = ('tcp:19769', f'tcp:{relay_port}')
-        assert 'Forwardport result:OK' in device.hdc('rport', *candidate)
-        reverse = candidate
+        relay_port = None
+        if relay_url:
+            base = relay_url.rstrip('/')
+            DEVICE_BASE = base
+            BASE_OVERRIDE = (relay_call_url or relay_url).rstrip('/')
+            evidence['externalRelay'] = {'device': base, 'hostCalls': BASE_OVERRIDE}
+            if relay_host_port:
+                candidate = ('tcp:19769', f'tcp:{relay_host_port}')
+                clear_forward(device.hdc, candidate[0])
+                assert 'Forwardport result:OK' in device.hdc('rport', *candidate)
+                reverse = candidate
+            if owner_login:
+                flow['flow']['switch'](device, translation['flow']['BUNDLE'], True)
+                flow['flow']['switch'](device, translation['inspector']['NAME'], True)
+            try:
+                evidence['relayLogBaseline'] = len(fixture_log(relay_port))
+            except Exception:
+                evidence['relayLogBaseline'] = 0
+        else:
+            command = [str(node), str(fixture), str(ws_module())]
+            if owner_login:
+                flow['flow']['switch'](device, translation['flow']['BUNDLE'], True)
+                flow['flow']['switch'](device, translation['inspector']['NAME'], True)
+                command.append('--owner-login')
+            environment = dict(os.environ)
+            if cross_device_target:
+                environment['MH_RELAY_PAGE_DUMP'] = '/tmp/mh-liveshare-viewer-page.html'
+            if device_host:
+                # The emulator reaches the host directly (QEMU 10.0.2.2), so expose the
+                # local fixture on all interfaces and skip the hdc reverse forwarding.
+                environment['MH_RELAY_HOST'] = '0.0.0.0'
+            proc = subprocess.Popen(command, stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE, text=True, env=environment)
+            assert select.select([proc.stdout], [], [], 5)[0], 'Relay did not report a bound port'
+            relay_port = int(proc.stdout.readline())
+            if device_host:
+                base = f'http://{device_host}:{relay_port}'
+                DEVICE_BASE = base
+            else:
+                candidate = ('tcp:19769', f'tcp:{relay_port}')
+                clear_forward(device.hdc, candidate[0])
+                assert 'Forwardport result:OK' in device.hdc('rport', *candidate)
+                reverse = candidate
         device.app('mkdir '+folder)
         state = workspace_path+'/owner-shares.json'
         patch = saved[paths[2]].rstrip()
@@ -431,8 +686,11 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
             sessions.append(device.rpc('session/create', {'request': args})['sessionId'])
         if owner_login:
             with support['model_key'](device):
-                device.rpc('session/selectModel', {'request': {'sessionId': sessions[0], 'provider': 'deepseek-official',
-                    'model': 'deepseek-flash', 'reasoningEffort': 'off'}})
+                catalog = device.rpc('session/modelCatalog', {})
+                default = catalog['default']
+                assert default['provider'] in catalog.get('routableProviders', [default['provider']]), catalog
+                device.rpc('session/selectModel', {'request': {'sessionId': sessions[0], 'provider': default['provider'],
+                    'model': default['model'], 'reasoningEffort': default.get('reasoningEffort') or 'off'}})
                 flow['flow']['restart'](device)
                 verify_owner_login(device, title, evidence)
         evidence['authorized'] = owner(device, 'testPublish', {'sessionId': sessions[0]})
@@ -462,6 +720,8 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
 
         verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model,
                       program_check if program_policy else None, attachments, guest_check)
+        if cross_device_target:
+            cross_device_viewer(device, relay_port, share, sessions, cross_device_target, evidence)
         evidence['stop'] = owner(device, 'stop', {'shareId': share})
         assert evidence['stop'] == {'ok': True} and device.rpc('liveshareShares/list', {}) == {'shares': []}
         status, _ = relay_call(relay_port, share, {'op': 'asset', 'path': ''})
@@ -511,6 +771,12 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
                 evidence['relayMessages'] = [json.loads(row) for row in messages.splitlines()]
                 if stderr:
                     evidence['relayError'] = stderr
+            elif base.startswith(('http://', 'https://')):
+                try:
+                    records = fixture_log(relay_port)
+                    evidence['relayMessages'] = records[evidence.get('relayLogBaseline', 0):]
+                except Exception as error:
+                    evidence['relayError'] = str(error)[:300]
             output.write_text(json.dumps(evidence, indent=2)+'\n')
     created_id = evidence['created']['shareId']
     messages = evidence['relayMessages']
@@ -532,10 +798,19 @@ if __name__ == '__main__':
     parser.add_argument('--attachments', action='store_true', help='Verify viewer access to shared images after restart')
     parser.add_argument('--guest-uploads', action='store_true', help='Submit visitor files and images through the shared Gateway')
     parser.add_argument('--host-port', type=int, default=19643)
+    parser.add_argument('--cross-device', help='Second loopback emulator target that presents the viewer page')
+    parser.add_argument('--relay-url', help='External Relay base URL (https:// for public deployment) instead of the local fixture')
+    parser.add_argument('--device-host', help='Host address the emulator reaches directly (e.g. 10.0.2.2); skips reverse forwarding')
+    parser.add_argument('--relay-host-port', type=int, help='Host port of an externally started Relay fixture to forward to the device loopback')
+    parser.add_argument('--admin-token', default=None, help='Fixture Relay admin token for an external deployment')
+    parser.add_argument('--viewer-token', default=None, help='Fixture Relay viewer token for an external deployment')
+    parser.add_argument('--relay-call-url', help='Host-visible Relay base URL when it differs from the device URL (local forwarding tests)')
     args = parser.parse_args()
-    if (args.model or args.owner_login or args.program_policy or args.attachments or args.guest_uploads) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
+    if (args.model or args.program_policy or args.attachments or args.guest_uploads) and not os.environ.get('MH_TEST_DEEPSEEK_API_KEY'):
         parser.error('The selected live model scenario requires MH_TEST_DEEPSEEK_API_KEY')
     if args.program_policy and args.owner_login:
         parser.error('--program-policy requires the program preset; run the native login test separately')
     run(support['Emulator'](args.target, args.host_port), args.output, args.model, args.owner_login,
-        args.host_port, args.program_policy, args.attachments, verify_guest_uploads if args.guest_uploads else None)
+        args.host_port, args.program_policy, args.attachments, verify_guest_uploads if args.guest_uploads else None,
+        args.cross_device, args.relay_url, args.relay_host_port, args.admin_token, args.viewer_token,
+        args.relay_call_url, args.device_host)

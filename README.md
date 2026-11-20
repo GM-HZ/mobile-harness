@@ -8,7 +8,11 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 
 鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.5，源码子模块同步锁定官方 RC.5 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。普通包默认带通用 PTC；Office 与 HTTP/1 适配沿用已有实现。
 
-0.4.58 使用官方 DSH RC.5，修复真实公网溢出时当前回合被纳入摘要的问题。鸿蒙模拟器实测 DeepSeek Flash 拒绝超限请求后，DSH 压缩此前历史、在原回合重试并在重启后继续会话。 [能力矩阵](docs/dsh-capabilities.md) · [本轮证据](docs/evidence/emulator-live-overflow-0.4.58.json)
+0.4.69 在合并后的基线上补齐遗留验收：PTC 单链接读取加固与并发父目录边界、LiveShare 自建 Relay 的双模拟器跨设备 viewer（owner 实际 ArkWeb 授权后，第二台设备真实浏览器读取共享会话）、本机 Ollama 非 DeepSeek 端点接入、原生 addon 加载位置实测，以及 Forge 公开读与全新安装账号入口复验。Forge 真实账号授权与托管仓库写操作已在临时私有仓库完成（仓库已删除）；真机麦克风采集与官方公网 LiveShare Relay／真实身份提供方仍待外部条件，在批次记录中单列。
+
+## 交付总结
+
+0.4.69 的完整交付清单与证据索引见 [docs/work/2026-11-20-final-delivery.md](docs/work/2026-11-20-final-delivery.md)；能力回归闸门见 [docs/work/2026-11-20-capability-parity-gate.md](docs/work/2026-11-20-capability-parity-gate.md)。
 
 ## 文档
 
