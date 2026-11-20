@@ -18,6 +18,10 @@ Rules:
    `patches/`), `converged`.
 4. Migrate only when an upstream seam actually exists; otherwise keep the compat
    layer and let the gate suite guard behavior.
+5. Behavior contracts: `scripts/adaptation/compat_contracts.py` (G1
+   `compat-contracts`) asserts the public behavior of forge (command guard/abort),
+   package (registry provenance round-trip), liveshare and sharp export surfaces;
+   device-only modules stay covered by their G2/G3 feature gates.
 
 ## Modules
 

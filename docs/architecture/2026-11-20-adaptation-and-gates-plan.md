@@ -288,3 +288,21 @@ upstream seam 判断与 gate）；G4 release 构建结果写入证据/RSI；补�
 
 下一轮：给 compat 层补行为级合同（至少 forge/liveshare/office 三个），并评估上游 seam 是否出现；
 把 G4 release 记录纳入 tag 发布流程；补真实模型 turn 的 session 写入回归。
+
+
+### 2026-11-20（第 9 轮：compat 行为合同 + 发布闸门）
+
+- **compat 行为合同**：新增 `scripts/adaptation/compat_contracts.py`（G1 `compat-contracts`），
+  用 Node fixture 验证：forge 命令守卫/abort、package registry provenance 读写/拒绝非法 URL、
+  liveshare/sharp/boot-cache 导出面。结果 **9/9 通过**。
+- **发布闸门**：新增 `scripts/adaptation/release_gate.py`（G4 `release-gate`）：
+  tag/release 必须有当前 commit 的绿色 release evidence、体积预算与三项检查通过；
+  `gate-release.yml` 在生成 evidence 后调用它。本地用已有 evidence 验证：
+  `G4 release gate OK: 0.4.69 @ 1c1c910 (store 768,498,560 B, self 773,562,265 B)`。
+- registry：`G0=3, G1=7, G2=63, G3=3, G4=7`；本地 G1 全绿（host-syntax / anchors /
+  compat-inventory / compat-contracts）。
+- 环境限制：真机仍锁屏（`screenLocked=true`），设备 G3 未跑；`MH_TEST_DEEPSEEK_API_KEY`
+  未配置，真实模型 turn 的 session 写入回归待补。
+
+下一轮：把 G4 release 记录与 tag 流程跑一次端到端演练（本地模拟 tag）；补 G2 中稳定子集的
+nightly 覆盖；等真机解锁后跑 G3 device_lab verify/exec/overlay。

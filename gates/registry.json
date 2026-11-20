@@ -54,6 +54,12 @@
           "timeout": 120
         },
         {
+          "id": "compat-contracts",
+          "command": "python3 scripts/adaptation/compat_contracts.py",
+          "covers": "forge/package/liveshare/sharp public behavior contracts",
+          "timeout": 120
+        },
+        {
           "id": "patch-rehearsal",
           "command": "python3 scripts/adaptation/patch_rehearsal.py",
           "covers": "patches/series.json applies cleanly to the pinned tarballs",
@@ -617,6 +623,16 @@
           "command": "HARMONY_UNSIGNED=1 ./build.sh --package && python3 scripts/adaptation/store_build_check.py",
           "covers": "store HAP has no exec shim / overlay libraries",
           "timeout": 1800
+        },
+        {
+          "id": "release-gate",
+          "command": "python3 scripts/adaptation/release_gate.py --version <version>",
+          "covers": "tag/release blocked unless green release evidence exists for the commit",
+          "requires": [
+            "release evidence for this commit"
+          ],
+          "optional": true,
+          "timeout": 120
         },
         {
           "id": "release-evidence",
