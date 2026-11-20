@@ -12,6 +12,18 @@
 
 仓库新增 [deploy/liveshare-acceptance-relay](../../deploy/liveshare-acceptance-relay/README.md)：Dockerfile + docker-compose + nginx（含 WebSocket Upgrade、3600s 超时、32m 上传上限）+ certbot 步骤 + .env 模板。本机已验证：token 生效（旧夹具 token 被拒）、owner 登录页（env 与 argv 两种模式）、TLS 反代下预检通过（health 200、匿名 WSS 401、TLS 1.3）、compose YAML 可解析、nginx 关键指令齐全。证据：[relay-deployment-recipe](../evidence/relay-deployment-recipe-0.4.69.json)。Docker 镜像构建未在本机验证（本机 Docker daemon 未运行），需在服务器 `docker compose up -d --build` 后立即跑预检。
 
+## 公网路径已用临时隧道预演（2026-11-20）
+
+在等你的服务器期间，用 Cloudflare 临时隧道（cloudflared quick tunnel）把本机 Relay 暴露成公网 HTTPS 端点，跑通了完整公网路径：
+
+- 预检通过：TLS 1.3、公共 CA（Google Trust Services）、`/health` 200、匿名 WSS 401；
+- owner 在 ArkWeb 里对公网 URL 完成分享授权，分享创建/扩源/重连、reader 拒绝与实时撤销、stop、网关回收、profile 恢复全部通过；
+- 第二台设备真实浏览器经公网 URL 加载 viewer 页面（18 个页面资源、10 次 `session/list`），渲染出共享会话标题与只读提示。
+
+证据：[relay-public-tunnel-acceptance](../evidence/relay-public-tunnel-acceptance-0.4.69.json)。注意：Relay 仍是仓库夹具（替代 Relay），隧道 URL 已关闭，两台设备在同一局域网；**官方 Relay、你的域名部署和异地第二网络仍未验证**。
+
+过程中发现一个兼容点：被拒绝的 WebSocket Upgrade 响应需要带 `Content-Length: 0`，否则 Cloudflare 边缘返回 500；Relay 夹具已修正并记录拒绝日志。
+
 ## 服务器就绪后要做的事
 
 1. **部署 Relay**：官方 Relay 服务端不随上游包或本仓库交付，需要在服务器上部署可用的 LiveShare Relay 实现（或继续用自建 Relay 作替代，并在证据里明确写「替代 Relay」）。
