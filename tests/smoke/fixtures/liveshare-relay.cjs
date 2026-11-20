@@ -301,7 +301,9 @@ server.on('upgrade', (request, socket, head) => {
     && request.headers['x-liveshare-owner-credential'] === credential
     && (!shares.has(share) || shares.get(share).owner === owner);
   if (url.pathname !== '/__tunnel_gateway__' || !share || !authenticated) {
-    socket.end('HTTP/1.1 401 Unauthorized\r\nConnection: close\r\n\r\n');
+    log({ upgradeRejected: url.pathname, hasUpgrade: Boolean(request.headers.upgrade),
+          hasKey: Boolean(request.headers['sec-websocket-key']), authenticated });
+    socket.end('HTTP/1.1 401 Unauthorized\r\nContent-Length: 0\r\nConnection: close\r\n\r\n');
     return;
   }
   const probe = share.startsWith('test-');

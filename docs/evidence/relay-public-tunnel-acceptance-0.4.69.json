@@ -1,0 +1,113 @@
+{
+  "kind": "public-network LiveShare acceptance through an ephemeral Cloudflare quick tunnel",
+  "artifactContext": {
+    "expectedVersion": "0.4.69",
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "sourceCommit": "fea825b092cacb3628527a9dffff772b8f71acaf"
+  },
+  "checkedAt": "2026-11-20T08:16:45+0800",
+  "endpoint": {
+    "publicUrl": "https://hearts-rebates-sells-hon.trycloudflare.com (ephemeral quick tunnel, closed after the run)",
+    "tunnel": "cloudflared quick tunnel -> local Relay fixture on 127.0.0.1:18090",
+    "relayConfig": "deployment env: viewer/admin tokens, owner login, viewer login redirect"
+  },
+  "preflight": {
+    "ok": true,
+    "failures": [],
+    "tls": {
+      "protocol": "TLSv1.3",
+      "issuer": "C=US, O=Google Trust Services, CN=WE1",
+      "subjectAltName": "DNS:trycloudflare.com, DNS:*.trycloudflare.com"
+    },
+    "health": {
+      "status": 200,
+      "body": "{\"release_id\":\"mobile-harness-test-relay\"}"
+    },
+    "wss": {
+      "outcome": "http",
+      "status": 401
+    }
+  },
+  "observed": {
+    "externalRelay": {
+      "device": "https://hearts-rebates-sells-hon.trycloudflare.com",
+      "hostCalls": "https://hearts-rebates-sells-hon.trycloudflare.com"
+    },
+    "arkwebOwnerVerified": true,
+    "reachable": {
+      "ok": true,
+      "httpReachable": true,
+      "blocking": false
+    },
+    "addedSecondSource": true,
+    "restoredOnlineSources": [
+      "88f9fd8c-142f-44f4-b878-134922718d64",
+      "0e31c363-153f-4956-82a1-98af4ac70b20"
+    ],
+    "readerBeforeRevocation": {
+      "anonymousRefused": true,
+      "htmlBytes": 46960,
+      "visibleSessionIds": [
+        "0e31c363-153f-4956-82a1-98af4ac70b20",
+        "88f9fd8c-142f-44f4-b878-134922718d64"
+      ],
+      "accessRefusalCodes": {
+        "outsideSession": "remote-access/denied",
+        "ownerManagement": "remote-access/denied"
+      },
+      "sharedHistoryReadable": true
+    },
+    "ownerAppliedLiveRevocation": true,
+    "stop": {
+      "ok": true
+    },
+    "stoppedShareUnavailable": true,
+    "gatewayThreadStopped": true,
+    "configRestored": true,
+    "crossDeviceViewer": {
+      "pageUserAgent": "Mozilla/5.0 (Phone; OpenHarmony 7.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36  ArkWeb/7.0.0.105 Mobile HuaweiBrowser/5.1.9.315",
+      "viewerContextRequests": 2,
+      "viewerAsset200": 18,
+      "viewerSessionListCalls": 10,
+      "sharedTitle": "MH cross-device viewer e9cb6c",
+      "sharedTitleVisible": true,
+      "ownerManagementAttempted": false,
+      "visibleTexts": [
+        "会话层级",
+        "MH cross-device viewer e9cb6c",
+        "更多操作",
+        "打开右侧边栏",
+        "对话",
+        "统计",
+        "更多会话视图",
+        "载入历史…",
+        "添加文件或调用指令",
+        "仅可查看观看者不能自行更改",
+        "发送消息",
+        "打开侧边栏",
+        "hearts-rebates-sells-hon.trycloudflare.com",
+        "08, :, 16",
+        "08",
+        ":",
+        "16",
+        "100"
+      ]
+    }
+  },
+  "transportNote": "the rejected WebSocket upgrade response needed Content-Length: 0 to pass through the Cloudflare tunnel (before that the edge returned 500); the Relay fixture now always sends it and logs rejected upgrades",
+  "scope": {
+    "verified": [
+      "the Relay fixture is reachable over a public HTTPS endpoint with a public CA certificate (TLS 1.3)",
+      "the owner completes the share authorization inside ArkWeb against the public URL, and the share is created, expanded and reconnected",
+      "reader checks, live revocation, stop and gateway shutdown pass over the public URL",
+      "the second device's real browser loads the viewer page over the public URL, reads 18 page assets and 10 session-list calls, and renders the shared session title and the read-only viewer notice",
+      "the first device profile and boot configuration are restored"
+    ],
+    "caveats": [
+      "the Relay is the repository fixture behind a temporary tunnel, not the official LiveShare Relay",
+      "both devices are on the same local network; the transport crosses the public internet through the Cloudflare edge but a second network/location is not covered",
+      "the tunnel URL is ephemeral and was closed after the run; the user's domain deployment is still pending",
+      "the identity is synthetic (fixture viewer token and fixture owner authorization page)"
+    ]
+  }
+}

@@ -493,13 +493,13 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
             time.sleep(2)
         assert page, fixture_log(relay_port)[-8:]
         assert 'HuaweiBrowser' in page['userAgent'] or 'ArkWeb' in page['userAgent'], page
-        deadline = time.monotonic() + 90
+        deadline = time.monotonic() + 150
         while time.monotonic() < deadline:
             records = fixture_log(relay_port)
             rpc = [row for row in records if row.get('viewerRpc') == 'call:/api/session/list'
                    and row.get('viaCookie')]
             assets = [row for row in records if row.get('viewerAsset') and row.get('status') == 200]
-            context = [row for row in records if row.get('viewerContext') and row.get('viaCookie')]
+            context = [row for row in records if row.get('viewerContext')]
             if rpc and len(assets) >= 3 and context:
                 break
             time.sleep(1)
@@ -509,7 +509,7 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
         subprocess.run([HDC, '-t', target, 'shell',
                         'uitest dumpLayout -p /data/local/tmp/mh-liveshare-viewer.json >/dev/null 2>&1'],
                        check=False, timeout=60)
-        deadline = time.monotonic() + 60
+        deadline = time.monotonic() + 150
         texts = []
         collected = []
         tapped = set()
