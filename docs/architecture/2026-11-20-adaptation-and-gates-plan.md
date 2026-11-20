@@ -270,3 +270,21 @@ G2 夜间矩阵接线（把 ad-hoc smoke 子集纳入 gate-nightly），G4 构�
 
 下一轮：compat 模块层与 native binding 的清单化收敛（不追求一次性迁移，先给每个面建立
 upstream seam 判断与 gate）；G4 release 构建结果写入证据/RSI；补真实模型 turn 的 session 写入回归。
+
+
+### 2026-11-20（第 8 轮：compat 层清单化 + G4 发布证据）
+
+- **compat 层清单**：新增 `adaptation/compat.json`（10 个模块）+ `docs/architecture/compat-layer.md`
+  + `scripts/adaptation/compat_check.py`（G1 `compat-inventory`，零依赖运行）。每个模块记录：
+  消费者、对应上游能力、gate id、决策（keep-compat / upstream-seam-candidate）、优先级；
+  G1 会拒绝未登记模块、悬空消费者、未知 gate、未文档化模块。
+- **G4 发布证据**：新增 `scripts/adaptation/release_evidence.py`，对 store/self HAP 计算 hash/体积、
+  跑 store shape + variant 断言，写入 `docs/evidence/release/<version>-<commit>.json` 并记 RSI 台账；
+  `gate-release.yml` 已接线（构建 store/self 后自动生成发布记录）。
+  首次运行：store `768,498,560 B` / self `773,562,265 B`，三项检查全过。
+- registry：`G0=3, G1=6, G2=63, G3=3, G4=6`；RSI 台账 18 次运行（G0 6/7、G1 7/7、G2 2/2、G4 2/2）。
+- 说明：compat 层大多属于"上游没有可用 seam"的功能适配，本轮先做到**可清点、可门禁、可选择**；
+  真正的迁移只在出现上游 provider/seam 时进行，避免为了"迁移"而迁移。
+
+下一轮：给 compat 层补行为级合同（至少 forge/liveshare/office 三个），并评估上游 seam 是否出现；
+把 G4 release 记录纳入 tag 发布流程；补真实模型 turn 的 session 写入回归。

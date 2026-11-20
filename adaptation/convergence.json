@@ -54,12 +54,13 @@
         "@deepseek-ai/dsh-office",
         "@deepseek-ai/dsh-experimental-voice-input-bundle"
       ],
-      "current": "whole module replaced by our compat implementation via module URL hooks",
+      "current": "feature adapters loaded by our host wiring (inventoried in adaptation/compat.json + docs/architecture/compat-layer.md)",
       "target": "upstream bundle/provider seams when available; keep compat layer otherwise",
       "priority": "P2",
       "risk": "medium",
       "gate": "G1 host-syntax + G2 feature gates",
-      "status": "keep"
+      "status": "inventoried",
+      "note": "10 modules mapped to consumers, upstream capabilities, gate ids and decisions (keep-compat / upstream-seam-candidate). G1 compat-inventory enforces the mapping."
     },
     {
       "id": "native-overlay-bindings",

@@ -12,3 +12,7 @@
 {"commit": "34536fd28611cd111ab2034b262570a0bbbfa0a5", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/34536fd28611cd111ab2034b262570a0bbbfa0a5.json", "note": "", "at": "2026-11-20T23:12:16+0800"}
 {"commit": "34536fd28611cd111ab2034b262570a0bbbfa0a5", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/34536fd28611cd111ab2034b262570a0bbbfa0a5.json", "note": "", "at": "2026-11-20T23:12:17+0800"}
 {"commit": "34536fd28611cd111ab2034b262570a0bbbfa0a5", "tiers": ["G2"], "ok": true, "evidence": ".build/gate-evidence/G2", "note": "settings-patch recovery 71.9s", "at": "2026-11-20T23:12:21+0800"}
+{"commit": "1c1c910eda58293d875a8d9a234903b16077532c", "tiers": ["G4"], "ok": true, "evidence": "docs/evidence/release/unknown-1c1c910eda58293d875a8d9a234903b16077532c.json", "note": "", "at": "2026-11-20T23:13:57+0800"}
+{"commit": "1c1c910eda58293d875a8d9a234903b16077532c", "tiers": ["G4"], "ok": true, "evidence": "docs/evidence/release/0.4.69-1c1c910eda58293d875a8d9a234903b16077532c.json", "note": "", "at": "2026-11-20T23:14:06+0800"}
+{"commit": "1c1c910eda58293d875a8d9a234903b16077532c", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/1c1c910eda58293d875a8d9a234903b16077532c.json", "note": "", "at": "2026-11-20T23:14:07+0800"}
+{"commit": "1c1c910eda58293d875a8d9a234903b16077532c", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/1c1c910eda58293d875a8d9a234903b16077532c.json", "note": "", "at": "2026-11-20T23:14:08+0800"}

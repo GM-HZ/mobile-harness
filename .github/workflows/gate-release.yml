@@ -36,8 +36,11 @@ jobs:
       - name: Build self variant and assert shape
         run: |
           HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package
-          cp .build/artifacts/harmonyos/*-unsigned.hap .build/self.hap
+          HAP=$(ls .build/artifacts/harmonyos/*-unsigned.hap)
+          VERSION=$(basename "$HAP" | sed -E 's/.*-v([0-9]+\.[0-9]+\.[0-9]+)-.*/\1/')
+          cp "$HAP" .build/self.hap
           python3 scripts/adaptation/variant_check.py --variant self --hap .build/self.hap
+          python3 scripts/adaptation/release_evidence.py --store .build/store.hap --self .build/self.hap --version "$VERSION"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

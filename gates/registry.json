@@ -48,6 +48,12 @@
           "timeout": 300
         },
         {
+          "id": "compat-inventory",
+          "command": "python3 scripts/adaptation/compat_check.py",
+          "covers": "compat modules have inventory rows, consumers and documented gates",
+          "timeout": 120
+        },
+        {
           "id": "patch-rehearsal",
           "command": "python3 scripts/adaptation/patch_rehearsal.py",
           "covers": "patches/series.json applies cleanly to the pinned tarballs",
@@ -611,6 +617,16 @@
           "command": "HARMONY_UNSIGNED=1 ./build.sh --package && python3 scripts/adaptation/store_build_check.py",
           "covers": "store HAP has no exec shim / overlay libraries",
           "timeout": 1800
+        },
+        {
+          "id": "release-evidence",
+          "command": "python3 scripts/adaptation/release_evidence.py --store <store-hap> --self <self-hap>",
+          "covers": "artifact hashes/sizes + store/self shape assertions in one release record",
+          "requires": [
+            "built store and self HAPs"
+          ],
+          "optional": true,
+          "timeout": 300
         },
         {
           "id": "variant-store-check",

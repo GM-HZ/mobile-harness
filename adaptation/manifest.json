@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "34536fd28611cd111ab2034b262570a0bbbfa0a5",
+  "generatedFrom": "1c1c910eda58293d875a8d9a234903b16077532c",
   "layers": [
     "host",
     "web",
@@ -967,6 +967,23 @@
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-session-persistence-jsonl",
         "dsh-session-persistence-jsonl/lib/index.js"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "patches:patches/settings-client-recovery.patch",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/settings-client-recovery.patch",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "fff529da0a602be5b2ba8c041fa6947b44fb75d9565d3e2198ac3c82003c0e46",
+      "bytes": 39587,
+      "fragility": "low",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-client-ui-settings-general",
+        "dsh-client-ui-settings-general/lib/client.js"
       ],
       "gates": [
         "G0"

@@ -10,6 +10,7 @@ and how a change is proven before it reaches `main`.
 - `gates/registry.json` — gate tiers and the commands that make them up.
 - `variants/` — store/self/lab build shapes with HAP assertions (`variant_check.py`).
 - `docs/architecture/seams/` — contracts for each fragile upstream touchpoint (see [seams README](seams/README.md)).
+- [compat-layer.md](compat-layer.md) — inventory and decisions for the HarmonyOS compatibility modules.
 
 Rules of thumb:
 
