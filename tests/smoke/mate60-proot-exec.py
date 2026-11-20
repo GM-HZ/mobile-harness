@@ -232,6 +232,18 @@ busybox echo SHIM_OK; echo "SHIM_EXIT=$?"
 echo ELF_DEBUG_DONE
 """
 
+DYNAMIC_PROBE = """set +e
+echo "--- install a dynamically linked static-package tool ---"
+mh-install busybox-dyn https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/busybox-1.36.1-r31.apk bin/busybox busybox
+echo "MH_INSTALL_DYN_EXIT=$?"
+ls -l /usr/lib/mh-tools/busybox-dyn/tool 2>&1
+echo "--- run the dynamic tool ---"
+busybox-dyn echo DYN_EXEC_OK; echo "DYN_EXIT=$?"
+busybox-dyn uname -m; echo "DYN_UNAME_EXIT=$?"
+busybox-dyn --help >/dev/null 2>&1; echo "DYN_HELP_EXIT=$?"
+echo DYNAMIC_PROBE_DONE
+"""
+
 
 class Device:
     def __init__(self, target, port):
@@ -351,7 +363,8 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
              "elf-transparent": "real-device transparent downloaded tool execution",
              "elf-install": "real-device install and run a downloaded static tool by name",
              "runtime-eval": "real-device JIT and PTY capability evaluation",
-             "elf-debug": "real-device loader exit-status comparison"}
+             "elf-debug": "real-device loader exit-status comparison",
+             "elf-dynamic": "real-device dynamically linked ELF execution"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -447,7 +460,7 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug", "elf-dynamic"], default="exec")
     parser.add_argument("--loader-file", default=str(Path(__file__).with_name("fixtures") / "inmemory-elf-loader.py"))
     parser.add_argument("--payload-file")
     parser.add_argument("--elf-args", default="")
@@ -459,7 +472,8 @@ def main():
              "elf-download": "python3 ./inmemory-elf-runner.py",
              "elf-mhexec": MH_EXEC_PROBE, "elf-transparent": TRANSPARENT_PROBE,
              "elf-install": INSTALL_PROBE, "runtime-eval": RUNTIME_EVAL_PROBE,
-             "elf-debug": DEBUG_EXIT_PROBE}.get(args.probe, PROBE)
+             "elf-debug": DEBUG_EXIT_PROBE, "dynamic": DYNAMIC_PROBE,
+             "elf-dynamic": DYNAMIC_PROBE}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe,
         loader_file=(args.loader_file if args.probe == "elf-loader" else None),
         payload_file=(args.payload_file if args.probe == "elf-run" else None),

@@ -217,3 +217,25 @@ GitHub Actions 的 `Build HarmonyOS HAP` 通过 `workflow_dispatch` 输入 `self
 - **PTY/terminal**：guest 内 `/dev/ptmx`、`/dev/pts` 都不存在，`pty.openpty()` 报 `out of pty devices`；PTY 在设备节点层就不可用，纯用户态方案无法补，terminal/系统 PTY 维持延期。
 
 证据：[mate60-runtime-eval-0.4.69.json](../evidence/mate60-runtime-eval-0.4.69.json)。
+
+## 动态 ELF（PIE + PT_INTERP）支持（模拟器与真机已验证）
+
+`mh-exec` 在静态 ELF 之外补齐了动态链接程序：
+
+1. 主程序 `PT_LOAD` 匿名映射（PIE 固定在 base `0x1000000000`）；
+2. 读取 `PT_INTERP` 指向的 guest 路径（`/lib/ld-musl-aarch64.so.1`，这是随包签名的 musl），把解释器各段匿名映射到 base `0x2000000000`；
+3. 启动栈按内核语义设置 `AT_PHDR`/`AT_ENTRY`（主程序）、`AT_BASE`（解释器基址）；跳到解释器入口；
+4. musl ld 完成主程序 PIE 重定位，并从签名绑定路径加载 `libc.musl-aarch64.so.1`。
+
+实测（Alpine `busybox 1.36.1-r31`，动态 PIE，919232 字节）：
+
+```
+mh-install busybox-dyn https://.../busybox-1.36.1-r31.apk bin/busybox busybox
+busybox-dyn echo DYN_EXEC_OK   -> DYN_EXEC_OK / CHILD_EXIT 0
+busybox-dyn uname -m           -> aarch64
+busybox-dyn --help             -> exit 0
+```
+
+模拟器与 Mate 60 真机（自建签名包）均通过。证据：[mate60-dynamic-elf-0.4.69.json](../evidence/mate60-dynamic-elf-0.4.69.json)。
+
+限制：需要的共享库必须是随包签名绑定（musl/libc/libstdc++ 等已覆盖；其它库需要构建期打包或后续 dlopen shim）；调用仍是显式 `mh-exec`/`mh-install`。

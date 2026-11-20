@@ -58,6 +58,7 @@ def parse(data):
     e_phoff = struct.unpack_from("<Q", data, 32)[0]
     phentsize, phnum = struct.unpack_from("<HH", data, 54)
     segments = []
+    interp = None
     for index in range(phnum):
         offset = e_phoff + index * phentsize
         p_type, p_flags = struct.unpack_from("<II", data, offset)
@@ -65,11 +66,14 @@ def parse(data):
         if p_type == 1 and p_memsz:
             segments.append({"flags": p_flags, "offset": p_offset, "vaddr": p_vaddr,
                              "filesz": p_filesz, "memsz": p_memsz, "align": p_align})
-    return e_type, e_entry, e_phoff, segments, phnum
+        elif p_type == 3 and p_filesz:
+            interp = data[p_offset:p_offset + p_filesz].split(b"\0")[0].decode("utf8", "replace")
+    return e_type, e_entry, e_phoff, segments, phnum, interp
 
 
-def map_segments(data, e_type, segments):
-    base = 0 if e_type == 2 else 0x1000000000
+def map_segments(data, e_type, segments, base=None):
+    if base is None:
+        base = 0 if e_type == 2 else 0x1000000000
     mapped = []
     for segment in segments:
         start = align_down(segment["vaddr"])
@@ -105,7 +109,7 @@ def phdr_address(e_phoff, segments):
     raise SystemExit("program headers are not inside a loadable segment")
 
 
-def build_stack(argv, entry, phdr, phnum, phentsize):
+def build_stack(argv, entry, phdr, phnum, phentsize, at_base=0):
     size = 2 * 1024 * 1024
     pointer = libc.mmap(None, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0)
     if pointer == -1:
@@ -125,7 +129,7 @@ def build_stack(argv, entry, phdr, phnum, phentsize):
     random_ptr = push(random_bytes)
     top &= ~0xF
     auxv = [(AT_PHDR, phdr), (AT_PHENT, phentsize), (AT_PHNUM, phnum), (AT_PAGESZ, PAGE),
-            (AT_BASE, 0), (AT_FLAGS, 0), (AT_ENTRY, entry), (AT_UID, os.getuid()),
+            (AT_BASE, at_base), (AT_FLAGS, 0), (AT_ENTRY, entry), (AT_UID, os.getuid()),
             (AT_EUID, os.geteuid()), (AT_GID, os.getgid()), (AT_EGID, os.getegid()),
             (AT_HWCAP, 0), (AT_CLKTCK, 100), (AT_SECURE, 0), (AT_RANDOM, random_ptr),
             (AT_EXECFN, argv_ptrs[0]), (AT_NULL, 0)]
@@ -155,19 +159,32 @@ def trampoline():
     return page
 
 
+def load_interpreter(path):
+    """Map the dynamic interpreter (musl ld, a signed HAP binding) into anonymous memory."""
+    override = os.environ.get("MH_ELF_INTERP")
+    interp_path = override or path
+    data = open(interp_path, "rb").read()
+    i_type, i_entry, i_phoff, i_segments, i_phnum, _ = parse(data)
+    base, _mapped = map_segments(data, i_type, i_segments, base=0x2000000000)
+    if base != 0x2000000000:
+        raise SystemExit("interpreter base mismatch")
+    return i_entry + base, base
+
+
 def main():
     argv = sys.argv[1:]
     if not argv:
         raise SystemExit("usage: mh-exec <elf> [args...]")
     path = argv[0]
     data = open(path, "rb").read()
-    e_type, e_entry, e_phoff, segments, phnum = parse(data)
+    e_type, e_entry, e_phoff, segments, phnum, interp = parse(data)
     if os.environ.get("MH_ELF_DRY_RUN"):
         for segment in segments:
             print("SEGMENT vaddr=0x%x offset=0x%x filesz=%d memsz=%d align=0x%x flags=%d" %
                   (segment["vaddr"], segment["offset"], segment["filesz"], segment["memsz"],
                    segment["align"], segment["flags"]))
-        print("ENTRY 0x%x TYPE %d PHDR 0x%x" % (e_entry, e_type, phdr_address(e_phoff, segments)))
+        print("ENTRY 0x%x TYPE %d PHDR 0x%x INTERP %s" %
+              (e_entry, e_type, phdr_address(e_phoff, segments), interp or "-"))
         print("ARGV", argv)
         return 0
     loaded_argv = [os.environ.get("MH_ELF_ARGV0") or argv[0]] + argv[1:]
@@ -177,13 +194,19 @@ def main():
         # non-PIE static binary) would otherwise clobber the parent interpreter.
         try:
             base, mapped = map_segments(data, e_type, segments)
-            print("LOADED segments=%d base=0x%x entry=0x%x" % (len(mapped), base, e_entry))
-            phdr = phdr_address(e_phoff, segments) + base
-            entry = e_entry + base
-            stack = build_stack(loaded_argv, entry, phdr, phnum, 56)
+            main_phdr = phdr_address(e_phoff, segments) + base
+            main_entry = e_entry + base
+            if interp:
+                start, at_base = load_interpreter(interp)
+                print("LOADED segments=%d base=0x%x entry=0x%x interp=%s interp_base=0x%x" %
+                      (len(mapped), base, e_entry, interp, at_base))
+            else:
+                start, at_base = main_entry, 0
+                print("LOADED segments=%d base=0x%x entry=0x%x" % (len(mapped), base, e_entry))
+            stack = build_stack(loaded_argv, main_entry, main_phdr, phnum, 56, at_base)
             page = trampoline()
             target = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)(page)
-            target(entry, stack)
+            target(start, stack)
         finally:
             os._exit(0)
     _, status = os.waitpid(pid, 0)
