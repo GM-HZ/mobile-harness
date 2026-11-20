@@ -53,7 +53,10 @@ def stage_dsh(root, raw, baseline):
     # it in the final carrier so PluginManager recognizes shipped ownership.
     bundle_manifest = json.loads(bundle_files[0].read_text())
     application["dependencies"][bundle_manifest["name"]] = bundle_manifest["version"]
-    key = hashlib.sha256(lock.read_bytes() + (manifest / "package.json").read_bytes() + Path(__file__).read_bytes() + b''.join(file.read_bytes() for file in bundle_files)).hexdigest()
+    patch_dir = root / "patches"
+    patch_bytes = b''.join(path.name.encode() + path.read_bytes()
+                           for path in sorted(patch_dir.glob("*.patch")) if path.is_file())
+    key = hashlib.sha256(lock.read_bytes() + (manifest / "package.json").read_bytes() + Path(__file__).read_bytes() + b''.join(file.read_bytes() for file in bundle_files) + patch_bytes).hexdigest()
     pinned = json.loads(lock.read_text())["packages"]
     for package, source in json.loads((manifest / "lsp-sources.json").read_text()).items():
         recorded = pinned["node_modules/" + package]
@@ -96,6 +99,16 @@ def stage_dsh(root, raw, baseline):
             for name in NATIVE_MODULES:
                 if (modules / name).read_bytes() != prior.read("dsh/node_modules/" + name):
                     raise ValueError(f"DSH native input changed and needs a new HAP binding: {name}")
+        # patches/series.json replaces fragile boot-time string surgery where a
+        # package-level fix is enough (see patches/README.md).
+        series_path = patch_dir / "series.json"
+        if series_path.is_file():
+            for entry in json.loads(series_path.read_text())["patches"]:
+                subprocess.run(["patch", "-p1", "--forward", "--batch", "-s",
+                                "-i", str(patch_dir / entry["file"])], cwd=modules, check=True)
+                target = modules / entry["package"] / entry["path"]
+                if entry["marker"] not in target.read_text():
+                    raise ValueError(f"patch marker missing after apply: {entry['file']}")
 
         pending = archive.with_suffix(".tmp")
         try:

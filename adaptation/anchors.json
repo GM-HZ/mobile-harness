@@ -21,7 +21,9 @@
       "file": "dsh/node_modules/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js",
       "pattern": "await link(tmp, finalPath);",
       "count": 1,
-      "contract": "docs/architecture/seams/host-bash-hooks.md"
+      "contract": "docs/architecture/seams/host-bash-hooks.md",
+      "replacement": "globalThis.__dshClientRenameNoReplace(tmp, finalPath)",
+      "patch": "patches/session-persistence-eacces-fallback.patch"
     },
     {
       "id": "settings-client-apply",

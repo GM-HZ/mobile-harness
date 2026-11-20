@@ -98,7 +98,8 @@ def main():
                 print("    " + line)
     evidence = {"commit": commit(), "tiers": wanted_tiers, "startedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
                 "entries": records, "failures": failures, "ok": failures == 0}
-    directory = args.evidence_dir / "-".join(wanted_tiers)
+    evidence_dir = args.evidence_dir if args.evidence_dir.is_absolute() else ROOT / args.evidence_dir
+    directory = evidence_dir / "-".join(wanted_tiers)
     directory.mkdir(parents=True, exist_ok=True)
     path = directory / (evidence["commit"] + ".json")
     path.write_text(json.dumps(evidence, indent=2) + "\n")

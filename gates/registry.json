@@ -48,6 +48,16 @@
           "timeout": 300
         },
         {
+          "id": "patch-rehearsal",
+          "command": "python3 scripts/adaptation/patch_rehearsal.py",
+          "covers": "patches/series.json applies cleanly to the pinned tarballs",
+          "requires": [
+            "upstream tarball cache (scripts/adaptation/bump.py)"
+          ],
+          "optional": true,
+          "timeout": 300
+        },
+        {
           "id": "host-contracts",
           "command": "python3 scripts/adaptation/host_contracts.py",
           "covers": "apply boot-time transformations and validate the results",
@@ -77,6 +87,15 @@
           "id": "capability-parity-gate",
           "command": "python3 tests/bench/capability-parity-regression.py --output .build/capability-parity-gate.json",
           "covers": "recovery/voice/ollama/ptc/liveshare/account/addon",
+          "timeout": 1200
+        },
+        {
+          "id": "nightly-recovery",
+          "command": "python3 tests/smoke/emulator-recovery.py \"$MH_EMULATOR\" .build/gate-evidence/recovery.json",
+          "covers": "crash recovery on the isolated emulator",
+          "requires": [
+            "MH_EMULATOR env"
+          ],
           "timeout": 1200
         },
         {

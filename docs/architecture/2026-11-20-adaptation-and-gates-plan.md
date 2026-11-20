@@ -198,3 +198,25 @@ G3 真机 CI 调度协议，RSI 台账。
 
 下一轮：补丁收敛的第一个真实迁移（优先 session-persistence 或 bash 命令锚点，走 pnpm patch 试验），
 G2 夜间矩阵接线（把 ad-hoc smoke 子集纳入 gate-nightly），G4 构建矩阵接入 release 流程。
+
+
+### 2026-11-20（第 4 轮：首个补丁迁移、发布闸门、夜间矩阵）
+
+- **补丁基础设施**：`patches/series.json` + `patches/session-persistence-eacces-fallback.patch`
+  + `scripts/adaptation/patch_rehearsal.py`（对 `.build/upstream-bump` 的 npm tarball 应用 patch、
+  校验 marker/语法）。`scripts/build/harmonyos_dsh.py` 在 `npm ci` 后按序应用补丁（cache key 含补丁哈希），
+  并在装配时校验 marker；`packages/dsh-host/dsh-client.cjs` 对 session 替换改为"未打补丁→运行时替换，
+  已打补丁→直接放行，否则明确报错"的双模。
+- **迁移预演**：用真实 dsh-layer.zip 构造 patched layer，`anchors.py` 识别 patched 模式、
+  `host_contracts.py` 报告 `mode=patched`，G1 全绿；patch rehearsal 通过。剩最后一步：
+  用完整构建出的 patched layer 跑一次 G2 recovery，然后删除 boot hook。
+- **G4 发布闸门**：variants 增加 HAP 体积预算（store ≤790MB、self/lab ≤800MB），
+  `variant_check.py` 执行断言；新增 `gate-release.yml`（tag/dispatch：G0/G1 → 构建 store/self →
+  store_shape + variant_check → 上传证据）。
+- **G2 夜间矩阵**：registry 增加 `nightly-recovery`（emulator-recovery），nightly workflow
+  改为 capability gate + recovery；本地在隔离模拟器（5557）验证：**PASS（34.8s）**。
+- **修复**：`gates/run.py` 自定义相对 evidence dir 的路径解析 bug；`host_contracts.py` 支持
+  `--layer` 以便对 patched layer 预演。
+
+下一轮：真实 patched-layer 构建 + G2 回归后删除 session boot hook（完成首个收敛）；把 G4 构建矩阵
+接入 release 记录；补 G2 矩阵中其余稳定项；继续第二个锚点（bash 命令）的 pnpm patch 迁移。

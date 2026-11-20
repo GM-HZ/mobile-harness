@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "a7c7ea53fd9499ffd2d364b1fd9ebbf9d40cc52e",
+  "generatedFrom": "0d82190ab5657a02af90e581c746baf8d8965670",
   "layers": [
     "host",
     "web",
@@ -20,8 +20,8 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-client.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "535e77457c91c363e3320ff0a66b079b584653ad9d29cbf0b7ddc0d3dad64758",
-      "bytes": 9914,
+      "sha256": "7623d957ef2f7697ef4e44656a475bd3cb89741314a5a305950b634cf330521f",
+      "bytes": 10357,
       "fragility": "high",
       "upstreamTouchpoints": [
         "\"bash\",\\n\\t\\t\\t\"-c\",",
@@ -857,8 +857,8 @@
       "kind": "file",
       "source": "variants/lab.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "bffd23f5ec03cce579757f753f4f6b1781c5002d874db92f74bb66d5ade5051b",
-      "bytes": 535,
+      "sha256": "0af1a49ac3ecf92855e0703114ee3cfdda01904965c5e5e4aa0903483dc8f832",
+      "bytes": 606,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -871,8 +871,8 @@
       "kind": "file",
       "source": "variants/self.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "24f316033f5c4b506ed4d0b08d4f0680ceacd490635f91412dec9743c72906c0",
-      "bytes": 596,
+      "sha256": "b4ac75f6f73d4557c0ef68a869e409af92c36366eb292d3f7c93b437ab4a15d9",
+      "bytes": 673,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -885,8 +885,8 @@
       "kind": "file",
       "source": "variants/store.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "8ac00df90fbf64e3df318302a14d7ea3011c12c0457260d9846febe4c09ae421",
-      "bytes": 459,
+      "sha256": "e0a739eb1f0d15fdc3c0b3a3c84abc08ad00e2780855f42a39b60c8598484095",
+      "bytes": 552,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [

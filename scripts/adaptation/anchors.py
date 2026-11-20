@@ -58,10 +58,14 @@ def main():
                 continue
             text = payload.decode("utf-8", "replace")
             actual = text.count(anchor["pattern"])
-            ok = actual == anchor["count"]
-            checked.append({"id": anchor["id"], "ok": ok, "expected": anchor["count"], "actual": actual})
+            replacement = anchor.get("replacement")
+            patched = replacement is not None and replacement in text
+            ok = actual == anchor["count"] or patched
+            checked.append({"id": anchor["id"], "ok": ok, "expected": anchor["count"],
+                            "actual": actual, "patched": bool(patched)})
             if not ok:
-                failures.append(f"{anchor['id']}: expected {anchor['count']} occurrence(s), found {actual} in {path}")
+                failures.append(f"{anchor['id']}: expected {anchor['count']} occurrence(s), "
+                                f"found {actual} in {path} (patched={patched})")
     result = {"layer": str(layer), "checked": checked, "failures": failures, "ok": not failures}
     if args.json:
         Path(args.json).write_text(json.dumps(result, indent=2) + "\n")

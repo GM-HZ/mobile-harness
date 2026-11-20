@@ -65,6 +65,10 @@ def main():
     g2 = [{"id": "capability-parity-gate",
            "command": "python3 tests/bench/capability-parity-regression.py --output .build/capability-parity-gate.json",
            "covers": "recovery/voice/ollama/ptc/liveshare/account/addon", "timeout": 1200}]
+    g2.append({"id": "nightly-recovery",
+               "command": "python3 tests/smoke/emulator-recovery.py \"$MH_EMULATOR\" .build/gate-evidence/recovery.json",
+               "covers": "crash recovery on the isolated emulator", "requires": ["MH_EMULATOR env"],
+               "timeout": 1200})
     for name in sorted(emulator):
         if name.endswith("emulator-recovery.py"):
             continue
@@ -89,6 +93,10 @@ def main():
                 {"id": "upstream-anchors", "command": "python3 scripts/adaptation/anchors.py",
                  "covers": "literal upstream anchors used by runtime hooks",
                  "requires": ["assembled dsh-layer.zip"], "timeout": 300},
+                {"id": "patch-rehearsal", "command": "python3 scripts/adaptation/patch_rehearsal.py",
+                 "covers": "patches/series.json applies cleanly to the pinned tarballs",
+                 "requires": ["upstream tarball cache (scripts/adaptation/bump.py)"],
+                 "optional": True, "timeout": 300},
                 {"id": "host-contracts", "command": "python3 scripts/adaptation/host_contracts.py",
                  "covers": "apply boot-time transformations and validate the results",
                  "requires": ["assembled DSH layer"], "optional": True, "timeout": 300},

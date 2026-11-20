@@ -1,0 +1,17 @@
+--- a/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js
++++ b/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js
+@@ -3228,13 +3228,13 @@
+ 		});
+ 		await this.syncDirPosix(project);
+ 		await this.rejectExistingLog(finalPath, id);
+ 		const tmp = await this.writeSyncedTempFile(finalPath, content);
+ 		let linked = false;
+ 		try {
+-			await link(tmp, finalPath);
++			try { await link(tmp, finalPath); } catch (error) { if (error?.code !== 'EACCES') throw error; globalThis.__dshClientRenameNoReplace(tmp, finalPath); }
+ 			linked = true;
+ 		} finally {
+ 			/* v8 ignore next -- link failure is the TOCTOU/IO race guarded above; not reachable in test */
+ 			if (!linked) await rm(tmp, { force: true });
+ 		}
+ 		await this.syncDirPosix(dir);

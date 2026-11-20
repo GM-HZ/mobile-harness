@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "patches": [
+    {
+      "file": "session-persistence-eacces-fallback.patch",
+      "package": "@deepseek-ai/dsh-session-persistence-jsonl",
+      "path": "lib/index.js",
+      "marker": "globalThis.__dshClientRenameNoReplace(tmp, finalPath)",
+      "reason": "HarmonyOS denies link(2) for the publish path (EACCES); fall back to the native renameNoReplace helper. Replaces the boot-time replacePinned hook."
+    }
+  ]
+}

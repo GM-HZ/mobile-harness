@@ -50,7 +50,10 @@ def node_check(source):
 
 
 def main():
-    layer = locate()
+    parser = __import__("argparse").ArgumentParser(description=__doc__)
+    parser.add_argument("--layer")
+    args = parser.parse_args()
+    layer = Path(args.layer) if args.layer else locate()
     if not layer:
         print("SKIP host contracts: assembled DSH layer unavailable", file=sys.stderr)
         return 2
@@ -81,12 +84,24 @@ def main():
             if not ok:
                 failures.append(f"{module}: replacement breaks the module: " + result.stderr.strip()[:300])
         session = archive.read(SESSION).decode()
-        if "await link(tmp, finalPath);" not in session:
-            failures.append("session-persistence anchor missing")
         boot = (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
-        if "await link(tmp, finalPath);" not in boot:
-            failures.append("dsh-client.cjs no longer targets the session-persistence anchor")
-        checked.append({"id": "session-persistence-contract", "ok": "await link(tmp, finalPath);" in session})
+        anchor = "await link(tmp, finalPath);"
+        replacement = "globalThis.__dshClientRenameNoReplace(tmp, finalPath)"
+        anchored = anchor in session
+        patched = replacement in session
+        ok = False
+        if anchored:
+            ok = anchor in boot
+            if not ok:
+                failures.append("dsh-client.cjs no longer targets the session-persistence anchor")
+        elif patched:
+            ok = replacement in boot and "patches/series.json already carries" in boot
+            if not ok:
+                failures.append("patched session-persistence module but boot code is not tolerant")
+        else:
+            failures.append("session-persistence module has neither the anchor nor the patch marker")
+        checked.append({"id": "session-persistence-contract", "ok": ok,
+                        "mode": "runtime-replacement" if anchored else "patched"})
     result = {"layer": str(layer), "checked": checked, "failures": failures, "ok": not failures}
     print(json.dumps(result, indent=2))
     if failures:

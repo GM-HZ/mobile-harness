@@ -5,7 +5,10 @@
     {
       "id": "bash-command-anchor",
       "manifest": "host:packages/dsh-host/dsh-client.cjs",
-      "upstream": ["@deepseek-ai/dsh-bash-local", "@deepseek-ai/dsh-bash-sandbox"],
+      "upstream": [
+        "@deepseek-ai/dsh-bash-local",
+        "@deepseek-ai/dsh-bash-sandbox"
+      ],
       "current": "runtime string replacement via registerHooks/replacePinned",
       "target": "pnpm patch of the two npm packages (or an upstream command-spawn seam)",
       "priority": "P1",
@@ -16,18 +19,23 @@
     {
       "id": "session-persistence-link",
       "manifest": "host:packages/dsh-host/dsh-client.cjs",
-      "upstream": ["@deepseek-ai/dsh-session-persistence-jsonl"],
-      "current": "runtime string replacement of `await link(tmp, finalPath);`",
+      "upstream": [
+        "@deepseek-ai/dsh-session-persistence-jsonl"
+      ],
+      "current": "runtime string replacement OR patches/series.json patch (boot hook tolerates both)",
       "target": "pnpm patch (atomic append step) or upstream storage seam",
       "priority": "P1",
       "risk": "high",
       "gate": "G1 host contracts + G2 recovery",
-      "status": "keep-with-gate"
+      "status": "patch-prepared",
+      "note": "patches/session-persistence-eacces-fallback.patch applies cleanly to the pinned tarball (patch_rehearsal); synthetic patched layer passes G1 anchors/contracts. Remaining: full patched-layer build + G2 recovery before deleting the boot hook."
     },
     {
       "id": "settings-client-injection",
       "manifest": "web:runtime/harmonyos/web/settings-recovery.js",
-      "upstream": ["@deepseek-ai/dsh-client-ui-settings-general"],
+      "upstream": [
+        "@deepseek-ai/dsh-client-ui-settings-general"
+      ],
       "current": "build-time string injection into apply(ctx)",
       "target": "client plugin/slot if upstream exposes one; otherwise pnpm patch",
       "priority": "P1",
@@ -38,8 +46,12 @@
     {
       "id": "compat-module-replacement",
       "manifest": "compat:runtime/harmonyos/compat/*",
-      "upstream": ["@deepseek-ai/dsh-experimental-forge-bundle", "@deepseek-ai/dsh-experimental-liveshare",
-                    "@deepseek-ai/dsh-office", "@deepseek-ai/dsh-experimental-voice-input-bundle"],
+      "upstream": [
+        "@deepseek-ai/dsh-experimental-forge-bundle",
+        "@deepseek-ai/dsh-experimental-liveshare",
+        "@deepseek-ai/dsh-office",
+        "@deepseek-ai/dsh-experimental-voice-input-bundle"
+      ],
       "current": "whole module replaced by our compat implementation via module URL hooks",
       "target": "upstream bundle/provider seams when available; keep compat layer otherwise",
       "priority": "P2",
@@ -50,7 +62,10 @@
     {
       "id": "native-overlay-bindings",
       "manifest": "native:runtime/harmonyos/native/poc.c",
-      "upstream": ["DSH subprocess/sandbox contract", "HarmonyOS loader policy"],
+      "upstream": [
+        "DSH subprocess/sandbox contract",
+        "HarmonyOS loader policy"
+      ],
       "current": "compiled binding table + generated guest-libs.inc",
       "target": "data-driven bindings (no poc.c edits per library) + variant budgets",
       "priority": "P2",

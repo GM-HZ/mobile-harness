@@ -7,8 +7,20 @@
     "HARMONY_GUEST_LIB_GROUPS": ""
   },
   "hap": {
-    "present": ["resources/rawfile/dsh-self-build.json"],
-    "absent": ["mh-exec", "mh-install", "mh_exec_shim", "libguest_lib_", "libguest_ext_"],
-    "flag": {"selfBuild": false, "signedExecBypass": false}
+    "present": [
+      "resources/rawfile/dsh-self-build.json"
+    ],
+    "absent": [
+      "mh-exec",
+      "mh-install",
+      "mh_exec_shim",
+      "libguest_lib_",
+      "libguest_ext_"
+    ],
+    "flag": {
+      "selfBuild": false,
+      "signedExecBypass": false
+    },
+    "maxBytes": 790000000
   }
 }

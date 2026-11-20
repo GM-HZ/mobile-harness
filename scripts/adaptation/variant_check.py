@@ -51,6 +51,9 @@ def main():
             hits = [name for name in names if token in name]
             if hits:
                 failures.append(f"forbidden asset {token}: {hits[:3]}")
+        maximum = variant["hap"].get("maxBytes")
+        if maximum and hap.stat().st_size > maximum:
+            failures.append(f"HAP too large: {hap.stat().st_size} > {maximum}")
         for token, minimum in variant["hap"].get("minimum", {}).items():
             count = sum(1 for name in names if token in name)
             if count < minimum:
