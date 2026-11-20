@@ -500,6 +500,8 @@ MH_TEST_DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
   --guest-uploads --attachments
 ```
 
+加 `--device-host 10.0.2.2` 时夹具临时监听 `0.0.0.0`，设备经模拟器 QEMU 用户网络直连宿主（不做 hdc 反向转发），用于跨设备 viewer；owner 登录页仍需要回环/HTTPS 地址，因此 owner 登录与跨设备 viewer 分开跑。
+
 加 `--relay-url <url>` 可对独立启动的 Relay（或公网 HTTPS Relay）运行同一套验收，不再在测试内启动夹具；`--relay-call-url` 用于宿主调用地址与设备可见地址不同的本机转发验证，`--relay-host-port` 会为设备建立回环转发。公网地址就绪先用 `relay-preflight.py` 检查证书、`/health` 与匿名 WSS 升级。
 
 加 `--cross-device <second-loopback-target>` 时，测试 Relay 会把 owner 的 index 资源取回并注入官方 `viewerCarrierScript`，再在第二台模拟器的系统浏览器打开 viewer 页面。测试检查浏览器 UA、`/__liveshare/context`、页面资源与会话 cookie 的 `session/list` 调用，并核对界面出现观看者只读提示。owner 侧的已有 reader 回归会先撤销访问再经夹具 admin 恢复，第二台设备因此是真实读者。该链路使用自建 Relay 与本机 `hdc rport`，不是官方公网 Relay。

@@ -42,7 +42,8 @@
 
 ## 回归闸门
 
-- [capability-parity-gate](../evidence/capability-parity-gate-0.4.69.json)：同一 0.4.69 制品上按固定顺序跑 9 个步骤（恢复、语音、原生麦克风采集、Ollama 路由、PTC 链接/边界、LiveShare owner 流、账号入口、addon 位置），2026-11-20 通过（约 5.5 分钟，失败 0）。运行方式见 [回归闸门记录](2026-11-20-capability-parity-gate.md)。
+- [capability-parity-gate](../evidence/capability-parity-gate-0.4.69.json)：同一 0.4.69 制品上按固定顺序跑 10 个步骤（恢复、语音、原生麦克风采集、Ollama 路由、PTC 链接/边界、LiveShare owner 流与直连跨设备 viewer、账号入口、addon 位置），2026-11-20 通过（约 6.5 分钟，失败 0）。运行方式见 [回归闸门记录](2026-11-20-capability-parity-gate.md)。
+- [LiveShare 直连跨设备](../evidence/liveshare-cross-device-direct-0.4.69.json)：模拟器经 10.0.2.2 直连宿主夹具（不做 hdc 反向转发），第二台设备真实浏览器渲染只读 viewer；定位出反向转发长连接导致 owner 网关 1006 断开的问题。
 
 ## 仍受外部条件阻塞
 

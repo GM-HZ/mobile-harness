@@ -1,6 +1,6 @@
 # 2026-11-20 能力对齐回归闸门
 
-`tests/bench/capability-parity-regression.py` 在同一个 0.4.69 制品上按固定顺序跑 9 个既有验收步骤，产出单一可复现的发布闸门结果，而不是把多次零散运行拼在一起。
+`tests/bench/capability-parity-regression.py` 在同一个 0.4.69 制品上按固定顺序跑 10 个既有验收步骤，产出单一可复现的发布闸门结果，而不是把多次零散运行拼在一起。
 
 ## 运行
 
@@ -27,29 +27,33 @@ python3 tests/bench/capability-parity-regression.py \
 | ptc-link-fixture | 应用数据视图的链接创建前置条件 |
 | ptc-boundary | PTC 自建链接/元数据拒绝、宿主并发父目录移动的越界防护 |
 | liveshare | owner 实际 ArkWeb 授权、分享创建/扩源/重连、reader 拒绝与实时撤销、stop、网关回收 |
+| liveshare-cross-device | 第二台设备真实浏览器经**模拟器直连宿主路由**（`--device-host 10.0.2.2`）渲染只读 viewer；不依赖 hdc 反向转发 |
 | account-entry | 全新应用数据下的公网 DeepSeek 授权页打开/取消、回环 PKCE、重启保持、登出撤销 |
 | native-addon-location | Host 内实测原生 addon 的加载位置限制 |
 
 ## 本批次结果（通过）
 
-2026-11-20 09:22–09:28（约 5.5 分钟），`ok=true`、失败 0：
+2026-11-20 10:01 前后（约 6.5 分钟），`ok=true`、失败 0：
 
 | 步骤 | 结果 | 秒 |
 | --- | --- | --- |
-| recovery | 通过 | 32 |
-| voice-input | 通过 | 44 |
-| voice-native-capture | 通过 | 39 |
-| ollama-routes | 通过 | 74 |
+| recovery | 通过 | 33 |
+| voice-input | 通过 | 43 |
+| voice-native-capture | 通过 | 37 |
+| ollama-routes | 通过 | 85 |
 | ptc-link-fixture | 通过 | 1 |
-| ptc-boundary | 通过 | 43 |
-| liveshare | 通过 | 48 |
-| account-entry | 通过 | 34 |
-| native-addon-location | 通过 | 15 |
+| ptc-boundary | 通过 | 42 |
+| liveshare | 通过 | 49 |
+| liveshare-cross-device | 通过 | 46 |
+| account-entry | 通过 | 36 |
+| native-addon-location | 通过 | 14 |
 
-证据：[capability-parity-gate-0.4.69.json](../evidence/capability-parity-gate-0.4.69.json)
+证据：[capability-parity-gate-0.4.69.json](../evidence/capability-parity-gate-0.4.69.json) · 直连跨设备单次记录：[liveshare-cross-device-direct-0.4.69.json](../evidence/liveshare-cross-device-direct-0.4.69.json)
+
+跨设备步骤用 `--device-host 10.0.2.2`：模拟器 QEMU 用户网络把 10.0.2.2 映射到宿主，夹具临时监听 0.0.0.0。此前的 hdc 反向转发会让 owner 网关 WebSocket 在长连接后以 1006 断开且不重连；直连路由没有该问题。owner 登录页仍走 127.0.0.1 回环（ArkWeb 只接受 https 或 127.0.0.1），两者在闸门里是独立步骤。
 
 ## 闸门之外的独立证据
 
-- **LiveShare 跨设备**：`emulator-liveshare-relay.py --owner-login --cross-device` 及公网隧道预演单独留证（[跨设备](../evidence/emulator-liveshare-cross-device-0.4.69.json) · [公网预演](../evidence/relay-public-tunnel-acceptance-0.4.69.json)）。闸门不依赖此步。
-  2026-11-20 复测记录：同一模拟器会话里连续跑 owner-login 跨设备时，owner 网关在 viewer 打开页面前以 1006 断开且不再重连（reader 检查刚通过、`/__fixture/state` 显示无 channel；重启 Host 也未恢复）。已确认与页面地址/端口转发无关（已修复内部模式的页面基址与陈旧转发清理），该现象仅在本环境的连续重启循环后出现；跨设备与公网证据仍是此前独立跑出的通过结果。后续若再次需要回归该步，建议使用新启动的模拟器会话。
+- **LiveShare 公网**：Cloudflare 隧道预演单独留证（[公网预演](../evidence/relay-public-tunnel-acceptance-0.4.69.json)）。
+  hdc 反向转发下的跨设备复测曾出现 owner 网关 1006 断连；已定位为**反向转发长连接不稳定**，改用模拟器直连路由（`--device-host 10.0.2.2`）后稳定复现通过，并已纳入闸门。
 - **Forge 公开读/真实账号**：设备 A 现按设计保留真实 GitHub 账号配置，夹具公开读需要空 `GH_CONFIG`；因此公开读单独留证（[Forge 公开读](../evidence/emulator-forge-public-read-0.4.69.json) · [真实账号](../evidence/emulator-forge-real-account-0.4.69.json)）。
