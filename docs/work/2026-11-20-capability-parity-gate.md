@@ -56,4 +56,4 @@ python3 tests/bench/capability-parity-regression.py \
 
 - **LiveShare 公网**：Cloudflare 隧道预演单独留证（[公网预演](../evidence/relay-public-tunnel-acceptance-0.4.69.json)）。
   hdc 反向转发下的跨设备复测曾出现 owner 网关 1006 断连；已定位为**反向转发长连接不稳定**，改用模拟器直连路由（`--device-host 10.0.2.2`）后稳定复现通过，并已纳入闸门。
-- **Forge 公开读/真实账号**：设备 A 现按设计保留真实 GitHub 账号配置，夹具公开读需要空 `GH_CONFIG`；因此公开读单独留证（[Forge 公开读](../evidence/emulator-forge-public-read-0.4.69.json) · [真实账号](../evidence/emulator-forge-real-account-0.4.69.json)）。
+- **Forge 公开读/真实账号**：设备 A 现按设计保留真实 GitHub 账号配置，夹具公开读需要空 `GH_CONFIG`；因此公开读单独留证（[Forge 公开读](../evidence/emulator-forge-public-read-0.4.69.json) · [真实账号](../evidence/emulator-forge-real-account-0.4.69.json)）。在第二台设备上复跑该步骤时，夹具注入 profile 后的重启会让应用上下文命令持续返回空内容、Host 不再就绪（同一次运行在设备 A 上通过），该环境问题留待后续排查，闸门不依赖它。
