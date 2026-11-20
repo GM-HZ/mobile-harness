@@ -228,6 +228,24 @@ class Device:
         return False
 
 
+def upload_file(device, relative, payload):
+    """Publish a host file through the HDC file channel and copy it into app storage."""
+    import tempfile
+    from pathlib import Path as _Path
+    with tempfile.TemporaryDirectory() as folder:
+        local = _Path(folder) / "payload"
+        local.write_bytes(payload)
+        remote = "/data/local/tmp/mh-elf-loader-" + uuid.uuid4().hex[:8]
+        assert "FileTransfer finish" in device.hdc("file", "send", str(local), remote)
+        try:
+            device.app("cp " + remote + " " + relative)
+            size = device.app("wc -c < " + relative).strip()
+            if int(size or 0) != len(payload):
+                raise AssertionError("uploaded size mismatch: " + size + " vs " + str(len(payload)))
+        finally:
+            device.hdc("shell", "rm", "-f", remote)
+
+
 def events(device, session_id):
     response = device.rpc("session/events", {"request": {"address": {"kind": "session", "sessionId": session_id}}},
                           timeout=120)
@@ -260,7 +278,7 @@ def texts(results):
     return "\n".join(item.get("text", "") for result in results for item in result["content"])
 
 
-def run(device, port, output, probe=None):
+def run(device, port, output, probe=None, loader_file=None):
     name = "proot-exec-" + uuid.uuid4().hex[:8]
     native = FILES + "/alpine/workspace-native/" + name
     probe = probe or PROBE
@@ -270,7 +288,8 @@ def run(device, port, output, probe=None):
              id(RUNTIME_PROBE): "real-device runtime package acquisition probe",
              id(RUNTIME_TARGET_PROBE): "real-device runtime pure-python install probe",
              id(PIP_NATIVE_PROBE): "real-device python dependency executability probe",
-             id(MMAP_PROBE): "real-device executable memory policy probe"}
+             id(MMAP_PROBE): "real-device executable memory policy probe",
+             "elf-loader": "real-device in-memory ELF loader prototype"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -293,8 +312,16 @@ def run(device, port, output, probe=None):
                                        "submittedAttachments": []})
         modes = [row["data"]["mode"] for row in events(device, session) if row["type"] == "sandbox/mode"]
         evidence["permissionMode"] = modes[-1] if modes else None
+        if loader_file:
+            from pathlib import Path as _Path
+            loader = _Path(loader_file).read_bytes()
+            upload_file(device, "alpine/workspace-native/" + name + "/elf-loader.py", loader)
+            evidence["uploadedLoaderBytes"] = len(loader)
+            command = "python3 ./elf-loader.py && echo INMEM_ELF_PROBE_DONE"
+        else:
+            command = probe
         instruction = ("Actually call bash exactly once now with precisely "
-                       + json.dumps({"command": probe, "description": "Probe PRoot exec semantics"})
+                       + json.dumps({"command": command, "description": "Probe PRoot exec semantics"})
                        + ". Use no other tools. Report the result and stop.")
         calls, results, _ = prompt(device, session, instruction)
         evidence["toolCalls"] = calls
@@ -303,7 +330,7 @@ def run(device, port, output, probe=None):
         if not bash_calls:
             raise AssertionError("The model did not call bash")
         arguments = json.loads(bash_calls[0]["arguments"])
-        evidence["commandMatched"] = arguments.get("command") == probe
+        evidence["commandMatched"] = arguments.get("command") == command
         evidence["command"] = arguments.get("command")
         text = texts(results)
         evidence["resultText"] = text
@@ -337,12 +364,14 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader"], default="exec")
+    parser.add_argument("--loader-file", default=str(Path(__file__).with_name("fixtures") / "inmemory-elf-loader.py"))
     args = parser.parse_args()
     probe = {"native": NATIVE_PROBE, "bypass": BYPASS_PROBE, "runtime": RUNTIME_PROBE,
              "runtime-target": RUNTIME_TARGET_PROBE, "pip-native": PIP_NATIVE_PROBE,
-             "mmap": MMAP_PROBE}.get(args.probe, PROBE)
-    run(Device(args.target, args.port), args.port, args.output, probe)
+             "mmap": MMAP_PROBE, "elf-loader": "python3 ./elf-loader.py"}.get(args.probe, PROBE)
+    run(Device(args.target, args.port), args.port, args.output, probe,
+        loader_file=args.loader_file if args.probe == "elf-loader" else None)
     print(args.output)
 
 

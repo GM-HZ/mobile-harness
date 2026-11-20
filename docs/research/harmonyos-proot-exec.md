@@ -113,3 +113,28 @@ python3 tests/smoke/mate60-proot-exec.py --target <usb-serial> --output out.json
 这为"全面对齐 PC"提供了可行技术路线：**in-memory loader + 静态工具运行时下载**，而不必把所有原生工具都打进 HAP。
 
 > 注意：这是有意绕过平台代码签名边界的做法，适合自用开发者 harness，不适合应用市场分发构建。
+
+## 第一版内存加载器原型（0.4.69，模拟器已验证）
+
+`tests/smoke/fixtures/inmemory-elf-loader.py` 是最小验证：内嵌一个 aarch64 `ET_EXEC`（`write(1, ...)` + `ret`），先写入工作区 `./probe.elf`（走真实文件读取路径），然后解析 program header → `mmap(PROT_READ|WRITE, MAP_PRIVATE|MAP_ANON|MAP_FIXED, vaddr=0x400000)` → 拷贝段 → `mprotect(PROT_READ|EXEC)` → 通过 ctypes 跳转到 entry。段代码用 `svc #0` 写 stdout，再 `ret` 回到加载器。
+
+模拟器实测输出：
+
+```
+ELF_WRITTEN_TO_DISK 544
+ELF_HEADER_OK entry=0x400100 phnum=1
+SEGMENT_MAPPED 0x400000 size 4096 prot 5
+ENTER_ENTRY 0x400100
+IN-MEMORY-ELF-OK
+RETURNED_FROM_ELF (no exit_group called)
+INMEM_ELF_PROBE_DONE
+```
+
+证据：[emulator-inmemory-elf-loader-0.4.69.json](../evidence/emulator-inmemory-elf-loader-0.4.69.json)。复现：`python3 tests/smoke/mate60-proot-exec.py --target <target> --probe elf-loader --output out.json`（脚本会把 loader 通过 HDC 文件通道上传到工作区，再让真实会话的 `bash` 工具执行）。
+
+## 下一步（实现 PC 对齐的执行能力）
+
+1. **真实静态二进制**：补 argc/argv/envp/auxv 栈、`fork`+`waitpid`（避免被加载程序 `exit_group` 带走 Host），支持静态 PIE 的 `R_AARCH64_RELATIVE` 重定位；用运行时下载的静态 busybox/fd/ripgrep 验证。
+2. **native 集成**：把加载器写成签名 native helper（NAPI/子进程入口），接入 bash/subprocess provider，做到"下载静态工具直接跑"。
+3. **动态 ELF**：映射签名 musl 解释器/库（signed 文件可直接 mmap PROT_EXEC），按内核语义设置 auxv 后交给解释器重定位；逐步支持动态链接工具。
+4. **dlopen 扩展**：原生扩展库（Python wheel/.node）需要给 `dlopen` 做同样的内存加载 shim，难度更高，先以构建期签名为准。
