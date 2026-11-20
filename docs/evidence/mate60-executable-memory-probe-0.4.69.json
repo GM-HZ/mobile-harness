@@ -1,0 +1,63 @@
+{
+  "kind": "real-device executable memory policy probe (key result for full PC parity)",
+  "artifact": {
+    "signedHap": "dsh-mh-harmonyos-arm64-v0.4.69-signed.hap",
+    "signedSha256": "5b3a306ba4dfc6269a4ad8ef5a8a1f2ad75bc2e670ff03fce058ea867a43d24a",
+    "sourceCommit": "386f03547055e4f619fb9b367ab1dd668163c079"
+  },
+  "device": "HUAWEI Mate 60 (BRA-AL00), HarmonyOS 7.0.0.111, API 26",
+  "method": "python3 ctypes -> musl libc mmap/mprotect under the packaged PRoot guest; machine code page written and executed through CFUNCTYPE",
+  "results": {
+    "anonymousRwxMmap": "OK (errno 0)",
+    "anonymousRxMmap": "OK (errno 0)",
+    "mprotectReadWriteToReadExec": "OK (errno 0)",
+    "signedBoundFileReadExecMmap": "OK (errno 0) — the signed /bin/busybox inside the HAP can be mapped executable",
+    "copiedUnsignedFileReadExecMmap": "EPERM errno 13 Permission denied",
+    "memfdReadExecMmap": "EPERM errno 13 Permission denied",
+    "arbitraryMachineCodeExecution": "OK — a hand-written ARM64 page (mov x0,#42; ret) returned 42"
+  },
+  "interpretation": {
+    "platformPolicy": "HarmonyOS permits executable anonymous memory and blocks executable mappings of unsigned app-data files and memfd; files signed inside the HAP remain mappable executable",
+    "consequence": "a signed native helper can implement a userspace in-memory ELF loader (read ELF bytes -> anonymous RW mapping -> relocate -> mprotect RX -> jump), which bypasses the file-signature restriction for arbitrary binaries at the loader level",
+    "scopeOfBypass": "static ELF binaries can be loaded directly; dynamically linked binaries need the signed musl interpreter/libs or additional loader work; Node V8 JIT (needs anonymous RWX, which is now confirmed available) may also be re-enableable",
+    "caveat": "this deliberately bypasses the platform code-signing boundary; acceptable for the user's own developer harness, not for a store-distributed build"
+  },
+  "rawProbe": {
+    "kind": "real-device executable memory policy probe",
+    "target": "37R0224115035605",
+    "checkedAt": "2026-11-20T20:31:23+0800",
+    "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-5d085942",
+    "model": {
+      "default": {
+        "provider": "deepseek-account",
+        "model": "deepseek-flash",
+        "reasoningEffort": "off"
+      }
+    },
+    "permissionMode": "danger-full-access",
+    "toolCalls": [
+      {
+        "turn": 1,
+        "step": 1,
+        "callId": "call_00_34vKRrGSMZVDwoXgcKEF8913",
+        "name": "bash",
+        "arguments": "{\"command\": \"set +e\\necho \\\"PWD=$PWD\\\"\\ncp /bin/busybox ./copied-bx 2>/dev/null\\npython3 - <<'PY' 2>&1\\nimport ctypes, os\\nlibc = ctypes.CDLL(None, use_errno=True)\\nlibc.mmap.restype = ctypes.c_void_p\\nlibc.mmap.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_long]\\nlibc.mprotect.restype = ctypes.c_int\\nlibc.mprotect.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int]\\nPROT_READ, PROT_WRITE, PROT_EXEC = 1, 2, 4\\nMAP_PRIVATE, MAP_SHARED, MAP_ANON = 2, 1, 0x20\\ndef show(label, value, err):\\n    print(label, 'OK' if err == 0 else 'ERR', value, 'errno', err, os.strerror(err) if err else '')\\nshow('anon_rwx', None, 0) if False else None\\nctypes.set_errno(0)\\nr = libc.mmap(None, 4096, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)\\nshow('anon_rwx', r, ctypes.get_errno())\\nctypes.set_errno(0)\\nr2 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)\\nshow('anon_rx', r2, ctypes.get_errno())\\nctypes.set_errno(0)\\nr3 = libc.mmap(None, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0)\\nm = libc.mprotect(r3, 4096, PROT_READ|PROT_EXEC)\\nshow('mprotect_rw_to_rx', m, ctypes.get_errno())\\nctypes.set_errno(0)\\nfd = os.open('/bin/busybox', os.O_RDONLY)\\nr4 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE, fd, 0)\\nshow('bound_file_rx', r4, ctypes.get_errno())\\nctypes.set_errno(0)\\nfd2 = os.open('./copied-bx', os.O_RDONLY)\\nr5 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE, fd2, 0)\\nshow('copied_file_rx', r5, ctypes.get_errno())\\nctypes.set_errno(0)\\nmfd = os.memfd_create('execprobe')\\nos.write(mfd, b'\\\\x7fELF' + b'\\\\x00'*256)\\nr6 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_SHARED, mfd, 0)\\nshow('memfd_rx', r6, ctypes.get_errno())\\ncode = bytes.fromhex('400580d2c0035fd6')\\nbuf = ctypes.create_string_buffer(code, len(code))\\nctypes.set_errno(0)\\nr7 = libc.mmap(None, 4096, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)\\nif r7 is not None:\\n    ctypes.memmove(r7, code, len(code))\\nprot = libc.mprotect(r7, 4096, PROT_READ|PROT_EXEC)\\nshow('code_page_rx', prot, ctypes.get_errno())\\nif prot == 0:\\n    fn = ctypes.CFUNCTYPE(ctypes.c_int)(r7)\\n    try:\\n        print('EXECUTE_CODE_RESULT', fn())\\n    except Exception as error:\\n        print('EXECUTE_CODE_ERROR', repr(error))\\nelse:\\n    print('EXECUTE_CODE_SKIPPED')\\nPY\\necho MMAP_PROBE_DONE\", \"description\": \"Probe PRoot exec semantics\"}"
+      }
+    ],
+    "bashCallCount": 1,
+    "commandMatched": false,
+    "command": "set +e\necho \"PWD=$PWD\"\ncp /bin/busybox ./copied-bx 2>/dev/null\npython3 - <<'PY' 2>&1\nimport ctypes, os\nlibc = ctypes.CDLL(None, use_errno=True)\nlibc.mmap.restype = ctypes.c_void_p\nlibc.mmap.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_long]\nlibc.mprotect.restype = ctypes.c_int\nlibc.mprotect.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int]\nPROT_READ, PROT_WRITE, PROT_EXEC = 1, 2, 4\nMAP_PRIVATE, MAP_SHARED, MAP_ANON = 2, 1, 0x20\ndef show(label, value, err):\n    print(label, 'OK' if err == 0 else 'ERR', value, 'errno', err, os.strerror(err) if err else '')\nshow('anon_rwx', None, 0) if False else None\nctypes.set_errno(0)\nr = libc.mmap(None, 4096, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)\nshow('anon_rwx', r, ctypes.get_errno())\nctypes.set_errno(0)\nr2 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)\nshow('anon_rx', r2, ctypes.get_errno())\nctypes.set_errno(0)\nr3 = libc.mmap(None, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0)\nm = libc.mprotect(r3, 4096, PROT_READ|PROT_EXEC)\nshow('mprotect_rw_to_rx', m, ctypes.get_errno())\nctypes.set_errno(0)\nfd = os.open('/bin/busybox', os.O_RDONLY)\nr4 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE, fd, 0)\nshow('bound_file_rx', r4, ctypes.get_errno())\nctypes.set_errno(0)\nfd2 = os.open('./copied-bx', os.O_RDONLY)\nr5 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE, fd2, 0)\nshow('copied_file_rx', r5, ctypes.get_errno())\nctypes.set_errno(0)\nmfd = os.memfd_create('execprobe')\nos.write(mfd, b'\\x7fELF' + b'\\x00'*256)\nr6 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_SHARED, mfd, 0)\nshow('memfd_rx', r6, ctypes.get_errno())\ncode = bytes.fromhex('400580d2c0035fd6')\nbuf = ctypes.create_string_buffer(code, len(code))\nctypes.set_errno(0)\nr7 = libc.mmap(None, 4096, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)\nif r7 is not None:\n    ctypes.memmove(r7, code, len(code))\nprot = libc.mprotect(r7, 4096, PROT_READ|PROT_EXEC)\nshow('code_page_rx', prot, ctypes.get_errno())\nif prot == 0:\n    fn = ctypes.CFUNCTYPE(ctypes.c_int)(r7)\n    try:\n        print('EXECUTE_CODE_RESULT', fn())\n    except Exception as error:\n        print('EXECUTE_CODE_ERROR', repr(error))\nelse:\n    print('EXECUTE_CODE_SKIPPED')\nPY\necho MMAP_PROBE_DONE",
+    "resultText": "PWD=/workspace-native/proot-exec-5d085942\nanon_rwx OK 390162771968 errno 0 \nanon_rx OK 390162776064 errno 0 \nmprotect_rw_to_rx OK 0 errno 0 \nbound_file_rx OK 390162784256 errno 0 \ncopied_file_rx ERR 18446744073709551615 errno 13 Permission denied\nmemfd_rx ERR 18446744073709551615 errno 13 Permission denied\ncode_page_rx OK 0 errno 0 \nEXECUTE_CODE_RESULT 42\nMMAP_PROBE_DONE\n",
+    "markers": {
+      "EXEC_SH_OK": false,
+      "EXEC_BASH_OK": false,
+      "EXEC_NODE_OK": false,
+      "EXEC_PY_OK": false,
+      "EXEC_SCRIPT_OK": false,
+      "COPY_NODE_OK": false,
+      "PROOT_EXEC_PROBE_DONE": false
+    },
+    "exits": {},
+    "ok": false
+  }
+}

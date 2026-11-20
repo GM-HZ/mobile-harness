@@ -101,6 +101,82 @@ python3 -c "import urllib.request; print(urllib.request.urlopen('https://pypi.or
 echo RUNTIME_TARGET_PROBE_DONE
 """
 
+PIP_NATIVE_PROBE = """set +e
+echo "PWD=$PWD"
+echo "--- pure python package + console script ---"
+python3 -m pip install --no-cache-dir --target ./pylibs pyfiglet > ./pip-pure.log 2>&1; echo "PIP_PURE_EXIT=$?"
+ls ./pylibs/bin 2>/dev/null
+if [ -f ./pylibs/bin/pyfiglet ]; then
+  chmod +x ./pylibs/bin/pyfiglet
+  head -1 ./pylibs/bin/pyfiglet
+  ( exec ./pylibs/bin/pyfiglet -f small MH ) > ./console.log 2>&1; echo "CONSOLE_EXEC_EXIT=$?"
+  head -4 ./console.log
+fi
+echo "--- native python wheel (ujson) ---"
+python3 -m pip install --no-cache-dir --target ./pylibs ujson > ./pip-native.log 2>&1; echo "PIP_NATIVE_EXIT=$?"
+tail -2 ./pip-native.log
+PYTHONPATH=./pylibs python3 -c "import ujson; print('UJSON_IMPORT_OK', ujson.__version__)" 2>&1; echo "UJSON_IMPORT_EXIT=$?"
+echo PIP_NATIVE_PROBE_DONE
+"""
+
+MMAP_PROBE = """set +e
+echo "PWD=$PWD"
+cp /bin/busybox ./copied-bx 2>/dev/null
+python3 - <<'PY' 2>&1
+import ctypes, os
+libc = ctypes.CDLL(None, use_errno=True)
+libc.mmap.restype = ctypes.c_void_p
+libc.mmap.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int, ctypes.c_int, ctypes.c_int, ctypes.c_long]
+libc.mprotect.restype = ctypes.c_int
+libc.mprotect.argtypes = [ctypes.c_void_p, ctypes.c_size_t, ctypes.c_int]
+PROT_READ, PROT_WRITE, PROT_EXEC = 1, 2, 4
+MAP_PRIVATE, MAP_SHARED, MAP_ANON = 2, 1, 0x20
+def show(label, value, err):
+    print(label, 'OK' if err == 0 else 'ERR', value, 'errno', err, os.strerror(err) if err else '')
+show('anon_rwx', None, 0) if False else None
+ctypes.set_errno(0)
+r = libc.mmap(None, 4096, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)
+show('anon_rwx', r, ctypes.get_errno())
+ctypes.set_errno(0)
+r2 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)
+show('anon_rx', r2, ctypes.get_errno())
+ctypes.set_errno(0)
+r3 = libc.mmap(None, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANON, -1, 0)
+m = libc.mprotect(r3, 4096, PROT_READ|PROT_EXEC)
+show('mprotect_rw_to_rx', m, ctypes.get_errno())
+ctypes.set_errno(0)
+fd = os.open('/bin/busybox', os.O_RDONLY)
+r4 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE, fd, 0)
+show('bound_file_rx', r4, ctypes.get_errno())
+ctypes.set_errno(0)
+fd2 = os.open('./copied-bx', os.O_RDONLY)
+r5 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE, fd2, 0)
+show('copied_file_rx', r5, ctypes.get_errno())
+ctypes.set_errno(0)
+mfd = os.memfd_create('execprobe')
+os.write(mfd, b'\\x7fELF' + b'\\x00'*256)
+r6 = libc.mmap(None, 4096, PROT_READ|PROT_EXEC, MAP_SHARED, mfd, 0)
+show('memfd_rx', r6, ctypes.get_errno())
+code = bytes.fromhex('400580d2c0035fd6')
+buf = ctypes.create_string_buffer(code, len(code))
+ctypes.set_errno(0)
+r7 = libc.mmap(None, 4096, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE|MAP_ANON, -1, 0)
+if r7 is not None:
+    ctypes.memmove(r7, code, len(code))
+prot = libc.mprotect(r7, 4096, PROT_READ|PROT_EXEC)
+show('code_page_rx', prot, ctypes.get_errno())
+if prot == 0:
+    fn = ctypes.CFUNCTYPE(ctypes.c_int)(r7)
+    try:
+        print('EXECUTE_CODE_RESULT', fn())
+    except Exception as error:
+        print('EXECUTE_CODE_ERROR', repr(error))
+else:
+    print('EXECUTE_CODE_SKIPPED')
+PY
+echo MMAP_PROBE_DONE
+"""
+
 
 class Device:
     def __init__(self, target, port):
@@ -192,7 +268,9 @@ def run(device, port, output, probe=None):
              id(NATIVE_PROBE): "real-device native execution bypass probe",
              id(BYPASS_PROBE): "real-device runtime native-code bypass probe",
              id(RUNTIME_PROBE): "real-device runtime package acquisition probe",
-             id(RUNTIME_TARGET_PROBE): "real-device runtime pure-python install probe"}
+             id(RUNTIME_TARGET_PROBE): "real-device runtime pure-python install probe",
+             id(PIP_NATIVE_PROBE): "real-device python dependency executability probe",
+             id(MMAP_PROBE): "real-device executable memory policy probe"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -259,10 +337,11 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap"], default="exec")
     args = parser.parse_args()
     probe = {"native": NATIVE_PROBE, "bypass": BYPASS_PROBE, "runtime": RUNTIME_PROBE,
-             "runtime-target": RUNTIME_TARGET_PROBE}.get(args.probe, PROBE)
+             "runtime-target": RUNTIME_TARGET_PROBE, "pip-native": PIP_NATIVE_PROBE,
+             "mmap": MMAP_PROBE}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe)
     print(args.output)
 

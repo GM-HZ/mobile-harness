@@ -93,3 +93,23 @@ python3 tests/smoke/mate60-proot-exec.py --target <usb-serial> --output out.json
 3. `./build.sh --package` 重新产出 signed HAP，`hdc install -r` 覆盖安装（本机实测约 36 秒）。
 
 所以"要提前打包"的范围 = **实际需要的原生工具清单**，不是整套工具链；纯语言工具和脚本可以运行时解决。
+
+## 关键突破：匿名可执行内存可用，可以自研内存加载器
+
+之前判断"没有绕过"只在**文件级** exec 上成立；进一步用 Python ctypes 直接调 musl `mmap`/`mprotect`（真机）得到：
+
+| 测试 | 结果 |
+| --- | --- |
+| 匿名 `mmap(PROT_READ|WRITE|EXEC)` | ✅ OK |
+| 匿名 `mmap(PROT_READ|EXEC)` | ✅ OK |
+| `mprotect(RW → RX)` | ✅ OK |
+| 映射**签名 HAP 内**文件为可执行（`/bin/busybox`） | ✅ OK |
+| 映射工作区里的**未签名**副本为可执行 | ❌ EPERM |
+| 映射 `memfd` 为可执行 | ❌ EPERM |
+| 手写 ARM64 机器码页（`mov x0,#42; ret`）经 CFUNCTYPE 执行 | ✅ 返回 42 |
+
+即：平台禁止的是**未签名文件的可执行映射**，但**匿名可执行内存完全可用**。因此 signed native helper 可以实现用户态 ELF 加载器：读取任意 ELF 字节 → 匿名 RW 映射 → 重定位 → `mprotect(RX)` → 跳转执行。对**静态 ELF**（大量 Go/Rust CLI 工具都是静态构建）可以完全绕过文件签名限制；动态 ELF 需要 signed musl 解释器/库配合或更多加载器工作。Node V8 的 JIT 也依赖匿名 RWX（已确认可用），"jitless" 可能是构建选择而非平台强制。
+
+这为"全面对齐 PC"提供了可行技术路线：**in-memory loader + 静态工具运行时下载**，而不必把所有原生工具都打进 HAP。
+
+> 注意：这是有意绕过平台代码签名边界的做法，适合自用开发者 harness，不适合应用市场分发构建。
