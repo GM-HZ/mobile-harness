@@ -22,3 +22,6 @@
 {"commit": "62b0e87a588247f264727364ee4fb7d3837edc24", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/62b0e87a588247f264727364ee4fb7d3837edc24.json", "note": "", "at": "2026-11-20T23:18:26+0800"}
 {"commit": "62b0e87a588247f264727364ee4fb7d3837edc24", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/62b0e87a588247f264727364ee4fb7d3837edc24.json", "note": "", "at": "2026-11-20T23:18:28+0800"}
 {"commit": "62b0e87a588247f264727364ee4fb7d3837edc24", "tiers": ["G2"], "ok": true, "evidence": ".build/gate-evidence/G2", "note": "nightly core subset: native-addon 14.5s, inspector 18.1s", "at": "2026-11-20T23:18:28+0800"}
+{"commit": "a041ad2dbc47cfc3d013e2dd12788ba6af73af11", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/a041ad2dbc47cfc3d013e2dd12788ba6af73af11.json", "note": "", "at": "2026-11-20T23:20:19+0800"}
+{"commit": "a041ad2dbc47cfc3d013e2dd12788ba6af73af11", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/a041ad2dbc47cfc3d013e2dd12788ba6af73af11.json", "note": "", "at": "2026-11-20T23:20:20+0800"}
+{"commit": "a041ad2dbc47cfc3d013e2dd12788ba6af73af11", "tiers": ["G2"], "ok": true, "evidence": ".build/gate-evidence/G2", "note": "nightly 6-item subset: availability 13.0s, lsp-bundle 20.5s", "at": "2026-11-20T23:20:20+0800"}

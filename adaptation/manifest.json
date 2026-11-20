@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "62b0e87a588247f264727364ee4fb7d3837edc24",
+  "generatedFrom": "a041ad2dbc47cfc3d013e2dd12788ba6af73af11",
   "layers": [
     "host",
     "web",
@@ -1017,6 +1017,7 @@
         "runtime/harmonyos/tools/mh-exec.py",
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",
+        "scripts/adaptation/release_dry_run.sh",
         "scripts/build/harmonyos_guest_extras.py",
         "scripts/build/stage-harmonyos.py"
       ],
@@ -1053,6 +1054,7 @@
         ".github/workflows/harmonyos.yml",
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",
+        "scripts/adaptation/release_dry_run.sh",
         "scripts/build/stage-harmonyos.py"
       ],
       "gates": [

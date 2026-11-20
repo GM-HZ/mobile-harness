@@ -324,3 +324,19 @@ nightly 覆盖；等真机解锁后跑 G3 device_lab verify/exec/overlay。
 
 下一轮：补 G2 稳定子集（再挑 1-2 个无模型依赖用例）与 G3 解锁后的设备证据；把
 `release_dry_run.sh` 纳入发布文档；继续缩小 compat 的 upstream-seam-candidate 面。
+
+
+### 2026-11-20（第 11 轮：nightly 覆盖、flake 策略、发布 runbook）
+
+- nightly 稳定子集再扩 2 个无模型依赖用例并实测通过：
+  `nightly-inspector-availability`（13.0s）、`nightly-lsp-bundle`（20.5s）；
+  nightly workflow 现覆盖 capability gate + recovery + native-addon + inspector +
+  inspector-availability + lsp-bundle，共 6 项。
+- `gates/run.py` 增加 `--retries N`：失败条目按 flake 策略重试（最多 2 次），
+  证据记录 `attempts/flake`，状态打印 `PASS (flake)`；nightly 使用 `--retries 1`。
+- 新增 [release-runbook.md](release-runbook.md)：本地 dry run、CI tag 流程、证据要求、
+  回滚与检查清单，与 `release_dry_run.sh`/`release_gate.py` 对应。
+- registry：`G0=3, G1=7, G2=67, G3=3, G4=7`；真机仍锁屏、测试密钥未配置。
+
+下一轮：把 nightly 的 flake 记录写进 RSI 台账（重试成功标记）；继续找无模型用例；
+真机解锁后补 G3 证据；有密钥时补真实 session 写入回归。

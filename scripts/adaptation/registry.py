@@ -75,6 +75,14 @@ def main():
                "command": "python3 tests/smoke/emulator-native-addon-location.py \"$MH_EMULATOR\" .build/gate-evidence/native-addon.json",
                "covers": "native addon location + Inspector evaluation on the native Host",
                "requires": ["MH_EMULATOR env"], "timeout": 1200})
+    g2.append({"id": "nightly-inspector-availability",
+               "command": "python3 tests/smoke/emulator-inspector-availability.py \"$MH_EMULATOR\" .build/gate-evidence/inspector-availability.json",
+               "covers": "optional Inspector worker availability probe", "requires": ["MH_EMULATOR env"],
+               "timeout": 900})
+    g2.append({"id": "nightly-lsp-bundle",
+               "command": "python3 tests/smoke/emulator-lsp-bundle.py \"$MH_EMULATOR\" .build/gate-evidence/lsp-bundle.json",
+               "covers": "LSP bundle composition on the native Host", "requires": ["MH_EMULATOR env"],
+               "timeout": 1200})
     g2.append({"id": "nightly-inspector",
                "command": "python3 tests/smoke/emulator-inspector.py \"$MH_EMULATOR\" .build/gate-evidence/inspector.json",
                "covers": "Inspector CDP over the authenticated ArkWeb proxy",
