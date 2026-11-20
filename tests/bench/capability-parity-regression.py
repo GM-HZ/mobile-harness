@@ -46,6 +46,11 @@ def build_steps(args):
         step("ptc-boundary", "emulator-ptc-boundary.py", [args.target, "{out}"], "ptc-boundary.json", 600),
         step("liveshare", "emulator-liveshare-relay.py",
              [args.target, "{out}", "--owner-login"], "liveshare.json", 900),
+        # The second device reaches the host fixture directly (QEMU 10.0.2.2), which
+        # keeps the owner gateway WebSocket alive; hdc reverse forwarding drops it.
+        step("liveshare-cross-device", "emulator-liveshare-relay.py",
+             [args.target, "{out}", "--cross-device", args.second_target, "--device-host", "10.0.2.2"],
+             "liveshare-cross-device.json", 900),
         step("account-entry", "emulator-account.py", [args.account_target, "{out}"], "account.json", 480),
         step("native-addon-location", "emulator-native-addon-location.py", [args.target, "{out}"],
              "addon-location.json", 480),

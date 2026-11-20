@@ -322,8 +322,7 @@ def verify_program_policy(device, port, share, session, folder, sessions, eviden
         assert owner(device, 'stop', {'shareId': other}) == {'ok': True}
 
 
-def verify_reader(device, port, share, shared, outside, evidence, model, program_check, attachments, guest_check,
-                  cross_device_check=None):
+def verify_reader(device, port, share, shared, outside, evidence, model, program_check, attachments, guest_check):
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''}, token=None)
     assert status == 401 and body['error'] == 'viewer-login-required'
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
@@ -362,11 +361,6 @@ def verify_reader(device, port, share, shared, outside, evidence, model, program
             if program_check:
                 program_check()
         evidence['testModelKeyRemoved'] = True
-    if cross_device_check:
-        # Prove the second device viewer while the share still authorizes readers;
-        # the revocation below deliberately invalidates it afterwards.
-        cross_device_check()
-        evidence['crossDeviceBeforeRevocation'] = True
     status, body = relay_call(port, share, {}, path='/__fixture/revoke', token=ADMIN_TOKEN)
     assert status == 200 and body['revoked'] is True
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
@@ -448,6 +442,11 @@ def browser_tap(target, labels=('浏览器', '极简浏览')):
 
 def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
     """Read the shared session from the official viewer page on a second device."""
+    # Keep the owner device awake while the second device loads the page; the
+    # emulator can suspend the app when the screen is idle and drop the gateway.
+    device.hdc('shell', 'power-shell', 'wakeup')
+    device.start()
+    device.ready('normal')
     node = Path(os.environ.get('DEVECO_HOME', '/Applications/DevEco-Studio.app/Contents'))/'tools/node/bin/node'
     source = agent['read_bytes'](device, PROTOCOL_PACKAGE)
     carrier = subprocess.run([str(node), '--input-type=module', '-e', CARRIER_SCRIPT],
@@ -465,7 +464,9 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
         return subprocess.check_output([HDC, '-t', target, *args], text=True, timeout=90).strip()
 
     reverse = None
-    if RELAY_HOST_PORT:
+    if DEVICE_BASE:
+        reverse = None
+    elif RELAY_HOST_PORT:
         reverse = ('tcp:19769', f'tcp:{RELAY_HOST_PORT}')
     elif relay_port:
         reverse = ('tcp:19769', f'tcp:{relay_port}')
@@ -474,6 +475,20 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
         assert 'Forwardport result:OK' in hdc('rport', *reverse)
     title = 'MH cross-device viewer ' + uuid.uuid4().hex[:6]
     assert device.rpc('session/rename', {'request': {'sessionId': sessions[0], 'title': title}})['title'] == title
+    # The reader regression revoked viewer access just before this call; restore it
+    # through the fixture admin route so the second device is an actual reader.
+    request = Request(relay_base(relay_port) + '/__fixture/authorize?shareId=' + share, data=b'{}',
+                      headers={'Authorization': 'Bearer ' + ADMIN_TOKEN, 'Content-Type': 'application/json'})
+    with urlopen(request, timeout=8) as response:
+        assert json.load(response) == {'authorized': True}
+    deadline = time.monotonic() + 90
+    while time.monotonic() < deadline:
+        status, body = reader_rpc(relay_port, share, 'session/list', {'_request': {}})
+        if status == 200 and body.get('result', {}).get('ok'):
+            break
+        time.sleep(0.5)
+    else:
+        raise AssertionError('The fixture re-authorization did not restore viewer reads')
     try:
         page = None
         for attempt in range(3):
@@ -563,7 +578,7 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
 
 def run(device, output, model, owner_login, host_port, program_policy, attachments=False, guest_check=None,
         cross_device_target=None, relay_url=None, relay_host_port=None, admin_token=None, viewer_token=None,
-        relay_call_url=None):
+        relay_call_url=None, device_host=None):
     global BASE_OVERRIDE, DEVICE_BASE, RELAY_HOST_PORT, ADMIN_TOKEN, VIEWER_TOKEN
     if admin_token:
         ADMIN_TOKEN = admin_token
@@ -619,14 +634,22 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
             environment = dict(os.environ)
             if cross_device_target:
                 environment['MH_RELAY_PAGE_DUMP'] = '/tmp/mh-liveshare-viewer-page.html'
+            if device_host:
+                # The emulator reaches the host directly (QEMU 10.0.2.2), so expose the
+                # local fixture on all interfaces and skip the hdc reverse forwarding.
+                environment['MH_RELAY_HOST'] = '0.0.0.0'
             proc = subprocess.Popen(command, stdout=subprocess.PIPE,
                                     stderr=subprocess.PIPE, text=True, env=environment)
             assert select.select([proc.stdout], [], [], 5)[0], 'Relay did not report a bound port'
             relay_port = int(proc.stdout.readline())
-            candidate = ('tcp:19769', f'tcp:{relay_port}')
-            clear_forward(device.hdc, candidate[0])
-            assert 'Forwardport result:OK' in device.hdc('rport', *candidate)
-            reverse = candidate
+            if device_host:
+                base = f'http://{device_host}:{relay_port}'
+                DEVICE_BASE = base
+            else:
+                candidate = ('tcp:19769', f'tcp:{relay_port}')
+                clear_forward(device.hdc, candidate[0])
+                assert 'Forwardport result:OK' in device.hdc('rport', *candidate)
+                reverse = candidate
         device.app('mkdir '+folder)
         state = workspace_path+'/owner-shares.json'
         patch = saved[paths[2]].rstrip()
@@ -695,12 +718,10 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
         def program_check():
             verify_program_policy(device, relay_port, share, sessions[0], folder, sessions, evidence)
 
-        def cross_device_check():
-            cross_device_viewer(device, relay_port, share, sessions, cross_device_target, evidence)
-
         verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model,
-                      program_check if program_policy else None, attachments, guest_check,
-                      cross_device_check if cross_device_target else None)
+                      program_check if program_policy else None, attachments, guest_check)
+        if cross_device_target:
+            cross_device_viewer(device, relay_port, share, sessions, cross_device_target, evidence)
         evidence['stop'] = owner(device, 'stop', {'shareId': share})
         assert evidence['stop'] == {'ok': True} and device.rpc('liveshareShares/list', {}) == {'shares': []}
         status, _ = relay_call(relay_port, share, {'op': 'asset', 'path': ''})
@@ -779,6 +800,7 @@ if __name__ == '__main__':
     parser.add_argument('--host-port', type=int, default=19643)
     parser.add_argument('--cross-device', help='Second loopback emulator target that presents the viewer page')
     parser.add_argument('--relay-url', help='External Relay base URL (https:// for public deployment) instead of the local fixture')
+    parser.add_argument('--device-host', help='Host address the emulator reaches directly (e.g. 10.0.2.2); skips reverse forwarding')
     parser.add_argument('--relay-host-port', type=int, help='Host port of an externally started Relay fixture to forward to the device loopback')
     parser.add_argument('--admin-token', default=None, help='Fixture Relay admin token for an external deployment')
     parser.add_argument('--viewer-token', default=None, help='Fixture Relay viewer token for an external deployment')
@@ -791,4 +813,4 @@ if __name__ == '__main__':
     run(support['Emulator'](args.target, args.host_port), args.output, args.model, args.owner_login,
         args.host_port, args.program_policy, args.attachments, verify_guest_uploads if args.guest_uploads else None,
         args.cross_device, args.relay_url, args.relay_host_port, args.admin_token, args.viewer_token,
-        args.relay_call_url)
+        args.relay_call_url, args.device_host)
