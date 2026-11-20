@@ -1,0 +1,984 @@
+{
+  "schema": 1,
+  "generatedFrom": "8d3f22ee351c8041674c9ef5e9691469a450223a",
+  "layers": [
+    "host",
+    "web",
+    "compat",
+    "diagnostics",
+    "native",
+    "packaging",
+    "tools",
+    "bundles",
+    "app"
+  ],
+  "entries": [
+    {
+      "id": "host:packages/dsh-host/dsh-client.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-client.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "535e77457c91c363e3320ff0a66b079b584653ad9d29cbf0b7ddc0d3dad64758",
+      "bytes": 9914,
+      "fragility": "high",
+      "upstreamTouchpoints": [
+        "\"bash\",\\n\\t\\t\\t\"-c\",",
+        "await link(tmp, finalPath);",
+        "dsh-bash-local/lib/index.js",
+        "dsh-bash-sandbox/lib/index.js",
+        "dsh-session-persistence-jsonl/lib/index.js"
+      ],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-bash-pipe.mjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-bash-pipe.mjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "538f21257a6651e53b15ae10bc46d5542ce46d373c28e717a3cba8e5419829f7",
+      "bytes": 7834,
+      "fragility": "medium",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-terminal",
+        "dsh-terminal/lib/index.js"
+      ],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-fs.mjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-fs.mjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "3add135f5df6f41186ceba29879219e7a50b4cc833687813fe1c0036155c8526",
+      "bytes": 951,
+      "fragility": "medium",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-fs-sandbox",
+        "dsh-fs-sandbox/lib/index.js"
+      ],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-http.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-http.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "0a74f602d9c16828d1ffc8a14aadba40e47069eb855d24a8e1ec38f9207ae316",
+      "bytes": 917,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-office-entry.mjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-office-entry.mjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "cfbebd56c7ce9242a410d35a59150d6192c2799d7c187c21babb0ab0a5038a96",
+      "bytes": 212,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-office-launch.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-office-launch.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "ea72fc1bdbeeb1a847e4944c01e2694ba0df22d02499c9301db68258c51a7832",
+      "bytes": 5039,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-office.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-office.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "1adffa93549b8199e4716c03489b910c1f1c44511dff8060d7c593bbf137b679",
+      "bytes": 10034,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-ptc.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-ptc.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "387ffc45bd3a329673c6c982017dcaf7be1c231d0e034ebdc1abe700e291ef65",
+      "bytes": 3512,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-subprocess.mjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-subprocess.mjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "60d2daf76636cd63d7e8cf049b7703cacb22d534e1a6896d8e0d3c1fe836c9bb",
+      "bytes": 3672,
+      "fragility": "medium",
+      "upstreamTouchpoints": [
+        "dsh-subprocess-local/lib/index.js",
+        "dsh-subprocess/lib/index.js"
+      ],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-workflow-wire.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-workflow-wire.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "0c6fa21ebe18718d037c18e978355ee5bacc6e8183cd35ef734c44e64bb212c0",
+      "bytes": 1659,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-workflow-worker.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-workflow-worker.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "4826b77be0d3430c8f6b5f92e87a88d11a8d98480fe61441836d2894b388ea9a",
+      "bytes": 2938,
+      "fragility": "high",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-harmony-workflow.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-harmony-workflow.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "548d1a4993dbef7571f0a37a043850318793d569add7d0efd08c430145a1e90d",
+      "bytes": 4710,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-native-web.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-native-web.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "973d01c370883943cabe42f1abcabb59f701e20f16f5a4ec837aff9bd9972f2a",
+      "bytes": 46708,
+      "fragility": "high",
+      "upstreamTouchpoints": [
+        "\"darwin-arm64\",",
+        "(await import(\"@vscode/ripgrep\")).rgPath",
+        "...exec.agent === void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },",
+        "...getDefaultEnvironment(),",
+        "...loadOptionalPatches(binName, join(context.home, \"cordis.patch.yml\")) ?? [],",
+        "@deepseek-ai/dsh-experimental-liveshare",
+        "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice",
+        "@deepseek-ai/dsh-terminal-bash",
+        "@deepseek-ai/dsh-tool-bash-persistent",
+        "Build and export all runtime entry points before reporting ready.",
+        "Read and use the cordis-plugin-development skill.",
+        "This does not change PATH or package-manager settings."
+      ],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "web:runtime/harmonyos/web/settings-recovery.js",
+      "layer": "web",
+      "kind": "file",
+      "source": "runtime/harmonyos/web/settings-recovery.js",
+      "role": "web client injection",
+      "sha256": "7222288a0d844d504e217e56741b403f5284688d65ce72d56813dbe6460f28dc",
+      "bytes": 1937,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/LICENSE.gh.txt",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/LICENSE.gh.txt",
+      "role": "upstream capability shim",
+      "sha256": "6da4adc42392c8485e40b4251c7e332fc3352df1947c9ffade71dd60b14a7a4f",
+      "bytes": 1068,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-boot-cache.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-boot-cache.cjs",
+      "role": "upstream capability shim",
+      "sha256": "aa87b7338a4be5be28fc647a4385d9ecac1793971a15a470c0de160d6f015cf0",
+      "bytes": 2944,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-forge.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-forge.cjs",
+      "role": "upstream capability shim",
+      "sha256": "4c4e2e4b28160e28b422c543d88025eba15ae623009f025b684faa48fda9fc57",
+      "bytes": 7331,
+      "fragility": "high",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-inspector-worker.cjs",
+      "role": "upstream capability shim",
+      "sha256": "e1f93d3fed98957e528e604cf60672c296d2bacbd86e20d653e4f5c97055a335",
+      "bytes": 2066,
+      "fragility": "high",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-liveshare.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs",
+      "role": "upstream capability shim",
+      "sha256": "02d45cd475cd20d059008413ed9e5b91390d29a28a9a72dafba61e1cb5948577",
+      "bytes": 12528,
+      "fragility": "high",
+      "upstreamTouchpoints": [
+        "async upload(agent, request, signal) {"
+      ],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-office-worker.mjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-office-worker.mjs",
+      "role": "upstream capability shim",
+      "sha256": "fe2823ce97ceb3cd2e3e4c2c6dbb92ab2c7be861daaa9cf8a2a731e21f16c54b",
+      "bytes": 2917,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-package.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-package.cjs",
+      "role": "upstream capability shim",
+      "sha256": "1fc3f78a32a484ac0ec9398e95b47bdab627c5c8f7e0a42288c3d38905467ee8",
+      "bytes": 7653,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-pnpm-fetch.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-pnpm-fetch.cjs",
+      "role": "upstream capability shim",
+      "sha256": "210db0480cf38bfe061b8bb375ebc40c6eda9d0e1e8e47b35eb1a79396dc3cb8",
+      "bytes": 61,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-sharp.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-sharp.cjs",
+      "role": "upstream capability shim",
+      "sha256": "cb4d5ea30c8b865a19c9ea6ceb88e870d12ea35a78a555cf022b7470ecf9f93d",
+      "bytes": 3988,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/dsh-harmony-speech.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/dsh-harmony-speech.cjs",
+      "role": "upstream capability shim",
+      "sha256": "3fd9582f537f998d5e25cc7d654e62ac985ee0be75b0fb6864849018ca8f2924",
+      "bytes": 5695,
+      "fragility": "high",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "compat:runtime/harmonyos/compat/fetch-shim-boot.cjs",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/fetch-shim-boot.cjs",
+      "role": "upstream capability shim",
+      "sha256": "75807f994f3dd96d936964645ecedf0ff8c893c52d53c9cde9c5e1603ea9936e",
+      "bytes": 155,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "diagnostics:runtime/harmonyos/diagnostics/dsh-probe.cjs",
+      "layer": "diagnostics",
+      "kind": "file",
+      "source": "runtime/harmonyos/diagnostics/dsh-probe.cjs",
+      "role": "diagnostic probe",
+      "sha256": "7ec1bb91c6c916adb1a5692ca49952f7b1fd1a0c159d3b4cf98cb31757a0ec87",
+      "bytes": 8949,
+      "fragility": "high",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-session-persistence-jsonl",
+        "@deepseek-ai/dsh-web-frontend",
+        "dsh-session-persistence-jsonl/lib/index.js"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "diagnostics:runtime/harmonyos/diagnostics/dsh-seccomp-probe.cjs",
+      "layer": "diagnostics",
+      "kind": "file",
+      "source": "runtime/harmonyos/diagnostics/dsh-seccomp-probe.cjs",
+      "role": "diagnostic probe",
+      "sha256": "30a6f954be426c3fd59705f8997bcbfcad75f3678bdeed05aa72cfb3d8e53142",
+      "bytes": 1490,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/dsh-shell.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/dsh-shell.c",
+      "role": "native runtime / adapter",
+      "sha256": "0bf8e572f374b300b139aad62c8b1baa97744bbaac01214c9be0152718a1f0ab",
+      "bytes": 5110,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/dsh-speech.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/dsh-speech.c",
+      "role": "native runtime / adapter",
+      "sha256": "bc51cbec6bf29fbe2a99dd8efb5ffd85a6049690049295354d329cb2c6dc6859",
+      "bytes": 8724,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/dsh-workflow.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/dsh-workflow.c",
+      "role": "native runtime / adapter",
+      "sha256": "33ff84309b7f65f3885260e7c79455c29c852441fb36cf98da881b646538f17d",
+      "bytes": 11447,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/guest-loader-selfbuild.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/guest-loader-selfbuild.c",
+      "role": "native runtime / adapter",
+      "sha256": "bb775055d38b21388fe3df0a878d46a55bdbab5b040b7de3d25f70f8c19da04c",
+      "bytes": 8115,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/guest-tools.inc",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/guest-tools.inc",
+      "role": "native runtime / adapter",
+      "sha256": "17deebecfbc11a272e41dea22c24f4a6a03f7685036188966fe35fc6259bb3a3",
+      "bytes": 12629,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/mh-exec-shim.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/mh-exec-shim.c",
+      "role": "native runtime / adapter",
+      "sha256": "feb1650da7e2614b48ad9a15bfe5288ba66965f26d4be61dee33e08e46128c07",
+      "bytes": 5552,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/mh-native-demo.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/mh-native-demo.c",
+      "role": "native runtime / adapter",
+      "sha256": "637b7f7b4c2bd32a694a3bf913647cc89c3ead642d4fa49f2ef79b4c58bb5c46",
+      "bytes": 481,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/nativehost.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/nativehost.c",
+      "role": "native runtime / adapter",
+      "sha256": "ee880aad2a4ffef14d03c0ac5bf086d5f90523d090cbe838063f626766fbf9a2",
+      "bytes": 4885,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/poc.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/poc.c",
+      "role": "native runtime / adapter",
+      "sha256": "d130b5fd4fd82b4d543339130421cc97bf05018af410b3a4fa4ad20051ba4d18",
+      "bytes": 35634,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/ptc-file-filter.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/ptc-file-filter.c",
+      "role": "native runtime / adapter",
+      "sha256": "33e8bbe3039bee37d1f2fe778259f5751e037cfe2e6336b84c0111589713f5d5",
+      "bytes": 6036,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/ptc-file-filter.h",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/ptc-file-filter.h",
+      "role": "native runtime / adapter",
+      "sha256": "d00d8e91a814d7d3ea742a82bcad52bafe25259abd89012ad25124e0d33f4039",
+      "bytes": 292,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/ptc-supervisor.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/ptc-supervisor.c",
+      "role": "native runtime / adapter",
+      "sha256": "fc9ab976eb0cb22bf5055a44d065a237ec408ea81ff6a2a049e6a9c5859e674c",
+      "bytes": 17811,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/ptc-supervisor.h",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/ptc-supervisor.h",
+      "role": "native runtime / adapter",
+      "sha256": "920f61cead0eef5372fef93d4b90cc2801a2ae576ab3fe25eeec0ca6315ef374",
+      "bytes": 520,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/workflow-broker.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/workflow-broker.c",
+      "role": "native runtime / adapter",
+      "sha256": "1c9d8cd2e1a22375319fe8613a67352bd33ed995a66ba09a1f463eb520e7f8e4",
+      "bytes": 13416,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/workflow-broker.h",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/workflow-broker.h",
+      "role": "native runtime / adapter",
+      "sha256": "c849cd2aea0debb740400bf30d0b7b723fd790ce2f94ffa72f5ed26448ea97eb",
+      "bytes": 641,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/build-native-shell.sh",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/build-native-shell.sh",
+      "role": "build and packaging scripts",
+      "sha256": "f27e30f141ef99b31dd578eae00c319c1d641510202e655ce37684cb7fd20627",
+      "bytes": 1583,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/build-proot-runtime.sh",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/build-proot-runtime.sh",
+      "role": "build and packaging scripts",
+      "sha256": "3eea53d41e9af70354398e8939e33d0237f3defbec1b935b33732df696411c57",
+      "bytes": 1302,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/build-startup-sources.py",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/build-startup-sources.py",
+      "role": "build and packaging scripts",
+      "sha256": "64f5eb9d26588e11caf8bfa3fd5849afabb20d59e7e9e950baff1c570f8bceb6",
+      "bytes": 1675,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/package-image-runtime.sh",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/package-image-runtime.sh",
+      "role": "build and packaging scripts",
+      "sha256": "69cccb3b5108832ae7c8a7655a8ae4787fe897d59f183f8dff93b4a2e76e069d",
+      "bytes": 489,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/package-plugin-runtime.py",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/package-plugin-runtime.py",
+      "role": "build and packaging scripts",
+      "sha256": "25a8aa0b3f43848b25a2197d7ba88330598e7816a98535a4e510ff3bce8122f5",
+      "bytes": 3297,
+      "fragility": "high",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/package-shell-tools.py",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/package-shell-tools.py",
+      "role": "build and packaging scripts",
+      "sha256": "65d45d5c2ff1faa7bdd544f9074c2c1a32880df2fa574edb9af91381d69ab122",
+      "bytes": 3694,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/record-build-inputs.py",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/record-build-inputs.py",
+      "role": "build and packaging scripts",
+      "sha256": "bec733abea493a493ced6cfd270c0ca175d8631acb988664fbcc9937f440bfc1",
+      "bytes": 689,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "tools:runtime/harmonyos/tools/mh-exec.py",
+      "layer": "tools",
+      "kind": "file",
+      "source": "runtime/harmonyos/tools/mh-exec.py",
+      "role": "guest tools shipped inside the HAP",
+      "sha256": "c37ff861e53ce0bcfc80823b62a5528878558916669596a8bc5f6a4d51b6871a",
+      "bytes": 9723,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "tools:runtime/harmonyos/tools/mh-install.py",
+      "layer": "tools",
+      "kind": "file",
+      "source": "runtime/harmonyos/tools/mh-install.py",
+      "role": "guest tools shipped inside the HAP",
+      "sha256": "9049ae22d641c99649ad33156fbd6cffd9b188d6321677e42789a2e1a2811c78",
+      "bytes": 4020,
+      "fragility": "high",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "bundles:packages/bundles/mobile/dsh-client.patch.yml",
+      "layer": "bundles",
+      "kind": "file",
+      "source": "packages/bundles/mobile/dsh-client.patch.yml",
+      "role": "profile/bundle overlays",
+      "sha256": "6ce49112e8467025fe31301a31347ced24e824d5cc6d25ced2bfdf514b422b08",
+      "bytes": 355,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "bundles:packages/bundles/mobile-lsp/cordis.patch.yml",
+      "layer": "bundles",
+      "kind": "file",
+      "source": "packages/bundles/mobile-lsp/cordis.patch.yml",
+      "role": "profile/bundle overlays",
+      "sha256": "dfb0202e7f0b56c539ebc846f656ba338fda95e611c2f63f2def5d935783da06",
+      "bytes": 1567,
+      "fragility": "medium",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-lsp",
+        "@deepseek-ai/dsh-lsp-stdio",
+        "@deepseek-ai/dsh-tool-lsp"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "bundles:packages/bundles/mobile-lsp/package.json",
+      "layer": "bundles",
+      "kind": "file",
+      "source": "packages/bundles/mobile-lsp/package.json",
+      "role": "profile/bundle overlays",
+      "sha256": "9c6dbb51f2537eca7448ea997bdc14bb723af5e03ca64d3ab5877b24762d6a18",
+      "bytes": 493,
+      "fragility": "low",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-lsp",
+        "@deepseek-ai/dsh-lsp-stdio",
+        "@deepseek-ai/dsh-tool-lsp"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "app:apps/harmonyos",
+      "layer": "app",
+      "kind": "tree",
+      "source": "apps/harmonyos",
+      "role": "HarmonyOS app host (ArkTS + native)",
+      "sha256": "b30fda1ec3403a369d62356dde11f778ae3d5c735cb883ed47f7865c610fba8c",
+      "files": 26,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G4"
+      ]
+    },
+    {
+      "id": "switch:HARMONY_SELF_BUILD",
+      "layer": "variant",
+      "kind": "switch",
+      "source": "HARMONY_SELF_BUILD",
+      "role": "self-built variant: exec shim, mh-exec, native overlay, self signed-exec bypass",
+      "places": [
+        ".github/workflows/harmonyos.yml",
+        "docs/development.md",
+        "docs/evidence/emulator-exec-bypass-switch-0.4.69.json",
+        "docs/evidence/emulator-loader-fallback-attempt-0.4.69.json",
+        "docs/evidence/native-overlay-0.4.69.json",
+        "docs/research/harmonyos-proot-exec.md",
+        "runtime/harmonyos/packaging/build-native-shell.sh",
+        "runtime/harmonyos/tools/mh-exec.py",
+        "scripts/build/harmonyos_guest_extras.py",
+        "scripts/build/stage-harmonyos.py"
+      ],
+      "gates": [
+        "G0",
+        "G4"
+      ]
+    },
+    {
+      "id": "switch:HARMONY_GUEST_LIB_GROUPS",
+      "layer": "variant",
+      "kind": "switch",
+      "source": "HARMONY_GUEST_LIB_GROUPS",
+      "role": "signed native library/extension groups (common,media,extensions)",
+      "places": [
+        "docs/evidence/native-overlay-0.4.69.json",
+        "docs/research/harmonyos-proot-exec.md",
+        "docs/work/2026-11-20-signed-lib-size.md",
+        "scripts/build/harmonyos_guest_extras.py",
+        "scripts/build/stage-harmonyos.py"
+      ],
+      "gates": [
+        "G0",
+        "G4"
+      ]
+    },
+    {
+      "id": "switch:HARMONY_UNSIGNED",
+      "layer": "variant",
+      "kind": "switch",
+      "source": "HARMONY_UNSIGNED",
+      "role": "unsigned emulator build",
+      "places": [
+        ".github/workflows/harmonyos.yml",
+        "docs/development.md",
+        "docs/evidence/emulator-capability-parity-0.4.69.json",
+        "docs/evidence/emulator-chat-import-0.4.39.json",
+        "docs/evidence/emulator-cot-translation-0.4.45.json",
+        "docs/evidence/emulator-creator-and-voice-0.4.53.json",
+        "docs/evidence/emulator-creator-liveshare-0.4.55.json",
+        "docs/evidence/emulator-dsh-rc4-0.4.31.json",
+        "docs/evidence/emulator-dsh-rc5-0.4.42.json",
+        "docs/evidence/emulator-exec-bypass-switch-0.4.69.json"
+      ],
+      "gates": [
+        "G0",
+        "G4"
+      ]
+    },
+    {
+      "id": "switch:HARMONY_SIGNING_PROFILE",
+      "layer": "variant",
+      "kind": "switch",
+      "source": "HARMONY_SIGNING_PROFILE",
+      "role": "real-device signing profile",
+      "places": [
+        "docs/development.md",
+        "scripts/build/stage-harmonyos.py"
+      ],
+      "gates": [
+        "G0",
+        "G4"
+      ]
+    },
+    {
+      "id": "switch:HARMONY_EXPERIMENTAL_HOST_PROCESS",
+      "layer": "variant",
+      "kind": "switch",
+      "source": "HARMONY_EXPERIMENTAL_HOST_PROCESS",
+      "role": "experimental host-process build",
+      "places": [
+        "docs/development.md",
+        "docs/evidence/emulator-restructure-0.4.25.json",
+        "scripts/build/harmonyos.sh",
+        "scripts/build/stage-harmonyos.py"
+      ],
+      "gates": [
+        "G0",
+        "G4"
+      ]
+    }
+  ],
+  "pins": {
+    "docs/build-inputs.sha256": {
+      "sha256": "ddfe0f3c161d2edc93d4f714f21334445acf0a750b3e388f921587c50d304fcb",
+      "bytes": 16223
+    },
+    "docs/guest-tools-lock.json": {
+      "sha256": "ead2dd967e92aa55b5335fb5a84d3dab38d39b81d35f55cc5499a50a850ad07d",
+      "bytes": 11799
+    },
+    "runtime/harmonyos/dsh/package-lock.json": {
+      "sha256": "a2ba4190e0ed9b63a991bfd1c5dc32891a5fc846430c2d373ea98c9a9f4ccf0d",
+      "bytes": 451595
+    },
+    ".gitmodules": {
+      "sha256": "5f8c50079f05351e48de4bbea361a06aeaa3e1770aca65ca1512ce27e09c63ee",
+      "bytes": 885
+    },
+    "submodules": {
+      "dsh": "9c2670d3bce5275e0d1610272958121af87787bb",
+      "node": "d89bb1b482fa09245c4f2cbb3b5b6a70bea6deaf",
+      "proot": "60485d2646c1e09105099772da4a20deda8d020d",
+      "dshm": "1cb0db693ea5121f0dab0208b1144b4c1b8ee2c0",
+      "termony": "2fe84795201dbe14a586819f7de641db6b6c18b7",
+      "typescript": "050880ce59e30b356b686bd3144efe24f875ebc8",
+      "typescript-language-server": "048a362038fdf5656a4917fc7b57b3d70aa60efe",
+      "pyright": "a28cce4077d87b80bead12de809f79845e39c8ba"
+    },
+    "dshRelease": "0.2.2-rc.5",
+    "npmLock": {
+      "path": "runtime/harmonyos/dsh/package-lock.json",
+      "sha256": "a2ba4190e0ed9b63a991bfd1c5dc32891a5fc846430c2d373ea98c9a9f4ccf0d"
+    }
+  }
+}

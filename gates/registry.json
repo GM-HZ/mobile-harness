@@ -1,0 +1,550 @@
+{
+  "schema": 1,
+  "source": "scripts/adaptation/registry.py",
+  "tiers": {
+    "G0": {
+      "name": "static/consistency",
+      "entries": [
+        {
+          "id": "adaptation-verify",
+          "command": "python3 scripts/adaptation/verify.py",
+          "covers": "manifest/pins/submodule consistency",
+          "timeout": 120
+        },
+        {
+          "id": "manifest-fresh",
+          "command": "python3 scripts/adaptation/inventory.py --check",
+          "covers": "checked-in manifest matches the tree",
+          "timeout": 120
+        },
+        {
+          "id": "relay-preflight-self-test",
+          "command": "python3 tests/smoke/relay-preflight.py --self-test",
+          "covers": "public Relay preflight tooling",
+          "timeout": 180
+        }
+      ]
+    },
+    "G1": {
+      "name": "host contracts",
+      "entries": [],
+      "note": "P1: add host overlay/compat module contract tests and anchor snapshots"
+    },
+    "G2": {
+      "name": "emulator capability",
+      "entries": [
+        {
+          "id": "capability-parity-gate",
+          "command": "python3 tests/bench/capability-parity-regression.py --output .build/capability-parity-gate.json",
+          "covers": "recovery/voice/ollama/ptc/liveshare/account/addon",
+          "timeout": 1200
+        },
+        {
+          "id": "emulator-account",
+          "command": "python3 tests/smoke/emulator-account.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "clean signed-out device"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-agent-continuation",
+          "command": "python3 tests/smoke/emulator-agent-continuation.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-alternative-editing",
+          "command": "python3 tests/smoke/emulator-alternative-editing.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-auto-review-liveshare",
+          "command": "python3 tests/smoke/emulator-auto-review-liveshare.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "relay fixture/second emulator"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-background-schedule",
+          "command": "python3 tests/smoke/emulator-background-schedule.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-builtin-binding",
+          "command": "python3 tests/smoke/emulator-builtin-binding.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-chat-import-ui",
+          "command": "python3 tests/smoke/emulator-chat-import-ui.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-chat-import",
+          "command": "python3 tests/smoke/emulator-chat-import.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-compaction-auto",
+          "command": "python3 tests/smoke/emulator-compaction-auto.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-compaction-faults",
+          "command": "python3 tests/smoke/emulator-compaction-faults.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-compaction-live-overflow",
+          "command": "python3 tests/smoke/emulator-compaction-live-overflow.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-compaction-overflow",
+          "command": "python3 tests/smoke/emulator-compaction-overflow.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-compaction",
+          "command": "python3 tests/smoke/emulator-compaction.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-cordis-inspect",
+          "command": "python3 tests/smoke/emulator-cordis-inspect.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-cot-translation",
+          "command": "python3 tests/smoke/emulator-cot-translation.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-deepseek-vision",
+          "command": "python3 tests/smoke/emulator-deepseek-vision.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-dsh-capabilities",
+          "command": "python3 tests/smoke/emulator-dsh-capabilities.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-forge-account",
+          "command": "python3 tests/smoke/emulator-forge-account.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "host gh credentials",
+            "clean signed-out device"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-forge-github",
+          "command": "python3 tests/smoke/emulator-forge-github.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "host gh credentials"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-fs-publication",
+          "command": "python3 tests/smoke/emulator-fs-publication.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-goal-continuation",
+          "command": "python3 tests/smoke/emulator-goal-continuation.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-goal-restart",
+          "command": "python3 tests/smoke/emulator-goal-restart.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-inspector-availability",
+          "command": "python3 tests/smoke/emulator-inspector-availability.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-inspector",
+          "command": "python3 tests/smoke/emulator-inspector.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-interactions",
+          "command": "python3 tests/smoke/emulator-interactions.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-liveshare-browser",
+          "command": "python3 tests/smoke/emulator-liveshare-browser.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "relay fixture/second emulator"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-liveshare-relay",
+          "command": "python3 tests/smoke/emulator-liveshare-relay.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "relay fixture/second emulator"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-lsp-bundle",
+          "command": "python3 tests/smoke/emulator-lsp-bundle.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-lsp-lifecycle",
+          "command": "python3 tests/smoke/emulator-lsp-lifecycle.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-lsp",
+          "command": "python3 tests/smoke/emulator-lsp.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-mcp-stdio",
+          "command": "python3 tests/smoke/emulator-mcp-stdio.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-native-addon-location",
+          "command": "python3 tests/smoke/emulator-native-addon-location.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-office-cancel",
+          "command": "python3 tests/smoke/emulator-office-cancel.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-office-provider",
+          "command": "python3 tests/smoke/emulator-office-provider.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-office",
+          "command": "python3 tests/smoke/emulator-office.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-ollama",
+          "command": "python3 tests/smoke/emulator-ollama.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "host Ollama model"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-optional-iteration",
+          "command": "python3 tests/smoke/emulator-optional-iteration.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-persistent-bash",
+          "command": "python3 tests/smoke/emulator-persistent-bash.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-personalized-recommendations",
+          "command": "python3 tests/smoke/emulator-personalized-recommendations.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-pi-ai-protocols",
+          "command": "python3 tests/smoke/emulator-pi-ai-protocols.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-plugin-git-update",
+          "command": "python3 tests/smoke/emulator-plugin-git-update.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-plugin-market-public",
+          "command": "python3 tests/smoke/emulator-plugin-market-public.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-plugin-market-ui",
+          "command": "python3 tests/smoke/emulator-plugin-market-ui.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-plugin-market",
+          "command": "python3 tests/smoke/emulator-plugin-market.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-plugin-public-graph",
+          "command": "python3 tests/smoke/emulator-plugin-public-graph.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-ptc-approval",
+          "command": "python3 tests/smoke/emulator-ptc-approval.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "model route"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-ptc-boundary",
+          "command": "python3 tests/smoke/emulator-ptc-boundary.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "model route"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-ptc-host",
+          "command": "python3 tests/smoke/emulator-ptc-host.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "model route"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-ptc-lifecycle",
+          "command": "python3 tests/smoke/emulator-ptc-lifecycle.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "model route"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-ptc-link-fixture",
+          "command": "python3 tests/smoke/emulator-ptc-link-fixture.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "model route"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-python-wheel",
+          "command": "python3 tests/smoke/emulator-python-wheel.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-standard-tools",
+          "command": "python3 tests/smoke/emulator-standard-tools.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-subprocess",
+          "command": "python3 tests/smoke/emulator-subprocess.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-titles-badge",
+          "command": "python3 tests/smoke/emulator-titles-badge.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-toolkit",
+          "command": "python3 tests/smoke/emulator-toolkit.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-voice-input",
+          "command": "python3 tests/smoke/emulator-voice-input.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [
+            "voice-model+audio fixtures"
+          ],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-web-tools",
+          "command": "python3 tests/smoke/emulator-web-tools.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-workflow",
+          "command": "python3 tests/smoke/emulator-workflow.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-workspace-dependencies",
+          "command": "python3 tests/smoke/emulator-workspace-dependencies.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-worktree-restore",
+          "command": "python3 tests/smoke/emulator-worktree-restore.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        },
+        {
+          "id": "emulator-worktree",
+          "command": "python3 tests/smoke/emulator-worktree.py <target> <output> [scenario flags]",
+          "covers": "smoke acceptance",
+          "requires": [],
+          "timeout": 1800
+        }
+      ],
+      "note": "requires two API 26 ARM64 emulators for cross-device cases"
+    },
+    "G3": {
+      "name": "real-device lab",
+      "entries": [
+        {
+          "id": "mate60-proot-exec",
+          "command": "python3 tests/smoke/mate60-proot-exec.py --target <usb-serial> --output <output>",
+          "covers": "real-device acceptance",
+          "requires": [
+            "USB device",
+            "screen unlocked"
+          ],
+          "timeout": 1200
+        },
+        {
+          "id": "mate60-verify",
+          "command": "python3 tests/smoke/mate60-verify.py --target <usb-serial> --output <output>",
+          "covers": "real-device acceptance",
+          "requires": [
+            "USB device",
+            "screen unlocked"
+          ],
+          "timeout": 1200
+        }
+      ],
+      "note": "device-specific; run when the Mate 60 is connected and unlocked"
+    },
+    "G4": {
+      "name": "build/release",
+      "entries": [
+        {
+          "id": "build-unsigned",
+          "command": "HARMONY_UNSIGNED=1 ./build.sh --package",
+          "covers": "emulator HAP builds",
+          "timeout": 1800
+        },
+        {
+          "id": "build-self",
+          "command": "HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package",
+          "covers": "self-build variant builds and includes exec/overlay assets",
+          "timeout": 1800
+        },
+        {
+          "id": "build-store-shape",
+          "command": "HARMONY_UNSIGNED=1 ./build.sh --package && python3 scripts/adaptation/store_build_check.py",
+          "covers": "store HAP has no exec shim / overlay libraries",
+          "timeout": 1800
+        }
+      ],
+      "note": "store/self/lab variant matrix and HAP size/feature budgets"
+    }
+  }
+}
