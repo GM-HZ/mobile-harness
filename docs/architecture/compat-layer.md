@@ -91,3 +91,11 @@ liveshare (`dsh-experimental-liveshare{,-protocol}`), speech
 (`dsh-experimental-speech-to-text-sensevoice`) show real provider seams and remain
 `upstream-seam-candidate`; office-kit is already the upstream provider (our worker
 only adapts the phone runtime); image/sharp has only a weak seam upstream.
+
+## Forge migration plan
+
+`docs/architecture/seams/forge-upstream-seam.md` records the feasibility study:
+upstream `GitHubProvider` accepts any `GhRunner`, so the current load-time source
+rewrite (`import { execa } ...` → `globalThis.__harmonyGh`) can become a package
+patch that injects our guest runner at the registration site, keeping the upstream
+provider/session/client UI intact.

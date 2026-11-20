@@ -389,3 +389,17 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 
 下一轮：把 forge 的 upstream provider seam 做成迁移试验（只读调研 + 可行性报告，不改行为）；
 继续补齐 nightly/G3；有密钥时补 session 写入回归。
+
+
+### 2026-11-20（第 15 轮：forge upstream seam 可行性）
+
+- 只读调研上游 forge：`dsh-experimental-forge`（provider registry）+ `-forge-github`
+  （`GitHubProvider(ghRunner, hosts, limits)`）+ `-forge-bundle`（cordis.patch 注册链），
+  证据与契约细节写入 `docs/architecture/seams/forge-upstream-seam.md`。
+- 关键发现：**upstream `GhRunner` 是可注入契约**；且 `execa` 已在 DSH layer 中，
+  因此可以把当前 `dsh-native-web.cjs` 的**运行期源码改写**（`import { execa }` →
+  `globalThis.__harmonyGh`）替换为 `patches/forge-github-guest-runner.patch`：
+  在注册点注入 `__harmonyGhRunner`，保留上游 provider/session/client UI，只保留 guest gh 传输。
+- 迁移选项 A（package patch，推荐先做）与 B（自定义 Cordis plugin，待上游导出类）已记录；
+  风险：forge bundle 的 worktree/forge-session、账号桥、取消语义映射。
+- 下一轮实施 A：adapter + patch + rehearsal + 构建/forge 门禁验证，然后删除 load-time 改写。

@@ -49,7 +49,8 @@
           "@deepseek-ai/dsh-experimental-forge-github",
           "@deepseek-ai/dsh-experimental-client-ui-forge"
         ],
-        "note": "upstream forge packages expose provider/client seams (provider hits 304/18/381); candidate for migration after inspecting the provider contract."
+        "note": "Upstream GitHubProvider accepts any GhRunner. execa is present in the DSH layer, so a package patch can inject our guest runner at the registration site; planned migration in docs/architecture/seams/forge-upstream-seam.md.",
+        "seamDoc": "docs/architecture/seams/forge-upstream-seam.md"
       }
     },
     {
