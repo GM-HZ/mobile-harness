@@ -340,3 +340,18 @@ nightly 覆盖；等真机解锁后跑 G3 device_lab verify/exec/overlay。
 
 下一轮：把 nightly 的 flake 记录写进 RSI 台账（重试成功标记）；继续找无模型用例；
 真机解锁后补 G3 证据；有密钥时补真实 session 写入回归。
+
+
+### 2026-11-20（第 12 轮：TARGETS 合同、flake 分桶、nightly 再扩）
+
+- `patches/TARGETS.md`：按 dsh-Go 的 TARGETS 风格，为每条补丁记录 package/file、锚点、
+  原因、失败模式与 gate；`patch_rehearsal` 现在会拒绝未在 TARGETS.md 登记的补丁。
+- RSI 台账新增 flake 分桶：`gates/run.py --record` 会把 flake 次数写入账本，
+  `report` 输出 `first-pass / flake-pass / fail` 三段统计（当前 27 次运行：G0 9+0+1、
+  G1 10+0+0、G2 4+0+0、G4 3+0+0）。
+- nightly 再扩 2 个无模型依赖用例并实测：`nightly-mcp-stdio`（5.9s）、
+  `nightly-ptc-link-fixture`（1.0s）；nightly 矩阵现 8 项，registry G2=69。
+- 真机仍锁屏、测试密钥未配置（G3 与真实 session 回归继续挂起）。
+
+下一轮：为 G3 设备 lab 增加"解锁检测→自动排队/跳过"的调度说明；尝试把 nightly 的
+flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化（从 series.json 派生）。

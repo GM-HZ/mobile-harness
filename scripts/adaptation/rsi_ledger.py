@@ -34,13 +34,14 @@ def main():
     recorder.add_argument("--ok", action="store_true")
     recorder.add_argument("--evidence", default="")
     recorder.add_argument("--note", default="")
+    recorder.add_argument("--flakes", type=int, default=0)
     reporter = sub.add_parser("report")
     reporter.add_argument("--limit", type=int, default=50)
     args = parser.parse_args()
     if args.command == "record":
         commit = __import__("subprocess").check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
         record({"commit": commit, "tiers": args.tiers.split(","), "ok": bool(args.ok),
-                "evidence": args.evidence, "note": args.note,
+                "flakes": args.flakes, "evidence": args.evidence, "note": args.note,
                 "at": time.strftime("%Y-%m-%dT%H:%M:%S%z")})
         print(f"ledger entry recorded ({args.tiers} ok={bool(args.ok)})")
         return 0
@@ -53,8 +54,10 @@ def main():
     print(f"runs: {len(recent)} (of {len(rows)} recorded)")
     for tier in tiers:
         selected = [row for row in recent if tier in row["tiers"]]
-        passed = sum(1 for row in selected if row["ok"])
-        print(f"  {tier}: {passed}/{len(selected)} passed")
+        first = sum(1 for row in selected if row["ok"] and not row.get("flakes"))
+        flaked = sum(1 for row in selected if row["ok"] and row.get("flakes"))
+        failed = sum(1 for row in selected if not row["ok"])
+        print(f"  {tier}: {len(selected)} runs = {first} first-pass + {flaked} flake-pass + {failed} fail")
     last = recent[-1]
     print(f"last: {last['commit'][:12]} {'PASS' if last['ok'] else 'FAIL'} {last['tiers']} {last['at']}")
     return 0

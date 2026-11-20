@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "a041ad2dbc47cfc3d013e2dd12788ba6af73af11",
+  "generatedFrom": "f1e93e720625fe7b6645d348de6fed912e27bc9a",
   "layers": [
     "host",
     "web",
@@ -894,8 +894,8 @@
       "kind": "file",
       "source": "patches/README.md",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "207113cfbbe932aab2c8336485f3a292ca6320d507bff0cdb6fe427609c9f1e2",
-      "bytes": 1342,
+      "sha256": "903bb4eea242927e5b57c22f2f4f17c2127bd1c337ae92ea3beb2493b1e9497e",
+      "bytes": 1385,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [

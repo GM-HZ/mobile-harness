@@ -38,7 +38,11 @@ def main():
     args = parser.parse_args()
     release = version()
     series = json.loads(SERIES.read_text())["patches"]
+    targets = (ROOT / "patches/TARGETS.md").read_text()
     failures = []
+    for entry in series:
+        if entry["file"] not in targets:
+            failures.append(f"{entry['file']}: not documented in patches/TARGETS.md")
     checked = []
     workspace = Path(tempfile.mkdtemp(prefix="patch-rehearsal-"))
     try:

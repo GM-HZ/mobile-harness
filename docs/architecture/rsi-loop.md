@@ -18,8 +18,11 @@ The gate suite exists so the repo can improve itself without a human memory of
 
 1. Every escaped defect adds at least one durable gate case (G2/G3, or a G1
    contract if it is an upstream-anchor issue).
-2. Flaky tests are retried at most twice and quarantined after two consecutive
-   non-repro results; quarantined tests must be fixed or removed within a week.
+2. Flaky tests are retried at most twice (`gates/run.py --retries`) and quarantined
+   after two consecutive non-repro results; quarantined tests must be fixed or
+   removed within a week. The ledger separates **first-pass**, **flake-pass** and
+   **fail** counts per tier, so a rising flake-pass count is visible in the weekly
+   scoreboard.
 3. A release is blocked unless G0/G1/G4 pass on the release commit and the last
    G2 run is green; G3 real-device evidence is required for device-facing changes.
 4. The scoreboard is reviewed weekly (`python3 scripts/adaptation/rsi_ledger.py report`).

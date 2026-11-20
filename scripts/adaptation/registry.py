@@ -75,6 +75,14 @@ def main():
                "command": "python3 tests/smoke/emulator-native-addon-location.py \"$MH_EMULATOR\" .build/gate-evidence/native-addon.json",
                "covers": "native addon location + Inspector evaluation on the native Host",
                "requires": ["MH_EMULATOR env"], "timeout": 1200})
+    g2.append({"id": "nightly-mcp-stdio",
+               "command": "python3 tests/smoke/emulator-mcp-stdio.py \"$MH_EMULATOR\" .build/gate-evidence/mcp-stdio.json",
+               "covers": "Node/Python MCP stdio servers on the native Host", "requires": ["MH_EMULATOR env"],
+               "timeout": 1200})
+    g2.append({"id": "nightly-ptc-link-fixture",
+               "command": "python3 tests/smoke/emulator-ptc-link-fixture.py \"$MH_EMULATOR\" .build/gate-evidence/ptc-link-fixture.json",
+               "covers": "platform link restrictions that gate PTC boundary fixtures",
+               "requires": ["MH_EMULATOR env"], "timeout": 900})
     g2.append({"id": "nightly-inspector-availability",
                "command": "python3 tests/smoke/emulator-inspector-availability.py \"$MH_EMULATOR\" .build/gate-evidence/inspector-availability.json",
                "covers": "optional Inspector worker availability probe", "requires": ["MH_EMULATOR env"],

@@ -117,10 +117,12 @@ def main():
     path.write_text(json.dumps(evidence, indent=2) + "\n")
     print(f"evidence: {path.relative_to(ROOT)}")
     if args.record:
+        flakes = sum(1 for record in records if record.get("flake"))
         subprocess.run(["python3", "scripts/adaptation/rsi_ledger.py", "record",
                         "--tiers", ",".join(wanted_tiers),
                         "--evidence", str(path.relative_to(ROOT))] +
                        (["--ok"] if failures == 0 else []) +
+                       (["--flakes", str(flakes)] if flakes else []) +
                        (["--note", "failures=" + str(failures)] if failures else []),
                        cwd=ROOT, check=False)
     return 0 if failures == 0 else 1
