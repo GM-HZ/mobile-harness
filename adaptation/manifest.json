@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "99ae56f610aae2640a3b3b45b131a51bc609895d",
+  "generatedFrom": "4e8f0bb2be2df6713b7264eb2789f018ff500ee0",
   "layers": [
     "host",
     "web",
@@ -10,6 +10,7 @@
     "packaging",
     "tools",
     "bundles",
+    "variants",
     "app"
   ],
   "entries": [
@@ -894,6 +895,7 @@
       "source": "HARMONY_UNSIGNED",
       "role": "unsigned emulator build",
       "places": [
+        ".github/workflows/gate-nightly.yml",
         ".github/workflows/harmonyos.yml",
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",

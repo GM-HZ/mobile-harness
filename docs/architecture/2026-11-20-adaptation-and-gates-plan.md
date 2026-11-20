@@ -156,3 +156,22 @@ G4 对每个变体做构建断言（例如 store 不得包含 `/usr/bin/mh-exec`
 - store/self/lab 变体矩阵（`variants/*.json`）与 G4 尺寸/特性预算；
 - 真机 G3 的 CI 调度（等设备可用性协议）；
 - RSI 闭环：flake 台账、失败自动 issue、发布闸门与周报。
+
+
+### 2026-11-20（P1 进展：bump 排练与变体矩阵）
+
+- `scripts/adaptation/bump.py`：上游 bump dry-run。按 npm registry 拉取 watched 包
+  （dsh、bash-local、bash-sandbox、session-persistence-jsonl、settings-general + 平台 addon），
+  逐条校验 `adaptation/anchors.json`，输出受影响清单和证据
+  `docs/evidence/upstream-bump/<target>-dry-run.json`。
+  - 当前 npm 上最新即为已 pin 的 `0.2.2-rc.5`，所以首轮排练是"同版本自检"：5/5 锚点 OK，
+    平台 addon 按自身锁定版本（0.1.2）校验存在性；ripgrep 非 DSH 包按规则跳过。
+- `variants/{store,self,lab}.json` + `scripts/adaptation/variant_check.py`：
+  - store：无 `mh-exec`/`mh-install`/exec shim/overlay 库，`signedExecBypass=false`；
+  - self：含 `mh-exec`、`mh-install`、`libguest_mh_exec_shim.so`、≥8 个 overlay 库，`signedExecBypass=true`；
+  - 用能力分支的真实构建产物（0.4.69 default/selfbuild unsigned HAP）验证通过。
+- G4 registry 增加 `variant-store-check`/`variant-self-check`；G1 增加可选的
+  `upstream-bump-rehearsal`（需要 npm registry）。
+
+下一轮：G1 行为级合同测试（overlay 行为断言/快照 diff），补丁收敛到 `pnpm patch`/扩展点的迁移清单，
+G3 真机 CI 调度协议，RSI 台账。

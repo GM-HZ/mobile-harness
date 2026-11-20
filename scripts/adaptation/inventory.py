@@ -31,6 +31,7 @@ LAYERS = [
     ("packaging", "runtime/harmonyos/packaging", "build and packaging scripts"),
     ("tools", "runtime/harmonyos/tools", "guest tools shipped inside the HAP"),
     ("bundles", "packages/bundles", "profile/bundle overlays"),
+    ("variants", "variants", "store/self/lab build variant definitions"),
 ]
 TREE_LAYERS = [("app", "apps/harmonyos", "HarmonyOS app host (ArkTS + native)")]
 PIN_FILES = [

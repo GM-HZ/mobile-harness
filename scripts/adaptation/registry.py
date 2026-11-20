@@ -29,6 +29,10 @@ G4 = [
      "covers": "self-build variant builds and includes exec/overlay assets", "timeout": 1800},
     {"id": "build-store-shape", "command": "HARMONY_UNSIGNED=1 ./build.sh --package && python3 scripts/adaptation/store_build_check.py",
      "covers": "store HAP has no exec shim / overlay libraries", "timeout": 1800},
+    {"id": "variant-store-check", "command": "python3 scripts/adaptation/variant_check.py --variant store --hap <hap>",
+     "covers": "store HAP matches variants/store.json", "optional": True, "timeout": 120},
+    {"id": "variant-self-check", "command": "python3 scripts/adaptation/variant_check.py --variant self --hap <hap>",
+     "covers": "self HAP matches variants/self.json", "optional": True, "timeout": 120},
 ]
 
 
@@ -83,6 +87,9 @@ def main():
                 {"id": "upstream-anchors", "command": "python3 scripts/adaptation/anchors.py",
                  "covers": "literal upstream anchors used by runtime hooks",
                  "requires": ["assembled dsh-layer.zip"], "timeout": 300},
+                {"id": "upstream-bump-rehearsal", "command": "python3 scripts/adaptation/bump.py",
+                 "covers": "dry-run the next DSH release against our anchors",
+                 "requires": ["npm registry"], "optional": True, "timeout": 600},
             ], "note": "anchor checks need the assembled DSH layer (build machine)"},
             "G2": {"name": "emulator capability", "entries": g2,
                    "note": "requires two API 26 ARM64 emulators for cross-device cases"},

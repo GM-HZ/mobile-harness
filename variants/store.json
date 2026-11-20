@@ -1,0 +1,14 @@
+{
+  "name": "store",
+  "description": "Distribution build: no signed-exec bypass, no runtime loader, no native overlay.",
+  "env": {
+    "HARMONY_UNSIGNED": "1",
+    "HARMONY_SELF_BUILD": "0",
+    "HARMONY_GUEST_LIB_GROUPS": ""
+  },
+  "hap": {
+    "present": ["resources/rawfile/dsh-self-build.json"],
+    "absent": ["mh-exec", "mh-install", "mh_exec_shim", "libguest_lib_", "libguest_ext_"],
+    "flag": {"selfBuild": false, "signedExecBypass": false}
+  }
+}

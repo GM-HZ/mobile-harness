@@ -1,0 +1,16 @@
+{
+  "name": "self",
+  "description": "Self-built variant: exec shim, mh-exec/mh-install and the default native overlay groups (common,media,extensions).",
+  "env": {
+    "HARMONY_UNSIGNED": "1",
+    "HARMONY_SELF_BUILD": "1",
+    "HARMONY_GUEST_LIB_GROUPS": "common,media,extensions"
+  },
+  "hap": {
+    "present": ["resources/rawfile/mh-exec.py", "resources/rawfile/mh-install.py",
+                "libs/arm64-v8a/libguest_mh_exec_shim.so", "libguest_lib_", "libguest_ext_"],
+    "absent": [],
+    "minimum": {"libguest_lib_": 8},
+    "flag": {"selfBuild": true, "signedExecBypass": true}
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "lab",
+  "description": "Lab variant: same as self but pins every overlay group and is used for G2/G3 experiments.",
+  "env": {
+    "HARMONY_UNSIGNED": "1",
+    "HARMONY_SELF_BUILD": "1",
+    "HARMONY_GUEST_LIB_GROUPS": "common,media,extensions"
+  },
+  "hap": {
+    "present": ["resources/rawfile/mh-exec.py", "libs/arm64-v8a/libguest_mh_exec_shim.so",
+                "libguest_lib_", "libguest_ext_"],
+    "absent": [],
+    "minimum": {"libguest_lib_": 8},
+    "flag": {"selfBuild": true, "signedExecBypass": true}
+  }
+}

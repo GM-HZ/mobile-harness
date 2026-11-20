@@ -46,6 +46,16 @@
             "assembled dsh-layer.zip"
           ],
           "timeout": 300
+        },
+        {
+          "id": "upstream-bump-rehearsal",
+          "command": "python3 scripts/adaptation/bump.py",
+          "covers": "dry-run the next DSH release against our anchors",
+          "requires": [
+            "npm registry"
+          ],
+          "optional": true,
+          "timeout": 600
         }
       ],
       "note": "anchor checks need the assembled DSH layer (build machine)"
@@ -562,6 +572,20 @@
           "command": "HARMONY_UNSIGNED=1 ./build.sh --package && python3 scripts/adaptation/store_build_check.py",
           "covers": "store HAP has no exec shim / overlay libraries",
           "timeout": 1800
+        },
+        {
+          "id": "variant-store-check",
+          "command": "python3 scripts/adaptation/variant_check.py --variant store --hap <hap>",
+          "covers": "store HAP matches variants/store.json",
+          "optional": true,
+          "timeout": 120
+        },
+        {
+          "id": "variant-self-check",
+          "command": "python3 scripts/adaptation/variant_check.py --variant self --hap <hap>",
+          "covers": "self HAP matches variants/self.json",
+          "optional": true,
+          "timeout": 120
         }
       ],
       "note": "store/self/lab variant matrix and HAP size/feature budgets"
