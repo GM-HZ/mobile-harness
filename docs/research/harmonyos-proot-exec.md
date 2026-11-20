@@ -138,3 +138,40 @@ INMEM_ELF_PROBE_DONE
 2. **native 集成**：把加载器写成签名 native helper（NAPI/子进程入口），接入 bash/subprocess provider，做到"下载静态工具直接跑"。
 3. **动态 ELF**：映射签名 musl 解释器/库（signed 文件可直接 mmap PROT_EXEC），按内核语义设置 auxv 后交给解释器重定位；逐步支持动态链接工具。
 4. **dlopen 扩展**：原生扩展库（Python wheel/.node）需要给 `dlopen` 做同样的内存加载 shim，难度更高，先以构建期签名为准。
+
+## 第二版：真实静态工具（模拟器已跑通）
+
+`tests/smoke/fixtures/inmemory-elf-runner.py` 在原型基础上补齐了真实程序运行所需的部分：
+
+- 解析全部 PT_LOAD（按页对齐，处理非页对齐 vaddr/offset 与 BSS）；
+- 构建 argc/argv/envp/auxv 启动栈（`AT_PHDR/AT_PHNUM/AT_ENTRY/AT_PAGESZ/AT_RANDOM/AT_UID...`）；
+- `fork()` 子进程 + 机器码 trampoline（`mov sp,x1; br x0`）进入 ELF entry，父进程 `waitpid`，因此被加载程序的 `exit_group`/崩溃不会影响 Host；
+- 支持 `MH_ELF_ARGV0` 覆盖 argv[0]（busybox 需要）。
+
+模拟器实测（Alpine `busybox-static 1.36.1-r31` aarch64，1,115,944 字节，ET_EXEC）：
+
+```
+# 宿主上传后运行
+INMEM_BUSYBOX_OK
+LOADED segments=2 base=0x0 entry=0x404400
+CHILD_EXIT 0
+
+# guest 内 curl 下载 -> gzip -> tar -> loader 运行
+CURL_OK
+GZIP_OK
+TAR_OK
+-rwxr-xr-x 1 mobile-harness 20020074 1115944 ./bbx/bin/busybox.static
+DOWNLOADED_INMEM_OK
+CHILD_EXIT 0
+ELF_DOWNLOAD_PROBE_DONE
+```
+
+即"**运行时下载静态工具 → 直接执行**"在鸿蒙沙箱内已经打通（模拟器）。证据：[emulator-inmemory-static-tool-0.4.69.json](../evidence/emulator-inmemory-static-tool-0.4.69.json)。
+
+复现：
+
+```sh
+python3 tests/smoke/mate60-proot-exec.py --target <target>   --probe elf-download --output out.json
+```
+
+接下来的工程化：native helper 集成、静态 PIE 重定位、动态 ELF、dlopen shim、JIT/PTY 重评。

@@ -278,7 +278,7 @@ def texts(results):
     return "\n".join(item.get("text", "") for result in results for item in result["content"])
 
 
-def run(device, port, output, probe=None, loader_file=None):
+def run(device, port, output, probe=None, loader_file=None, payload_file=None, elf_args="", elf_argv0=None):
     name = "proot-exec-" + uuid.uuid4().hex[:8]
     native = FILES + "/alpine/workspace-native/" + name
     probe = probe or PROBE
@@ -289,7 +289,9 @@ def run(device, port, output, probe=None, loader_file=None):
              id(RUNTIME_TARGET_PROBE): "real-device runtime pure-python install probe",
              id(PIP_NATIVE_PROBE): "real-device python dependency executability probe",
              id(MMAP_PROBE): "real-device executable memory policy probe",
-             "elf-loader": "real-device in-memory ELF loader prototype"}
+             "elf-loader": "real-device in-memory ELF loader prototype",
+             "elf-run": "real-device in-memory static ELF execution",
+             "elf-download": "real-device download-and-run static tool"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -312,12 +314,33 @@ def run(device, port, output, probe=None, loader_file=None):
                                        "submittedAttachments": []})
         modes = [row["data"]["mode"] for row in events(device, session) if row["type"] == "sandbox/mode"]
         evidence["permissionMode"] = modes[-1] if modes else None
-        if loader_file:
+        if probe == "python3 ./inmemory-elf-runner.py":
+            from pathlib import Path as _Path
+            runner = _Path("tests/smoke/fixtures/inmemory-elf-runner.py").read_bytes()
+            upload_file(device, "alpine/workspace-native/" + name + "/inmemory-elf-runner.py", runner)
+            evidence["uploadedLoaderBytes"] = len(runner)
+            command = ("set +e; "
+                       "curl -sSLo ./bb.apk https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/busybox-static-1.36.1-r31.apk && echo CURL_OK; "
+                       "gzip -dc ./bb.apk > ./bb.tar && echo GZIP_OK; "
+                       "mkdir -p ./bbx && tar -xf ./bb.tar -C ./bbx && echo TAR_OK; "
+                       "ls -l ./bbx/bin/busybox.static; "
+                       "MH_ELF_ARGV0=busybox python3 ./inmemory-elf-runner.py ./bbx/bin/busybox.static echo DOWNLOADED_INMEM_OK; "
+                       "echo ELF_DOWNLOAD_PROBE_DONE")
+        elif loader_file and not payload_file:
             from pathlib import Path as _Path
             loader = _Path(loader_file).read_bytes()
             upload_file(device, "alpine/workspace-native/" + name + "/elf-loader.py", loader)
             evidence["uploadedLoaderBytes"] = len(loader)
             command = "python3 ./elf-loader.py && echo INMEM_ELF_PROBE_DONE"
+        elif payload_file:
+            from pathlib import Path as _Path
+            runner = _Path("tests/smoke/fixtures/inmemory-elf-runner.py").read_bytes()
+            upload_file(device, "alpine/workspace-native/" + name + "/inmemory-elf-runner.py", runner)
+            payload = _Path(payload_file).read_bytes()
+            upload_file(device, "alpine/workspace-native/" + name + "/guest-tool", payload)
+            evidence["uploadedPayloadBytes"] = len(payload)
+            prefix = ("MH_ELF_ARGV0=" + elf_argv0 + " ") if elf_argv0 else ""
+            command = prefix + "python3 ./inmemory-elf-runner.py ./guest-tool " + elf_args
         else:
             command = probe
         instruction = ("Actually call bash exactly once now with precisely "
@@ -364,14 +387,20 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download"], default="exec")
     parser.add_argument("--loader-file", default=str(Path(__file__).with_name("fixtures") / "inmemory-elf-loader.py"))
+    parser.add_argument("--payload-file")
+    parser.add_argument("--elf-args", default="")
+    parser.add_argument("--elf-argv0")
     args = parser.parse_args()
     probe = {"native": NATIVE_PROBE, "bypass": BYPASS_PROBE, "runtime": RUNTIME_PROBE,
              "runtime-target": RUNTIME_TARGET_PROBE, "pip-native": PIP_NATIVE_PROBE,
-             "mmap": MMAP_PROBE, "elf-loader": "python3 ./elf-loader.py"}.get(args.probe, PROBE)
+             "mmap": MMAP_PROBE, "elf-loader": "python3 ./elf-loader.py",
+             "elf-download": "python3 ./inmemory-elf-runner.py"}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe,
-        loader_file=args.loader_file if args.probe == "elf-loader" else None)
+        loader_file=(args.loader_file if args.probe == "elf-loader" else None),
+        payload_file=(args.payload_file if args.probe == "elf-run" else None),
+        elf_args=args.elf_args, elf_argv0=args.elf_argv0)
     print(args.output)
 
 
