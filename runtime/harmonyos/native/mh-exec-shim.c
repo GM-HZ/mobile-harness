@@ -133,7 +133,7 @@ int execve(const char *path, char *const argv[], char *const envp[])
 	int count;
 	int state;
 
-	if (!path || path[0] != '/')
+	if (!path)
 		return (int) sys_execve(path, argv, envp);
 
 	/* Skip the redirect when already running inside the loader chain. */

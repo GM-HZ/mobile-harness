@@ -287,3 +287,11 @@ shim 拦截 `execve`：
 限制：这是**构建期配置**的签名 overlay；运行时下载的任意未签名 `.so` 仍不能 `dlopen`（需要额外的用户态 dlopen 加载器，属更大工程）。
 
 证据：[native-overlay-0.4.69.json](../evidence/native-overlay-0.4.69.json)；体积实测见 [signed-lib-size](2026-11-20-signed-lib-size.md)。
+
+## 真机复测（2026-11-20 晚）
+
+- **透明 exec**：Mate 60（自建签名包）下载静态 busybox 与动态 busybox（PT_INTERP）后**直接 `./tool` 执行**，均 exit 0；git/node/curl 不受影响。相对路径（`./tool`）也可用：shim 对相对目标做同样的映射探测并重定向，mh-exec 从继承的 cwd 打开。
+- **签名 overlay**：真机上 `/usr/lib/libarchive.so.13` 等库存在，`ctypes.CDLL('/usr/lib/libarchive.so.13')` 成功；`require('/usr/lib/mh-demo.node').answer()` → 42；运行时下载的动态 `jq-1.8.2` 直接运行，`'{"a":1}' | jq .a` → 1。
+- 修复点：shim 早先只处理绝对路径，导致直接 `./downloaded-tool` 走 PRoot loader 失败；现已支持相对路径。
+
+证据：[transparent-exec-0.4.69.json](../evidence/transparent-exec-0.4.69.json) · [native-overlay-0.4.69.json](../evidence/native-overlay-0.4.69.json)。

@@ -12,7 +12,7 @@
 | 语音、LiveShare、Forge、Office、账号、本地模型 | 完整 | 已验收（公开 Relay、真机语音待外部条件） | 不变 | ✅ 基本成 |
 | 静态 CLI 工具 | 任意下载 | **已通**（mh-install + mh-exec） | 更强 | ✅ 已成 |
 | 动态链接 CLI 工具 | 任意 | **已实现**（Alpine 动态 busybox 跑通；依赖需签名库） | 大多数发行版 CLI 可跑（依赖已签名库） | ✅ 已成（库覆盖待扩展） |
-| 任意二进制"透明"执行（`./tool`） | 是 | **已实现**（LD_PRELOAD exec shim，自建包；静态/动态下载工具直接跑，模拟器验证，真机重定向已验证） | 已透明 | ✅ 已成（仅自建包） |
+| 任意二进制"透明"执行（`./tool`） | 是 | **已实现**（LD_PRELOAD exec shim；静态/动态下载工具直接跑，模拟器与 Mate 60 真机均已验证） | 已透明 | ✅ 已成（仅自建包） |
 | 原生扩展 `.so` / Python wheel / `.node` | 任意 | **配置化签名 overlay 已实现**（Node 扩展 dlopen 实测 42；签名库 dlopen 正常；任意运行时未签名 .so 仍不可） | 构建期配置可裁剪；运行时任意 dlopen 仍缺 userspace loader | ✅ 配置路径已成（运行时任意仍难） |
 | 语言工具链（gcc/clang/rust/go、make、cmake） | 任意 | 没有；且编译出的二进制需要签名/内存加载，依赖库需逐个可加载 | 编译器本身可作为动态 ELF 跑，但仍需库与构建期产物落地 | 🔶 可做但成本高 |
 | 包管理器（apt/pacman/apk/npm/pip 原生部分） | 任意 | pip 纯 Python ✅；npm JS ✅；常见动态库已签名（jq/libarchive/图像类）；原生包仍受未签名 dlopen 限制 | 纯语言包可用，常见原生依赖已覆盖 | 🔶 大部分 |
