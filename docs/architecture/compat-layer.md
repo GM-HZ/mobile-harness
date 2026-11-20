@@ -78,3 +78,16 @@ Gate: `emulator-voice-input`.
 Office document conversion worker (paired with `packages/dsh-host/dsh-harmony-office*`).
 Decision: keep-compat. Gates: `emulator-office`, `emulator-office-provider`,
 `emulator-office-cancel`.
+
+## Upstream seam watch
+
+`scripts/adaptation/seam_watch.py` fetches the pinned release of the packages
+behind each compat area and reports provider/plugin seam signals; evidence lands
+in `docs/evidence/upstream-seams/<version>.json` and is attached to the matching
+`adaptation/compat.json` rows (`seamEvidence`).
+
+Latest watch (0.2.2-rc.5): forge (provider seams in `dsh-experimental-forge*`),
+liveshare (`dsh-experimental-liveshare{,-protocol}`), speech
+(`dsh-experimental-speech-to-text-sensevoice`) show real provider seams and remain
+`upstream-seam-candidate`; office-kit is already the upstream provider (our worker
+only adapts the phone runtime); image/sharp has only a weak seam upstream.

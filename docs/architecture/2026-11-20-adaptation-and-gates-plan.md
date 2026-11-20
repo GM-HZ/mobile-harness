@@ -371,3 +371,21 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 
 下一轮：真机解锁后跑 G3 verify/exec/overlay 并写证据；有测试密钥时补 session 写入回归；
 把 scoreboard 纳入 release evidence/周报流程。
+
+
+### 2026-11-20（第 14 轮：上游 seam 观察 + release 携带 scoreboard）
+
+- `scripts/adaptation/seam_watch.py`：拉取 compat 相关上游包（forge/liveshare/speech/office/image 共 13 个），
+  统计 provider/client/seam 信号，证据写入 `docs/evidence/upstream-seams/0.2.2-rc.5.json`；
+  结果：forge（provider 304/18/381）、liveshare（58 + protocol 36）、speech sensevoice（17）
+  确有上游 provider seam，保持 `upstream-seam-candidate`；office-kit 本身就是上游 provider；
+  image/sharp 上游 seam 很弱。
+- `adaptation/compat.json` 增加 `seamEvidence`（上游包 + 证据路径 + 结论），compat-layer.md 增加
+  "Upstream seam watch" 章节。
+- release evidence 现在携带 RSI scoreboard 的 hash；`release_gate.py` 校验 scoreboard 未漂移。
+  重跑 `release_dry_run.sh`：`G4 release gate OK: 0.4.69 @ 74a1072 (store 768,498,560 B, self 773,562,265 B)`，
+  evidence 写入 `docs/evidence/release/0.4.69-74a1072….json`。
+- 真机仍锁屏、测试密钥未配置。
+
+下一轮：把 forge 的 upstream provider seam 做成迁移试验（只读调研 + 可行性报告，不改行为）；
+继续补齐 nightly/G3；有密钥时补 session 写入回归。

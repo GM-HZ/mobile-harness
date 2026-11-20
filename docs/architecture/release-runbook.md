@@ -31,7 +31,9 @@ Triggered by a `v*` tag (or manual dispatch) on the self-hosted macOS/DevEco lab
   `signedExecBypass=false`; size within `variants/store.json` maxBytes.
 - self HAP: contains the loader tools/shim/overlay and
   `signedExecBypass=true`; size within `variants/self.json` maxBytes.
-- evidence for the tagged commit exists under `docs/evidence/release/`.
+- evidence for the tagged commit exists under `docs/evidence/release/`;
+- the evidence embeds the current RSI scoreboard hash
+  (`docs/evidence/rsi/scoreboard.md`) and the release gate fails if it drifted.
 
 ## Rollback / checks
 

@@ -59,9 +59,15 @@ def main():
     for label, path in (("store", args.store), ("self", args.self_hap)):
         artifacts[label] = {"file": path.name, "sha256": sha256(path), "bytes": path.stat().st_size,
                             "maxBytes": variants[label]["hap"].get("maxBytes")}
+    subprocess.run(["python3", "scripts/adaptation/gate_report.py"], cwd=ROOT, check=False,
+                   capture_output=True)
+    scoreboard = ROOT / "docs/evidence/rsi/scoreboard.md"
+    rsi = None
+    if scoreboard.is_file():
+        rsi = {"path": str(scoreboard.relative_to(ROOT)), "sha256": sha256(scoreboard)}
     ok = all(check["passed"] for check in checks)
     evidence = {"version": version, "commit": commit, "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-                "artifacts": artifacts, "checks": checks, "ok": ok}
+                "artifacts": artifacts, "checks": checks, "rsiScoreboard": rsi, "ok": ok}
     EVIDENCE.mkdir(parents=True, exist_ok=True)
     output = EVIDENCE / f"{version}-{commit}.json"
     output.write_text(json.dumps(evidence, indent=2) + "\n")

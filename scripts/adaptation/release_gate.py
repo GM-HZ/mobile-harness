@@ -33,6 +33,15 @@ def main():
     for check in evidence.get("checks", []):
         if not check.get("passed"):
             failures.append("failed check: " + check.get("command", "?"))
+    rsi = evidence.get("rsiScoreboard")
+    if rsi:
+        scoreboard = ROOT / rsi["path"]
+        if not scoreboard.is_file():
+            failures.append("RSI scoreboard missing: " + rsi["path"])
+        else:
+            import hashlib
+            if hashlib.sha256(scoreboard.read_bytes()).hexdigest() != rsi["sha256"]:
+                failures.append("RSI scoreboard hash drifted: " + rsi["path"])
     for label, artifact in evidence.get("artifacts", {}).items():
         maximum = artifact.get("maxBytes")
         if maximum and artifact.get("bytes", 0) > maximum:

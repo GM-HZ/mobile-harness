@@ -41,7 +41,16 @@
         "emulator-forge-github"
       ],
       "gateNote": "follows the upstream forge bundle surface",
-      "priority": "P2"
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-experimental-forge",
+          "@deepseek-ai/dsh-experimental-forge-github",
+          "@deepseek-ai/dsh-experimental-client-ui-forge"
+        ],
+        "note": "upstream forge packages expose provider/client seams (provider hits 304/18/381); candidate for migration after inspecting the provider contract."
+      }
     },
     {
       "file": "dsh-harmony-inspector-worker.cjs",
@@ -69,7 +78,15 @@
         "emulator-liveshare-browser"
       ],
       "gateNote": "relay acceptance plus local fixture",
-      "priority": "P2"
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-experimental-liveshare",
+          "@deepseek-ai/dsh-experimental-liveshare-protocol"
+        ],
+        "note": "upstream liveshare exposes provider seam (58 hits) and a protocol package (36 hits); candidate for migration."
+      }
     },
     {
       "file": "dsh-harmony-package.cjs",
@@ -111,7 +128,14 @@
         "capability-parity-gate"
       ],
       "gateNote": "images/attachments path",
-      "priority": "P2"
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-compaction-image-offload"
+        ],
+        "note": "only a weak image seam upstream (1 hit); keep compat for now."
+      }
     },
     {
       "file": "dsh-harmony-speech.cjs",
@@ -124,7 +148,15 @@
         "emulator-voice-input"
       ],
       "gateNote": "device audio path",
-      "priority": "P2"
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice",
+          "@deepseek-ai/dsh-experimental-voice-input-bundle"
+        ],
+        "note": "upstream sensevoice provider exists (17 hits); voice-input bundle is a thin bundle \u2014 check if a provider can be mounted instead of our launcher."
+      }
     },
     {
       "file": "dsh-harmony-office-worker.mjs",
@@ -139,7 +171,16 @@
         "emulator-office-cancel"
       ],
       "gateNote": "office build/test pipeline",
-      "priority": "P2"
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-office-kit",
+          "@deepseek-ai/dsh-tool-office",
+          "@deepseek-ai/dsh-skill-office"
+        ],
+        "note": "office-kit is already the upstream provider (79 hits); our worker only adapts the phone runtime \u2014 keep compat."
+      }
     }
   ]
 }

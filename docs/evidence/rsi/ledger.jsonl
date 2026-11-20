@@ -30,3 +30,6 @@
 {"commit": "f1e93e720625fe7b6645d348de6fed912e27bc9a", "tiers": ["G2"], "ok": true, "flakes": 0, "evidence": ".build/gate-evidence/G2", "note": "nightly mcp-stdio 5.9s + ptc-link-fixture 1.0s", "at": "2026-11-20T23:21:25+0800"}
 {"commit": "7101bffc92ad9e0b7ab2c1fba79a2dd91d318e25", "tiers": ["G0"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0/7101bffc92ad9e0b7ab2c1fba79a2dd91d318e25.json", "note": "", "at": "2026-11-20T23:22:15+0800"}
 {"commit": "7101bffc92ad9e0b7ab2c1fba79a2dd91d318e25", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/7101bffc92ad9e0b7ab2c1fba79a2dd91d318e25.json", "note": "", "at": "2026-11-20T23:22:16+0800"}
+{"commit": "74a1072dd291e6c1eb8e3ba2812d09a704496a55", "tiers": ["G4"], "ok": true, "flakes": 0, "evidence": "docs/evidence/release/0.4.69-74a1072dd291e6c1eb8e3ba2812d09a704496a55.json", "note": "", "at": "2026-11-20T23:26:46+0800"}
+{"commit": "74a1072dd291e6c1eb8e3ba2812d09a704496a55", "tiers": ["G0"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0/74a1072dd291e6c1eb8e3ba2812d09a704496a55.json", "note": "", "at": "2026-11-20T23:26:51+0800"}
+{"commit": "74a1072dd291e6c1eb8e3ba2812d09a704496a55", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/74a1072dd291e6c1eb8e3ba2812d09a704496a55.json", "note": "", "at": "2026-11-20T23:26:53+0800"}
