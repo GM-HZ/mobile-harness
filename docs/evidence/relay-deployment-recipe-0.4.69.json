@@ -71,7 +71,7 @@
     }
   },
   "notValidated": [
-    "the Docker image build itself: the Docker daemon is not running on this machine; the server runs `docker compose up -d --build` and then the preflight and device acceptance"
+    "nginx/certbot on the real server (configuration reviewed and key directives checked; executed on the user's server)"
   ],
   "scope": {
     "verified": [
@@ -83,5 +83,48 @@
     "pending": [
       "deploying the container on the user's public server and running the preflight against the real domain"
     ]
+  },
+  "dockerValidation": {
+    "build": {
+      "command": "docker build -f deploy/liveshare-acceptance-relay/Dockerfile -t mh-relay-acceptance:0.4.69 .",
+      "exit": 0,
+      "imageId": "sha256:c1ed59618c1ac6c94ca21c16bae5c7dca70d447ef85b7a739ae0121a5d121e50",
+      "base": "node:22-alpine",
+      "dependency": "ws@8.18.0"
+    },
+    "container": {
+      "command": "docker run --rm -p 127.0.0.1:18083:8080 -e MH_RELAY_VIEWER_TOKEN=... -e MH_RELAY_ADMIN_TOKEN=... -e MH_RELAY_OWNER_LOGIN=1 -e MH_RELAY_LOGIN_REDIRECT=1 mh-relay-acceptance:0.4.69",
+      "healthStatus": "healthy",
+      "healthEndpoint": {
+        "status": 200,
+        "body": {
+          "release_id": "mobile-harness-test-relay"
+        }
+      },
+      "anonymousRpc": 401,
+      "configuredViewerToken": {
+        "status": 404,
+        "body": {
+          "error": "unknown-share"
+        }
+      },
+      "ownerLoginPage": {
+        "status": 200,
+        "containsButton": true
+      },
+      "logs": [
+        "8080",
+        "{\"ownerAuthorizationDisplayed\":true}"
+      ]
+    },
+    "preflightThroughTlsProxy": {
+      "ok": true,
+      "tls": "TLSv1.3",
+      "health": 200,
+      "wss": {
+        "outcome": "http",
+        "status": 401
+      }
+    }
   }
 }

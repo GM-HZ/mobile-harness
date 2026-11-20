@@ -68,6 +68,10 @@ sudo rm -f /etc/nginx/conf.d/liveshare-acceptance.conf
 sudo systemctl reload nginx
 ```
 
+## 已验证范围
+
+本机已构建镜像并运行容器：healthcheck 为 healthy、`/health` 200、匿名 viewer 401、配置的 viewer token 通过鉴权、owner 登录页可打开、TLS 反代下预检通过（TLS 1.3 / HTTP 200 / 匿名 WSS 401）。nginx/certbot 与公网域名部分需在服务器上执行。
+
 ## 已知限制
 
 - 身份是**合成身份**：viewer cookie token 与 owner 授权页均为夹具行为；真实 OAuth/OIDC 身份提供方不在本配方内。
