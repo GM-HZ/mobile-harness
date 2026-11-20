@@ -355,3 +355,19 @@ nightly 覆盖；等真机解锁后跑 G3 device_lab verify/exec/overlay。
 
 下一轮：为 G3 设备 lab 增加"解锁检测→自动排队/跳过"的调度说明；尝试把 nightly 的
 flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化（从 series.json 派生）。
+
+
+### 2026-11-20（第 13 轮：周报 scoreboard、targets 索引、设备等待解锁）
+
+- `scripts/adaptation/gate_report.py`：从 RSI 台账 + registry 生成
+  `docs/evidence/rsi/scoreboard.md`（每层 first/flake/fail、最近失败、registry 快照），
+  作为每周 RSI 闭环的可执行产物。
+- `scripts/adaptation/patch_targets.py`：从 `series.json` + `anchors.json` 生成
+  `patches/targets.json`（机器可读索引，含 gate 与 TARGETS.md 登记状态），
+  G1 `patch-targets --check` 防止索引漂移；registry G1=8。
+- `device_lab.py run --wait-unlock N`：轮询屏幕解锁，超时优雅退出（当前真机锁定，
+  实测 `exit 4` + 提示解锁后重试），为 G3 调度提供可重试协议。
+- 真机仍锁屏、测试密钥未配置；nightly 8 项矩阵保持。
+
+下一轮：真机解锁后跑 G3 verify/exec/overlay 并写证据；有测试密钥时补 session 写入回归；
+把 scoreboard 纳入 release evidence/周报流程。

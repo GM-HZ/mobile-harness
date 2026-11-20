@@ -92,6 +92,8 @@ def main():
     sub.add_parser("status")
     runner = sub.add_parser("run")
     runner.add_argument("--suite", choices=sorted(SUITES), required=True)
+    runner.add_argument("--wait-unlock", type=int, default=0,
+                        help="poll for an unlocked screen up to N seconds before running")
     args = parser.parse_args()
     serial = detect()
     if not serial:
@@ -101,6 +103,13 @@ def main():
     if args.command == "status":
         print(json.dumps(device, ensure_ascii=False, indent=2))
         return 0
+    deadline = time.monotonic() + args.wait_unlock
+    while device.get("screenLocked") and time.monotonic() < deadline:
+        time.sleep(5)
+        device = status(serial)
+    if device.get("screenLocked"):
+        print("SKIP device lab: screen is locked (unlock the phone and retry)", file=sys.stderr)
+        return 4
     LOCK.parent.mkdir(parents=True, exist_ok=True)
     lock = LOCK.open("w")
     try:

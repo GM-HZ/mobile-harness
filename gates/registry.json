@@ -60,6 +60,12 @@
           "timeout": 120
         },
         {
+          "id": "patch-targets",
+          "command": "python3 scripts/adaptation/patch_targets.py --check",
+          "covers": "machine patch index matches series.json/anchors and TARGETS.md",
+          "timeout": 120
+        },
+        {
           "id": "patch-rehearsal",
           "command": "python3 scripts/adaptation/patch_rehearsal.py",
           "covers": "patches/series.json applies cleanly to the pinned tarballs",

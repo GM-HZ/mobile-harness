@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "f1e93e720625fe7b6645d348de6fed912e27bc9a",
+  "generatedFrom": "7101bffc92ad9e0b7ab2c1fba79a2dd91d318e25",
   "layers": [
     "host",
     "web",
@@ -894,10 +894,29 @@
       "kind": "file",
       "source": "patches/README.md",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "903bb4eea242927e5b57c22f2f4f17c2127bd1c337ae92ea3beb2493b1e9497e",
-      "bytes": 1385,
+      "sha256": "2217eb0f5b1682ff20a13404dfda7e56f7f1d222914b25cb899edccd361d1cdb",
+      "bytes": 1564,
       "fragility": "low",
       "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "patches:patches/TARGETS.md",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/TARGETS.md",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "e9d30a00c027a074d0963d25cecabe21054d3c0fd8f46f58e41b0fc1018a99e7",
+      "bytes": 1881,
+      "fragility": "low",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-bash-local",
+        "@deepseek-ai/dsh-bash-sandbox",
+        "@deepseek-ai/dsh-client-ui-settings-general",
+        "@deepseek-ai/dsh-session-persistence-jsonl"
+      ],
       "gates": [
         "G0"
       ]

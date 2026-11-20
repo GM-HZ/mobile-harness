@@ -25,7 +25,10 @@ The gate suite exists so the repo can improve itself without a human memory of
    scoreboard.
 3. A release is blocked unless G0/G1/G4 pass on the release commit and the last
    G2 run is green; G3 real-device evidence is required for device-facing changes.
-4. The scoreboard is reviewed weekly (`python3 scripts/adaptation/rsi_ledger.py report`).
+4. The scoreboard is reviewed weekly:
+   `python3 scripts/adaptation/gate_report.py` writes
+   `docs/evidence/rsi/scoreboard.md` (per-tier first/flake/fail + recent failures
+   + registry snapshot).
 
 ## Current coverage
 
