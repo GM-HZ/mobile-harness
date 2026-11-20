@@ -170,17 +170,19 @@ def main():
         print("ENTRY 0x%x TYPE %d PHDR 0x%x" % (e_entry, e_type, phdr_address(e_phoff, segments)))
         print("ARGV", argv)
         return 0
-    base, mapped = map_segments(data, e_type, segments)
-    print("LOADED segments=%d base=0x%x entry=0x%x" % (len(mapped), base, e_entry))
-    phdr = phdr_address(e_phoff, segments) + base
-    entry = e_entry + base
     loaded_argv = [os.environ.get("MH_ELF_ARGV0") or argv[0]] + argv[1:]
-    stack = build_stack(loaded_argv, entry, phdr, phnum, 56)
-    page = trampoline()
     pid = os.fork()
-    if pid == 0:  # child: raw entry, never returns to Python
-        target = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)(page)
+    if pid == 0:
+        # Map and start inside the child only: MAP_FIXED segments (0x400000 for a
+        # non-PIE static binary) would otherwise clobber the parent interpreter.
         try:
+            base, mapped = map_segments(data, e_type, segments)
+            print("LOADED segments=%d base=0x%x entry=0x%x" % (len(mapped), base, e_entry))
+            phdr = phdr_address(e_phoff, segments) + base
+            entry = e_entry + base
+            stack = build_stack(loaded_argv, entry, phdr, phnum, 56)
+            page = trampoline()
+            target = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)(page)
             target(entry, stack)
         finally:
             os._exit(0)

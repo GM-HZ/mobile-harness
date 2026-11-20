@@ -201,6 +201,37 @@ echo "--- transparent direct execution (no mh-exec) ---"
 echo TRANSPARENT_PROBE_DONE
 """
 
+INSTALL_PROBE = """set +e
+echo "--- install a static tool by name ---"
+mh-install busybox https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/busybox-static-1.36.1-r31.apk bin/busybox.static busybox
+echo "MH_INSTALL_EXIT=$?"
+ls -l /usr/bin/busybox /usr/lib/mh-tools/busybox/tool 2>&1
+echo "--- run by name ---"
+busybox echo MH_INSTALL_RUN_OK; echo "RUN_EXIT=$?"
+busybox uname -m; echo "UNAME_EXIT=$?"
+echo MH_INSTALL_PROBE_DONE
+"""
+
+RUNTIME_EVAL_PROBE = """set +e
+echo "--- node jitless options ---"
+node --v8-options 2>&1 | grep -i -m3 jitless
+echo "--- node without NODE_OPTIONS ---"
+env -u NODE_OPTIONS node -e "console.log('NODE_NO_JITLESS_OK')" 2>&1; echo "NODE_EXIT=$?"
+echo "--- pty support ---"
+python3 -c "import pty,os; m,s=pty.openpty(); print('PTY_OK',m,s); os.close(m); os.close(s)" 2>&1; echo "PTY_EXIT=$?"
+ls -l /dev/ptmx 2>&1; ls -d /dev/pts 2>&1
+echo RUNTIME_EVAL_DONE
+"""
+
+DEBUG_EXIT_PROBE = """set +e
+export MH_ELF_ARGV0=busybox
+TOOL=/usr/lib/mh-tools/busybox/tool
+python3 /usr/bin/mh-exec $TOOL echo DIRECT_PY_OK; echo "DIRECT_PY_EXIT=$?"
+mh-exec $TOOL echo SCRIPT_OK; echo "SCRIPT_EXIT=$?"
+busybox echo SHIM_OK; echo "SHIM_EXIT=$?"
+echo ELF_DEBUG_DONE
+"""
+
 
 class Device:
     def __init__(self, target, port):
@@ -317,7 +348,10 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
              "elf-run": "real-device in-memory static ELF execution",
              "elf-download": "real-device download-and-run static tool",
              "elf-mhexec": "real-device /usr/bin/mh-exec download-and-run",
-             "elf-transparent": "real-device transparent downloaded tool execution"}
+             "elf-transparent": "real-device transparent downloaded tool execution",
+             "elf-install": "real-device install and run a downloaded static tool by name",
+             "runtime-eval": "real-device JIT and PTY capability evaluation",
+             "elf-debug": "real-device loader exit-status comparison"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -413,7 +447,7 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug"], default="exec")
     parser.add_argument("--loader-file", default=str(Path(__file__).with_name("fixtures") / "inmemory-elf-loader.py"))
     parser.add_argument("--payload-file")
     parser.add_argument("--elf-args", default="")
@@ -423,7 +457,9 @@ def main():
              "runtime-target": RUNTIME_TARGET_PROBE, "pip-native": PIP_NATIVE_PROBE,
              "mmap": MMAP_PROBE, "elf-loader": "python3 ./elf-loader.py",
              "elf-download": "python3 ./inmemory-elf-runner.py",
-             "elf-mhexec": MH_EXEC_PROBE, "elf-transparent": TRANSPARENT_PROBE}.get(args.probe, PROBE)
+             "elf-mhexec": MH_EXEC_PROBE, "elf-transparent": TRANSPARENT_PROBE,
+             "elf-install": INSTALL_PROBE, "runtime-eval": RUNTIME_EVAL_PROBE,
+             "elf-debug": DEBUG_EXIT_PROBE}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe,
         loader_file=(args.loader_file if args.probe == "elf-loader" else None),
         payload_file=(args.payload_file if args.probe == "elf-run" else None),

@@ -370,10 +370,12 @@ class DshEngine {
         enabled = false;
       }
       if (!enabled) {
-        try {
-          fileIo.unlinkSync(root + '/usr/bin/mh-exec');
-        } catch (error) {
-          // Not present: nothing to clean up.
+        for (const stale of ['/usr/bin/mh-exec', '/usr/bin/mh-install']) {
+          try {
+            fileIo.unlinkSync(root + stale);
+          } catch (error) {
+            // Not present: nothing to clean up.
+          }
         }
         hilog.info(0xD005, 'DSHClient', 'signed exec bypass disabled: store build');
         return;
@@ -387,7 +389,15 @@ class DshEngine {
       } finally {
         fileIo.closeSync(fd);
       }
-      hilog.info(0xD005, 'DSHClient', 'signed exec bypass enabled: /usr/bin/mh-exec');
+      const installerTarget = root + '/usr/bin/mh-install';
+      const installerBytes = context.resourceManager.getRawFileContentSync('mh-install.py');
+      const installerFd = fileIO.openSync(installerTarget, 1 | 64 | 512, 0o755);
+      try {
+        fileIo.writeSync(installerFd, installerBytes.buffer);
+      } finally {
+        fileIo.closeSync(installerFd);
+      }
+      hilog.info(0xD005, 'DSHClient', 'signed exec bypass enabled: /usr/bin/mh-exec /usr/bin/mh-install');
     } catch (error) {
       hilog.warn(0xD005, 'DSHClient', 'self-build tool setup failed: %{public}s', String(error));
     }

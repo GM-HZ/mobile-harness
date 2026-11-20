@@ -171,10 +171,13 @@ def main():
         "note": "Self-built HAPs include the in-memory ELF runner at /usr/bin/mh-exec; store builds never include it.",
     }) + "\n")
     loader = RAW / "mh-exec.py"
+    installer = RAW / "mh-install.py"
     if SELF_BUILD:
         copy(RUNTIME / "tools" / "mh-exec.py", loader)
+        copy(RUNTIME / "tools" / "mh-install.py", installer)
     else:
         loader.unlink(missing_ok=True)
+        installer.unlink(missing_ok=True)
     print(f"Self-build signed-exec bypass: {'enabled' if SELF_BUILD else 'disabled'}")
     signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
     profile = Path(signing_profile or ROOT / "build-profile.json5")

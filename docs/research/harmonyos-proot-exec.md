@@ -200,3 +200,20 @@ GitHub Actions 的 `Build HarmonyOS HAP` 通过 `workflow_dispatch` 输入 `self
 因此透明回退需要：找回/重建那份 patched PRoot 源码树并在其 loader 上打补丁；或换集成点（PATH shim / Host 命令重写 / LD_PRELOAD 式拦截）。当前已回退，保留 `mh-exec` 显式命令与构建开关。证据：[emulator-loader-fallback-attempt-0.4.69.json](../evidence/emulator-loader-fallback-attempt-0.4.69.json)。
 
 下一步优先做**用户态工具安装器**：`mh-install <name> <url> <member>` 把下载的静态工具装到私有目录并生成 `/usr/bin/<name>` shim（`#!/bin/sh` + `exec /usr/bin/mh-exec ...`），实现"下载后按名字直接用"，不依赖 loader 改造。
+
+## 工具安装器 mh-install（自建包，已在真机验证）
+
+`mh-install <name> <url> [member] [argv0]` 把下载的静态工具装到 `/usr/lib/mh-tools/<name>/tool`，并生成 `/usr/bin/<name>` shim，实现"下载后按名字直接跑"。
+
+- 机制：curl 下载 → gzip+tar 解包（`member` 指定归档内路径，如 `bin/busybox.static`）→ 写 shim；
+- **shim 必须是 Python 脚本**：外壳 shim（无论 `exec` 还是子进程方式）在 PRoot loader 管理的 `/bin/sh` 里嵌套执行 python3 后，退出时会 SIGSEGV（功能输出正常但退出码 139）；改成 `#!/usr/bin/python3` 的 shim、在同一解释器内执行 mh-exec 代码后，退出码为 0；
+- 真机（Mate 60，自建签名包）实测：`mh-install busybox <apk-url> bin/busybox.static busybox` → `/usr/bin/busybox`；`busybox echo MH_INSTALL_RUN_OK` / `busybox uname -m` 均 exit 0。
+
+证据：[mate60-mh-install-0.4.69.json](../evidence/mate60-mh-install-0.4.69.json)。
+
+## Node JIT 与 PTY/terminal 重评（真机）
+
+- **JIT**：内置 Node 的 V8 选项显示 `--jitless` 是默认值（`default: --jitless`），即使 `env -u NODE_OPTIONS node ...` 运行，默认仍是 jitless。虽然匿名可执行内存可用，但**当前打包的 Node 是 jitless 构建/配置**，需要换 Node 构建或找到可用的关闭开关才能恢复 JIT。
+- **PTY/terminal**：guest 内 `/dev/ptmx`、`/dev/pts` 都不存在，`pty.openpty()` 报 `out of pty devices`；PTY 在设备节点层就不可用，纯用户态方案无法补，terminal/系统 PTY 维持延期。
+
+证据：[mate60-runtime-eval-0.4.69.json](../evidence/mate60-runtime-eval-0.4.69.json)。
