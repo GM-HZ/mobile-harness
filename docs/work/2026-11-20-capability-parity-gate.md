@@ -50,5 +50,6 @@ python3 tests/bench/capability-parity-regression.py \
 
 ## 闸门之外的独立证据
 
-- **LiveShare 跨设备**：`emulator-liveshare-relay.py --owner-login --cross-device` 及公网隧道预演单独留证（[跨设备](../evidence/emulator-liveshare-cross-device-0.4.69.json) · [公网预演](../evidence/relay-public-tunnel-acceptance-0.4.69.json)）。连续 owner-login 重启后该环境偶发 owner 网关 1006 断连，闸门不依赖此步。
+- **LiveShare 跨设备**：`emulator-liveshare-relay.py --owner-login --cross-device` 及公网隧道预演单独留证（[跨设备](../evidence/emulator-liveshare-cross-device-0.4.69.json) · [公网预演](../evidence/relay-public-tunnel-acceptance-0.4.69.json)）。闸门不依赖此步。
+  2026-11-20 复测记录：同一模拟器会话里连续跑 owner-login 跨设备时，owner 网关在 viewer 打开页面前以 1006 断开且不再重连（reader 检查刚通过、`/__fixture/state` 显示无 channel；重启 Host 也未恢复）。已确认与页面地址/端口转发无关（已修复内部模式的页面基址与陈旧转发清理），该现象仅在本环境的连续重启循环后出现；跨设备与公网证据仍是此前独立跑出的通过结果。后续若再次需要回归该步，建议使用新启动的模拟器会话。
 - **Forge 公开读/真实账号**：设备 A 现按设计保留真实 GitHub 账号配置，夹具公开读需要空 `GH_CONFIG`；因此公开读单独留证（[Forge 公开读](../evidence/emulator-forge-public-read-0.4.69.json) · [真实账号](../evidence/emulator-forge-real-account-0.4.69.json)）。
