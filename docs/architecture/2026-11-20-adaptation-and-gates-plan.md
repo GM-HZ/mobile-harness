@@ -420,3 +420,17 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 
 下一轮：补 forge 干净 fixture 或在该前置条件下复测；评估 liveshare 的 provider seam 迁移；
 真机解锁后跑 G3。
+
+
+### 2026-11-20（第 17 轮：liveshare seam 结论 + forge fixture 深入）
+
+- 新增 `docs/architecture/seams/liveshare-upstream-seam.md`：上游 liveshare 的 Config 只有身份/状态文件字段，
+  owner-gateway 在 `TunnelWorker` 内部用 `child_process.spawn` 启动，**没有 worker/spawn 注入点**；
+  我们的三处运行时改写（spawn→Worker、viewer uploads、policies）暂时只能 keep-compat。
+  结论：现在保留 compat；若上游出现 spawn/worker factory seam 再迁移；可选的低风险收敛是把
+  upload 补丁改成包级 patch。
+- forge 干净 fixture 复测：清理 `alpine/native-benchmark-home/.config/gh` 后，`emulator-forge-account`
+  可推进到 OAuth 登录成功、进入 `forgePanel/changeRequestText`，但该调用返回
+  `forgePanel/diff-failed`（gh 读取 fixture diff 失败）。属 fixture/TLS/GH_CONFIG 环境问题，
+  非构建或注册失败；已记录为待排查的 G2 fixture 项（不阻塞门禁）。
+- compat.json liveshare 条目补充 seamDoc/结论；compat-layer.md 同步。

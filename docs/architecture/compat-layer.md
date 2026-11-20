@@ -49,8 +49,10 @@ Gates: `emulator-inspector`, `emulator-inspector-availability`.
 ### dsh-harmony-liveshare.cjs
 
 LiveShare relay/WebRTC transport adapter for the experimental LiveShare bundle.
-Decision: upstream-seam-candidate. Gates: `emulator-liveshare-relay`,
-`emulator-liveshare-browser`.
+Decision: keep-compat. Upstream config has no spawn/worker factory injection point
+(see `docs/architecture/seams/liveshare-upstream-seam.md`); optional future
+convergence is package-patching the client upload patches. Gates:
+`emulator-liveshare-relay`, `emulator-liveshare-browser`.
 
 ### dsh-harmony-package.cjs
 

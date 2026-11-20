@@ -87,7 +87,8 @@
           "@deepseek-ai/dsh-experimental-liveshare",
           "@deepseek-ai/dsh-experimental-liveshare-protocol"
         ],
-        "note": "upstream liveshare exposes provider seam (58 hits) and a protocol package (36 hits); candidate for migration."
+        "note": "No upstream injection point for the owner-gateway spawn (TunnelWorker uses child_process.spawn internally; Config has no spawn/worker factory). keep-compat; optional package-patch migration for upload patches. See seam doc.",
+        "seamDoc": "docs/architecture/seams/liveshare-upstream-seam.md"
       }
     },
     {

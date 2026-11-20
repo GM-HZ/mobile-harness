@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "c920d11cc25dd1e1131facfe22e116780a267d14",
+  "generatedFrom": "8d759b1d6d43925830e7495da8382f831ce32710",
   "layers": [
     "host",
     "web",
@@ -951,6 +951,23 @@
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-sandbox",
         "dsh-bash-sandbox/lib/index.js"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "patches:patches/forge-github-guest-runner.patch",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/forge-github-guest-runner.patch",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "64cd638d809049f56c5523b44aabe8d49af7b752773552a6632f1b4183fb161e",
+      "bytes": 778,
+      "fragility": "low",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-experimental-forge-github",
+        "dsh-experimental-forge-github/lib/index.js"
       ],
       "gates": [
         "G0"
