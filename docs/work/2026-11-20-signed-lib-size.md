@@ -51,3 +51,17 @@ Tier A+B+C：**原始 ~5.43 MB，HAP 增量约 ~2.2 MB（±15%）**。
 1. 在 `docs/guest-tools-lock.json` 增加 Tier A（再按需 Tier B）包及 SHA-256；
 2. `runtime/harmonyos/packaging/package-shell-tools.py` 会自动把包内 `usr/lib/*.so` 打包为签名 `libguest_cli_*.so` 并生成绑定（现有机制）；
 3. 重新构建自建 HAP，实测 HAP 体积增量并跑动态工具验证（jq、libarchive 类）。
+
+
+## 实测（2026-11-20 构建）
+
+实际打包后 HAP 体积（native 库在 HAP 内**不压缩存储**，因此增量≈原始 .so 字节）：
+
+| HARMONY_GUEST_LIB_GROUPS | HAP 字节 | 增量 |
+| --- | ---: | ---: |
+| （空，无 overlay） | 768,612,441 | — |
+| `common` | 770,883,129 | +2,270,688（≈2.3 MB） |
+| `common,media` | 773,649,461 | +5,037,020（≈5.0 MB） |
+| `common,media,extensions` | 773,654,447 | +5,042,006（≈5.0 MB） |
+
+所以此前"压缩后 ~2 MB"的估算偏低：**实际 A+B 约 +5 MB**；只开 Tier A（common）约 **+2.3 MB**。通过组配置可精确裁剪；store 构建不包含任何 overlay。

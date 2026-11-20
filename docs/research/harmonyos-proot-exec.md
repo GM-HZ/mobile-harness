@@ -262,3 +262,28 @@ shim 拦截 `execve`：
 真机：`LD_PRELOAD` 已注入、复制的未签名 `/bin/node` 被重定向执行（`COPY_NODE_OK / CHILD_EXIT 0`），复制的 busybox 以重定向后的 argv0 启动；一次干净的下载后直跑探针因模型回合超时未完成（Host web 正常），待复测。
 
 证据：[transparent-exec-0.4.69.json](../evidence/transparent-exec-0.4.69.json)。
+
+## 动态依赖库与原生扩展（签名 overlay，可配置裁剪）
+
+动态工具/原生扩展加载未签名库会被平台拒绝；解决办法是构建期把库/扩展签进 HAP 并以签名绑定暴露到 guest 路径，这样动态链接器和 `dlopen` 都能正常映射（签名文件允许可执行映射）。
+
+配置：
+- `docs/guest-tools-lock.json`：
+  - `libraries[]`：`{name, group, base, archive, sha256, files:[{member, guestPath}]}`；
+  - `extensions[]`：`{name, group, source, guestPath}`（source 可为构建产物，如 `{stage}/entry/libs/...`）。
+- 组选择：`HARMONY_GUEST_LIB_GROUPS`（自建默认 `common,media,extensions`；置空可全部关闭；store 构建不包含）。
+- `scripts/build/harmonyos_guest_extras.py` 把选中文件的 ELF 复制为签名 `libguest_lib_*` / `libguest_ext_*`，生成 `entry/src/main/cpp/guest-libs.inc`，由 `poc.c` 的 `packaged[]` 绑定到配置的 guest 路径；旧 overlay 文件在每次构建时清理。
+
+已加入（Alpine v3.22 固定版本）：
+- common：libjq、libonig、liblz4、liblzo2、libarchive、libacl、libattr、libyaml；
+- media：libpng16、libjpeg、libwebp、libsharpyuv、libtiff、libxml2；
+- extensions：`mh-native-demo` NAPI 扩展（构建产物，绑定 `/usr/lib/mh-demo.node`）。
+
+实测（模拟器）：
+- `/usr/lib/libarchive.so.13` 等签名库存在；`ctypes.CDLL('/usr/lib/libarchive.so.13')` 成功；
+- `require('/usr/lib/mh-demo.node').answer()` → **42**（dlopen 签名原生扩展成功）；
+- 运行时下载 Alpine `jq-1.8.2`（动态，依赖 libjq+libonig）直接执行：`jq --version` → `jq-1.8.2`，`'{"a":1}' | jq .a` → `1`。
+
+限制：这是**构建期配置**的签名 overlay；运行时下载的任意未签名 `.so` 仍不能 `dlopen`（需要额外的用户态 dlopen 加载器，属更大工程）。
+
+证据：[native-overlay-0.4.69.json](../evidence/native-overlay-0.4.69.json)；体积实测见 [signed-lib-size](2026-11-20-signed-lib-size.md)。

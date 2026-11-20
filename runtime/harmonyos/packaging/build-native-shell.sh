@@ -19,3 +19,12 @@ if [[ ${HARMONY_SELF_BUILD:-0} == 1 ]]; then
 else
   rm -f "$shim"
 fi
+
+demo="$stage/entry/libs/arm64-v8a/libguest_mh_native_demo.so"
+if [[ ${HARMONY_SELF_BUILD:-0} == 1 ]]; then
+  "$sdk/llvm/bin/clang" --target=aarch64-linux-ohos --sysroot="$sdk/sysroot" \
+    -shared -fPIC -O2 -DNAPI_VERSION=8 -I "$node_source/src" "$project/runtime/harmonyos/native/mh-native-demo.c" \
+    -o "$demo"
+else
+  rm -f "$demo"
+fi

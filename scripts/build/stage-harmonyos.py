@@ -139,6 +139,8 @@ def main():
         cmake = CPP / "CMakeLists.txt"
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
+    if SELF_BUILD:
+        os.environ.setdefault("HARMONY_GUEST_LIB_GROUPS", "common,media,extensions")
     stage_assets(inputs)
 
     stage_speech(ROOT, STAGE, RAW)

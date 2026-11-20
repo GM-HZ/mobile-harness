@@ -13,9 +13,9 @@
 | 静态 CLI 工具 | 任意下载 | **已通**（mh-install + mh-exec） | 更强 | ✅ 已成 |
 | 动态链接 CLI 工具 | 任意 | **已实现**（Alpine 动态 busybox 跑通；依赖需签名库） | 大多数发行版 CLI 可跑（依赖已签名库） | ✅ 已成（库覆盖待扩展） |
 | 任意二进制"透明"执行（`./tool`） | 是 | **已实现**（LD_PRELOAD exec shim，自建包；静态/动态下载工具直接跑，模拟器验证，真机重定向已验证） | 已透明 | ✅ 已成（仅自建包） |
-| 原生扩展 `.so` / Python wheel / `.node` | 任意 | `dlopen` 复制库 Permission denied；只能构建期签名绑定（如 sharp/vips/koffi） | 需要 dlopen shim 或构建期扩展机制 | 🔶 高难工程 |
+| 原生扩展 `.so` / Python wheel / `.node` | 任意 | **配置化签名 overlay 已实现**（Node 扩展 dlopen 实测 42；签名库 dlopen 正常；任意运行时未签名 .so 仍不可） | 构建期配置可裁剪；运行时任意 dlopen 仍缺 userspace loader | ✅ 配置路径已成（运行时任意仍难） |
 | 语言工具链（gcc/clang/rust/go、make、cmake） | 任意 | 没有；且编译出的二进制需要签名/内存加载，依赖库需逐个可加载 | 编译器本身可作为动态 ELF 跑，但仍需库与构建期产物落地 | 🔶 可做但成本高 |
-| 包管理器（apt/pacman/apk/npm/pip 原生部分） | 任意 | pip 纯 Python ✅；npm JS ✅；原生包 ❌（dlopen）；apk/dpkg 无 root，装进 rootfs 也无法执行未签名 ELF（动态 loader 后可部分可用） | 纯语言包可用，原生包仍需签名/loader 扩展 | 🔶 部分 |
+| 包管理器（apt/pacman/apk/npm/pip 原生部分） | 任意 | pip 纯 Python ✅；npm JS ✅；常见动态库已签名（jq/libarchive/图像类）；原生包仍受未签名 dlopen 限制 | 纯语言包可用，常见原生依赖已覆盖 | 🔶 大部分 |
 | Node JIT | 有 | **默认 `--jitless`**（实测 V8 选项 `default: --jitless`），匿名可执行内存虽可用但当前 Node 构建默认关闭 | 需换 Node 构建/验证 `--no-jitless` | ⚠️ 可评估 |
 | PTY / terminal / 交互式 shell | 完整 | guest 无 `/dev/ptmx`、`/dev/pts`，`openpty` 报 "out of pty devices" | **无解（设备节点层缺失）** | ❌ 平台边界，维持延期 |
 | GUI 自动化 / cua / Phone Use / computer use | 完整 | 未实现，原定延期 | 与 ELF 无关 | ❌ 延期 |

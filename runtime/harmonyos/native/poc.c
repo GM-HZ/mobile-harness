@@ -312,6 +312,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
         { "libguest_mh_exec_shim.so", "/usr/lib/libmh-exec-shim.so" },
 #endif
 #include "guest-tools.inc"
+#include "guest-libs.inc"
     };
     enum { packaged_count = sizeof(packaged) / sizeof(*packaged) };
     /* Host subprocesses keep native file URLs/cwd, while legacy Bash/MCP keep

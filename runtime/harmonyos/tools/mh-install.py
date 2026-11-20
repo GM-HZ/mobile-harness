@@ -56,20 +56,13 @@ def main():
             tarball = os.path.join(destination, "archive.tar")
             with open(tarball, "wb") as handle:
                 subprocess.run(["gzip", "-dc", archive], check=True, stdout=handle)
-            extracted = os.path.join(destination, "extract")
-            os.makedirs(extracted, exist_ok=True)
-            run(["tar", "-xf", tarball, "-C", extracted])
-            source = os.path.join(extracted, member)
-            if not os.path.isfile(source):
-                target = os.path.basename(member)
-                finder = subprocess.run(["find", extracted, "-name", target, "-type", "f"],
-                                        stdout=subprocess.PIPE, text=True, check=True)
-                candidates = [line for line in finder.stdout.splitlines() if line.strip()]
-                if not candidates:
-                    print("MH_INSTALL_ERROR member not found: " + member)
-                    return 1
-                source = candidates[0]
-            shutil.copy2(source, tool)
+            # Stream the single member to the tool file: extracting the whole tree
+            # fails in the guest because symlink creation is denied there.
+            with open(tool, "wb") as handle:
+                streamed = subprocess.run(["tar", "-xOf", tarball, member], check=False, stdout=handle)
+            if streamed.returncode != 0 or os.path.getsize(tool) == 0:
+                print("MH_INSTALL_ERROR member not found: " + member)
+                return 1
         else:
             shutil.copy2(archive, tool)
         with open(tool, "rb") as handle:

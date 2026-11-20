@@ -1,0 +1,58 @@
+{
+  "kind": "configurable signed native library overlay and dlopen native extension overlay",
+  "artifacts": {
+    "selfBuildUnsigned": "dsh-mh-harmonyos-arm64-v0.4.69-selfbuild-unsigned.hap",
+    "unsignedSha256": "f97b233d886057d95528e702fc01984d1f630d664f629343b4cfa6dc9846f6ae",
+    "selfBuildSigned": "dsh-mh-harmonyos-arm64-v0.4.69-selfbuild-signed.hap",
+    "signedSha256": "f96c38af9d118a4507fbcc0e62277dab61fe1a91ab5382aa5fdf9a6147a8b8a1",
+    "sourceCommit": "895a1fea8d5830dfee0c6f908d20ea8af0c324b2"
+  },
+  "configuration": {
+    "lock": "docs/guest-tools-lock.json libraries[] entries (group, base, archive, sha256, files[member,guestPath]) and extensions[] entries (source, guestPath)",
+    "groups": "HARMONY_GUEST_LIB_GROUPS (default for self builds: common,media,extensions; empty/none for store builds)",
+    "bindings": "scripts/build/harmonyos_guest_extras.py writes entry/src/main/cpp/guest-libs.inc; poc.c packaged[] includes it",
+    "storeBuilds": "HARMONY_SELF_BUILD!=1 -> no libraries/extensions staged and stale overlay files removed"
+  },
+  "measuredHapSizes": {
+    "none": {
+      "bytes": 768612441
+    },
+    "common": {
+      "bytes": 770883129,
+      "deltaBytes": 2270688
+    },
+    "common,media": {
+      "bytes": 773649461,
+      "deltaBytes": 5037020
+    },
+    "common,media,extensions": {
+      "bytes": 773654447,
+      "deltaBytes": 5042006
+    },
+    "note": "native libraries are stored uncompressed in the HAP, so the HAP delta equals the raw .so bytes"
+  },
+  "emulatorValidation": {
+    "device": "127.0.0.1:5555 API 26 ARM64 Phone emulator",
+    "signedLibrariesPresent": [
+      "/usr/lib/libarchive.so.13",
+      "/usr/lib/libjq.so.1",
+      "/usr/lib/libonig.so.5",
+      "/usr/lib/libpng16.so.16"
+    ],
+    "dlopenSignedLibraryViaCtypes": "CTYPES_LIBARCHIVE_OK",
+    "dlopenSignedNodeExtension": "EXTENSION_ANSWER 42 (require('/usr/lib/mh-demo.node'))",
+    "downloadedDynamicTool": "mh-install jq (Alpine jq-1.8.2) -> jq-1.8.2; '{a:1}' | jq .a -> 1; exit 0",
+    "rawResultText": "--- signed libraries present ---\n-rw-r--r--    1 3060     3060        722816 Nov 20 22:06 /usr/lib/libarchive.so.13\n-rw-r--r--    1 3060     3060        329496 Nov 20 22:06 /usr/lib/libjq.so.1\n-rw-r--r--    1 3060     3060        617760 Nov 20 22:06 /usr/lib/libonig.so.5\n-rw-r--r--    1 3060     3060        198528 Nov 20 22:06 /usr/lib/libpng16.so.16\n--- dlopen a signed library from python ctypes ---\nCTYPES_LIBARCHIVE_OK\nCTYPES_EXIT=0\n--- load a signed native extension through node dlopen ---\nEXTENSION_ANSWER 42\nEXT_EXIT=0\n--- run a downloaded dynamic tool that needs the new libs (jq) ---\nMH_INSTALL_OK /usr/bin/jq\nMH_INSTALL_TOOL /usr/lib/mh-tools/jq/tool\nJQ_INSTALL_EXIT=0\njq-1.8.2\nCHILD_EXIT 0\nJQ_VERSION_EXIT=0\n1\nCHILD_EXIT 0\nJQ_RUN_EXIT=0\nNATIVE_OVERLAY_PROBE_DONE\n",
+    "exitCodes": {
+      "CTYPES_EXIT": "0",
+      "EXT_EXIT": "0",
+      "JQ_INSTALL_EXIT": "0",
+      "JQ_VERSION_EXIT": "0",
+      "JQ_RUN_EXIT": "0"
+    }
+  },
+  "realDevice": {
+    "status": "pending: the Mate 60 was disconnected during validation; signed overlay HAP is built and ready"
+  },
+  "limitation": "This overlay loads configured (build-time) libraries/extensions that become signed HAP bindings. A runtime-downloaded arbitrary unsigned .so still cannot be dlopened; supporting that would need a userspace dlopen loader (separate, larger work)."
+}

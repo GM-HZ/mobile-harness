@@ -277,6 +277,21 @@ gzip -dc ./bb.apk > ./bb.tar; mkdir -p ./tr; tar -xf ./bb.tar -C ./tr && cp ./tr
 echo MINI_PROBE_DONE
 """
 
+NATIVE_OVERLAY_PROBE = """set +e
+echo "--- signed libraries present ---"
+ls -l /usr/lib/libonig.so.5 /usr/lib/libjq.so.1 /usr/lib/libarchive.so.13 /usr/lib/libpng16.so.16 2>&1
+echo "--- dlopen a signed library from python ctypes ---"
+python3 -c "import ctypes; ctypes.CDLL('/usr/lib/libarchive.so.13'); print('CTYPES_LIBARCHIVE_OK')" 2>&1; echo "CTYPES_EXIT=$?"
+echo "--- load a signed native extension through node dlopen ---"
+node -e "console.log('EXTENSION_ANSWER', require('/usr/lib/mh-demo.node').answer())" 2>&1; echo "EXT_EXIT=$?"
+echo "--- run a downloaded dynamic tool that needs the new libs (jq) ---"
+mh-install jq https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/jq-1.8.2-r0.apk usr/bin/jq jq
+echo "JQ_INSTALL_EXIT=$?"
+jq --version 2>&1; echo "JQ_VERSION_EXIT=$?"
+echo '{"a":1}' | jq .a 2>&1; echo "JQ_RUN_EXIT=$?"
+echo NATIVE_OVERLAY_PROBE_DONE
+"""
+
 
 class Device:
     def __init__(self, target, port):
@@ -400,7 +415,8 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
              "elf-dynamic": "real-device dynamically linked ELF execution",
              "shim-env": "real-device exec shim environment check",
              "shim-debug": "real-device exec shim loader debug",
-             "elf-transparent-mini": "real-device minimal transparent exec"}
+             "elf-transparent-mini": "real-device minimal transparent exec",
+             "native-overlay": "signed native library and extension overlay"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -496,7 +512,7 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug", "elf-dynamic", "shim-env", "shim-debug", "elf-transparent-mini"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug", "elf-dynamic", "shim-env", "shim-debug", "elf-transparent-mini", "native-overlay"], default="exec")
     parser.add_argument("--loader-file", default=str(Path(__file__).with_name("fixtures") / "inmemory-elf-loader.py"))
     parser.add_argument("--payload-file")
     parser.add_argument("--elf-args", default="")
@@ -509,7 +525,9 @@ def main():
              "elf-mhexec": MH_EXEC_PROBE, "elf-transparent": TRANSPARENT_PROBE,
              "elf-install": INSTALL_PROBE, "runtime-eval": RUNTIME_EVAL_PROBE,
              "elf-debug": DEBUG_EXIT_PROBE, "dynamic": DYNAMIC_PROBE,
-             "elf-dynamic": DYNAMIC_PROBE, "shim-env": SHIM_ENV_PROBE}.get(args.probe, PROBE)
+             "elf-dynamic": DYNAMIC_PROBE, "shim-env": SHIM_ENV_PROBE,
+             "shim-debug": SHIM_DEBUG_PROBE, "elf-transparent-mini": TRANSPARENT_MINI,
+             "native-overlay": NATIVE_OVERLAY_PROBE}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe,
         loader_file=(args.loader_file if args.probe == "elf-loader" else None),
         payload_file=(args.payload_file if args.probe == "elf-run" else None),
