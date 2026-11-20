@@ -32,6 +32,8 @@ HARMONY_SIGNING_PROFILE=/absolute/path/to/build-profile.json5 ./build.sh --packa
 
 `--package` 在 `.build/artifacts/harmonyos/` 生成带版本的 ARM64 HAP 及各自的 `.sha256` 文件。未签名包供 Phone 模拟器使用。普通调试签名包适用于签名配置覆盖的真机，可以在同包名、同签名且版本号更高时覆盖安装。
 
+自建构建可选开启"内存 ELF 运行器"（`/usr/bin/mh-exec`）：`HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package`。它让 guest 可以运行运行时下载的静态 ELF（绕过鸿蒙文件代码签名边界），**只用于自用/自编译构建**；默认构建与上架构建不得开启（默认构建不打包该脚本，且启动时会删除残留副本）。GitHub Actions 的 Build HarmonyOS HAP 通过 workflow dispatch 输入 `self_build_bypass: true` 开启并记录为自建变体。
+
 GitHub Actions 的 **Build HarmonyOS HAP** 可在 `main` 上手动触发。注册带 `deveco` 标签的 ARM64 macOS runner，并预装 DevEco Studio SDK 26。将校验清单中的运行时输入存放在 runner 检出目录之外。通过仓库 Actions 变量 `DEVECO_HOME` 和 `HARMONY_INPUTS_DIR` 指定绝对路径。工作流调用同一个打包命令并上传未签名 HAP 和校验文件。
 
 在模拟器通过回归后，从对应的 Git 提交创建 Release。发布包名中的版本号来自 `apps/harmonyos/AppScope/app.json5`，例如以下命令上传 0.4.26 的模拟器包。需要分发真机调试包时，将 `signed.hap` 及其校验文件一同附到该私有仓库的 Release。

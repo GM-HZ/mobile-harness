@@ -175,3 +175,18 @@ python3 tests/smoke/mate60-proot-exec.py --target <target>   --probe elf-downloa
 ```
 
 接下来的工程化：native helper 集成、静态 PIE 重定位、动态 ELF、dlopen shim、JIT/PTY 重评。
+
+## 自建开关（上架关闭 / 自编译可开）
+
+按发布策略把内存 ELF 运行器做成**构建期开关**：
+
+| 构建 | 命令 | 产物 |
+| --- | --- | --- |
+| 默认/上架 | `HARMONY_UNSIGNED=1 ./build.sh --package` | 不包含 `/usr/bin/mh-exec`；启动时若发现旧残留会删除；`dsh-self-build.json` 为 `signedExecBypass:false` |
+| 自建 | `HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package` | 打包 `mh-exec.py`，启动时写入 `/usr/bin/mh-exec` 并设为可执行；`signedExecBypass:true` |
+
+GitHub Actions 的 `Build HarmonyOS HAP` 通过 `workflow_dispatch` 输入 `self_build_bypass`（默认 false）控制。
+
+模拟器验证：默认 HAP 覆盖安装后 `mh-exec` 为 **ABSENT**；自建 HAP 安装后为 `-rwxr-xr-x`，执行 `curl → gzip → tar → mh-exec ./busybox.static echo MH_EXEC_SWITCH_OK` 输出 `MH_EXEC_SWITCH_OK`、`CHILD_EXIT 0`。证据：[emulator-exec-bypass-switch-0.4.69.json](../evidence/emulator-exec-bypass-switch-0.4.69.json)。
+
+安全边界：该开关有意绕过平台代码签名限制，仅适用于自用/自编译 harness；应用市场分发构建保持关闭。
