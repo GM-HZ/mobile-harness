@@ -14,3 +14,12 @@
 - Replacement strategy: move to a Cordis/bundle extension seam (upstream "no privileged core") or a `pnpm patch` of the npm packages; keep runtime string replacement as a last resort.
 - Gate: G1 anchor snapshot (planned), G2 capability gate (`bash`, exec probes), upstream bump rehearsal (`scripts/adaptation/verify.py`).
 - History: 0.2.2-rc.5 pinned 2026-11.
+
+### Session-persistence migration (2026-11-20)
+
+The `await link(tmp, finalPath);` surface is now a package patch
+(`patches/session-persistence-eacces-fallback.patch`) applied by
+`scripts/build/harmonyos_dsh.py`; the boot hook no longer rewrites it. The
+contract is: patched module contains the native fallback, `dsh-client.cjs`
+defines `globalThis.__dshClientRenameNoReplace`, and no boot-time replacement
+targets this file. Validated by a real patched build + G2 recovery.

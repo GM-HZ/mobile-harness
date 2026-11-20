@@ -57,6 +57,12 @@ def main():
                 checked.append({"id": anchor["id"], "ok": True, "kind": "exists"})
                 continue
             text = payload.decode("utf-8", "replace")
+            if "pattern" not in anchor:
+                ok = anchor.get("replacement", "\0") in text
+                checked.append({"id": anchor["id"], "ok": ok, "kind": "patched"})
+                if not ok:
+                    failures.append(f"{anchor['id']}: patch marker {anchor.get('replacement')!r} missing")
+                continue
             actual = text.count(anchor["pattern"])
             replacement = anchor.get("replacement")
             patched = replacement is not None and replacement in text

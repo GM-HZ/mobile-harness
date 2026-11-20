@@ -220,3 +220,18 @@ G2 夜间矩阵接线（把 ad-hoc smoke 子集纳入 gate-nightly），G4 构�
 
 下一轮：真实 patched-layer 构建 + G2 回归后删除 session boot hook（完成首个收敛）；把 G4 构建矩阵
 接入 release 记录；补 G2 矩阵中其余稳定项；继续第二个锚点（bash 命令）的 pnpm patch 迁移。
+
+
+### 2026-11-20（第 5 轮：首个真实收敛）
+
+- 在架构 worktree 完成环境准备（子模块 init、复用 `.build` 输入缓存、build-profile），
+  用 **patched DSH layer 实际构建**（`HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package`）。
+- 校验：新 layer 含 patch marker；G1 anchors/contracts 通过；安装到模拟器 5555 后
+  **G2 nightly-recovery PASS（46.3s）**，exec 探针（sh/bash/node/git/script + 未签名复制）全部符合预期。
+- 随后**删除 session boot hook**（`dsh-client.cjs` 不再改写 session 模块），重新构建并通过
+  G1；session-persistence 在 convergence.json 中标记为 **converged**。
+- `patches/` 纳入 adaptation manifest 层（G0 覆盖补丁哈希）。
+- 说明：模型 turn 的 session 写入未用真实密钥复测（需要 `MH_TEST_DEEPSEEK_API_KEY`）；
+  G2 recovery 已覆盖持久化/崩溃路径，后续可用测试密钥补一次真实 turn。
+
+下一轮：第二个收敛（bash 命令锚点 pnpm patch），并给 G2 矩阵补 session 写入回归；G4 发布矩阵接线。

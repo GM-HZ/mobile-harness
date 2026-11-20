@@ -37,8 +37,6 @@ const launchFile = '/tmp/dsh-client-launch';
 const packages = '/dsh/node_modules/@deepseek-ai';
 const bashPath = '/bin/bash';
 const landlockPath = packages + '/node-addon-system-linux-arm64/bin/landlock-run';
-const sessionModule = 'file://' + packages + '/dsh-session-persistence-jsonl/lib/index.js';
-const PATCHED_SESSION = 'globalThis.__dshClientRenameNoReplace(tmp, finalPath)';
 const bashModules = new Set([
   'file://' + packages + '/dsh-bash-local/lib/index.js',
   'file://' + packages + '/dsh-bash-sandbox/lib/index.js',
@@ -157,22 +155,11 @@ async function start() {
         moduleLoads.count++;
         moduleLoads.ms += performance.now() - started;
       }
-      if (url !== sessionModule && !bashModules.has(url)) return loaded;
+      if (!bashModules.has(url)) return loaded;
       const text = typeof loaded.source === 'string' ? loaded.source : Buffer.from(loaded.source).toString('utf8');
-      let source;
-      if (url === sessionModule) {
-        if (text.includes('await link(tmp, finalPath);')) {
-          source = replacePinned(text, 'await link(tmp, finalPath);',
-            "try { await link(tmp, finalPath); } catch (error) { if (error?.code !== 'EACCES') throw error; globalThis.__dshClientRenameNoReplace(tmp, finalPath); }", url);
-        } else if (text.includes(PATCHED_SESSION)) {
-          // patches/series.json already carries the EACCES fallback.
-          source = text;
-        } else {
-          throw new Error('Unexpected pinned DSH implementation: ' + url);
-        }
-      } else {
-        source = replacePinned(text, '"bash",\n\t\t\t"-c",', JSON.stringify(bashPath) + ',\n\t\t\t"-c",', url);
-      }
+      // patches/series.json owns the session-persistence EACCES fallback; only
+      // the bash command path still needs boot-time replacement.
+      const source = replacePinned(text, '"bash",\n\t\t\t"-c",', JSON.stringify(bashPath) + ',\n\t\t\t"-c",', url);
       return { ...loaded, source };
     }
   });

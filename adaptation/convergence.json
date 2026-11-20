@@ -22,13 +22,13 @@
       "upstream": [
         "@deepseek-ai/dsh-session-persistence-jsonl"
       ],
-      "current": "runtime string replacement OR patches/series.json patch (boot hook tolerates both)",
-      "target": "pnpm patch (atomic append step) or upstream storage seam",
+      "current": "patches/series.json; boot hook removed",
+      "target": "upstream storage seam (optional future)",
       "priority": "P1",
       "risk": "high",
       "gate": "G1 host contracts + G2 recovery",
-      "status": "patch-prepared",
-      "note": "patches/session-persistence-eacces-fallback.patch applies cleanly to the pinned tarball (patch_rehearsal); synthetic patched layer passes G1 anchors/contracts. Remaining: full patched-layer build + G2 recovery before deleting the boot hook."
+      "status": "converged",
+      "note": "patches/session-persistence-eacces-fallback.patch is applied by harmonyos_dsh.py; dsh-client.cjs no longer replaces the source. Validated with a real patched build (layer marker check + G1 anchors/contracts + G2 nightly-recovery PASS 46.3s + exec probe)."
     },
     {
       "id": "settings-client-injection",

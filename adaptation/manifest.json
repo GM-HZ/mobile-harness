@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "0d82190ab5657a02af90e581c746baf8d8965670",
+  "generatedFrom": "6e87561f4c71128a9c3d8b17c32a1dc1e9d5b085",
   "layers": [
     "host",
     "web",
@@ -11,6 +11,7 @@
     "tools",
     "bundles",
     "variants",
+    "patches",
     "app"
   ],
   "entries": [
@@ -20,15 +21,13 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-client.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "7623d957ef2f7697ef4e44656a475bd3cb89741314a5a305950b634cf330521f",
-      "bytes": 10357,
+      "sha256": "2d93d2867e896b9370d7c89ceba21e2f095f78d4c3517b74741e11663083c6df",
+      "bytes": 9680,
       "fragility": "high",
       "upstreamTouchpoints": [
         "\"bash\",\\n\\t\\t\\t\"-c\",",
-        "await link(tmp, finalPath);",
         "dsh-bash-local/lib/index.js",
-        "dsh-bash-sandbox/lib/index.js",
-        "dsh-session-persistence-jsonl/lib/index.js"
+        "dsh-bash-sandbox/lib/index.js"
       ],
       "gates": [
         "G0",
@@ -894,6 +893,53 @@
       ]
     },
     {
+      "id": "patches:patches/README.md",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/README.md",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "966fd92d40a38d744dc9736db415397d74e60ee5fc277c4f5ed2003e78815ff6",
+      "bytes": 939,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "patches:patches/series.json",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/series.json",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "18f9490fc64b7324e6733d6d68785779a036052d08945fda53f152fc0e4937a1",
+      "bytes": 440,
+      "fragility": "high",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-session-persistence-jsonl"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "patches:patches/session-persistence-eacces-fallback.patch",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/session-persistence-eacces-fallback.patch",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "73ecc91364ddd05b5ca9d24257dd70a4f49976e42674c4bc491641856c65c1dc",
+      "bytes": 748,
+      "fragility": "low",
+      "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-session-persistence-jsonl",
+        "dsh-session-persistence-jsonl/lib/index.js"
+      ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
       "id": "app:apps/harmonyos",
       "layer": "app",
       "kind": "tree",
@@ -915,6 +961,7 @@
       "source": "HARMONY_SELF_BUILD",
       "role": "self-built variant: exec shim, mh-exec, native overlay, self signed-exec bypass",
       "places": [
+        ".github/workflows/gate-release.yml",
         ".github/workflows/harmonyos.yml",
         "runtime/harmonyos/packaging/build-native-shell.sh",
         "runtime/harmonyos/tools/mh-exec.py",
@@ -952,6 +999,7 @@
       "role": "unsigned emulator build",
       "places": [
         ".github/workflows/gate-nightly.yml",
+        ".github/workflows/gate-release.yml",
         ".github/workflows/harmonyos.yml",
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",

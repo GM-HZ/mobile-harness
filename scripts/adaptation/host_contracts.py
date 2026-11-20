@@ -85,23 +85,13 @@ def main():
                 failures.append(f"{module}: replacement breaks the module: " + result.stderr.strip()[:300])
         session = archive.read(SESSION).decode()
         boot = (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
-        anchor = "await link(tmp, finalPath);"
         replacement = "globalThis.__dshClientRenameNoReplace(tmp, finalPath)"
-        anchored = anchor in session
         patched = replacement in session
-        ok = False
-        if anchored:
-            ok = anchor in boot
-            if not ok:
-                failures.append("dsh-client.cjs no longer targets the session-persistence anchor")
-        elif patched:
-            ok = replacement in boot and "patches/series.json already carries" in boot
-            if not ok:
-                failures.append("patched session-persistence module but boot code is not tolerant")
-        else:
-            failures.append("session-persistence module has neither the anchor nor the patch marker")
-        checked.append({"id": "session-persistence-contract", "ok": ok,
-                        "mode": "runtime-replacement" if anchored else "patched"})
+        boot_owns_hook = "await link(tmp, finalPath);" in boot
+        ok = patched and not boot_owns_hook and "globalThis.__dshClientRenameNoReplace = " in boot
+        if not ok:
+            failures.append("session-persistence contract: patched layer + helper defined + no boot-time replacement")
+        checked.append({"id": "session-persistence-contract", "ok": ok, "mode": "patched"})
     result = {"layer": str(layer), "checked": checked, "failures": failures, "ok": not failures}
     print(json.dumps(result, indent=2))
     if failures:

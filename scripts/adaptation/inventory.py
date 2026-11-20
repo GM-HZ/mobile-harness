@@ -32,6 +32,7 @@ LAYERS = [
     ("tools", "runtime/harmonyos/tools", "guest tools shipped inside the HAP"),
     ("bundles", "packages/bundles", "profile/bundle overlays"),
     ("variants", "variants", "store/self/lab build variant definitions"),
+    ("patches", "patches", "npm package patch series applied while assembling the DSH layer"),
 ]
 TREE_LAYERS = [("app", "apps/harmonyos", "HarmonyOS app host (ArkTS + native)")]
 PIN_FILES = [
