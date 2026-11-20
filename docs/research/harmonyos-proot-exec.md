@@ -239,3 +239,26 @@ busybox-dyn --help             -> exit 0
 模拟器与 Mate 60 真机（自建签名包）均通过。证据：[mate60-dynamic-elf-0.4.69.json](../evidence/mate60-dynamic-elf-0.4.69.json)。
 
 限制：需要的共享库必须是随包签名绑定（musl/libc/libstdc++ 等已覆盖；其它库需要构建期打包或后续 dlopen shim）；调用仍是显式 `mh-exec`/`mh-install`。
+
+## 透明 exec（LD_PRELOAD shim，自建包）
+
+目标：`./downloaded-tool args` 直接可用，不需要手动 `mh-exec`/`mh-install`。
+
+实现：`runtime/harmonyos/native/mh-exec-shim.c` 编译为 freestanding 的 `libguest_mh_exec_shim.so`（无 NEEDED 库、纯 syscall），在 `poc.c` 中以 `MH_SELF_BUILD` 编译开关控制：
+- 绑定到 guest `/usr/lib/libmh-exec-shim.so`；
+- 只在受管 shell 子进程里 `LD_PRELOAD` 该 shim（上架构建不设置、不打包）。
+
+shim 拦截 `execve`：
+1. 目标不是 ELF（脚本等）→ 原样执行；
+2. ELF 且文件可执行映射成功（签名 HAP 绑定，如 `/bin/node`、`git`）→ 原样执行；
+3. ELF 但文件映射被拒（运行时下载/复制）→ 重定向到 `/usr/bin/python3 /usr/bin/mh-exec <path> <args>`，由内存加载器执行（`argv[0]` 通过 `MH_ELF_ARGV0` 传递，`MH_EXEC_REDIRECT=1` 防递归）。
+
+效果（模拟器自建包）：
+- 下载的静态 busybox：`./tr/bin/busybox echo ...` → exit 0；
+- 下载的动态 busybox（PT_INTERP）：`./dynx/bin/busybox echo ...` → exit 0；
+- 签名工具 `git`/`node`/`curl` 在 preload 下仍正常。
+上架/默认构建验证：`LD_PRELOAD` 为空、`/usr/bin/mh-exec` 不存在、shim 是未绑定的 0 字节占位 → 能力关闭。
+
+真机：`LD_PRELOAD` 已注入、复制的未签名 `/bin/node` 被重定向执行（`COPY_NODE_OK / CHILD_EXIT 0`），复制的 busybox 以重定向后的 argv0 启动；一次干净的下载后直跑探针因模型回合超时未完成（Host web 正常），待复测。
+
+证据：[transparent-exec-0.4.69.json](../evidence/transparent-exec-0.4.69.json)。

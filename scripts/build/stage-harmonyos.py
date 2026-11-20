@@ -164,6 +164,10 @@ def main():
         ["python3", str(RUNTIME / "packaging/build-startup-sources.py")],
         env={**os.environ, "HARMONY_STAGE": str(STAGE)}, check=True
     )
+    if SELF_BUILD:
+        cmake = CPP / "CMakeLists.txt"
+        with cmake.open("a") as stream:
+            stream.write("\ntarget_compile_definitions(poc PRIVATE MH_SELF_BUILD=1)\n")
     stage_settings_client()
     (RAW / "dsh-self-build.json").write_text(json.dumps({
         "selfBuild": SELF_BUILD,

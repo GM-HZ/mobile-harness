@@ -1,0 +1,43 @@
+{
+  "kind": "transparent execution of downloaded static and dynamic ELF binaries (self-build exec shim)",
+  "artifacts": {
+    "selfBuildUnsignedSha256": "c1dc47590b4e9df2810d4d77c4a4e842504fc3fac1983d9d9f2e78aa21d1b181",
+    "selfBuildSignedSha256": "d5f2692eff0d8a520c4ff1c43a08c5b4dd7850c747d78bc929507df906fb0077",
+    "defaultUnsignedSha256": "1ebb8238c8f539ec95ded155d4dc05f913a1a138511fad1da279099880c12269",
+    "sourceCommit": "0ef139076a2e737667ffce8d1a70b58078aca71f"
+  },
+  "mechanism": {
+    "shim": "runtime/harmonyos/native/mh-exec-shim.c compiled freestanding (-nostdlib, raw syscalls, no NEEDED libs) into libguest_mh_exec_shim.so, bound at /usr/lib/libmh-exec-shim.so",
+    "activation": "poc.c sets LD_PRELOAD=/usr/lib/libmh-exec-shim.so for the managed shell child only when MH_SELF_BUILD is defined",
+    "behavior": "execve() probes the target: ELF files whose file-backed PROT_EXEC mapping succeeds (signed bindings) pass through; unsigned ELFs are redirected to /usr/bin/python3 /usr/bin/mh-exec <path> <args>; scripts/non-ELF pass through; MH_EXEC_REDIRECT guards recursion"
+  },
+  "emulator": {
+    "device": "127.0.0.1:5555 API 26 ARM64 Phone emulator (self build)",
+    "shimEnvironment": "LD_PRELOAD=[/usr/lib/libmh-exec-shim.so]\n-rw-r--r--    1 3060     3060          2520 Nov 20 21:27 /usr/lib/libmh-exec-shim.so\n-rwxr-xr-x    1 mobile-harness 20020074      9723 Nov 20 21:27 /usr/bin/mh-exec\n-rwxr--r--    1 3060     3060         67224 Nov 20 21:27 /usr/bin/python3\nMH_EXEC_REDIRECT=[]\nSHIM_ENV_DONE\n",
+    "transparentRun": "--- prepare a downloaded static tool ---\nCURL_OK\nGZIP_OK\nTAR_OK\n-rwxr-xr-x    1 mobile-harness 20020074   1115944 Nov 23  2025 ./tr/bin/busybox.static\n--- transparent direct execution (no mh-exec) ---\nTRANSPARENT_EXEC_OK\nTRANSPARENT_EXIT=0\naarch64\nUNAME_EXIT=0\n--- transparent dynamic ELF ---\nDYN_CURL_OK\nDYN_TAR_OK\nDYN_TRANSPARENT_OK\nDYN_TRANSPARENT_EXIT=0\n--- signed tool health under the preload ---\ngit version 2.49.1\nGIT_EXIT=0\nNODE_OK\nNODE_EXIT=0\ncurl 8.14.1 (aarch64-alpine-linux-musl) libcurl/8.14.1 OpenSSL/3.5.9 zlib/1.4 brotli/1.1.1 zstd/1.5.7 c-ares/1.34.9 libidn2/2.3.7 libpsl/0.21.5 nghttp2/1.69.0\nCURL_EXIT=0\nTRANSPARENT_PROBE_DONE\n",
+    "exitCodes": {
+      "TRANSPARENT_EXIT": "0",
+      "UNAME_EXIT": "0",
+      "DYN_TRANSPARENT_EXIT": "0",
+      "GIT_EXIT": "0",
+      "NODE_EXIT": "0",
+      "CURL_EXIT": "0"
+    },
+    "observed": "download -> ./busybox (static) and ./dynx/bin/busybox (dynamic, PT_INTERP) run directly with exit 0; git/node/curl still work under the preload"
+  },
+  "storeBuildGating": {
+    "shimEnvironment": "LD_PRELOAD=[]\n----------    1 mobile-harness 20020074         0 Nov 20 21:27 /usr/lib/libmh-exec-shim.so\nls: /usr/bin/mh-exec: No such file or directory\n-rwxr--r--    1 3060     3060         67224 Nov 20 21:44 /usr/bin/python3\nMH_EXEC_REDIRECT=[]\nSHIM_ENV_DONE\n",
+    "observed": "default build: LD_PRELOAD empty, /usr/lib/libmh-exec-shim.so is an unbound 0-byte placeholder, /usr/bin/mh-exec absent; transparent exec remains unavailable"
+  },
+  "realDevice": {
+    "device": "HUAWEI Mate 60 (BRA-AL00), HarmonyOS 7.0.0.111, API 26 (self signed build)",
+    "shimEnvironment": "LD_PRELOAD=[/usr/lib/libmh-exec-shim.so]\n-rw-r--r--    1 3060     3060          2520 Nov 20 21:29 /usr/lib/libmh-exec-shim.so\n-rwxr-xr-x    1 mobile-harness 20020306      9723 Nov 20 21:29 /usr/bin/mh-exec\n-rwxr--r--    1 3060     3060         67224 Nov 20 21:29 /usr/bin/python3\nMH_EXEC_REDIRECT=[]\nSHIM_ENV_DONE\n",
+    "observedTransparentRedirects": {
+      "copiedNode": "COPY_NODE_OK / CHILD_EXIT 0 / COPY_NODE_EXIT=0 -> a copied unsigned /bin/node ran through the redirect",
+      "copiedBusybox": "exec reported 'proot-bx: applet not found' (busybox started through the redirect with the copied argv0)",
+      "fakeElf": "redirected to mh-exec (mh-exec reported a short-file parse error)"
+    },
+    "rawExecProbe": "PWD=/workspace-native/proot-exec-29153883\n--- guest executables ---\n-rw-r--r--    1 3060     3060        865904 Nov 20 21:29 /bin/bash\n-rw-r--r--    1 3060     3060        919304 Nov 20 21:29 /bin/busybox\n-rw-r--r--    1 3060     3060      97198040 Nov 20 21:29 /bin/node\n-rw-r--r--    1 3060     3060        919304 Nov 20 21:29 /bin/sh\n-rwxr--r--    1 3060     3060       3080064 Nov 20 21:29 /usr/bin/git\n-rwxr--r--    1 3060     3060         67224 Nov 20 21:29 /usr/bin/python3\n--- bound exec ---\nEXEC_SH_OK\nSH_EXIT=0\nEXEC_BASH_OK\nBASH_EXIT=0\nEXEC_NODE_OK\nNODE_EXIT=0\nEXEC_PY_OK\nPY_EXIT=0\ngit version 2.49.1\nGIT_EXIT=0\n--- script exec ---\nEXEC_SCRIPT_OK\nSCRIPT_EXIT=0\n--- unbound applet ---\nXXD_EXIT=126\n--- copied guest ELF ---\nCHILD_EXIT 127\nCOPY_BUSYBOX_EXIT=127\nCOPY_NODE_OK\nCHILD_EXIT 0\nCOPY_NODE_EXIT=0\n--- downloaded style unsigned ELF ---\nFAKE_EXIT=1\nPROOT_EXEC_PROBE_DONE\n[stderr]\n/bin/bash: line 15: /bin/xxd: Not a tty\n/bin/bash: line 15: exec: /bin/xxd: cannot execute: No such file or directory\nproot-bx: applet not found\nTraceback (most recent call last):\n  File \"/usr/bin/mh-exec\", line 221, in <module>\n    sys.exit(main())\n             ^^^^^^\n  File \"/usr/bin/mh-exec\", line 180, in main\n    e_type, e_entry, e_phoff, segments, phnum, interp = parse(data)\n                                                        ^^^^^^^^^^^\n  File \"/usr/bin/mh-exec\", line 52, in parse\n    if data[:4] != b\"\\x7fELF\" or data[4] != 2 or data[5] != 1:\n                                 ~~~~^^^\nIndexError: index out of range\n",
+    "pending": "a clean download-and-run probe on the device timed out in the model turn (Host web was healthy); retest when the device account/network turn completes; the redirect behaviour itself is already visible above"
+  }
+}

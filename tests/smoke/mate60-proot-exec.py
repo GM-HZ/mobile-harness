@@ -196,8 +196,17 @@ gzip -dc ./bb.apk > ./bb.tar && echo GZIP_OK
 mkdir -p ./tr && tar -xf ./bb.tar -C ./tr && echo TAR_OK
 ls -l ./tr/bin/busybox.static
 echo "--- transparent direct execution (no mh-exec) ---"
-./tr/bin/busybox.static echo TRANSPARENT_EXEC_OK; echo "TRANSPARENT_EXIT=$?"
-./tr/bin/busybox.static uname -m; echo "UNAME_EXIT=$?"
+cp ./tr/bin/busybox.static ./tr/bin/busybox
+./tr/bin/busybox echo TRANSPARENT_EXEC_OK; echo "TRANSPARENT_EXIT=$?"
+./tr/bin/busybox uname -m; echo "UNAME_EXIT=$?"
+echo "--- transparent dynamic ELF ---"
+curl -sSLo ./dyn.apk https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/busybox-1.36.1-r31.apk && echo DYN_CURL_OK
+gzip -dc ./dyn.apk > ./dyn.tar && mkdir -p ./dynx && tar -xf ./dyn.tar -C ./dynx && echo DYN_TAR_OK
+./dynx/bin/busybox echo DYN_TRANSPARENT_OK; echo "DYN_TRANSPARENT_EXIT=$?"
+echo "--- signed tool health under the preload ---"
+git --version; echo "GIT_EXIT=$?"
+node -e "console.log('NODE_OK')"; echo "NODE_EXIT=$?"
+curl --version 2>&1 | head -1; echo "CURL_EXIT=$?"
 echo TRANSPARENT_PROBE_DONE
 """
 
@@ -242,6 +251,30 @@ busybox-dyn echo DYN_EXEC_OK; echo "DYN_EXIT=$?"
 busybox-dyn uname -m; echo "DYN_UNAME_EXIT=$?"
 busybox-dyn --help >/dev/null 2>&1; echo "DYN_HELP_EXIT=$?"
 echo DYNAMIC_PROBE_DONE
+"""
+
+SHIM_ENV_PROBE = """set +e
+echo "LD_PRELOAD=[$LD_PRELOAD]"
+ls -l /usr/lib/libmh-exec-shim.so 2>&1
+ls -l /usr/bin/mh-exec /usr/bin/python3 2>&1
+echo "MH_EXEC_REDIRECT=[$MH_EXEC_REDIRECT]"
+echo SHIM_ENV_DONE
+"""
+
+SHIM_DEBUG_PROBE = """set +e
+echo "LD_PRELOAD=[$LD_PRELOAD]"
+echo "--- musl LD_DEBUG=libs on /bin/true ---"
+LD_DEBUG=libs /bin/true 2>&1 | head -30
+echo "--- musl LD_DEBUG=libs on python3 ---"
+LD_DEBUG=libs python3 -c "print('PY_OK')" 2>&1 | head -30
+echo SHIM_DEBUG_DONE
+"""
+
+TRANSPARENT_MINI = """set +e
+curl -fsSLo ./bb.apk https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/busybox-static-1.36.1-r31.apk && echo MINI_CURL_OK
+gzip -dc ./bb.apk > ./bb.tar; mkdir -p ./tr; tar -xf ./bb.tar -C ./tr && cp ./tr/bin/busybox.static ./tr/bin/busybox && echo MINI_TAR_OK
+./tr/bin/busybox echo MINI_TRANSPARENT_OK; echo "MINI_EXIT=$?"
+echo MINI_PROBE_DONE
 """
 
 
@@ -364,7 +397,10 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
              "elf-install": "real-device install and run a downloaded static tool by name",
              "runtime-eval": "real-device JIT and PTY capability evaluation",
              "elf-debug": "real-device loader exit-status comparison",
-             "elf-dynamic": "real-device dynamically linked ELF execution"}
+             "elf-dynamic": "real-device dynamically linked ELF execution",
+             "shim-env": "real-device exec shim environment check",
+             "shim-debug": "real-device exec shim loader debug",
+             "elf-transparent-mini": "real-device minimal transparent exec"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -460,7 +496,7 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug", "elf-dynamic"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug", "elf-dynamic", "shim-env", "shim-debug", "elf-transparent-mini"], default="exec")
     parser.add_argument("--loader-file", default=str(Path(__file__).with_name("fixtures") / "inmemory-elf-loader.py"))
     parser.add_argument("--payload-file")
     parser.add_argument("--elf-args", default="")
@@ -473,7 +509,7 @@ def main():
              "elf-mhexec": MH_EXEC_PROBE, "elf-transparent": TRANSPARENT_PROBE,
              "elf-install": INSTALL_PROBE, "runtime-eval": RUNTIME_EVAL_PROBE,
              "elf-debug": DEBUG_EXIT_PROBE, "dynamic": DYNAMIC_PROBE,
-             "elf-dynamic": DYNAMIC_PROBE}.get(args.probe, PROBE)
+             "elf-dynamic": DYNAMIC_PROBE, "shim-env": SHIM_ENV_PROBE}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe,
         loader_file=(args.loader_file if args.probe == "elf-loader" else None),
         payload_file=(args.payload_file if args.probe == "elf-run" else None),
