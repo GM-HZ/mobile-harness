@@ -1,0 +1,40 @@
+{
+  "version": "0.4.69",
+  "commit": "62b0e87a588247f264727364ee4fb7d3837edc24",
+  "generatedAt": "2026-11-20T23:18:19+0800",
+  "artifacts": {
+    "store": {
+      "file": "store.hap",
+      "sha256": "de7dc332ef34200884f3120ed77a73067b0d1790ff9115c4cd8a55951c10b865",
+      "bytes": 768498560,
+      "maxBytes": 790000000
+    },
+    "self": {
+      "file": "self.hap",
+      "sha256": "f2bed8d2fd554468f2bba2a364f95ee78254505e9e7604959bcbaa83650554de",
+      "bytes": 773562265,
+      "maxBytes": 800000000
+    }
+  },
+  "checks": [
+    {
+      "command": "scripts/adaptation/store_build_check.py --hap .build/release-check/store.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 store shape OK: store.hap (209 entries)"
+    },
+    {
+      "command": "scripts/adaptation/variant_check.py --variant store --hap .build/release-check/store.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: store <- store.hap"
+    },
+    {
+      "command": "scripts/adaptation/variant_check.py --variant self --hap .build/release-check/self.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: self <- self.hap"
+    }
+  ],
+  "ok": true
+}

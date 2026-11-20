@@ -306,3 +306,21 @@ upstream seam 判断与 gate）；G4 release 构建结果写入证据/RSI；补�
 
 下一轮：把 G4 release 记录与 tag 流程跑一次端到端演练（本地模拟 tag）；补 G2 中稳定子集的
 nightly 覆盖；等真机解锁后跑 G3 device_lab verify/exec/overlay。
+
+
+### 2026-11-20（第 10 轮：G4 端到端演练 + nightly 矩阵扩展）
+
+- **nightly 稳定子集**：新增无模型依赖的 `nightly-native-addon`（14.5s PASS）与
+  `nightly-inspector`（18.1s PASS），nightly workflow 的 `--only` 扩为
+  capability-parity + recovery + native-addon + inspector；registry G2=65。
+  - 备注：`emulator-builtin-binding` 在本机暴露已知问题（Host 侧 `libguest_require_builtin.so`
+    依赖 `libstdc++.so.6` 无法从 HAP 绑定解析，`ERR_DLOPEN_FAILED`），暂不纳入 nightly，
+    作为 native addon 绑定的已知限制记录。
+- **G4 端到端演练**：新增 `scripts/adaptation/release_dry_run.sh`（store 构建 → self 构建 →
+  release evidence → release gate），本地完整跑通：
+  `G4 release gate OK: 0.4.69 @ 62b0e87 (store 768,498,560 B, self 773,562,265 B)`；
+  evidence 写入 `docs/evidence/release/0.4.69-62b0e87….json`（CI tag 流程会在 tag commit 上重新生成）。
+- 真机仍锁屏、测试密钥未配置，G3 与真实模型 turn 回归继续挂起。
+
+下一轮：补 G2 稳定子集（再挑 1-2 个无模型依赖用例）与 G3 解锁后的设备证据；把
+`release_dry_run.sh` 纳入发布文档；继续缩小 compat 的 upstream-seam-candidate 面。

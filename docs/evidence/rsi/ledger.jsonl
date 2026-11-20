@@ -18,3 +18,7 @@
 {"commit": "1c1c910eda58293d875a8d9a234903b16077532c", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/1c1c910eda58293d875a8d9a234903b16077532c.json", "note": "", "at": "2026-11-20T23:14:08+0800"}
 {"commit": "3d719bf64059df41f0a1d08abda84a1287e771c5", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/3d719bf64059df41f0a1d08abda84a1287e771c5.json", "note": "", "at": "2026-11-20T23:15:07+0800"}
 {"commit": "3d719bf64059df41f0a1d08abda84a1287e771c5", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/3d719bf64059df41f0a1d08abda84a1287e771c5.json", "note": "", "at": "2026-11-20T23:15:09+0800"}
+{"commit": "62b0e87a588247f264727364ee4fb7d3837edc24", "tiers": ["G4"], "ok": true, "evidence": "docs/evidence/release/0.4.69-62b0e87a588247f264727364ee4fb7d3837edc24.json", "note": "", "at": "2026-11-20T23:18:19+0800"}
+{"commit": "62b0e87a588247f264727364ee4fb7d3837edc24", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/62b0e87a588247f264727364ee4fb7d3837edc24.json", "note": "", "at": "2026-11-20T23:18:26+0800"}
+{"commit": "62b0e87a588247f264727364ee4fb7d3837edc24", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/62b0e87a588247f264727364ee4fb7d3837edc24.json", "note": "", "at": "2026-11-20T23:18:28+0800"}
+{"commit": "62b0e87a588247f264727364ee4fb7d3837edc24", "tiers": ["G2"], "ok": true, "evidence": ".build/gate-evidence/G2", "note": "nightly core subset: native-addon 14.5s, inspector 18.1s", "at": "2026-11-20T23:18:28+0800"}

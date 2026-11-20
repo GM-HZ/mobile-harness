@@ -37,7 +37,7 @@ jobs:
           "$HDC" -t "$MH_EMULATOR" shell aa start -a EntryAbility -b org.sayact.nodepoc
           sleep 10
       - name: G2 capability gate
-        run: python3 gates/run.py --tier G2 --only capability-parity-gate,nightly-recovery --evidence-dir .build/gate-evidence
+        run: python3 gates/run.py --tier G2 --only capability-parity-gate,nightly-recovery,nightly-native-addon,nightly-inspector --evidence-dir .build/gate-evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:

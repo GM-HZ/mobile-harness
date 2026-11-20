@@ -71,6 +71,14 @@ def main():
     g2 = [{"id": "capability-parity-gate",
            "command": "python3 tests/bench/capability-parity-regression.py --output .build/capability-parity-gate.json",
            "covers": "recovery/voice/ollama/ptc/liveshare/account/addon", "timeout": 1200}]
+    g2.append({"id": "nightly-native-addon",
+               "command": "python3 tests/smoke/emulator-native-addon-location.py \"$MH_EMULATOR\" .build/gate-evidence/native-addon.json",
+               "covers": "native addon location + Inspector evaluation on the native Host",
+               "requires": ["MH_EMULATOR env"], "timeout": 1200})
+    g2.append({"id": "nightly-inspector",
+               "command": "python3 tests/smoke/emulator-inspector.py \"$MH_EMULATOR\" .build/gate-evidence/inspector.json",
+               "covers": "Inspector CDP over the authenticated ArkWeb proxy",
+               "requires": ["MH_EMULATOR env"], "timeout": 1200})
     g2.append({"id": "nightly-recovery",
                "command": "python3 tests/smoke/emulator-recovery.py \"$MH_EMULATOR\" .build/gate-evidence/recovery.json",
                "covers": "crash recovery on the isolated emulator", "requires": ["MH_EMULATOR env"],
