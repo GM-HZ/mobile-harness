@@ -47,6 +47,38 @@ printf '\\177ELF' > ./proot-fake; chmod +x ./proot-fake
 echo PROOT_EXEC_PROBE_DONE
 """
 
+NATIVE_PROBE = """set +e
+echo "PWD=$PWD"
+echo "--- dlopen a copied guest library ---"
+cp /usr/lib/libstdc++.so.6 ./copied-libstdc++.so 2>&1
+python3 -c "import ctypes; ctypes.CDLL('./copied-libstdc++.so'); print('DLOPEN_COPY_OK')" 2>&1; echo "DLOPEN_COPY_EXIT=$?"
+echo "--- dlopen the bound guest library path ---"
+python3 -c "import ctypes; ctypes.CDLL('/usr/lib/libstdc++.so.6'); print('DLOPEN_BOUND_OK')" 2>&1; echo "DLOPEN_BOUND_EXIT=$?"
+echo "--- memfd + fexecve of a copied guest binary ---"
+python3 -c "import os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); os.fexecve(fd,['busybox','echo','MEMFD_EXEC_OK'],os.environ)" 2>&1; echo "MEMFD_EXIT=$?"
+echo "--- interpreters and package managers ---"
+python3 --version 2>&1
+node --version 2>&1
+command -v npm pnpm pip pip3 2>&1
+python3 -m pip --version 2>&1 | head -1
+echo NATIVE_PROBE_DONE
+"""
+
+BYPASS_PROBE = """set +e
+echo "PWD=$PWD"
+echo "--- memfd + libc fexecve ---"
+( python3 -c "import ctypes, os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); libc=ctypes.CDLL(None, use_errno=True); argv=(ctypes.c_char_p*3)(b'busybox', b'echo', b'MEMFD_FEXECVE_OK'); envp=(ctypes.c_char_p*1)(None); rc=libc.fexecve(fd, argv, envp); errno=ctypes.get_errno(); print('FEXECVE_RC', rc, 'ERRNO', errno, os.strerror(errno))" 2>&1 ); echo "FEXECVE_EXIT=$?"
+echo "--- memfd via /proc/self/fd execve ---"
+( python3 -c "import os; data=open('/bin/busybox','rb').read(); fd=os.memfd_create('bx'); os.write(fd,data); os.execve('/proc/self/fd/%d' % fd, ['busybox','echo','MEMFD_PROCFD_OK'], os.environ)" 2>&1 ); echo "PROCFD_EXIT=$?"
+echo "--- copied binary via /proc fd ---"
+( python3 -c "import os; os.execve('/proc/self/fd/%d' % os.open('./proot-bx', os.O_RDONLY), ['bx','echo','COPIED_PROCFD_OK'], os.environ)" 2>&1 ); echo "COPIED_PROCFD_EXIT=$?"
+echo "--- pure interpreter paths ---"
+python3 -c "print('PY_RUNTIME_OK')" 2>&1; echo "PY_RUNTIME_EXIT=$?"
+node -e "console.log('NODE_RUNTIME_OK')" 2>&1; echo "NODE_RUNTIME_EXIT=$?"
+python3 -m pip --version 2>&1 | head -1
+echo BYPASS_PROBE_DONE
+"""
+
 
 class Device:
     def __init__(self, target, port):
@@ -99,11 +131,12 @@ class Device:
 
 
 def events(device, session_id):
-    response = device.rpc("session/events", {"request": {"address": {"kind": "session", "sessionId": session_id}}})
+    response = device.rpc("session/events", {"request": {"address": {"kind": "session", "sessionId": session_id}}},
+                          timeout=120)
     return [row["event"] for row in response["records"] if row.get("event")]
 
 
-def prompt(device, session_id, instruction, timeout=120):
+def prompt(device, session_id, instruction, timeout=240):
     text = "ACCEPTANCE" + uuid.uuid4().hex.upper() + ": " + instruction
     before = max((row["seq"] for row in events(device, session_id)), default=0)
     device.rpc("session/prompt", {"request": {
@@ -129,10 +162,14 @@ def texts(results):
     return "\n".join(item.get("text", "") for result in results for item in result["content"])
 
 
-def run(device, port, output):
+def run(device, port, output, probe=None):
     name = "proot-exec-" + uuid.uuid4().hex[:8]
     native = FILES + "/alpine/workspace-native/" + name
-    evidence = {"kind": "real-device PRoot exec semantics probe", "target": device.target,
+    probe = probe or PROBE
+    kinds = {id(PROBE): "real-device PRoot exec semantics probe",
+             id(NATIVE_PROBE): "real-device native execution bypass probe",
+             id(BYPASS_PROBE): "real-device runtime native-code bypass probe"}
+    evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
     session = None
@@ -155,7 +192,7 @@ def run(device, port, output):
         modes = [row["data"]["mode"] for row in events(device, session) if row["type"] == "sandbox/mode"]
         evidence["permissionMode"] = modes[-1] if modes else None
         instruction = ("Actually call bash exactly once now with precisely "
-                       + json.dumps({"command": PROBE, "description": "Probe PRoot exec semantics"})
+                       + json.dumps({"command": probe, "description": "Probe PRoot exec semantics"})
                        + ". Use no other tools. Report the result and stop.")
         calls, results, _ = prompt(device, session, instruction)
         evidence["toolCalls"] = calls
@@ -164,7 +201,7 @@ def run(device, port, output):
         if not bash_calls:
             raise AssertionError("The model did not call bash")
         arguments = json.loads(bash_calls[0]["arguments"])
-        evidence["commandMatched"] = arguments.get("command") == PROBE
+        evidence["commandMatched"] = arguments.get("command") == probe
         evidence["command"] = arguments.get("command")
         text = texts(results)
         evidence["resultText"] = text
@@ -198,8 +235,10 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
+    parser.add_argument("--probe", choices=["exec", "native", "bypass"], default="exec")
     args = parser.parse_args()
-    run(Device(args.target, args.port), args.port, args.output)
+    probe = {"native": NATIVE_PROBE, "bypass": BYPASS_PROBE}.get(args.probe, PROBE)
+    run(Device(args.target, args.port), args.port, args.output, probe)
     print(args.output)
 
 

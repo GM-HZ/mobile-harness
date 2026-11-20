@@ -50,3 +50,25 @@ python3 tests/smoke/mate60-proot-exec.py --target <usb-serial> --output out.json
 ```
 
 脚本会新建临时 workspace/session，提示模型调用一次 `bash` 工具执行固定探针命令，并把原始输出与退出码写入证据 JSON；不会修改 profile。
+
+## 能不能绕过？运行时 native 代码的边界
+
+针对"运行时复制/下载的任意 ELF"继续做了三类绕过尝试（见 [native 绕过评估证据](../evidence/mate60-native-bypass-0.4.69.json)）：
+
+| 尝试 | 结果 |
+| --- | --- |
+| 复制一个已绑定的 `.so` 到工作区后 `ctypes.CDLL` | `OSError: Error loading shared library ./copied-libstdc++.so: Permission denied` |
+| 直接 `dlopen` 已绑定的 guest 路径 `/usr/lib/libstdc++.so.6` | 成功（说明限制在文件/映射来源，不在 ctypes） |
+| 把 `/bin/busybox` 字节写入 `memfd`，用 libc `fexecve` 执行 | 失败：`proot error: execveat() with non-AT_FDCWD fd is not currently supported`（当前 PRoot 实现不支持 execveat/memfd 执行） |
+| `os.execve('/proc/self/fd/<n>')` | guest 内没有 `/proc`，直接 `FileNotFoundError` |
+| 复制 `/bin/busybox` 或 `/bin/node` 到工作区后 `exec` | exit 182，`HARMONY_PRELOAD loader file mmap failed` |
+
+据此，当前**没有可用的运行时绕过路径**；限制来自两层：PRoot 的 preload 加载器只映射随包签名的绑定文件，以及 HarmonyOS 对应用数据中可执行映射的限制（连 `dlopen` 复制出来的 `.so` 都是 `Permission denied`）。
+
+理论上可研究的方向（均未验证，且不一定能通过内核策略）：
+
+1. **扩展 PRoot/加载器**：实现 `execveat`/memfd 支持并让 `HARMONY_PRELOAD` 映射任意 ELF，最后仍要过内核的 W^X/签名检查；
+2. **构建期打包**：把需要的工具加入签名 overlay（`packaged[]`/`guest-tools.inc`）后重新打包 HAP——这是当前 sh/node/python3/git/gh/curl/rg/sqlite3 的来源，也是唯一已验证可行的扩展方式；
+3. **解释器/WASM 路径**：纯 Python（pip 25.0.1 可用）、Node JS、以及未来的 WASI 引擎可以运行"逻辑代码"，但都不能替代原生进程 `exec`。
+
+因此执行能力不是"被砍到不能用"，而是从"任意 Linux 二进制"收敛为"**随包签名工具箱 + 解释器运行时**"：常用 Agent 命令（shell、git、gh、curl、python、node、rg、tar 等）都在；静态下载的二进制、自编译工具、带原生扩展的第三方包无法运行。
