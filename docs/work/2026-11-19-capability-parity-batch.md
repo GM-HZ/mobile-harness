@@ -40,6 +40,10 @@
 - [公网隧道预演](../evidence/relay-public-tunnel-acceptance-0.4.69.json)：Cloudflare 临时隧道把自建 Relay 暴露为公网 HTTPS，预检与完整公网跨设备路径通过（替代 Relay、同局域网、隧道已关闭）。
 - [公网 Relay 部署配方](../evidence/relay-deployment-recipe-0.4.69.json)：Docker/Compose + nginx（WebSocket Upgrade/长超时/上传上限）+ certbot 步骤；本机验证 token 门禁、owner 登录页两种模式、TLS 反代预检与 compose/nginx 配置项，并实际构建镜像、运行容器（healthcheck healthy、owner 登录页与预检通过）。
 
+## 回归闸门
+
+- [capability-parity-gate](../evidence/capability-parity-gate-0.4.69.json)：同一 0.4.69 制品上按固定顺序跑 9 个步骤（恢复、语音、原生麦克风采集、Ollama 路由、PTC 链接/边界、LiveShare owner 流、账号入口、addon 位置），2026-11-20 通过（约 5.5 分钟，失败 0）。运行方式见 [回归闸门记录](2026-11-20-capability-parity-gate.md)。
+
 ## 仍受外部条件阻塞
 
 | 项 | 完成所需条件 |

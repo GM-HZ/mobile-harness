@@ -57,6 +57,17 @@ python3 tests/smoke/emulator-recovery.py <loopback-target> .build/emulator-recov
 
 启动计时可通过第三个参数指定观测次数，默认 60。需要观察并行负载下的慢启动时可指定 120，并从设备日志分别核对解包、Host 就绪和 ArkWeb 就绪。应用的 60 秒 Host 看门狗从启动 Host 时起算。
 
+## 能力对齐回归闸门
+
+`tests/bench/capability-parity-regression.py` 在同一制品上按固定顺序跑 9 个验收步骤（恢复、语音、原生采集、Ollama 路由、PTC 链接前置与边界、LiveShare owner 流、账号入口、addon 位置），输出单一 gate JSON。需要两台模拟器、宿主 Ollama 与语音夹具；语音步骤前重置麦克风权限，账号步骤前清空第二台设备应用数据。
+
+```sh
+python3 tests/bench/capability-parity-regression.py --target <primary> --second-target <second> \
+  --output .build/capability-parity-gate.json
+```
+
+跨设备 LiveShare 与 Forge 公开读/真实账号为独立证据，不放入闸门（原因见 [回归闸门记录](work/2026-11-20-capability-parity-gate.md)）。
+
 ## MCP 模拟器回归
 
 普通 HAP 启动后可在隔离的 Phone 模拟器运行 MCP 冒烟测试。测试脚本在退出时清理临时配置。提供 `MH_TEST_DEEPSEEK_API_KEY` 后，脚本会暂存测试凭据，验证模型调用工具并清理凭据。没有配置该变量时，仅验证协议连接、工具列表和探针关闭。
