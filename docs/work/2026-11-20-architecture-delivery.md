@@ -31,9 +31,18 @@ upstream DeepSeek Harness, per the round-19 plan.
 
 ## 3. Known gaps (environment-blocked, tracked)
 
-1. **G3 real-device evidence**: Mate 60 stayed locked (`screenLocked=true`) for the whole session;
-   `device_lab.py run --suite verify|exec|overlay` is ready and tested to exit 4 with a clear message.
-   Once unlocked: `python3 scripts/adaptation/device_lab.py run --suite verify` then `exec`/`overlay`.
+1. **G3 real-device evidence (partial)**: on 2026-11-21 with an unlocked Mate 60 and the signed
+   self build installed:
+   - `device_lab run --suite verify` **PASS** (23 s; web 200, account credential-stored,
+     evidence `docs/evidence/device-lab/20261121T073808-verify.json`);
+   - `device_lab run --suite exec|overlay` **FAIL**: the bash tool now reaches PRoot but PRoot
+     reports `embedded loader descriptors: No such file or directory` and
+     `execve("/bin/bash"): Permission denied` (real-device compat PRoot mode; emulator fast mode
+     passes the same suites). The same run exposed and fixed a real bug: signed builds return a
+     3-byte status cell with binary padding (`30 00 18`), so the bash exit-status parser now
+     extracts digits instead of requiring `ddd`. `device_lab` also now requires the probe's own
+     `ok:true`, not just exit code 0.
+   - the phone auto-locked during the long session, so exec/overlay are pending another unlocked run.
 2. **Real model turn / session write regression**: no `MH_TEST_DEEPSEEK_API_KEY`; G2 recovery covers
    persistence paths but a real turn remains unverified.
 3. **forge fixture**: `emulator-forge-account` reaches OAuth sign-in and the forge panel RPC, but

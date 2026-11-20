@@ -1,0 +1,45 @@
+{
+  "kind": "real-device PRoot exec semantics probe",
+  "target": "37R0224115035605",
+  "checkedAt": "2026-11-21T07:41:39+0800",
+  "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-eb27b35a",
+  "model": {
+    "default": {
+      "provider": "deepseek-account",
+      "model": "deepseek-flash",
+      "reasoningEffort": "off"
+    }
+  },
+  "permissionMode": "danger-full-access",
+  "toolCalls": [
+    {
+      "turn": 1,
+      "step": 1,
+      "callId": "call_00_LVvuJ8XTFbJfq6EHImDr0810",
+      "name": "bash",
+      "arguments": "{\"command\": \"set +e\\necho \\\"PWD=$PWD\\\"\\necho \\\"--- guest executables ---\\\"\\nls -l /bin/sh /bin/bash /bin/node /bin/busybox /usr/bin/python3 /usr/bin/git 2>&1 | head -12\\necho \\\"--- bound exec ---\\\"\\n( exec /bin/sh -c 'echo EXEC_SH_OK' ); echo \\\"SH_EXIT=$?\\\"\\n( exec /bin/bash -c 'echo EXEC_BASH_OK' ); echo \\\"BASH_EXIT=$?\\\"\\n( exec /bin/node -e 'console.log(\\\"EXEC_NODE_OK\\\")' ); echo \\\"NODE_EXIT=$?\\\"\\n( exec /usr/bin/python3 -c 'print(\\\"EXEC_PY_OK\\\")' ); echo \\\"PY_EXIT=$?\\\"\\n( exec /usr/bin/git --version ); echo \\\"GIT_EXIT=$?\\\"\\necho \\\"--- script exec ---\\\"\\nprintf '#!/bin/sh\\\\necho EXEC_SCRIPT_OK\\\\n' > ./proot-exec.sh; chmod +x ./proot-exec.sh\\n( exec ./proot-exec.sh ); echo \\\"SCRIPT_EXIT=$?\\\"\\necho \\\"--- unbound applet ---\\\"\\n( exec /bin/xxd /dev/null ); echo \\\"XXD_EXIT=$?\\\"\\necho \\\"--- copied guest ELF ---\\\"\\ncp /bin/busybox ./proot-bx 2>/dev/null; chmod +x ./proot-bx 2>/dev/null\\n( exec ./proot-bx true ); echo \\\"COPY_BUSYBOX_EXIT=$?\\\"\\ncp /bin/node ./proot-node 2>/dev/null; chmod +x ./proot-node 2>/dev/null\\n( exec ./proot-node -e 'console.log(\\\"COPY_NODE_OK\\\")' ); echo \\\"COPY_NODE_EXIT=$?\\\"\\necho \\\"--- downloaded style unsigned ELF ---\\\"\\nprintf '\\\\177ELF' > ./proot-fake; chmod +x ./proot-fake\\n( exec ./proot-fake ); echo \\\"FAKE_EXIT=$?\\\"\\necho PROOT_EXEC_PROBE_DONE\\n\", \"description\": \"Probe PRoot exec semantics\"}"
+    },
+    {
+      "turn": 1,
+      "step": 2,
+      "callId": "call_00_3JaRB5cZ5h1HsonkAVSv1299",
+      "name": "bash",
+      "arguments": "{\"command\": \"echo STDOUT_TEST\", \"description\": \"Verify bash still usable once\"}"
+    }
+  ],
+  "bashCallCount": 2,
+  "commandMatched": true,
+  "command": "set +e\necho \"PWD=$PWD\"\necho \"--- guest executables ---\"\nls -l /bin/sh /bin/bash /bin/node /bin/busybox /usr/bin/python3 /usr/bin/git 2>&1 | head -12\necho \"--- bound exec ---\"\n( exec /bin/sh -c 'echo EXEC_SH_OK' ); echo \"SH_EXIT=$?\"\n( exec /bin/bash -c 'echo EXEC_BASH_OK' ); echo \"BASH_EXIT=$?\"\n( exec /bin/node -e 'console.log(\"EXEC_NODE_OK\")' ); echo \"NODE_EXIT=$?\"\n( exec /usr/bin/python3 -c 'print(\"EXEC_PY_OK\")' ); echo \"PY_EXIT=$?\"\n( exec /usr/bin/git --version ); echo \"GIT_EXIT=$?\"\necho \"--- script exec ---\"\nprintf '#!/bin/sh\\necho EXEC_SCRIPT_OK\\n' > ./proot-exec.sh; chmod +x ./proot-exec.sh\n( exec ./proot-exec.sh ); echo \"SCRIPT_EXIT=$?\"\necho \"--- unbound applet ---\"\n( exec /bin/xxd /dev/null ); echo \"XXD_EXIT=$?\"\necho \"--- copied guest ELF ---\"\ncp /bin/busybox ./proot-bx 2>/dev/null; chmod +x ./proot-bx 2>/dev/null\n( exec ./proot-bx true ); echo \"COPY_BUSYBOX_EXIT=$?\"\ncp /bin/node ./proot-node 2>/dev/null; chmod +x ./proot-node 2>/dev/null\n( exec ./proot-node -e 'console.log(\"COPY_NODE_OK\")' ); echo \"COPY_NODE_EXIT=$?\"\necho \"--- downloaded style unsigned ELF ---\"\nprintf '\\177ELF' > ./proot-fake; chmod +x ./proot-fake\n( exec ./proot-fake ); echo \"FAKE_EXIT=$?\"\necho PROOT_EXEC_PROBE_DONE\n",
+  "resultText": "[stderr]\nproot error: embedded loader descriptors: No such file or directory\nproot error: execve(\"/bin/bash\"): Permission denied\nproot info: possible causes:\n  * the program is a script but its interpreter (eg. /bin/sh) was not found;\n  * the program is an ELF but its interpreter (eg. ld-linux.so) was not found;\n  * the program is a foreign binary but qemu was not specified;\n  * qemu does not work correctly (if specified);\n  * the loader was not found or doesn't work.\nfatal error: see `libproot_exec.so --help`.\n\n[stderr]\nproot error: embedded loader descriptors: No such file or directory\nproot error: execve(\"/bin/bash\"): Permission denied\nproot info: possible causes:\n  * the program is a script but its interpreter (eg. /bin/sh) was not found;\n  * the program is an ELF but its interpreter (eg. ld-linux.so) was not found;\n  * the program is a foreign binary but qemu was not specified;\n  * qemu does not work correctly (if specified);\n  * the loader was not found or doesn't work.\nfatal error: see `libproot_exec.so --help`.\n",
+  "markers": {
+    "EXEC_SH_OK": false,
+    "EXEC_BASH_OK": false,
+    "EXEC_NODE_OK": false,
+    "EXEC_PY_OK": false,
+    "EXEC_SCRIPT_OK": false,
+    "COPY_NODE_OK": false,
+    "PROOT_EXEC_PROBE_DONE": false
+  },
+  "exits": {},
+  "ok": false
+}

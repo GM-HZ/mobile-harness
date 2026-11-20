@@ -80,7 +80,15 @@ def run_suite(serial, suite):
     started = time.monotonic()
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=1200)
     elapsed = round(time.monotonic() - started)
-    return {"suite": suite, "exit": result.returncode, "passed": result.returncode == 0,
+    probe = {}
+    if output.is_file():
+        try:
+            probe = json.loads(output.read_text())
+        except (ValueError, OSError):
+            probe = {}
+    # Probe scripts exit 0 even when they report a failed acceptance; require both.
+    passed = result.returncode == 0 and probe.get("ok", True) is not False
+    return {"suite": suite, "exit": result.returncode, "passed": passed, "probeOk": probe.get("ok"),
             "durationSeconds": elapsed, "outputTail": (result.stdout + result.stderr)[-1500:],
             "evidence": str(output.relative_to(ROOT)) if output.is_file() else None,
             "requiresModel": suite in ("exec", "overlay")}

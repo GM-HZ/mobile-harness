@@ -457,3 +457,17 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
   当前数字、证据位置、环境阻塞的遗留项（真机锁屏、测试密钥、forge fixture、CI 未在 runner 实跑、
   运行时任意 dlopen）与恢复步骤。
 - 架构 README 加入交付文档入口。
+
+
+### 2026-11-21（真机 G3 首次验证）
+
+- 真机解锁、安装当前签名 self 构建后：
+  - `device_lab run --suite verify` **PASS**（23s，web 200、账号凭据已存）；
+  - `exec` / `overlay` **FAIL**：bash 工具已能到达 PRoot，但真机 compat PRoot 模式报
+    `embedded loader descriptors: No such file or directory` / `execve("/bin/bash"): Permission denied`
+    （同一构建在模拟器 fast 模式通过）。
+- 顺带修复两个真实问题：
+  - 签名构建的 bash 退出状态单元是 `30 00 18` 这种 ASCII 数字+二进制填充，旧解析要求 `^\d{3}$`
+    导致 "Bash exited without a valid command status"；改为提取数字；
+  - `device_lab` 之前只看探针退出码，现要求探针证据 `ok:true`。
+- 真机在长时间验证中自动锁屏，剩余 exec/overlay 与 compat PRoot 问题需再次解锁后续跑。

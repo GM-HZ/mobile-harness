@@ -1,0 +1,38 @@
+{
+  "kind": "real-device probe",
+  "target": "37R0224115035605",
+  "checkedAt": "2026-11-21T07:42:06+0800",
+  "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-ae320934",
+  "model": {
+    "default": {
+      "provider": "deepseek-account",
+      "model": "deepseek-flash",
+      "reasoningEffort": "off"
+    }
+  },
+  "permissionMode": "danger-full-access",
+  "toolCalls": [
+    {
+      "turn": 1,
+      "step": 1,
+      "callId": "call_00_9g7s3CbENYpBDeJj4DVB0849",
+      "name": "bash",
+      "arguments": "{\"command\": \"set +e\\necho \\\"--- signed libraries present ---\\\"\\nls -l /usr/lib/libonig.so.5 /usr/lib/libjq.so.1 /usr/lib/libarchive.so.13 /usr/lib/libpng16.so.16 2>&1\\necho \\\"--- dlopen a signed library from python ctypes ---\\\"\\npython3 -c \\\"import ctypes; ctypes.CDLL('/usr/lib/libarchive.so.13'); print('CTYPES_LIBARCHIVE_OK')\\\" 2>&1; echo \\\"CTYPES_EXIT=$?\\\"\\necho \\\"--- load a signed native extension through node dlopen ---\\\"\\nnode -e \\\"console.log('EXTENSION_ANSWER', require('/usr/lib/mh-demo.node').answer())\\\" 2>&1; echo \\\"EXT_EXIT=$?\\\"\\necho \\\"--- run a downloaded dynamic tool that needs the new libs (jq) ---\\\"\\nmh-install jq https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/jq-1.8.2-r0.apk usr/bin/jq jq\\necho \\\"JQ_INSTALL_EXIT=$?\\\"\\njq --version 2>&1; echo \\\"JQ_VERSION_EXIT=$?\\\"\\necho '{\\\"a\\\":1}' | jq .a 2>&1; echo \\\"JQ_RUN_EXIT=$?\\\"\\necho NATIVE_OVERLAY_PROBE_DONE\\n\", \"description\": \"Probe PRoot exec semantics\"}"
+    }
+  ],
+  "bashCallCount": 1,
+  "commandMatched": true,
+  "command": "set +e\necho \"--- signed libraries present ---\"\nls -l /usr/lib/libonig.so.5 /usr/lib/libjq.so.1 /usr/lib/libarchive.so.13 /usr/lib/libpng16.so.16 2>&1\necho \"--- dlopen a signed library from python ctypes ---\"\npython3 -c \"import ctypes; ctypes.CDLL('/usr/lib/libarchive.so.13'); print('CTYPES_LIBARCHIVE_OK')\" 2>&1; echo \"CTYPES_EXIT=$?\"\necho \"--- load a signed native extension through node dlopen ---\"\nnode -e \"console.log('EXTENSION_ANSWER', require('/usr/lib/mh-demo.node').answer())\" 2>&1; echo \"EXT_EXIT=$?\"\necho \"--- run a downloaded dynamic tool that needs the new libs (jq) ---\"\nmh-install jq https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/jq-1.8.2-r0.apk usr/bin/jq jq\necho \"JQ_INSTALL_EXIT=$?\"\njq --version 2>&1; echo \"JQ_VERSION_EXIT=$?\"\necho '{\"a\":1}' | jq .a 2>&1; echo \"JQ_RUN_EXIT=$?\"\necho NATIVE_OVERLAY_PROBE_DONE\n",
+  "resultText": "[stderr]\nproot error: embedded loader descriptors: No such file or directory\nproot error: execve(\"/bin/bash\"): Permission denied\nproot info: possible causes:\n  * the program is a script but its interpreter (eg. /bin/sh) was not found;\n  * the program is an ELF but its interpreter (eg. ld-linux.so) was not found;\n  * the program is a foreign binary but qemu was not specified;\n  * qemu does not work correctly (if specified);\n  * the loader was not found or doesn't work.\nfatal error: see `libproot_exec.so --help`.\n",
+  "markers": {
+    "EXEC_SH_OK": false,
+    "EXEC_BASH_OK": false,
+    "EXEC_NODE_OK": false,
+    "EXEC_PY_OK": false,
+    "EXEC_SCRIPT_OK": false,
+    "COPY_NODE_OK": false,
+    "PROOT_EXEC_PROBE_DONE": false
+  },
+  "exits": {},
+  "ok": false
+}

@@ -334,11 +334,13 @@ function installProotSpawn(workspace) {
         if (child.exitCode === 0) {
           const status = Buffer.alloc(3);
           const count = fs.readSync(launched.statusFd, status);
-          const text = status.toString();
-          if (count !== 3 || !/^\d{3}$/.test(text) || Number(text) > 255) {
+          // The native launcher returns an ASCII exit code followed by binary
+          // padding in a 3-byte status cell (e.g. "0\0\x18").
+          const digits = status.toString('latin1').replace(/\D/g, '');
+          if (count < 1 || digits.length === 0 || Number(digits) > 255) {
             throw new Error('Bash exited without a valid command status');
           }
-          child.exitCode = Number(text);
+          child.exitCode = Number(digits);
         }
       } catch (error) {
         clearInterval(timer);
