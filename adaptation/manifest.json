@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "4e8f0bb2be2df6713b7264eb2789f018ff500ee0",
+  "generatedFrom": "a7c7ea53fd9499ffd2d364b1fd9ebbf9d40cc52e",
   "layers": [
     "host",
     "web",
@@ -833,6 +833,62 @@
         "@deepseek-ai/dsh-lsp-stdio",
         "@deepseek-ai/dsh-tool-lsp"
       ],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "variants:variants/README.md",
+      "layer": "variants",
+      "kind": "file",
+      "source": "variants/README.md",
+      "role": "store/self/lab build variant definitions",
+      "sha256": "a82fb73a39e7d1bdbceb09f8df3113b345a243a9bb7bec961933a185015ad2fc",
+      "bytes": 609,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "variants:variants/lab.json",
+      "layer": "variants",
+      "kind": "file",
+      "source": "variants/lab.json",
+      "role": "store/self/lab build variant definitions",
+      "sha256": "bffd23f5ec03cce579757f753f4f6b1781c5002d874db92f74bb66d5ade5051b",
+      "bytes": 535,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "variants:variants/self.json",
+      "layer": "variants",
+      "kind": "file",
+      "source": "variants/self.json",
+      "role": "store/self/lab build variant definitions",
+      "sha256": "24f316033f5c4b506ed4d0b08d4f0680ceacd490635f91412dec9743c72906c0",
+      "bytes": 596,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "variants:variants/store.json",
+      "layer": "variants",
+      "kind": "file",
+      "source": "variants/store.json",
+      "role": "store/self/lab build variant definitions",
+      "sha256": "8ac00df90fbf64e3df318302a14d7ea3011c12c0457260d9846febe4c09ae421",
+      "bytes": 459,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
       "gates": [
         "G0"
       ]

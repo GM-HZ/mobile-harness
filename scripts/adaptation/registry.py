@@ -70,7 +70,9 @@ def main():
             continue
         g2.append({"id": Path(name).stem, "command": f"python3 {name} <target> <output> [scenario flags]",
                    "covers": "smoke acceptance", "requires": requirements(name), "timeout": 1800})
-    g3 = []
+    g3 = [{"id": "device-lab-verify", "command": "python3 scripts/adaptation/device_lab.py run --suite verify",
+           "covers": "device lab protocol: lock + status + read-only verify", "optional": True,
+           "requires": ["USB device connected and unlocked"], "timeout": 900}]
     for name in sorted(device):
         command = f"python3 {name} --target <usb-serial> --output <output>"
         g3.append({"id": Path(name).stem, "command": command,
@@ -87,6 +89,9 @@ def main():
                 {"id": "upstream-anchors", "command": "python3 scripts/adaptation/anchors.py",
                  "covers": "literal upstream anchors used by runtime hooks",
                  "requires": ["assembled dsh-layer.zip"], "timeout": 300},
+                {"id": "host-contracts", "command": "python3 scripts/adaptation/host_contracts.py",
+                 "covers": "apply boot-time transformations and validate the results",
+                 "requires": ["assembled DSH layer"], "optional": True, "timeout": 300},
                 {"id": "upstream-bump-rehearsal", "command": "python3 scripts/adaptation/bump.py",
                  "covers": "dry-run the next DSH release against our anchors",
                  "requires": ["npm registry"], "optional": True, "timeout": 600},

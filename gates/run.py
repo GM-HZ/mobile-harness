@@ -59,6 +59,7 @@ def main():
     parser.add_argument("--only", help="comma separated entry ids")
     parser.add_argument("--list", action="store_true")
     parser.add_argument("--evidence-dir", type=Path, default=ROOT / "docs/evidence/gates")
+    parser.add_argument("--record", action="store_true", help="append the run to the RSI ledger")
     args = parser.parse_args()
     tiers = load_registry()
     if args.list:
@@ -102,6 +103,13 @@ def main():
     path = directory / (evidence["commit"] + ".json")
     path.write_text(json.dumps(evidence, indent=2) + "\n")
     print(f"evidence: {path.relative_to(ROOT)}")
+    if args.record:
+        subprocess.run(["python3", "scripts/adaptation/rsi_ledger.py", "record",
+                        "--tiers", ",".join(wanted_tiers),
+                        "--evidence", str(path.relative_to(ROOT))] +
+                       (["--ok"] if failures == 0 else []) +
+                       (["--note", "failures=" + str(failures)] if failures else []),
+                       cwd=ROOT, check=False)
     return 0 if failures == 0 else 1
 
 

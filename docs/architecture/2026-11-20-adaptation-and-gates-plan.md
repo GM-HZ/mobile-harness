@@ -175,3 +175,26 @@ G4 对每个变体做构建断言（例如 store 不得包含 `/usr/bin/mh-exec`
 
 下一轮：G1 行为级合同测试（overlay 行为断言/快照 diff），补丁收敛到 `pnpm patch`/扩展点的迁移清单，
 G3 真机 CI 调度协议，RSI 台账。
+
+
+### 2026-11-20（第 3 轮：行为合同、补丁收敛、设备 lab、RSI 台账）
+
+- **G1 行为合同**（`scripts/adaptation/host_contracts.py`）：把启动期变换真正作用于组装的
+  上游源码再验证——settings client 注入后仍是合法 JS 且含注册调用；bash-local/bash-sandbox
+  的命令替换产出 `"/bin/bash", "-c"` 且模块仍可解析；session-persistence 锚点仍在两侧存在。
+  4 个合同全部通过；registry 增加可选 `host-contracts`。
+- **补丁收敛清单**（`adaptation/convergence.json` + `docs/architecture/patch-convergence.md`）：
+  6 个适配面按"扩展点 > pnpm patch > 运行时替换"排序，标出 P1/P2/P3、风险、对应 gate 和迁移目标；
+  规则是运行时替换必须同时有锚点、seam 合同、G1 合同与迁移目标。
+- **G3 设备 lab 协议**（`scripts/adaptation/device_lab.py`）：USB 设备检测、屏幕锁状态、
+  版本/boot 状态、flock 串行锁、verify/exec/overlay 套件、证据落盘；registry 增加可选
+  `device-lab-verify`，新增 manual dispatch workflow `gate-device.yml`。真机当前锁屏，
+  `status` 正确报告 `screenLocked=true` 并提示无法自动解锁。
+- **RSI 台账**（`scripts/adaptation/rsi_ledger.py` + `docs/architecture/rsi-loop.md`）：
+  `gates/run.py --record` 自动记录每次 gate 运行（commit/层/结果/证据），`report` 输出
+  scoreboard；首次运行就抓到"manifest 在变体文件加入后未重新生成"的陈旧问题并在修复后转绿，
+  形成第一条"失败→修复→再绿"的真实闭环记录。
+- 当前 registry：G0=3、G1=5、G2=62、G3=3、G4=5。
+
+下一轮：补丁收敛的第一个真实迁移（优先 session-persistence 或 bash 命令锚点，走 pnpm patch 试验），
+G2 夜间矩阵接线（把 ad-hoc smoke 子集纳入 gate-nightly），G4 构建矩阵接入 release 流程。

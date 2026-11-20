@@ -1,0 +1,31 @@
+# Manual real-device gate. Requires a self-hosted macOS/DevEco lab with the
+# Mate 60 attached via USB; the script exits 2 (skipped) when no device is found.
+name: Gate Device
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  device-lab:
+    runs-on: [self-hosted, macOS, ARM64, deveco]
+    timeout-minutes: 45
+    env:
+      DEVECO_HOME: ${{ vars.DEVECO_HOME }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - name: Device status
+        run: python3 scripts/adaptation/device_lab.py status
+      - name: G3 device lab verify
+        run: python3 scripts/adaptation/device_lab.py run --suite verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate-evidence-device
+          path: docs/evidence/device-lab
+          if-no-files-found: ignore
