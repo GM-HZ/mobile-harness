@@ -72,3 +72,24 @@ python3 tests/smoke/mate60-proot-exec.py --target <usb-serial> --output out.json
 3. **解释器/WASM 路径**：纯 Python（pip 25.0.1 可用）、Node JS、以及未来的 WASI 引擎可以运行"逻辑代码"，但都不能替代原生进程 `exec`。
 
 因此执行能力不是"被砍到不能用"，而是从"任意 Linux 二进制"收敛为"**随包签名工具箱 + 解释器运行时**"：常用 Agent 命令（shell、git、gh、curl、python、node、rg、tar 等）都在；静态下载的二进制、自编译工具、带原生扩展的第三方包无法运行。
+
+## 不用提前打包的部分：运行时获取纯语言工具
+
+原生二进制受签名限制，但"工具"不止原生二进制。真机实测（见 [运行时工具证据](../evidence/mate60-runtime-tool-probe-0.4.69.json)）：
+
+- guest 内自带 `python3.12` + **pip 25.0.1**，网络可达 PyPI（`https://pypi.org/simple/...` 返回 200）。
+- 基础 Python 环境被标记为 externally-managed（PEP 668），`pip install --user` 会被拒绝并提示改用 venv 或 `--target`。
+- 用 `python3 -m pip install --no-cache-dir --target ./pylibs pyfiglet` **实际下载安装成功**（1.8 MB），再 `PYTHONPATH=./pylibs python3 -m pyfiglet MH` 正常输出。
+- `node -e` 纯 JS 运行时正常（Node 24.14.1）。
+
+也就是说：**纯 Python 包、纯 JS 代码、bash/Python/Node 脚本都不需要重新打包 HAP**，可以在运行时从 PyPI/npm 等来源获取并运行；只有"原生可执行文件/原生扩展库"才需要构建期签名打包。带编译扩展的 Python wheel / 带预编译二进制的 npm 包预期仍会命中同样的 `dlopen Permission denied`（尚未逐个验证）。
+
+## 工具链扩展的维护方式
+
+新增原生工具不是手工搬整个工具链，而是声明式清单 + 重新构建：
+
+1. `docs/guest-tools-lock.json` 锁定 Alpine aarch64 APK 的 URL 与 SHA-256；
+2. `runtime/harmonyos/packaging/package-shell-tools.py` 从 APK 里取出选定 ELF（`BINS` 列表）打包成签名 `libguest_cli_*.so`、生成 `guest-tools.inc` 绑定与 `shell-tools-layer.zip` 数据层；
+3. `./build.sh --package` 重新产出 signed HAP，`hdc install -r` 覆盖安装（本机实测约 36 秒）。
+
+所以"要提前打包"的范围 = **实际需要的原生工具清单**，不是整套工具链；纯语言工具和脚本可以运行时解决。

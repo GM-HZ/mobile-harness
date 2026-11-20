@@ -79,6 +79,28 @@ python3 -m pip --version 2>&1 | head -1
 echo BYPASS_PROBE_DONE
 """
 
+RUNTIME_PROBE = """set +e
+echo "PWD=$PWD"
+echo "--- pip install a pure-python tool at runtime ---"
+python3 -m pip install --no-cache-dir --user pyfiglet > ./pip-install.log 2>&1; echo "PIP_INSTALL_EXIT=$?"
+tail -4 ./pip-install.log
+python3 -m pyfiglet -f small MH 2>&1 | head -6; echo "PYFIGLET_EXIT=$?"
+echo "--- node js runtime ---"
+node -e "console.log('NODE_JS_RUNTIME_OK')" 2>&1; echo "NODE_JS_EXIT=$?"
+echo RUNTIME_PROBE_DONE
+"""
+
+RUNTIME_TARGET_PROBE = """set +e
+echo "PWD=$PWD"
+echo "--- pip install into a project directory ---"
+python3 -m pip install --no-cache-dir --target ./pylibs pyfiglet > ./pip-target.log 2>&1; echo "PIP_TARGET_EXIT=$?"
+tail -3 ./pip-target.log
+PYTHONPATH=./pylibs python3 -m pyfiglet -f small MH 2>&1 | head -6; echo "PYFIGLET_TARGET_EXIT=$?"
+echo "--- direct network check ---"
+python3 -c "import urllib.request; print(urllib.request.urlopen('https://pypi.org/simple/pyfiglet/', timeout=15).status)" 2>&1; echo "PYPI_HTTP_EXIT=$?"
+echo RUNTIME_TARGET_PROBE_DONE
+"""
+
 
 class Device:
     def __init__(self, target, port):
@@ -168,7 +190,9 @@ def run(device, port, output, probe=None):
     probe = probe or PROBE
     kinds = {id(PROBE): "real-device PRoot exec semantics probe",
              id(NATIVE_PROBE): "real-device native execution bypass probe",
-             id(BYPASS_PROBE): "real-device runtime native-code bypass probe"}
+             id(BYPASS_PROBE): "real-device runtime native-code bypass probe",
+             id(RUNTIME_PROBE): "real-device runtime package acquisition probe",
+             id(RUNTIME_TARGET_PROBE): "real-device runtime pure-python install probe"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -235,9 +259,10 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target"], default="exec")
     args = parser.parse_args()
-    probe = {"native": NATIVE_PROBE, "bypass": BYPASS_PROBE}.get(args.probe, PROBE)
+    probe = {"native": NATIVE_PROBE, "bypass": BYPASS_PROBE, "runtime": RUNTIME_PROBE,
+             "runtime-target": RUNTIME_TARGET_PROBE}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe)
     print(args.output)
 
