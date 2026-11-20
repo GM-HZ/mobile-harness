@@ -10,6 +10,10 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 
 0.4.69 在合并后的基线上补齐遗留验收：PTC 单链接读取加固与并发父目录边界、LiveShare 自建 Relay 的双模拟器跨设备 viewer（owner 实际 ArkWeb 授权后，第二台设备真实浏览器读取共享会话）、本机 Ollama 非 DeepSeek 端点接入、原生 addon 加载位置实测，以及 Forge 公开读与全新安装账号入口复验。Forge 真实账号授权与托管仓库写操作已在临时私有仓库完成（仓库已删除）；真机麦克风采集与官方公网 LiveShare Relay／真实身份提供方仍待外部条件，在批次记录中单列。
 
+## 交付总结
+
+0.4.69 的完整交付清单与证据索引见 [docs/work/2026-11-20-final-delivery.md](docs/work/2026-11-20-final-delivery.md)；能力回归闸门见 [docs/work/2026-11-20-capability-parity-gate.md](docs/work/2026-11-20-capability-parity-gate.md)。
+
 ## 文档
 
 | 内容 | 入口 |
