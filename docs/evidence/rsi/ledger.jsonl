@@ -6,3 +6,6 @@
 {"commit": "0d82190ab5657a02af90e581c746baf8d8965670", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/0d82190ab5657a02af90e581c746baf8d8965670.json", "note": "", "at": "2026-11-20T22:45:34+0800"}
 {"commit": "6e87561f4c71128a9c3d8b17c32a1dc1e9d5b085", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/6e87561f4c71128a9c3d8b17c32a1dc1e9d5b085.json", "note": "", "at": "2026-11-20T23:01:50+0800"}
 {"commit": "6e87561f4c71128a9c3d8b17c32a1dc1e9d5b085", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/6e87561f4c71128a9c3d8b17c32a1dc1e9d5b085.json", "note": "", "at": "2026-11-20T23:01:51+0800"}
+{"commit": "679d2e90e32ae23e194440493e16adb5e213b3ca", "tiers": ["G0"], "ok": true, "evidence": "docs/evidence/gates/G0/679d2e90e32ae23e194440493e16adb5e213b3ca.json", "note": "", "at": "2026-11-20T23:06:29+0800"}
+{"commit": "679d2e90e32ae23e194440493e16adb5e213b3ca", "tiers": ["G1"], "ok": true, "evidence": "docs/evidence/gates/G1/679d2e90e32ae23e194440493e16adb5e213b3ca.json", "note": "", "at": "2026-11-20T23:06:31+0800"}
+{"commit": "679d2e90e32ae23e194440493e16adb5e213b3ca", "tiers": ["G2"], "ok": true, "evidence": ".build/gate-evidence/G2", "note": "nightly-recovery 55.9s", "at": "2026-11-20T23:06:31+0800"}

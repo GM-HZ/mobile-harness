@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "6e87561f4c71128a9c3d8b17c32a1dc1e9d5b085",
+  "generatedFrom": "679d2e90e32ae23e194440493e16adb5e213b3ca",
   "layers": [
     "host",
     "web",
@@ -21,14 +21,10 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-client.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "2d93d2867e896b9370d7c89ceba21e2f095f78d4c3517b74741e11663083c6df",
-      "bytes": 9680,
+      "sha256": "1a54fa2650dc1d515c4e14a5a7396477d7f45c603632bb46a10bfcd9cdb3948b",
+      "bytes": 8939,
       "fragility": "high",
-      "upstreamTouchpoints": [
-        "\"bash\",\\n\\t\\t\\t\"-c\",",
-        "dsh-bash-local/lib/index.js",
-        "dsh-bash-sandbox/lib/index.js"
-      ],
+      "upstreamTouchpoints": [],
       "gates": [
         "G0",
         "G1"
@@ -898,8 +894,8 @@
       "kind": "file",
       "source": "patches/README.md",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "966fd92d40a38d744dc9736db415397d74e60ee5fc277c4f5ed2003e78815ff6",
-      "bytes": 939,
+      "sha256": "eb5a919b85e0cfeb47b87aeb180fafb8a6f9eb58636805482919f28d6848e54e",
+      "bytes": 1125,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -912,10 +908,12 @@
       "kind": "file",
       "source": "patches/series.json",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "18f9490fc64b7324e6733d6d68785779a036052d08945fda53f152fc0e4937a1",
-      "bytes": 440,
+      "sha256": "9791013a60898b58eb6b962ce72ac195d3616b4a261b3ca9ad8ba65a20dadc41",
+      "bytes": 1128,
       "fragility": "high",
       "upstreamTouchpoints": [
+        "@deepseek-ai/dsh-bash-local",
+        "@deepseek-ai/dsh-bash-sandbox",
         "@deepseek-ai/dsh-session-persistence-jsonl"
       ],
       "gates": [

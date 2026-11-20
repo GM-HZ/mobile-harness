@@ -3,17 +3,17 @@
   "description": "Literal upstream anchors our runtime hooks depend on. Checked by scripts/adaptation/anchors.py; contracts live in docs/architecture/seams/.",
   "anchors": [
     {
-      "id": "bash-local-command",
+      "id": "bash-local-patch",
       "file": "dsh/node_modules/@deepseek-ai/dsh-bash-local/lib/index.js",
-      "pattern": "\"bash\",\n\t\t\t\"-c\",",
-      "count": 1,
+      "replacement": "\"/bin/bash\",\n\t\t\t\"-c\",",
+      "patch": "patches/bash-local-shell-path.patch",
       "contract": "docs/architecture/seams/host-bash-hooks.md"
     },
     {
-      "id": "bash-sandbox-command",
+      "id": "bash-sandbox-patch",
       "file": "dsh/node_modules/@deepseek-ai/dsh-bash-sandbox/lib/index.js",
-      "pattern": "\"bash\",\n\t\t\t\"-c\",",
-      "count": 1,
+      "replacement": "\"/bin/bash\",\n\t\t\t\"-c\",",
+      "patch": "patches/bash-sandbox-shell-path.patch",
       "contract": "docs/architecture/seams/host-bash-hooks.md"
     },
     {

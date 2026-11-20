@@ -72,17 +72,17 @@ def main():
             checked.append({"id": "settings-client-injection", "ok": ok})
             if not ok:
                 failures.append("settings injection breaks the client: " + result.stderr.strip()[:300])
+        boot_no_replacement = ANCHOR not in (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         for module in BASH_MODULES:
             source = archive.read(module).decode()
-            if source.count(ANCHOR) != 1:
-                failures.append(f"{module}: anchor count {source.count(ANCHOR)} != 1")
-                continue
-            replaced = source.replace(ANCHOR, '"/bin/bash",\n\t\t\t"-c",', 1)
-            result = node_check(replaced)
-            ok = result.returncode == 0 and '"/bin/bash",\n\t\t\t"-c",' in replaced
-            checked.append({"id": "bash-command-" + module.rsplit("/", 1)[0].rsplit("/", 1)[-1], "ok": ok})
+            patched = '"/bin/bash",\n\t\t\t"-c",' in source
+            syntax = node_check(source)
+            ok = patched and boot_no_replacement and syntax.returncode == 0
+            module_id = module.rsplit("/", 1)[0].rsplit("/", 1)[-1]
+            checked.append({"id": "bash-command-" + module_id, "ok": ok, "mode": "patched"})
             if not ok:
-                failures.append(f"{module}: replacement breaks the module: " + result.stderr.strip()[:300])
+                failures.append(f"{module}: patched={patched} bootNoReplacement={boot_no_replacement} "
+                                f"syntax={syntax.returncode} {syntax.stderr.strip()[:200]}")
         session = archive.read(SESSION).decode()
         boot = (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         replacement = "globalThis.__dshClientRenameNoReplace(tmp, finalPath)"

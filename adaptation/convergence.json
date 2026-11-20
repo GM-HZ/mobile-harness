@@ -9,12 +9,13 @@
         "@deepseek-ai/dsh-bash-local",
         "@deepseek-ai/dsh-bash-sandbox"
       ],
-      "current": "runtime string replacement via registerHooks/replacePinned",
+      "current": "patches/series.json (bash-local + bash-sandbox); no boot hook",
       "target": "pnpm patch of the two npm packages (or an upstream command-spawn seam)",
       "priority": "P1",
       "risk": "high",
       "gate": "G1 upstream-anchors + G2 capability gate",
-      "status": "keep-with-gate"
+      "status": "converged",
+      "note": "patches/bash-local-shell-path.patch + bash-sandbox patch replace the shell argv literal; dsh-client.cjs no longer registers source hooks. Validated by real patched build (G1 anchors/contracts, G2 nightly-recovery PASS 55.9s, exec probe all expected)."
     },
     {
       "id": "session-persistence-link",

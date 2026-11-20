@@ -61,11 +61,14 @@ def main():
             target = workspace / entry["package"] / entry["path"]
             text = target.read_text() if target.is_file() else ""
             ok = result.returncode == 0 and entry["marker"] in text
+            if entry.get("removed"):
+                ok = ok and entry["removed"] not in text
             syntax = subprocess.run(["node", "--check", str(target)], capture_output=True, text=True)
             ok = ok and syntax.returncode == 0
             checked.append({"file": entry["file"], "package": entry["package"], "ok": ok})
             if not ok:
                 failures.append(f"{entry['file']}: apply={result.returncode} marker={entry['marker'] in text} "
+                                f"removedStillPresent={bool(entry.get('removed') and entry['removed'] in text)} "
                                 f"syntax={syntax.returncode} {result.stderr.strip()[:300]}")
     finally:
         if not args.keep:

@@ -20,3 +20,7 @@ patch must be rehearsed with `python3 scripts/adaptation/patch_rehearsal.py`
 - `session-persistence-eacces-fallback.patch` — HarmonyOS denies `link(2)` for the
   publish path; fall back to the native `renameNoReplace` helper (converged: no
   boot-time replacement remains).
+
+- `bash-local-shell-path.patch`, `bash-sandbox-shell-path.patch` — the guest shell is
+  `/bin/bash`; replaced the argv literal so no boot-time module rewriting remains
+  (converged).

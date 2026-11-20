@@ -23,3 +23,11 @@ The `await link(tmp, finalPath);` surface is now a package patch
 contract is: patched module contains the native fallback, `dsh-client.cjs`
 defines `globalThis.__dshClientRenameNoReplace`, and no boot-time replacement
 targets this file. Validated by a real patched build + G2 recovery.
+
+### Bash command migration (2026-11-20)
+
+`dsh-bash-local` and `dsh-bash-sandbox` now ship patched argv literals
+(`"/bin/bash"`), applied by `harmonyos_dsh.py` from `patches/series.json`; the
+`replacePinned` boot hook and the `registerHooks` source rewrite were removed.
+Contract: both modules contain the patched literal and `dsh-client.cjs` contains
+no replacement for the old anchor. Validated by a real patched build + G2.

@@ -235,3 +235,22 @@ G2 夜间矩阵接线（把 ad-hoc smoke 子集纳入 gate-nightly），G4 构�
   G2 recovery 已覆盖持久化/崩溃路径，后续可用测试密钥补一次真实 turn。
 
 下一轮：第二个收敛（bash 命令锚点 pnpm patch），并给 G2 矩阵补 session 写入回归；G4 发布矩阵接线。
+
+
+### 2026-11-20（第 6 轮：第二个收敛，boot hook 清零）
+
+- 新增 `patches/bash-local-shell-path.patch`、`patches/bash-sandbox-shell-path.patch`
+  （把 shell argv 从 `"bash"` 改为 `"/bin/bash"`），`patch_rehearsal` 全部通过（3/3）。
+- **删除 `dsh-client.cjs` 里所有源码替换逻辑**（`replacePinned`/`registerHooks` 源改写），
+  hook 仅保留启动源缓存与指标；`anchors.json` 的 bash 项改为 patch 断言；`host_contracts`
+  改为验证 patched module + boot 无替换。
+- 真实构建（self）→ layer 两个 bash 模块均含 patched 字面量；安装模拟器 5555：
+  **G2 nightly-recovery PASS（55.9s）**、exec 探针全绿（sh/bash/node/git/script=0，
+  未签名复制按预期 126/127，COPY_NODE 重定向 0）。
+- 真实构建（store）→ HAP `768,589,984 B`，**store_build_check + variant_store 均通过**
+  （无 mh-exec/exec shim/overlay 库，signedExecBypass=false，体积在预算内）。
+- 结果：两个高脆弱面（session-persistence、bash 命令）都已 converged；boot 时不再有
+  字符串替换，剩余脆弱性主要在 build-time 注入（settings client）与 compat 模块层。
+
+下一轮：settings client 注入向 client plugin/上游 seam 迁移（或 pnpm patch 试验）；
+把 G4 构建矩阵结果写入 release/RSI 台账；补一次真实模型 turn 的 session 写入回归。
