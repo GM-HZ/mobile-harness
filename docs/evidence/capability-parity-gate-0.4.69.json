@@ -185,5 +185,132 @@
     "the native capture step is recorded and depends on host audio routing",
     "the cross-device viewer uses the emulator direct host route (--device-host 10.0.2.2, new in this round): hdc reverse forwarding drops the owner gateway WebSocket after a long-lived connection, while the direct route keeps it",
     "the owner-login LiveShare flow and the cross-device viewer are separate steps; the direct route cannot carry the ArkWeb owner authorization page because it only allows https or 127.0.0.1"
-  ]
+  ],
+  "runs": [
+    {
+      "startedAt": "2026-11-20T09:54:52+0800",
+      "finishedAt": "2026-11-20T10:01:59+0800",
+      "ok": true,
+      "failures": 0,
+      "steps": [
+        {
+          "name": "recovery",
+          "passed": true,
+          "elapsedSeconds": 33
+        },
+        {
+          "name": "voice-input",
+          "passed": true,
+          "elapsedSeconds": 43
+        },
+        {
+          "name": "voice-native-capture",
+          "passed": true,
+          "elapsedSeconds": 37
+        },
+        {
+          "name": "ollama-routes",
+          "passed": true,
+          "elapsedSeconds": 85
+        },
+        {
+          "name": "ptc-link-fixture",
+          "passed": true,
+          "elapsedSeconds": 1
+        },
+        {
+          "name": "ptc-boundary",
+          "passed": true,
+          "elapsedSeconds": 42
+        },
+        {
+          "name": "liveshare",
+          "passed": true,
+          "elapsedSeconds": 49
+        },
+        {
+          "name": "liveshare-cross-device",
+          "passed": true,
+          "elapsedSeconds": 46
+        },
+        {
+          "name": "account-entry",
+          "passed": true,
+          "elapsedSeconds": 36
+        },
+        {
+          "name": "native-addon-location",
+          "passed": true,
+          "elapsedSeconds": 14
+        }
+      ]
+    },
+    {
+      "startedAt": "2026-11-20T10:08:30+0800",
+      "finishedAt": "2026-11-20T10:15:14+0800",
+      "ok": true,
+      "failures": 0,
+      "steps": [
+        {
+          "name": "recovery",
+          "passed": true,
+          "elapsedSeconds": 33
+        },
+        {
+          "name": "voice-input",
+          "passed": true,
+          "elapsedSeconds": 41
+        },
+        {
+          "name": "voice-native-capture",
+          "passed": true,
+          "elapsedSeconds": 34
+        },
+        {
+          "name": "ollama-routes",
+          "passed": true,
+          "elapsedSeconds": 79
+        },
+        {
+          "name": "ptc-link-fixture",
+          "passed": true,
+          "elapsedSeconds": 1
+        },
+        {
+          "name": "ptc-boundary",
+          "passed": true,
+          "elapsedSeconds": 41
+        },
+        {
+          "name": "liveshare",
+          "passed": true,
+          "elapsedSeconds": 44
+        },
+        {
+          "name": "liveshare-cross-device",
+          "passed": true,
+          "elapsedSeconds": 43
+        },
+        {
+          "name": "account-entry",
+          "passed": true,
+          "elapsedSeconds": 34
+        },
+        {
+          "name": "native-addon-location",
+          "passed": true,
+          "elapsedSeconds": 14
+        }
+      ]
+    }
+  ],
+  "reproducibility": {
+    "consecutiveRuns": 2,
+    "bothGreen": true,
+    "runSeconds": [
+      427,
+      404
+    ],
+    "note": "two consecutive runs of the same gate on the same artifact both finished green; the second run is independent of the first and reused the same emulators"
+  }
 }

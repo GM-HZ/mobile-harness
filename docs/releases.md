@@ -425,4 +425,6 @@ Forge 真实账号:0.4.69 在设备端完成 GitHub 设备授权（账号 GM-HZ�
 
 公网 LiveShare 预演:0.4.69 用 Cloudflare 临时隧道把自建 Relay 暴露为公网 HTTPS 端点。预检通过（TLS 1.3、公共 CA、health 200、匿名 WSS 401）；owner 在 ArkWeb 对公网 URL 完成分享授权，分享创建/扩源/重连、reader 拒绝与撤销、stop、网关回收与配置恢复通过；第二台设备真实浏览器经公网 URL 加载 viewer 页面并渲染共享会话标题与只读提示。该 Relay 仍是替代实现、设备在同一局域网、隧道已关闭；官方 Relay 与用户域名/异地网络仍待验。被拒绝的 WebSocket Upgrade 响应补充了 `Content-Length: 0` 以兼容 Cloudflare 隧道。
 
+能力对齐回归闸门:0.4.69 的 10 步闸门（恢复、语音含原生采集、Ollama 路由、PTC 链接/边界、LiveShare owner 流、直连跨设备 viewer、账号入口、addon 位置）连续两次全绿（约 6–7 分钟/次）；LiveShare 内部跨设备改用模拟器直连宿主路由（`--device-host 10.0.2.2`）规避 hdc 反向转发长连接断开。完整交付总结见 [2026-11-20 交付总结](work/2026-11-20-final-delivery.md)。
+
 未签名 HAP 为 `.build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap`，SHA-256 `8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf`。 [本轮实测](evidence/emulator-capability-parity-0.4.69.json) · [PTC 边界](evidence/emulator-ptc-boundary-0.4.69.json) · [LiveShare 跨设备](evidence/emulator-liveshare-cross-device-0.4.69.json) · [Forge 公开读](evidence/emulator-forge-public-read-0.4.69.json) · [账号入口](evidence/emulator-account-fresh-0.4.69.json) · [addon 位置实测](evidence/emulator-native-addon-location-0.4.69.json) · [原生麦克风采集](evidence/emulator-voice-native-capture-0.4.69.json) · [Forge 真实账号](evidence/emulator-forge-real-account-0.4.69.json) · [公网隧道预演](evidence/relay-public-tunnel-acceptance-0.4.69.json)
