@@ -189,6 +189,18 @@ MH_ELF_ARGV0=busybox mh-exec ./bbx/bin/busybox.static echo MH_EXEC_SWITCH_OK
 echo MH_EXEC_PROBE_DONE
 """
 
+TRANSPARENT_PROBE = """set +e
+echo "--- prepare a downloaded static tool ---"
+curl -sSLo ./bb.apk https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/busybox-static-1.36.1-r31.apk && echo CURL_OK
+gzip -dc ./bb.apk > ./bb.tar && echo GZIP_OK
+mkdir -p ./tr && tar -xf ./bb.tar -C ./tr && echo TAR_OK
+ls -l ./tr/bin/busybox.static
+echo "--- transparent direct execution (no mh-exec) ---"
+./tr/bin/busybox.static echo TRANSPARENT_EXEC_OK; echo "TRANSPARENT_EXIT=$?"
+./tr/bin/busybox.static uname -m; echo "UNAME_EXIT=$?"
+echo TRANSPARENT_PROBE_DONE
+"""
+
 
 class Device:
     def __init__(self, target, port):
@@ -304,7 +316,8 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
              "elf-loader": "real-device in-memory ELF loader prototype",
              "elf-run": "real-device in-memory static ELF execution",
              "elf-download": "real-device download-and-run static tool",
-             "elf-mhexec": "real-device /usr/bin/mh-exec download-and-run"}
+             "elf-mhexec": "real-device /usr/bin/mh-exec download-and-run",
+             "elf-transparent": "real-device transparent downloaded tool execution"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
@@ -400,7 +413,7 @@ def main():
     parser.add_argument("--target", default="37R0224115035605")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
-    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec"], default="exec")
+    parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent"], default="exec")
     parser.add_argument("--loader-file", default=str(Path(__file__).with_name("fixtures") / "inmemory-elf-loader.py"))
     parser.add_argument("--payload-file")
     parser.add_argument("--elf-args", default="")
@@ -410,7 +423,7 @@ def main():
              "runtime-target": RUNTIME_TARGET_PROBE, "pip-native": PIP_NATIVE_PROBE,
              "mmap": MMAP_PROBE, "elf-loader": "python3 ./elf-loader.py",
              "elf-download": "python3 ./inmemory-elf-runner.py",
-             "elf-mhexec": MH_EXEC_PROBE}.get(args.probe, PROBE)
+             "elf-mhexec": MH_EXEC_PROBE, "elf-transparent": TRANSPARENT_PROBE}.get(args.probe, PROBE)
     run(Device(args.target, args.port), args.port, args.output, probe,
         loader_file=(args.loader_file if args.probe == "elf-loader" else None),
         payload_file=(args.payload_file if args.probe == "elf-run" else None),
