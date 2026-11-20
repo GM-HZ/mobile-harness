@@ -434,3 +434,14 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
   `forgePanel/diff-failed`（gh 读取 fixture diff 失败）。属 fixture/TLS/GH_CONFIG 环境问题，
   非构建或注册失败；已记录为待排查的 G2 fixture 项（不阻塞门禁）。
 - compat.json liveshare 条目补充 seamDoc/结论；compat-layer.md 同步。
+
+
+### 2026-11-20（第 18 轮：speech seam 结论 + 全量 nightly 回归）
+
+- 新增 `docs/architecture/seams/speech-upstream-seam.md`：SenseVoice provider 的 Config 没有
+  worker/spawn factory，启动走通用 `ctx.subprocess.spawn` + pipe token 握手；我们改为 Host Worker
+  thread + 直接 handle 调用。结论：**keep-compat**（除非上游暴露 worker factory seam）。
+- **完整无模型 nightly 子集回归**（当前 forge-patched 构建，模拟器 5555）：
+  recovery 30.0s / native-addon 14.8s / inspector 14.5s / inspector-availability 13.5s /
+  lsp-bundle 20.4s / mcp-stdio 6.5s / ptc-link-fixture 1.0s —— **7/7 PASS**。
+- compat.json / compat-layer.md 同步 speech seam 结论；证据写入 gate evidence 与 RSI 台账。

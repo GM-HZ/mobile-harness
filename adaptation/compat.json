@@ -158,7 +158,8 @@
           "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice",
           "@deepseek-ai/dsh-experimental-voice-input-bundle"
         ],
-        "note": "upstream sensevoice provider exists (17 hits); voice-input bundle is a thin bundle \u2014 check if a provider can be mounted instead of our launcher."
+        "note": "Upstream Config has no worker/spawn factory; the provider uses ctx.subprocess.spawn and a pipe token handshake. We launch a Host Worker thread and call the handle directly. keep-compat until upstream adds a worker factory seam.",
+        "seamDoc": "docs/architecture/seams/speech-upstream-seam.md"
       }
     },
     {
