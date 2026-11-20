@@ -1,0 +1,173 @@
+{
+  "kind": "capability parity regression gate (single artifact, fixed order)",
+  "gateSource": "tests/bench/capability-parity-regression.py",
+  "artifact": {
+    "path": ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap",
+    "sha256": "8a8832751e6eebadd0ce5859e8a99f9d537cbfd04570cc38f33a4a68a54c4daf",
+    "bytes": 768585397
+  },
+  "sourceCommit": "0e432f5e3e99ce9ed57a038d0b63bebf1ed79a9a",
+  "startedAt": "2026-11-20T09:22:34+0800",
+  "finishedAt": "2026-11-20T09:28:45+0800",
+  "ok": true,
+  "failures": 0,
+  "steps": [
+    {
+      "name": "recovery",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-recovery.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/recovery.json"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 32,
+      "evidence": ".build/batch-011/recovery.json",
+      "log": ".build/batch-011/recovery.log"
+    },
+    {
+      "name": "voice-input",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-voice-input.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/voice.json",
+        "--model-root",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/.build/voice-native/models",
+        "--audio",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/.build/voice-native/mandarin-sample.wav",
+        "--arkweb",
+        "--native-mic"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 44,
+      "evidence": ".build/batch-011/voice.json",
+      "log": ".build/batch-011/voice-input.log"
+    },
+    {
+      "name": "voice-native-capture",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-voice-input.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/voice-capture.json",
+        "--model-root",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/.build/voice-native/models",
+        "--audio",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-package-management/.build/voice-native/mandarin-sample.wav",
+        "--native-mic-transcribe"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 39,
+      "evidence": ".build/batch-011/voice-capture.json",
+      "log": ".build/batch-011/voice-native-capture.log"
+    },
+    {
+      "name": "ollama-routes",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-ollama.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/ollama.json",
+        "--model",
+        "mh-smoke-ollama-079:latest",
+        "--context-window",
+        "16384",
+        "--max-tokens",
+        "4096"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 74,
+      "evidence": ".build/batch-011/ollama.json",
+      "log": ".build/batch-011/ollama-routes.log"
+    },
+    {
+      "name": "ptc-link-fixture",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-ptc-link-fixture.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/ptc-link.json"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 1,
+      "evidence": ".build/batch-011/ptc-link.json",
+      "log": ".build/batch-011/ptc-link-fixture.log"
+    },
+    {
+      "name": "ptc-boundary",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-ptc-boundary.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/ptc-boundary.json"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 43,
+      "evidence": ".build/batch-011/ptc-boundary.json",
+      "log": ".build/batch-011/ptc-boundary.log"
+    },
+    {
+      "name": "liveshare",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-liveshare-relay.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/liveshare.json",
+        "--owner-login"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 48,
+      "evidence": ".build/batch-011/liveshare.json",
+      "log": ".build/batch-011/liveshare.log"
+    },
+    {
+      "name": "account-entry",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-account.py",
+        "127.0.0.1:5557",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/account.json"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 34,
+      "evidence": ".build/batch-011/account.json",
+      "log": ".build/batch-011/account-entry.log"
+    },
+    {
+      "name": "native-addon-location",
+      "command": [
+        "python3",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/tests/smoke/emulator-native-addon-location.py",
+        "127.0.0.1:5555",
+        "/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-capability-parity/.build/batch-011/addon-location.json"
+      ],
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 15,
+      "evidence": ".build/batch-011/addon-location.json",
+      "log": ".build/batch-011/native-addon-location.log"
+    }
+  ],
+  "environment": {
+    "primaryDevice": "127.0.0.1:5555 DevEco API 26 ARM64 Phone emulator",
+    "secondDevice": "127.0.0.1:5557 for the account entry step (application data cleared before the step)",
+    "hostServices": "Ollama model mh-smoke-ollama-079:latest, voice fixture model/audio, host speakers for the native capture step"
+  },
+  "excluded": {
+    "liveshare-cross-device": "covered by separate evidence; after repeated owner-login restart cycles the owner gateway tunnel intermittently closes with code 1006 in this environment, so the gate does not depend on it",
+    "forge-public-read": "covered by separate evidence; the primary device now carries the real GitHub account configuration by design, and the second device restart with the fixture profile patch does not reach readiness reliably after its data is cleared"
+  },
+  "notes": [
+    "the gate starts the app and clears the microphone permission before voice steps, and clears the second device application data before the account step",
+    "the native capture step is recorded but non-critical because it depends on host audio routing"
+  ]
+}

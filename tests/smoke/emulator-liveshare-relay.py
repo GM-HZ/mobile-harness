@@ -43,6 +43,21 @@ VIEWER_TOKEN = 'fixture-viewer'
 ADMIN_TOKEN = 'fixture-admin'
 
 
+def clear_forward(hdc_call, listen):
+    """Remove any existing forward ruler with this device listen port."""
+    try:
+        listing = hdc_call('fport', 'ls')
+    except Exception:
+        return
+    for line in listing.splitlines():
+        parts = line.split()
+        if len(parts) >= 3 and parts[1] == listen:
+            try:
+                hdc_call('fport', 'rm', parts[1], parts[2])
+            except Exception:
+                pass
+
+
 def relay_base(port):
     if BASE_OVERRIDE:
         return BASE_OVERRIDE
@@ -307,7 +322,8 @@ def verify_program_policy(device, port, share, session, folder, sessions, eviden
         assert owner(device, 'stop', {'shareId': other}) == {'ok': True}
 
 
-def verify_reader(device, port, share, shared, outside, evidence, model, program_check, attachments, guest_check):
+def verify_reader(device, port, share, shared, outside, evidence, model, program_check, attachments, guest_check,
+                  cross_device_check=None):
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''}, token=None)
     assert status == 401 and body['error'] == 'viewer-login-required'
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
@@ -346,6 +362,11 @@ def verify_reader(device, port, share, shared, outside, evidence, model, program
             if program_check:
                 program_check()
         evidence['testModelKeyRemoved'] = True
+    if cross_device_check:
+        # Prove the second device viewer while the share still authorizes readers;
+        # the revocation below deliberately invalidates it afterwards.
+        cross_device_check()
+        evidence['crossDeviceBeforeRevocation'] = True
     status, body = relay_call(port, share, {}, path='/__fixture/revoke', token=ADMIN_TOKEN)
     assert status == 200 and body['revoked'] is True
     status, body = relay_call(port, share, {'op': 'asset', 'path': ''})
@@ -446,28 +467,19 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
     reverse = None
     if RELAY_HOST_PORT:
         reverse = ('tcp:19769', f'tcp:{RELAY_HOST_PORT}')
+    elif relay_port:
+        reverse = ('tcp:19769', f'tcp:{relay_port}')
+    if reverse:
+        clear_forward(hdc, reverse[0])
         assert 'Forwardport result:OK' in hdc('rport', *reverse)
-    # The reader regression revoked viewer access right before this call; grant it
-    # back through the fixture admin route so the second device is an actual reader.
     title = 'MH cross-device viewer ' + uuid.uuid4().hex[:6]
     assert device.rpc('session/rename', {'request': {'sessionId': sessions[0], 'title': title}})['title'] == title
-    request = Request(relay_base(relay_port) + '/__fixture/authorize?shareId=' + share, data=b'{}',
-                      headers={'Authorization': 'Bearer ' + ADMIN_TOKEN, 'Content-Type': 'application/json'})
-    with urlopen(request, timeout=8) as response:
-        assert json.load(response) == {'authorized': True}
-    # The owner applies the fixture revocation live; wait until the reader can list again.
-    deadline = time.monotonic() + 25
-    while time.monotonic() < deadline:
-        status, body = reader_rpc(relay_port, share, 'session/list', {'_request': {}})
-        if status == 200 and body.get('result', {}).get('ok'):
-            break
-        time.sleep(0.5)
-    else:
-        raise AssertionError('The fixture re-authorization did not restore viewer reads')
     try:
         page = None
         for attempt in range(3):
-            page_base = DEVICE_BASE or relay_base(relay_port)
+            # The device reaches the internally spawned fixture through its 19769 rport;
+            # external modes provide their own device-visible base.
+            page_base = DEVICE_BASE or 'http://127.0.0.1:19769'
             opened = hdc('shell', f"aa start -U '{page_base}/?shareId={share}'")
             print('cross-device: start ability ->', opened, flush=True)
             deadline = time.monotonic() + 45
@@ -588,6 +600,7 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
             evidence['externalRelay'] = {'device': base, 'hostCalls': BASE_OVERRIDE}
             if relay_host_port:
                 candidate = ('tcp:19769', f'tcp:{relay_host_port}')
+                clear_forward(device.hdc, candidate[0])
                 assert 'Forwardport result:OK' in device.hdc('rport', *candidate)
                 reverse = candidate
             if owner_login:
@@ -611,6 +624,7 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
             assert select.select([proc.stdout], [], [], 5)[0], 'Relay did not report a bound port'
             relay_port = int(proc.stdout.readline())
             candidate = ('tcp:19769', f'tcp:{relay_port}')
+            clear_forward(device.hdc, candidate[0])
             assert 'Forwardport result:OK' in device.hdc('rport', *candidate)
             reverse = candidate
         device.app('mkdir '+folder)
@@ -681,10 +695,12 @@ def run(device, output, model, owner_login, host_port, program_policy, attachmen
         def program_check():
             verify_program_policy(device, relay_port, share, sessions[0], folder, sessions, evidence)
 
-        verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model,
-                      program_check if program_policy else None, attachments, guest_check)
-        if cross_device_target:
+        def cross_device_check():
             cross_device_viewer(device, relay_port, share, sessions, cross_device_target, evidence)
+
+        verify_reader(device, relay_port, share, sessions[:2], sessions[2], evidence, model,
+                      program_check if program_policy else None, attachments, guest_check,
+                      cross_device_check if cross_device_target else None)
         evidence['stop'] = owner(device, 'stop', {'shareId': share})
         assert evidence['stop'] == {'ok': True} and device.rpc('liveshareShares/list', {}) == {'shares': []}
         status, _ = relay_call(relay_port, share, {'op': 'asset', 'path': ''})
