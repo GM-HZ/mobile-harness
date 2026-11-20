@@ -51,7 +51,7 @@ upstream DeepSeek Harness, per the round-19 plan.
 python3 gates/run.py --tier G0,G1 --record
 # nightly matrix (emulator running, MH_EMULATOR set)
 MH_EMULATOR=127.0.0.1:5555 python3 gates/run.py --tier G2 \
-  --only nightly-recovery,nightly-native-addon,nightly-inspector,nightly-inspector-availability,nightly-lsp-block,nightly-mcp-stdio,nightly-ptc-link-fixture --retries 1
+  --only nightly-recovery,nightly-native-addon,nightly-inspector,nightly-inspector-availability,nightly-lsp-bundle,nightly-mcp-stdio,nightly-ptc-link-fixture --retries 1
 # release dry run
 ./scripts/adaptation/release_dry_run.sh 0.4.69
 # device lab (unlocked phone)
