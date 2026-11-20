@@ -1,0 +1,32 @@
+{
+  "kind": "attempt: transparent unsigned-ELF fallback inside the PRoot preloader (blocked)",
+  "goal": "run downloaded static tools directly (./tool) without an explicit mh-exec",
+  "approach": [
+    "patched vendor/repos/proot/src/loader/loader.c so LOAD_ACTION_MMAP_FILE falls back to an anonymous RW mapping + byte copy + mprotect when the file mapping fails (unsigned file)",
+    "saved the patch as runtime/harmonyos/native/guest-loader-selfbuild.c",
+    "compiled it with the SDK clang freestanding flags used by build-proot-runtime.sh and staged it only for HARMONY_SELF_BUILD=1"
+  ],
+  "observations": {
+    "patchedLoaderBuild": "compiled successfully (symbol ohos_guest_loader present)",
+    "selfBuildWithPatchedLoader": "every bash tool command failed: 'Bash exited without a valid command status', including plain signed /bin/bash execution",
+    "compiledUnmodifiedVendorLoader": "same failure, so the problem is not the fallback patch but the loader provenance",
+    "baselineDefaultHap": "unpatched default build works normally (exec probe passes)",
+    "pinnedPreloaderStrings": [
+      "HARMONY_PRELOAD loader file mmap failed",
+      "HARMONY_PRELOAD loader open failed"
+    ],
+    "vendorLoaderStrings": "the strings above are absent from vendor/repos/proot/src/loader/loader.c",
+    "sizes": {
+      "pinnedPreloader": 3264,
+      "vendorCompiled": 3040,
+      "patchedCompiled": 3648
+    }
+  },
+  "conclusion": "the pinned libproot_preloader.so is built from a separate patched PRoot source tree (with OHOS-specific loader diagnostics/ABI), not from vendor/repos/proot; rebuilding the loader from the vendored tree changes runtime behaviour and breaks normal exec. Transparent loader-level fallback needs that patched tree (or a different integration point).",
+  "state": "reverted: stage script no longer overrides the preloader; self-build variant rebuilt and reinstalled with the working mh-exec switch; guest-loader-selfbuild.c kept as an unwired prototype patch",
+  "next": [
+    "locate or reconstruct the patched PRoot source tree used for the pinned preloader, then reapply the fallback there",
+    "alternative: provide a user-space tool installer (mh-install) that registers downloaded tools as PATH shims via mh-exec, giving 'download and run by name' without touching PRoot",
+    "alternative: command-rewriting shim in the Host bash pipe for executable paths"
+  ]
+}

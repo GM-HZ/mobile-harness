@@ -140,6 +140,7 @@ def main():
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MOBILE_HARNESS_EXPERIMENTAL_FORK=1)\n")
     stage_assets(inputs)
+
     stage_speech(ROOT, STAGE, RAW)
     subprocess.run(
         ["bash", str(RUNTIME / "packaging/build-native-shell.sh")],

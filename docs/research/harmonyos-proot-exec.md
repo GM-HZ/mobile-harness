@@ -190,3 +190,13 @@ GitHub Actions 的 `Build HarmonyOS HAP` 通过 `workflow_dispatch` 输入 `self
 模拟器验证：默认 HAP 覆盖安装后 `mh-exec` 为 **ABSENT**；自建 HAP 安装后为 `-rwxr-xr-x`，执行 `curl → gzip → tar → mh-exec ./busybox.static echo MH_EXEC_SWITCH_OK` 输出 `MH_EXEC_SWITCH_OK`、`CHILD_EXIT 0`。证据：[emulator-exec-bypass-switch-0.4.69.json](../evidence/emulator-exec-bypass-switch-0.4.69.json)。
 
 安全边界：该开关有意绕过平台代码签名限制，仅适用于自用/自编译 harness；应用市场分发构建保持关闭。
+
+## 透明执行的尝试与阻塞（2026-11-20）
+
+目标：让 `./downloaded-tool args` 直接可用，不需要显式 `mh-exec`。思路是修改 PRoot 的 guest loader（`loader/loader.c`）的 `LOAD_ACTION_MMAP_FILE`：当未签名文件的 `mmap(PROT_EXEC)` 被拒绝时，回退到匿名 RW 映射 + 拷贝 + `mprotect`。补丁保存在 `runtime/harmonyos/native/guest-loader-selfbuild.c`。
+
+结果：**当前不可行**。用 SDK clang 重新编译 vendored loader（无论是否打补丁）并仅在自建构建中替换 `libproot_preloader.so` 后，**所有** bash 命令都失败（包括签名 `/bin/bash` 的正常执行），而默认包正常。对比发现 pinned preloader 里有 `HARMONY_PRELOAD loader file mmap failed` 等字符串，这些不在 vendored loader 源码里；pinned preloader 大小 3264 bytes，vendored 编译产物 3040 bytes——说明 pinned loader 来自**另一份打过 OHOS 补丁的 PRoot 源码树**，vendored 树并非其构建来源。
+
+因此透明回退需要：找回/重建那份 patched PRoot 源码树并在其 loader 上打补丁；或换集成点（PATH shim / Host 命令重写 / LD_PRELOAD 式拦截）。当前已回退，保留 `mh-exec` 显式命令与构建开关。证据：[emulator-loader-fallback-attempt-0.4.69.json](../evidence/emulator-loader-fallback-attempt-0.4.69.json)。
+
+下一步优先做**用户态工具安装器**：`mh-install <name> <url> <member>` 把下载的静态工具装到私有目录并生成 `/usr/bin/<name>` shim（`#!/bin/sh` + `exec /usr/bin/mh-exec ...`），实现"下载后按名字直接用"，不依赖 loader 改造。
