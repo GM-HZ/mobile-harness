@@ -1,0 +1,23 @@
+{
+  "kind": "real GitHub account forge validation (private temporary repo PR)",
+  "checkedAt": "2026-11-21T10:12:58+0800",
+  "device": "API 26 Phone emulator 127.0.0.1:5555 (same Host JS as real device)",
+  "account": "GM-HZ (real GitHub token with repo scope)",
+  "repositoryUrl": "https://github.com/GM-HZ/mh-forge-fixture-100341/pull/1",
+  "headSha": "0b5b97956098735770b467a0535eb76fd5c34abf",
+  "track": null,
+  "fileText": "hello fixture",
+  "commits": {
+    "headSha": "0b5b97956098735770b467a0535eb76fd5c34abf",
+    "truncated": false,
+    "count": 1,
+    "first": {
+      "sha": "0b5b97956098735770b467a0535eb76fd5c34abf",
+      "parent": "15621bcce1ded3475521892388e5d9f334acec89",
+      "title": "fixture change",
+      "author": "MH Forge Fixture",
+      "authoredAt": "2026-11-21T02:03:49Z"
+    }
+  },
+  "note": "Forge panel read a real private PR through the guest gh CLI with a real account token: file contents and commit listing match GitHub. The real device could authenticate gh and run direct REST/GraphQL, but the forge gh-runner launch path on signed builds still needs the PRoot signed-exec fix validated (see docs plan 2026-11-21)."
+}

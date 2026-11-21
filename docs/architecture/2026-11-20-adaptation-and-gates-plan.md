@@ -539,3 +539,22 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 - forge fixture 有 loopback-only 保护（`The destructive crash fixture only accepts a loopback
   emulator target`），真机无法运行；forge 代理修复已在模拟器上通过 forge-account 验证，Host JS
   路径与真机一致。
+
+
+### 2026-11-21（真实 GitHub 账号 forge 验收）
+
+- 用真实账号（`GM-HZ`，host `gh` 已登录，repo scope）在 host 创建私有临时仓库
+  `mh-forge-fixture-100341` 与 PR #1（head `0b5b9795…`），把 token 写入 guest
+  `GH_CONFIG`，确认真机 guest `gh auth status` 为 `GM-HZ`，且真机 guest 直接
+  `gh api`（REST contents + GraphQL commits）返回真实 GitHub 数据。
+- **真实账号 forge 面板验收（模拟器 5555，Host JS 与真机同一份）PASS**：
+  `forgePanel/track` ok；`changeRequestText` = `hello fixture`；`changeRequestCommits`
+  headSha 与 PR 一致、1 个 commit、标题 `fixture change`。
+  证据：`docs/evidence/forge/real-account-emulator-20261121.json`。
+- **真机 forge 面板仍被 gh-runner 启动路径阻塞**：签名构建上 forge 的 guest gh 启动仍走
+  streaming launcher，触发 PRoot signed-exec loader handoff
+  （`embedded loader descriptors` / `execve("/bin/bash") Permission denied`）。
+  尝试改为 non-streaming `exec env … /usr/bin/gh …` + stdin 守卫，但真机验证未完成，
+  已回退未验证改动，保持分支干净；下一步在 launcher 层（与 `/bin/bash` 路由修复同源）继续。
+- 清理：已从真机与模拟器删除注入的 token；临时私有仓库因 token 缺 `delete_repo` scope
+  未能删除（仓库仍为 private），需要用户删除或授权 scope 后再删。
