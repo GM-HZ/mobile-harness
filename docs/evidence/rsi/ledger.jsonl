@@ -60,3 +60,4 @@
 {"commit": "90ecc86e3195a4e8c0742d606b48f6cb688007b3", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/90ecc86e3195a4e8c0742d606b48f6cb688007b3.json", "note": "", "at": "2026-11-21T08:38:34+0800"}
 {"commit": "e9d2559e2e70543b29220362d28c0cd6d58ba7f1", "tiers": ["G4"], "ok": true, "flakes": 0, "evidence": "docs/evidence/release/0.4.69-e9d2559e2e70543b29220362d28c0cd6d58ba7f1.json", "note": "", "at": "2026-11-21T08:39:44+0800"}
 {"commit": "e9d2559e2e70543b29220362d28c0cd6d58ba7f1", "tiers": ["G2"], "ok": true, "flakes": 0, "evidence": "docs/evidence/emulator", "note": "latest build: exec+overlay PASS, nightly 7/7 PASS", "at": "2026-11-21T08:42:28+0800"}
+{"commit": "f339296834818e6397b6b94212edceb7b286de50", "tiers": ["G3"], "ok": true, "flakes": 0, "evidence": "docs/evidence/device-lab", "note": "latest signed build 42a6872: verify PASS 17s, exec PASS 34s, overlay PASS 65s on Mate 60", "at": "2026-11-21T09:46:39+0800"}

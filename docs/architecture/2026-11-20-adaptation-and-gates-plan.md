@@ -530,3 +530,12 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
   （store 768,499,709 B / self 773,563,414 B；store/self 断言全过），evidence 已提交。
 - 结论：模拟器侧复验完成；真机侧 G3 与 session turn 已在上一轮完成；剩余仅
   `emulator-forge-github` 的临时 file-URL 插件注入限制（已文档化，forge 核心路径由 forge-account 覆盖）。
+
+
+### 2026-11-21（真机复验最新签名构建）
+
+- 当前分支构建签名 self HAP（`42a6872d…`）并安装到 Mate 60：
+  `verify PASS 17s` / `exec PASS 34s` / `overlay PASS 65s`。
+- forge fixture 有 loopback-only 保护（`The destructive crash fixture only accepts a loopback
+  emulator target`），真机无法运行；forge 代理修复已在模拟器上通过 forge-account 验证，Host JS
+  路径与真机一致。

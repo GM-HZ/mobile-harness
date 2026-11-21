@@ -1,9 +1,9 @@
 {
   "kind": "real-device read-only verification",
   "target": "37R0224115035605",
-  "checkedAt": "2026-11-21T08:10:29+0800",
+  "checkedAt": "2026-11-21T09:44:21+0800",
   "started": "start ability successfully.",
-  "readyMs": 136,
+  "readyMs": 13105,
   "parameters": {
     "model": "BRA-AL00",
     "brand": "HUAWEI",
@@ -25,7 +25,7 @@
   "web": 200,
   "storage": "/dev/block/platform/fa500000.ufs/by-name/userdata 465G 311G  154G  67% /mnt/debugtmp/100/debug_hap/org.sayact.nodepoc/data/storage/el1/base",
   "battery": {
-    "capacity": 100
+    "capacity": 87
   },
   "microphone": {
     "raw": "{\n  \"tokenID\": 537287734,\n  \"tokenAttr\": 8,\n  \"ver\": 1,\n  \"userId\": 100,\n  \"bundleName\": \"org.sayact.nodepoc\",\n  \"instIndex\": 0,\n  \"dlpType\": 0,\n  \"isRemote\": false,\n  \"isPermDialogForbidden\": false,\n"

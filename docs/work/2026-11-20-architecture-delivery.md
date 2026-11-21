@@ -84,3 +84,16 @@ python3 scripts/adaptation/gate_report.py
   the mobile Host's plugin boundary (documented in the plan).
 - G1 now has 11 entries (adds workflow wiring and real-device regression guards); G4 release gate
   re-run green at commit `e9d2559`.
+
+
+## 6. 2026-11-21 real-device re-validation (latest signed build)
+
+- Built the current branch as a signed self HAP (`42a6872d…`, 777,389,768 B) and installed it on the
+  Mate 60 (unlocked). G3 suites all pass on the latest code:
+  - `verify` PASS 17 s; `exec` PASS 34 s (all markers, COPY_NODE_OK, unsigned copy 126/127);
+  - `overlay` PASS 65 s (signed libs, node dlopen 42, dynamic jq 1.8.2).
+  Evidence: `docs/evidence/device-lab/20261121T0944*`/`20261121T0945*`.
+- The forge account fixture is intentionally loopback-emulator-only (`The destructive crash fixture
+  only accepts a loopback emulator target`), so the forge proxy fix was validated on the emulator
+  (`docs/evidence/forge/forge-account-emulator-20261121.json`); the mobile Host JS path is identical
+  in both builds.
