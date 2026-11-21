@@ -23,6 +23,7 @@ struct Index {
   @State progressPhase: string = '环境准备';
   @State splashVisible: boolean = true;
   @State splashOpacity: number = 1;
+  @State backgroundEnabled: boolean = true;
   @State restartError: string = '';
   @State restarting: boolean = false;
   private controller: webview.WebviewController = new webview.WebviewController();
@@ -44,6 +45,7 @@ struct Index {
         this.progressPercent = Math.max(this.progressPercent, progress.percent);
       }
       this.safe = session?.safe === true;
+      this.backgroundEnabled = dshEngine.isBackgroundEnabled();
       if (!session) {
         this.launchUrl = '';
         this.webFailed = false;
@@ -289,6 +291,20 @@ struct Index {
         .fontSize(15)
       Button('以安全模式重开').enabled(!this.restarting).onClick(() => { this.restart('safe'); })
       Button('以正常模式重开').enabled(!this.restarting).onClick(() => { this.restart('normal'); })
+      Row() {
+        Column({ space: 2 }) {
+          Text('后台常驻').fontSize(16)
+          Text(this.backgroundEnabled ? 'Host 在后台保持运行' : '后台已关闭，切后台将暂停')
+            .fontSize(12).fontColor('#8A8F9C')
+        }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+        Toggle({ type: ToggleType.Switch, isOn: this.backgroundEnabled })
+          .selectedColor('#4D6BFE')
+          .onChange((isOn: boolean) => {
+            this.backgroundEnabled = isOn;
+            const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+            dshEngine.setBackgroundEnabled(context, isOn);
+          })
+      }.width('100%').padding({ top: 8, bottom: 8 })
       Button('回滚插件配置并正常重开').enabled(!this.restarting).onClick(() => { this.rollbackPlugins(); })
       if (this.restartError) Text(this.restartError).fontSize(14)
       if (this.launchUrl && !this.webFailed) Button('返回会话').onClick(() => { this.recoveryOpen = false; })

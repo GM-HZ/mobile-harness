@@ -34,6 +34,7 @@ class DshEngine {
   private listeners: Set<EngineListener> = new Set<EngineListener>();
   private status: string = '正在准备本机 DSH…';
   private progress: EngineProgress = { phase: '环境准备', percent: 0 };
+  private backgroundPreference: boolean = true;
   private session?: BrowserSession;
   private running: boolean = false;
   private nativePoll: number = -1;
@@ -195,7 +196,7 @@ class DshEngine {
           ready = true;
           session.safe = mode === 'safe';
           this.publish('', session, { phase: '加载界面', percent: 90 });
-          void backgroundKeeper.start(context);
+          if (this.backgroundPreference) void backgroundKeeper.start(context);
           hilog.info(0xD005, 'DSHClient', 'native loopback ready ms=%{public}d mode=%{public}s',
             Date.now() - started, mode);
         } else if (!ready && Date.now() - nativeStarted > 60000) {
@@ -215,6 +216,39 @@ class DshEngine {
     const profile = root + '/native-benchmark-home/profiles/web';
     return [profile + '/cordis.patch.yml', profile + '/cordis.yml',
       profile + '/package.json', profile + '/pnpm-lock.yaml'];
+  }
+
+  private loadBackgroundPreference(context: common.UIAbilityContext): void {
+    try {
+      const path = context.filesDir + '/background-enabled.json';
+      const text = fileIo.readTextSync(path);
+      this.backgroundPreference = !text.includes('"enabled":false');
+    } catch (error) {
+      this.backgroundPreference = true;
+    }
+  }
+
+  isBackgroundEnabled(): boolean {
+    return this.backgroundPreference;
+  }
+
+  async setBackgroundEnabled(context: common.UIAbilityContext, enabled: boolean): Promise<void> {
+    this.backgroundPreference = enabled;
+    try {
+      const path = context.filesDir + '/background-enabled.json';
+      const file = fileIo.openSync(path,
+        fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      try {
+        fileIo.writeSync(file.fd, JSON.stringify({ enabled: enabled }) + '\n');
+      } finally { fileIo.closeSync(file); }
+    } catch (error) {
+      hilog.warn(0xD005, 'DSHClient', 'background preference write failed');
+    }
+    if (enabled) {
+      await backgroundKeeper.start(context);
+    } else {
+      await backgroundKeeper.stop(context);
+    }
   }
 
   extractOptional(context: common.UIAbilityContext): void {

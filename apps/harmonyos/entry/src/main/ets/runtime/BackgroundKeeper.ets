@@ -1,6 +1,7 @@
 import { common, wantAgent, WantAgent } from '@kit.AbilityKit';
 import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
 import { runningLock } from '@kit.BasicServicesKit';
+import { notificationManager } from '@kit.NotificationKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { util } from '@kit.ArkTS';
 import { hilog } from '@kit.PerformanceAnalysisKit';
@@ -28,6 +29,7 @@ export class BackgroundKeeper {
   private suspendHandler?: SuspendHandler;
   private activeHandler?: ActiveHandler;
   private powerLock?: runningLock.RunningLock;
+  private notificationId: number = 1001;
 
   async start(context: common.UIAbilityContext): Promise<boolean> {
     if (this.started) return true;
@@ -46,6 +48,7 @@ export class BackgroundKeeper {
       await this.acquirePowerLock();
       this.startHeartbeat(context);
       this.registerEvents();
+      await this.publishNotification(context);
       this.refreshTimer = setInterval(() => { this.refresh(context); }, 60000);
       hilog.info(0xD005, 'DSHClient', 'background continuous task started');
       return true;
@@ -74,9 +77,44 @@ export class BackgroundKeeper {
     }
     try {
       await this.releasePowerLock();
+      try { await notificationManager.cancel(this.notificationId); } catch (error) { /* optional */ }
       await backgroundTaskManager.stopBackgroundRunning(context);
     } catch (error) {
       hilog.warn(0xD005, 'DSHClient', 'background continuous task stop failed: %{public}s', String(error));
+    }
+  }
+
+  private async publishNotification(context: common.UIAbilityContext): Promise<void> {
+    try {
+      if (!notificationManager.isNotificationEnabledSync()) {
+        await notificationManager.requestEnableNotification(context);
+      }
+      const stopAgent: WantAgent = await wantAgent.getWantAgent({
+        wants: [{
+          bundleName: context.abilityInfo.bundleName,
+          abilityName: context.abilityInfo.name,
+          parameters: { stopBackground: true },
+        }],
+        actionType: wantAgent.OperationType.START_ABILITY,
+        requestCode: 1,
+      });
+      const request: notificationManager.NotificationRequest = {
+        id: this.notificationId,
+        notificationSlotType: notificationManager.SlotType.SERVICE_INFORMATION,
+        isOngoing: true,
+        content: {
+          notificationContentType: notificationManager.ContentType.NOTIFICATION_CONTENT_BASIC_TEXT,
+          normal: {
+            title: 'DeepSeek Harness',
+            text: '正在后台运行，点击按钮停止后台常驻',
+          },
+        },
+        actionButtons: [{ title: '停止后台', wantAgent: stopAgent }],
+      };
+      await notificationManager.publish(request);
+      hilog.info(0xD005, 'DSHClient', 'background notification published');
+    } catch (error) {
+      hilog.warn(0xD005, 'DSHClient', 'background notification unavailable: %{public}s', String(error));
     }
   }
 

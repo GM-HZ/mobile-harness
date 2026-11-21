@@ -50,3 +50,18 @@ iOS 端不是常驻 daemon，而是基于 audio/PiP/`BGContinuedProcessingTask` 
 3. 通知由系统长时任务通知提供，尚未做自定义"停止任务"action；
 4. store 上架合规风险（当前阶段不考虑上架）；
 5. 真正"系统保证永久常驻"仍需 `KEEP_BACKGROUND_RUNNING_SYSTEM`/special scenario ACL 或云端执行。
+
+
+## 5. 自定义通知、后台开关与长时 soak
+
+- BackgroundKeeper 发布常驻通知（`SERVICE_INFORMATION` slot、`isOngoing`），带
+  **"停止后台"** action；action 的 WantAgent 回到 EntryAbility，`onCreate/onNewWant` 识别
+  `stopBackground` 参数并释放 running lock/长时任务；
+- 发布前调用 `notificationManager.requestEnableNotification(context)`，首次使用会请求通知授权；
+- 恢复页新增 **"后台常驻"** Toggle：状态持久化到 `files/background-enabled.json`，
+  关闭时释放 running lock + 长时任务，下次启动按设置决定是否恢复；
+- 真机 soak：开启 running lock 后连续 **35 分钟**后台运行，pid 不变、heartbeat 每 5s 更新；
+  回前台 boot normal；
+- 通知与停止 action 的端到端点击验证受设备锁屏限制，尚未完成（代码已构建通过）。
+
+证据/限制：dataTransfer 仍需 running lock 兜底；厂商省电策略、通知授权、上架合规另算。
