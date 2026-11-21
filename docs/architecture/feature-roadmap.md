@@ -18,6 +18,7 @@
 | 运行时任意未签名 `.so` dlopen | ❌ | 只有构建期签名；需用户态 dlopen 加载器（大工程） |
 | Forge（真实账号/GitHub） | ✅ | 真实私有 PR 验收；launcher 走 packaged spawn |
 | LiveShare（relay/浏览器） | 🔶 | 本地/中继 fixture 通过；真机与公网 Relay 未验 |
+| LSP（代码智能） | 🔶 | 默认 opt-in（PluginManager 启用）；payload 在 optional 层 |
 | 语音输入（SenseVoice） | 🔶 | 设备路径适配中；`emulator-voice-input` |
 | Office 预览/转换 | 🔶 | compat worker；`emulator-office*` |
 | 包管理（pnpm/插件） | 🔶 | pnpm 桥 + fetch shim；`emulator-plugin-*` |

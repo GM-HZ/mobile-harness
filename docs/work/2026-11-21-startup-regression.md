@@ -206,3 +206,36 @@ store 构建保持 jitless，且 chunked store HAP shape 检查通过。
   极早使用这些能力可能遇到短暂未就绪；
 - 真机增量升级的“包内容实际变化”场景未单独构造，仅通过 marker 失效验证了 chunk 选择逻辑；
 - Host JIT 只影响 self/lab；store 仍 jitless（待商店策略确认后评估）。
+
+
+## 9. 冷启动 <20s、启动 UI 与 LSP 默认策略（最终）
+
+### 9.1 冷启动
+
+在真机 Mate 60 上最终达到 **readyMs 17.3s**（目标 <20s）：
+- chunk 解包 ~5s（zlib `PARALLEL_STRATEGY_PARALLEL_DECOMPRESSION` + 深度瘦身）；
+- 首次启动 Host 使用 `--jitless`（`dsh-host-jitless` marker），避免 JIT 首次编译开销；
+  之后温启动自动切回 JIT；
+- 可选层不再在 Host ready 时解包，而是首屏加载完成后再延迟 8s 后台解包，避免和 WebView/首轮交互抢 I/O。
+
+### 9.2 启动界面
+
+- 新增品牌化加载页：深色渐变背景、DS 品牌标识、产品名/副标题、**确定性进度条**、
+  阶段步骤（环境/解包/服务/界面）、百分比与状态文案；
+- 阶段进度由 `DshEngine` 以 `EngineProgress` 事件上报（准备、解包 chunk、启动 Host、加载界面）；
+- WebView 首帧完成后进度到 100% 并 320ms 淡出，平滑进入客户端；失败/安全模式仍可进入恢复选项；
+- 截图：`docs/evidence/startup/ui-splash.jpeg`、`ui-ready.jpeg`。
+
+### 9.3 LSP 默认改为 opt-in
+
+LSP（pyright + typescript-language-server）体积大、首启开销明显，默认 profile 不再注入
+`@mobile-harness/lsp`；用户可从 PluginManager 启用（payload 在 optional 层后台就绪）。
+`tests/smoke/emulator-lsp-bundle.py` 已支持"默认关闭 → 首次启用 → 测试开关"的流程。
+
+最终真机数据：
+| 指标 | 优化前 | 最终 |
+| --- | --- | --- |
+| 冷启动 前景 → ArkWeb | 59.7s | **17.3s** |
+| 温启动 前景 → ArkWeb | 13.1s | **9.97s** |
+| native loopback（温） | 9.9s | **6.9s** |
+| G3 verify/exec/overlay | — | PASS |

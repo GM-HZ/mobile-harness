@@ -2,7 +2,7 @@ import { abilityAccessCtrl, common } from '@kit.AbilityKit';
 import { url } from '@kit.ArkTS';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { BrowserSession, dshEngine } from '../runtime/DshEngine';
+import { BrowserSession, EngineProgress, dshEngine } from '../runtime/DshEngine';
 import { ForgeAccount } from './ForgeAccount';
 
 const LOCAL_ORIGIN = 'http://127.0.0.1:19592';
@@ -19,6 +19,10 @@ struct Index {
   @State forgeAccountOpen: boolean = false;
   @State safe: boolean = false;
   @State webFailed: boolean = false;
+  @State progressPercent: number = 0;
+  @State progressPhase: string = '环境准备';
+  @State splashVisible: boolean = true;
+  @State splashOpacity: number = 1;
   @State restartError: string = '';
   @State restarting: boolean = false;
   private controller: webview.WebviewController = new webview.WebviewController();
@@ -32,8 +36,13 @@ struct Index {
 
   aboutToAppear(): void {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
-    this.detachEngine = dshEngine.attach(context, (status: string, session?: BrowserSession) => {
+    this.detachEngine = dshEngine.attach(context, (status: string, session?: BrowserSession,
+      progress?: EngineProgress) => {
       this.status = status;
+      if (progress) {
+        this.progressPhase = progress.phase;
+        this.progressPercent = Math.max(this.progressPercent, progress.percent);
+      }
       this.safe = session?.safe === true;
       if (!session) {
         this.launchUrl = '';
@@ -61,6 +70,14 @@ struct Index {
   aboutToDisappear(): void {
     this.detachEngine?.();
     this.detachEngine = undefined;
+  }
+
+  private finishSplash(): void {
+    if (!this.splashVisible) return;
+    this.progressPhase = '就绪';
+    this.progressPercent = 100;
+    animateTo({ duration: 320, curve: Curve.EaseOut }, () => { this.splashOpacity = 0; });
+    setTimeout(() => { this.splashVisible = false; }, 340);
   }
 
   private async requestMicrophone(request: PermissionRequest): Promise<void> {
@@ -278,8 +295,51 @@ struct Index {
     }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
   }
 
+  @Builder
+  private splashScreen() {
+    Stack({ alignContent: Alignment.Bottom }) {
+      Column() {
+        Stack() {
+          Text('DS').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
+            .letterSpacing(1)
+        }.width(88).height(88).borderRadius(24)
+          .linearGradient({ angle: 135, colors: [['#5B7CFF', 0], ['#2B3AA8', 1]] })
+          .border({ width: 1, color: '#607BFF55' })
+        Text('DeepSeek Harness').fontSize(25).fontWeight(FontWeight.Medium)
+          .fontColor('#F5F6FA').margin({ top: 24 }).letterSpacing(0.4)
+        Text('本机 AI 执行环境').fontSize(12).fontColor('#767B8A').margin({ top: 9 }).letterSpacing(0.6)
+        Column() {
+          Row() {
+            Row().width(this.progressPercent + '%').height(4)
+              .backgroundColor('#4D6BFE').borderRadius(2)
+              .animation({ duration: 420, curve: Curve.EaseOut })
+          }.width('100%').height(4).backgroundColor('#20232E').borderRadius(2)
+          Row() {
+            Text(this.progressPhase).fontSize(11).fontColor('#9499A6')
+            Blank()
+            Text(this.progressPercent + '%').fontSize(11).fontColor('#5C6273')
+          }.width('100%').margin({ top: 12 })
+          Row({ space: 18 }) {
+            Text('环境').fontSize(10).fontColor(this.progressPercent >= 5 ? '#4D6BFE' : '#3A3F4E')
+            Text('解包').fontSize(10).fontColor(this.progressPercent >= 8 ? '#4D6BFE' : '#3A3F4E')
+            Text('服务').fontSize(10).fontColor(this.progressPercent >= 66 ? '#4D6BFE' : '#3A3F4E')
+            Text('界面').fontSize(10).fontColor(this.progressPercent >= 90 ? '#4D6BFE' : '#3A3F4E')
+          }.margin({ top: 12 })
+          Text(this.status).fontSize(12).fontColor('#6B7080').margin({ top: 10 })
+            .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
+        }.width(280).margin({ top: 42 })
+      }.width('100%').height('100%').justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
+      Text('恢复选项').fontSize(12).fontColor('#555B6A').padding(14)
+        .margin({ bottom: 16 })
+        .onClick(() => { this.splashVisible = false; this.recoveryOpen = true; })
+    }.width('100%').height('100%').padding({ left: 32, right: 32 })
+      .linearGradient({ angle: 180, colors: [['#090A0F', 0], ['#10121B', 0.55], ['#090A0F', 1]] })
+      .opacity(this.splashOpacity)
+  }
+
   build() {
-    Column() {
+    Stack({ alignContent: Alignment.Center }) {
       if (this.launchUrl) {
         Web({ src: this.launchUrl, controller: this.controller })
           .layoutWeight(1)
@@ -299,6 +359,7 @@ struct Index {
             if (!event || !event.data.isMainFrame()) return false;
             const url = event.data.getRequestUrl();
             if (url === RECOVERY_URL) {
+              this.splashVisible = false;
               this.recoveryOpen = true;
               return true;
             }
@@ -314,39 +375,42 @@ struct Index {
                 'JSON.stringify({ title: document.title, ready: document.readyState, atLoopback: location.hostname === "127.0.0.1", body: document.body?.innerText.length || 0 })'
               ).then((value: string) => {
                 hilog.info(0xD005, 'DSHClient', 'ArkWeb loaded %{public}s', value);
-              }).catch(() => {});
+                this.finishSplash();
+                const host = this.getUIContext().getHostContext() as common.UIAbilityContext;
+                // Optional feature payloads are large; keep the first seconds
+                // after reveal free of extraction I/O so the client is responsive.
+                setTimeout(() => { dshEngine.extractOptional(host); }, 8000);
+              }).catch(() => { this.finishSplash(); });
             }, 1500);
           })
           .onErrorReceive((event) => {
             if (event?.request.isMainFrame() && event.error.getErrorCode() !== -3 &&
                 event.request.getRequestUrl() !== RECOVERY_URL && event.request.getRequestUrl() !== GITHUB_URL) {
               this.webFailed = true;
+              this.splashVisible = false;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb main error %{public}d', event.error.getErrorCode());
             }
           })
           .onHttpErrorReceive((event) => {
             if (event?.request.isMainFrame()) {
               this.webFailed = true;
+              this.splashVisible = false;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb HTTP %{public}d', event.response.getResponseCode());
             }
           })
-          .onRenderExited(() => { this.webFailed = true; })
-        if (this.webFailed || this.recoveryOpen) {
-          this.recoveryPage()
-        } else if (this.forgeAccountOpen) {
-          ForgeAccount({ onClose: () => { this.forgeAccountOpen = false; } })
-        } else if (this.loginVisible) {
-          this.loginPage()
-        }
-      } else {
-        Text('Mobile Harness').fontSize(26).fontWeight(FontWeight.Medium)
-        if (this.recoveryOpen) {
-          this.recoveryPage()
-        } else {
-          Text(this.status).fontSize(15).margin({ top: 12 })
-          Button('恢复选项').margin({ top: 12 }).onClick(() => { this.recoveryOpen = true; })
-        }
+          .onRenderExited(() => { this.webFailed = true; this.splashVisible = false; })
       }
-    }.height('100%').width('100%').padding(this.launchUrl ? 0 : 24)
+      if (this.webFailed || this.recoveryOpen) {
+        this.recoveryPage()
+      } else if (this.forgeAccountOpen) {
+        ForgeAccount({ onClose: () => { this.forgeAccountOpen = false; } })
+      } else if (this.loginVisible) {
+        this.loginPage()
+      }
+      if (this.splashVisible && !this.recoveryOpen && !this.loginVisible &&
+          !this.forgeAccountOpen && !this.webFailed) {
+        this.splashScreen()
+      }
+    }.height('100%').width('100%')
   }
 }

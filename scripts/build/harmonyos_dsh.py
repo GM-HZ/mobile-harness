@@ -29,19 +29,27 @@ PRUNE_PATTERNS = (
     re.compile(r"\.map$"),
     re.compile(r"\.d\.ts$"),
     re.compile(r"/(?:test|tests|__tests__|spec)/"),
+    re.compile(r"node_modules/node-pty/prebuilds/"),
 )
 # Heavy payloads that are only imported when their feature is used. They stay
 # in the HAP but are extracted as a second archive in parallel with the core
 # layer, keeping first-boot wall time close to the core layer.
 OPTIONAL_PATTERNS = (
     re.compile(r"libreoffice-kit-wasm/"),
-    re.compile(r"node_modules/sherpa-onnx/"),
+    re.compile(r"node_modules/sherpa-onnx[^/]*/"),
     re.compile(r"dsh-experimental-client-ui-forge/"),
     re.compile(r"dsh-experimental-liveshare/"),
     re.compile(r"dsh-client-ui-sidebar-documentpreview/"),
     re.compile(r"node_modules/@img/sharp"),
     re.compile(r"node_modules/@google/genai/"),
     re.compile(r"node_modules/@anthropic-ai/"),
+    re.compile(r"dsh-experimental-inspector/"),
+    re.compile(r"node_modules/pyright/"),
+    re.compile(r"toolchains/lsp/node_modules/typescript/"),
+    re.compile(r"node_modules/openai/"),
+    re.compile(r"node_modules/@opentelemetry/"),
+    re.compile(r"node_modules/@smithy/"),
+    re.compile(r"node_modules/@aws-sdk/"),
 )
 
 

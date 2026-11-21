@@ -17,23 +17,29 @@ interface LayerManifest {
   chunks: LayerChunk[];
 }
 
+export interface EngineProgress {
+  phase: string;
+  percent: number;
+}
+
 export interface BrowserSession {
   url: string;
   cookie?: string;
   safe?: boolean;
 }
-type EngineListener = (status: string, session?: BrowserSession) => void;
+type EngineListener = (status: string, session?: BrowserSession, progress?: EngineProgress) => void;
 
 class DshEngine {
   private listeners: Set<EngineListener> = new Set<EngineListener>();
   private status: string = '正在准备本机 DSH…';
+  private progress: EngineProgress = { phase: '环境准备', percent: 0 };
   private session?: BrowserSession;
   private running: boolean = false;
   private nativePoll: number = -1;
 
   attach(context: common.UIAbilityContext, listener: EngineListener): () => void {
     this.listeners.add(listener);
-    listener(this.status, this.session);
+    listener(this.status, this.session, this.progress);
     if (!this.running) {
       this.running = true;
       this.start(context);
@@ -43,10 +49,11 @@ class DshEngine {
     return () => { this.listeners.delete(listener); };
   }
 
-  private publish(status: string, session?: BrowserSession): void {
+  private publish(status: string, session?: BrowserSession, progress?: EngineProgress): void {
     this.status = status;
     this.session = session;
-    this.listeners.forEach(listener => listener(status, session));
+    if (progress) this.progress = progress;
+    this.listeners.forEach(listener => listener(status, session, progress ?? this.progress));
   }
 
   private writeMode(path: string, mode: string): void {
@@ -166,6 +173,7 @@ class DshEngine {
     } catch (error) {
       optionalId = '';
     }
+    this.publish('正在启动本机 Harness…', undefined, { phase: '启动服务', percent: 72 });
     const nativeStarted = Date.now();
     poc.startNative(root, mode === 'safe');
     let ready = false;
@@ -183,12 +191,9 @@ class DshEngine {
           }
           recovery.write(mode, false);
           this.savePluginSnapshot(context, root);
-          if (mode !== 'safe' && /^[a-f0-9]{64}$/.test(optionalId)) {
-            void this.prepareOptionalLayer(context, dshRelease, optionalId);
-          }
           ready = true;
           session.safe = mode === 'safe';
-          this.publish('', session);
+          this.publish('', session, { phase: '加载界面', percent: 90 });
           hilog.info(0xD005, 'DSHClient', 'native loopback ready ms=%{public}d mode=%{public}s',
             Date.now() - started, mode);
         } else if (!ready && Date.now() - nativeStarted > 60000) {
@@ -208,6 +213,22 @@ class DshEngine {
     const profile = root + '/native-benchmark-home/profiles/web';
     return [profile + '/cordis.patch.yml', profile + '/cordis.yml',
       profile + '/package.json', profile + '/pnpm-lock.yaml'];
+  }
+
+  extractOptional(context: common.UIAbilityContext): void {
+    const root = context.filesDir + '/alpine';
+    const dshRelease = root + '/.dsh-0.2.2-rc.5';
+    let identity = '';
+    try {
+      for (const byte of context.resourceManager.getRawFileContentSync('dsh-optional-runtime-id.txt')) {
+        identity += String.fromCharCode(byte);
+      }
+    } catch (error) {
+      identity = '';
+    }
+    if (/^[a-f0-9]{64}$/.test(identity)) {
+      void this.prepareOptionalLayer(context, dshRelease, identity);
+    }
   }
 
   private async prepareOptionalLayer(context: common.UIAbilityContext, dshRelease: string,
@@ -305,6 +326,7 @@ class DshEngine {
         return;
       }
       const mode = state.pending ? 'safe' : state.mode;
+      this.publish('正在准备运行环境…', undefined, { phase: '环境准备', percent: 5 });
       for (const name of ['bin', 'lib', 'etc', 'tmp', 'root', 'dsh']) {
         const path = root + '/' + name;
         if (!fileIo.accessSync(path)) fileIo.mkdirSync(path, true);
@@ -329,38 +351,22 @@ class DshEngine {
       }
       const dshUnpackStarted = Date.now();
       let extractedChunks = 0;
-      for (const chunk of manifest.chunks) {
+      // Sequential extraction is faster on device: concurrent ArkTS zlib
+      // decompression into the same tree serializes on I/O and delays startup.
+      for (let chunkIndex = 0; chunkIndex < manifest.chunks.length; chunkIndex++) {
+        const chunk = manifest.chunks[chunkIndex];
         if (!/^dsh-layer-[0-9]+\.zip$/.test(chunk.file) || !/^[a-f0-9]{64}$/.test(chunk.sha256)) {
           throw new Error('Invalid packaged DSH chunk entry');
         }
-      }
-      // Sequential extraction is faster on device: concurrent ArkTS zlib
-      // decompression into the same tree serializes on I/O and delays startup.
-      for (const chunk of manifest.chunks) {
+        this.publish('正在解包核心组件…', undefined,
+          { phase: '解包核心组件', percent: 8 + Math.round(45 * (chunkIndex + 1) / manifest.chunks.length) });
         if (await this.unpack(context, chunk.file, dshRelease, chunk.sha256)) extractedChunks++;
       }
+      await this.unpackAuxLayers(context, root, mode);
+      this.publish('正在准备运行时…', undefined, { phase: '环境准备', percent: 56 });
       hilog.info(0xD005, 'DSHClient', 'startup chunks extracted=%{public}d/%{public}d ms=%{public}d',
         extractedChunks, manifest.chunks.length, Date.now() - dshUnpackStarted);
-      for (const archive of ['node-layer.zip', 'shell-tools-layer.zip',
-        'shell-extras-v3.zip', 'pnpm-layer-v2.zip']) {
-        const phase = Date.now();
-        const extracted = await this.unpack(context, archive, root);
-        hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
-          archive, String(extracted), Date.now() - phase);
-      }
-      if (mode !== 'safe') {
-        let wheelId = '';
-        for (const byte of context.resourceManager.getRawFileContentSync('workspace-python-id.txt')) {
-          wheelId += String.fromCharCode(byte);
-        }
-        if (!/^[a-f0-9]{64}$/.test(wheelId)) throw new Error('Invalid packaged Python layer identity');
-        const phase = Date.now();
-        const extracted = await this.unpack(context, 'workspace-python-v1.zip', root, wheelId);
-        hilog.info(0xD005, 'DSHClient', 'startup archive workspace-python-v1.zip extracted=%{public}s ms=%{public}d',
-          String(extracted), Date.now() - phase);
-        this.copyGuest(context, 'workspace-python.pth', root + '/usr/lib/python3.12/site-packages/mobile-harness-workspace.pth');
-        this.copyGuest(context, 'dsh-harmony-workspace-deps.json', root + '/dsh-harmony-workspace-deps.json');
-      }
+      this.publish('正在准备本地服务…', undefined, { phase: '启动服务', percent: 66 });
       this.prepareTimezone(root);
 
       for (const name of ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
@@ -368,6 +374,17 @@ class DshEngine {
         this.copyGuest(context, name, root + '/' + name);
       }
       if (mode !== 'safe') this.prepareSelfBuildTools(context, root);
+      try {
+        const coldBootMarker = root + '/dsh-host-jitless';
+        if (extractedChunks > 0) {
+          fileIo.writeSync(fileIo.openSync(coldBootMarker,
+            fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC).fd, new ArrayBuffer(0));
+        } else {
+          try { fileIo.unlinkSync(coldBootMarker); } catch (error) { /* warm boot */ }
+        }
+      } catch (error) {
+        // Marker is an optimization; ignore failures.
+      }
       if (mode === 'safe' || !fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
         await this.prepareResolver(root);
         this.runNative(context, root, started, mode);
@@ -389,6 +406,29 @@ class DshEngine {
       hilog.error(0xD005, 'DSHClient', 'setup error %{public}s', String(e));
     } finally {
       if (!nativeStarted) this.running = false;
+    }
+  }
+
+  private async unpackAuxLayers(context: common.UIAbilityContext, root: string, mode: string): Promise<void> {
+    for (const archive of ['node-layer.zip', 'shell-tools-layer.zip',
+      'shell-extras-v3.zip', 'pnpm-layer-v2.zip']) {
+      const phase = Date.now();
+      const extracted = await this.unpack(context, archive, root);
+      hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
+        archive, String(extracted), Date.now() - phase);
+    }
+    if (mode !== 'safe') {
+      let wheelId = '';
+      for (const byte of context.resourceManager.getRawFileContentSync('workspace-python-id.txt')) {
+        wheelId += String.fromCharCode(byte);
+      }
+      if (!/^[a-f0-9]{64}$/.test(wheelId)) throw new Error('Invalid packaged Python layer identity');
+      const phase = Date.now();
+      const extracted = await this.unpack(context, 'workspace-python-v1.zip', root, wheelId);
+      hilog.info(0xD005, 'DSHClient', 'startup archive workspace-python-v1.zip extracted=%{public}s ms=%{public}d',
+        String(extracted), Date.now() - phase);
+      this.copyGuest(context, 'workspace-python.pth', root + '/usr/lib/python3.12/site-packages/mobile-harness-workspace.pth');
+      this.copyGuest(context, 'dsh-harmony-workspace-deps.json', root + '/dsh-harmony-workspace-deps.json');
     }
   }
 
@@ -451,7 +491,9 @@ class DshEngine {
       context.resourceManager.closeRawFdSync(name);
     }
     try {
-      await zlib.decompressFile(archive, root);
+      await zlib.decompressFile(archive, root, {
+        parallel: zlib.ParallelStrategy.PARALLEL_STRATEGY_PARALLEL_DECOMPRESSION,
+      });
       fileIo.closeSync(fileIo.openSync(marker, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY).fd);
       hilog.info(0xD005, 'HarmonyPRoot', 'unpacked %{public}s', name);
       return true;

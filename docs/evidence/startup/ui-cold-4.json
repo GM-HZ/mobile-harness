@@ -1,0 +1,80 @@
+{
+  "target": "127.0.0.1:5557",
+  "mode": "cold",
+  "ready": true,
+  "wallSeconds": 70.7,
+  "nativeLoopbackMs": 48828,
+  "readyMs": 63774,
+  "phases": [
+    {
+      "at": "18:39:50.855",
+      "message": "ability foreground"
+    },
+    {
+      "at": "18:40:16.331",
+      "message": "startup archive node-layer.zip extracted=true ms=213"
+    },
+    {
+      "at": "18:40:16.648",
+      "message": "startup archive shell-tools-layer.zip extracted=true ms=317"
+    },
+    {
+      "at": "18:40:16.811",
+      "message": "startup archive shell-extras-v3.zip extracted=true ms=163"
+    },
+    {
+      "at": "18:40:17.234",
+      "message": "startup archive pnpm-layer-v2.zip extracted=true ms=422"
+    },
+    {
+      "at": "18:40:19.337",
+      "message": "startup archive workspace-python-v1.zip extracted=true ms=2103"
+    },
+    {
+      "at": "18:40:19.348",
+      "message": "startup chunks extracted=8/8 ms=26766"
+    },
+    {
+      "at": "18:40:19.998",
+      "message": "starting native Web ms=27448"
+    },
+    {
+      "at": "18:40:41.378",
+      "message": "native loopback ready ms=48828 mode=normal"
+    },
+    {
+      "at": "18:40:54.629",
+      "message": "ArkWeb loaded \"{\\\"title\\\":\\\"DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":30}\""
+    }
+  ],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 33,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 316
+    },
+    {
+      "event": "web-announced",
+      "ms": 18352,
+      "loadCount": 5413,
+      "loadMs": 3311
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 18700
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 19410,
+      "exchange": 303,
+      "page": 200
+    }
+  ],
+  "measuredAt": "2026-11-21T18:41:00+0800"
+}

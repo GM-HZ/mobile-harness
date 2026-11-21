@@ -1,0 +1,100 @@
+{
+  "target": "127.0.0.1:5557",
+  "mode": "cold",
+  "ready": true,
+  "wallSeconds": 28.2,
+  "nativeLoopbackMs": 18974,
+  "readyMs": 25168,
+  "phases": [
+    {
+      "at": "18:29:11.090",
+      "message": "ability foreground"
+    },
+    {
+      "at": "18:29:21.243",
+      "message": "startup chunks extracted=8/8 ms=9862"
+    },
+    {
+      "at": "18:29:21.316",
+      "message": "startup archive node-layer.zip extracted=true ms=73"
+    },
+    {
+      "at": "18:29:21.445",
+      "message": "startup archive shell-tools-layer.zip extracted=true ms=129"
+    },
+    {
+      "at": "18:29:21.564",
+      "message": "startup archive shell-extras-v3.zip extracted=true ms=119"
+    },
+    {
+      "at": "18:29:21.870",
+      "message": "startup archive pnpm-layer-v2.zip extracted=true ms=306"
+    },
+    {
+      "at": "18:29:22.971",
+      "message": "startup archive workspace-python-v1.zip extracted=true ms=1101"
+    },
+    {
+      "at": "18:29:23.133",
+      "message": "starting native Web ms=11766"
+    },
+    {
+      "at": "18:29:30.341",
+      "message": "native loopback ready ms=18974 mode=normal"
+    },
+    {
+      "at": "18:29:36.258",
+      "message": "ArkWeb loaded \"{\\\"title\\\":\\\"DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":320}\""
+    }
+  ],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 2,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 323
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 5430,
+      "pid": 32238
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 5449,
+      "pid": 32239
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5903,
+      "pid": 32238
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5904,
+      "pid": 32239
+    },
+    {
+      "event": "web-announced",
+      "ms": 5973,
+      "loadCount": 5770,
+      "loadMs": 1493
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 6009
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 6166,
+      "exchange": 303,
+      "page": 200
+    }
+  ],
+  "measuredAt": "2026-11-21T18:29:38+0800"
+}

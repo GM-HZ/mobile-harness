@@ -26,6 +26,14 @@ def run(emulator, output):
     saved = {}; before = {}
     try:
         emulator.ready('normal')
+        # Fresh profiles no longer enable LSP by default: it is a large optional
+        # payload for code navigation. Enable it first, then exercise the toggle.
+        initial = bundle(emulator)
+        if not initial['enabled']:
+            evidence['initialEnable'] = emulator.rpc('pluginManager/setBundleEnabled',
+                                                     {'name': NAME, 'enabled': True})
+            assert evidence['initialEnable']['application'] in ['applied', 'restart-required'], evidence['initialEnable']
+            emulator.stop(); emulator.start(); evidence['initialReadyMs'] = emulator.ready('normal')
         for path in [PROFILE + '/package.json', PROFILE + '/pnpm-lock.yaml', 'mobile-harness-boot.json']:
             exists = emulator.app('test -e ' + path + ' && printf PRESENT') == 'PRESENT'
             if exists:

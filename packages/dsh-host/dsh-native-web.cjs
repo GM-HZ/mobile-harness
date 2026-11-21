@@ -789,11 +789,9 @@ async function main() {
     const migration = path.join(profile.dir, '.mobile-harness-default-lsp-v1');
     if (!fs.existsSync(migration)) {
       const manifest = readProfileManifest('dsh', profile.dir);
-      const bundles = manifest.dsh.profile.bundles;
-      if (!bundles.includes('@mobile-harness/lsp')) {
-        bundles.push('@mobile-harness/lsp');
-        writeProfileManifest(profile.dir, manifest);
-      }
+      // LSP payload is large and only needed for code navigation; it is no
+      // longer enabled for fresh profiles. Users can enable the shipped bundle
+      // from PluginManager after the optional layer has been extracted.
       fs.writeFileSync(migration, '1\n', { mode: 0o600 });
       profile = loadProfile('dsh', profileName, installAnchor, home);
     }
