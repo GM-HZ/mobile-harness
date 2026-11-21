@@ -21,6 +21,17 @@ def bundle(emulator):
     return {key: item[key] for key in ['name', 'availability', 'removable', 'enabled', 'version']}
 
 
+def wait_optional_payload(emulator):
+    """The optional layer is extracted after first reveal; wait before enabling LSP."""
+    for _ in range(90):
+        present = emulator.app("cd data/storage/el2/base/haps/entry/files/alpine/.dsh-0.2.2-rc.5 && "
+                               "ls .validated-unpack-v2-dsh-layer-optional.zip-* 2>/dev/null | head -1")
+        if present:
+            return
+        time.sleep(1)
+    raise AssertionError("optional LSP payload did not become available")
+
+
 def run(emulator, output):
     evidence = {}; suffix = '.mh-lsp-toggle-' + uuid.uuid4().hex[:8]
     saved = {}; before = {}
@@ -30,6 +41,7 @@ def run(emulator, output):
         # payload for code navigation. Enable it first, then exercise the toggle.
         initial = bundle(emulator)
         if not initial['enabled']:
+            wait_optional_payload(emulator)
             evidence['initialEnable'] = emulator.rpc('pluginManager/setBundleEnabled',
                                                      {'name': NAME, 'enabled': True})
             assert evidence['initialEnable']['application'] in ['applied', 'restart-required'], evidence['initialEnable']
