@@ -1,0 +1,100 @@
+{
+  "target": "37R0224115035605",
+  "mode": "cold",
+  "ready": true,
+  "wallSeconds": 64.4,
+  "nativeLoopbackMs": 55886,
+  "readyMs": 59731,
+  "phases": [
+    {
+      "at": "14:25:33.086",
+      "message": "ability foreground"
+    },
+    {
+      "at": "14:25:33.365",
+      "message": "startup archive node-layer.zip extracted=true ms=95"
+    },
+    {
+      "at": "14:25:33.530",
+      "message": "startup archive shell-tools-layer.zip extracted=true ms=165"
+    },
+    {
+      "at": "14:25:33.626",
+      "message": "startup archive shell-extras-v3.zip extracted=true ms=96"
+    },
+    {
+      "at": "14:25:33.764",
+      "message": "startup archive pnpm-layer-v2.zip extracted=true ms=138"
+    },
+    {
+      "at": "14:25:34.984",
+      "message": "startup archive workspace-python-v1.zip extracted=true ms=1220"
+    },
+    {
+      "at": "14:26:15.937",
+      "message": "startup archive dsh-layer.zip extracted=true ms=40948"
+    },
+    {
+      "at": "14:26:16.021",
+      "message": "starting native Web ms=42756"
+    },
+    {
+      "at": "14:26:29.151",
+      "message": "native loopback ready ms=55886 mode=normal"
+    },
+    {
+      "at": "14:26:32.817",
+      "message": "ArkWeb loaded \"{\\\"title\\\":\\\"Probe PRoot exec semantics \u2014 DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":87}\""
+    }
+  ],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 2,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 287
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 9550,
+      "pid": 42266
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 9575,
+      "pid": 42275
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 10417,
+      "pid": 42266
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 10435,
+      "pid": 42275
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 11405
+    },
+    {
+      "event": "web-announced",
+      "ms": 11411,
+      "loadCount": 5772,
+      "loadMs": 1286
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 11879,
+      "exchange": 303,
+      "page": 200
+    }
+  ],
+  "measuredAt": "2026-11-21T14:26:36+0800"
+}

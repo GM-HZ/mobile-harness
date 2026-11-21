@@ -34,9 +34,12 @@ PRUNE_PATTERNS = (
 OPTIONAL_PATTERNS = (
     re.compile(r"libreoffice-kit-wasm/"),
     re.compile(r"node_modules/sherpa-onnx/"),
-    re.compile(r"dsh-experimental-inspector/"),
-    re.compile(r"node_modules/pyright/"),
-    re.compile(r"toolchains/lsp/node_modules/typescript/"),
+    re.compile(r"dsh-experimental-client-ui-forge/"),
+    re.compile(r"dsh-experimental-liveshare/"),
+    re.compile(r"dsh-client-ui-sidebar-documentpreview/"),
+    re.compile(r"node_modules/@img/sharp"),
+    re.compile(r"node_modules/@google/genai/"),
+    re.compile(r"node_modules/@anthropic-ai/"),
 )
 
 

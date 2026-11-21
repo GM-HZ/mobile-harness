@@ -131,3 +131,27 @@
   首次立即使用这些能力可能失败，需要能力入口等待或提示（后续优化）；
 - 下一步按顺序：升级增量解包（P1）、Host/profile 并行与 bundle 延迟（P1）、
   copyGuest 去重（P2）、真机复测（需要设备重新连接）。
+
+
+## 6. 真机验证（Mate 60，2026-11-21）
+
+A/B 对比：同一台真机、同一 clean profile（base + web-app + LSP），旧构建 vs 本分支构建。
+
+| 指标 | 旧构建（741MB） | 本分支（656MB） |
+| --- | --- | --- |
+| 冷启动 前景 → ArkWeb（readyMs） | **59.7s** | **29.0s** |
+| 冷启动 wall | 64.4s | 34.3s |
+| 温启动 前景 → ArkWeb（readyMs） | 13.1s | **13.3s** |
+| 温启动 native loopback | 9.95s | 9.89s |
+| dsh-layer 解包 | 全量 | 核心层 + 后台 optional |
+
+结论：
+- **冷启动提升约 51%**（60s → 29s），主要来自解包瘦身/拆分；
+- **温启动没有实质变化（约 13s）**：瓶颈在 Host 启动（真机 ~10s，约 5,768 个模块；
+  设备 CPU + jitless Node），与解包无关；本次尝试的 Node compile cache 在真机上反而显著变慢，已回退；
+- 真机 G3 `verify` / `exec` / `overlay` 在该构建全部 PASS；
+- 证据：`docs/evidence/startup/device-baseline-{cold,warm}.json`、
+  `device-final2-{cold,warm}.json`。
+
+后续若要真机温启动继续下降，需要单独做 **Host 启动优化**（模块/启动路径裁剪、jitless 限制评估），
+不再属于解包优化范围；增量升级解包仍未实现（需要 chunked layer 设计）。

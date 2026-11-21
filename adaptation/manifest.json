@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "81e8ec84c65e22c8a7d902959a43ae10db6168b9",
+  "generatedFrom": "fb92c611a638506d39248b77e1ee8c40578510a4",
   "layers": [
     "host",
     "web",
@@ -1125,7 +1125,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "0640b72f947a9d001ebaa025ed796fc518febf19c65a835e417b53d964789590",
+      "sha256": "0811cca2e4274c12ab4ae34d56bdd40285d4b906d06a2cc558e6ffc82a2969e9",
       "files": 27,
       "fragility": "medium",
       "upstreamTouchpoints": [],

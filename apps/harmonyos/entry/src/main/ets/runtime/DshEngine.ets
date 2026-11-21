@@ -481,6 +481,11 @@ class DshEngine {
 
   private copyGuest(context: common.UIAbilityContext, asset: string, path: string): void {
     const bytes = context.resourceManager.getRawFileContentSync(asset);
+    try {
+      if (fileIo.statSync(path).size === bytes.length) return;
+    } catch (error) {
+      // Missing target: write it below.
+    }
     const file = fileIo.openSync(path, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
     try { fileIo.writeSync(file.fd, bytes.buffer); }
     finally { fileIo.closeSync(file.fd); }

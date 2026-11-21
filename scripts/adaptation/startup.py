@@ -72,11 +72,14 @@ def measure(target, warm=True, timeout=300):
     started = time.time()
     run(target, "aa start -a EntryAbility -b " + BUNDLE)
     seen = []
+    seen_set = set()
     ready = False
     while time.time() - started < timeout:
         lines = dump_logs(target)
-        if lines:
-            seen = lines[-80:]
+        for line in lines:
+            if line not in seen_set:
+                seen_set.add(line)
+                seen.append(line)
         text = "\n".join(seen)
         if "ArkWeb loaded" in text:
             ready = True
