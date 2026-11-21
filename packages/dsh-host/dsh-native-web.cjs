@@ -211,7 +211,9 @@ function installProotSpawn(workspace) {
   globalThis.__harmonyHostSpawn = (program, args, options) => {
     if (safeMode) throw new Error('Guest subprocesses are disabled in HarmonyOS recovery mode');
     // Keep the existing bounded search adapter and its signed /bin/rg mapping.
-    if (program === 'bash' || program === ripgrep) return globalThis.__harmonyProotSpawn(program, args, options);
+    if (program === 'bash' || program === '/bin/bash' || program === ripgrep) {
+      return globalThis.__harmonyProotSpawn(program, args, options);
+    }
     if (!Array.isArray(options.stdio) || options.stdio.length !== 3 ||
         !['ignore', 'pipe'].includes(options.stdio[0]) ||
         options.stdio.slice(1).some(mode => !['pipe', 'inherit'].includes(mode))) {
@@ -258,7 +260,7 @@ function installProotSpawn(workspace) {
     return launchGuest(guest, 'exec -- ' + [program, ...args].map(quoteShellArgument).join(' '), environment);
   };
   globalThis.__harmonyProotSpawn = (program, args, options) => {
-    if (program !== 'bash' && program !== ripgrep) return spawn(program, args, options);
+    if (program !== 'bash' && program !== '/bin/bash' && program !== ripgrep) return spawn(program, args, options);
     if (options.stdio.join(',') !== 'ignore,pipe,pipe') throw new Error('Harmony tools require captured output');
     const cwd = fs.realpathSync(options.cwd);
     const guest = path.posix.join('/workspace-native', relativeInWorkspace(allowedRoot, cwd));
@@ -334,11 +336,13 @@ function installProotSpawn(workspace) {
         if (child.exitCode === 0) {
           const status = Buffer.alloc(3);
           const count = fs.readSync(launched.statusFd, status);
-          const text = status.toString();
-          if (count !== 3 || !/^\d{3}$/.test(text) || Number(text) > 255) {
+          // The native launcher returns an ASCII exit code followed by binary
+          // padding in a 3-byte status cell (e.g. "0\0\x18").
+          const digits = status.toString('latin1').replace(/\D/g, '');
+          if (count < 1 || digits.length === 0 || Number(digits) > 255) {
             throw new Error('Bash exited without a valid command status');
           }
-          child.exitCode = Number(text);
+          child.exitCode = Number(digits);
         }
       } catch (error) {
         clearInterval(timer);
@@ -357,6 +361,14 @@ function installProotSpawn(workspace) {
     }, 25);
     return child;
   }
+  globalThis.__harmonyPackagedShell = (command, environment) => {
+    const commandLine = environment && environment.length
+      ? 'exec env ' + environment.map(quoteShellArgument).join(' ') + ' ' + command.replace(/^exec\s+/, '')
+      : command;
+    return globalThis.__harmonyProotSpawn('bash', ['-c', commandLine], {
+      stdio: ['ignore', 'pipe', 'pipe'], cwd: allowedRoot,
+    });
+  };
   return launchGuest;
 }
 function relativeInWorkspace(root, target) {
@@ -459,7 +471,6 @@ async function main() {
   const liveshareUrl = paths('dsh-experimental-liveshare/lib/index.js');
   const fileUploadsUrl = paths('dsh-client-file-upload/lib/index.js');
   const fileUploadSchemasUrl = paths('dsh-client-file-upload/lib/typert.host.js');
-  const forgeGithubUrl = paths('dsh-experimental-forge-github/lib/index.js');
   const translatorUrl = paths('dsh-experimental-translator/lib/index.js');
   const pluginMarketUrl = paths('dsh-plugin-market/lib/index.js');
   const workspaceDependenciesUrl = paths('dsh-tool-workspace-dependencies/lib/index.js');
@@ -486,7 +497,27 @@ async function main() {
   const launchGuest = installProotSpawn(workspace);
   globalThis.__harmonyGh = safeMode
     ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
-    : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(launchGuest, quoteShellArgument);
+    : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(
+      (cwd, command, environment) => globalThis.__harmonyPackagedShell(command, environment),
+      quoteShellArgument);
+  globalThis.__harmonyGhRunner = safeMode
+    ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
+    : async (args, signal, input) => {
+      const proxyEnv = {};
+      for (const name of ['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY',
+                          'http_proxy', 'https_proxy', 'no_proxy']) {
+        if (typeof process.env[name] === 'string') proxyEnv[name] = process.env[name];
+      }
+      const result = await globalThis.__harmonyGh('gh', Array.from(args), {
+        env: proxyEnv, timeout: 120000, maxBuffer: 32 * 1024 * 1024, cancelSignal: signal,
+        ...(input === undefined ? {} : { input }),
+      });
+      if (result.isCanceled) throw signal.reason ?? new Error('gh invocation canceled');
+      if (result.timedOut) throw Object.assign(new Error('gh invocation timed out'), { name: 'GhTimeoutError' });
+      if (result.isMaxBuffer) throw Object.assign(new Error('gh output exceeds maxBuffer'), { name: 'GhOutputLimitError' });
+      if (result.exitCode === undefined) throw Object.assign(new Error('gh could not start: ' + String(result.shortMessage)), { name: 'GhUnavailableError' });
+      return { exitCode: result.exitCode, stdout: result.stdout, stderr: result.stderr };
+    };
   if (!safeMode) {
     require(path.join(root, 'dsh-harmony-forge.cjs')).startForgeAccountBridge(root, globalThis.__harmonyGh, mark);
   }
@@ -566,11 +597,6 @@ async function main() {
         patched = replacePinned(patched, 'console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);',
           'console.log("dsh inspector: /inspector/devtools/");');
         return { ...result, source: patched };
-      }
-      if (url === forgeGithubUrl) {
-        const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
-        return { ...result, source: replacePinned(source, 'import { execa } from "execa";',
-          'const execa = globalThis.__harmonyGh;') };
       }
       if (url === translatorUrl || url === pluginMarketUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();

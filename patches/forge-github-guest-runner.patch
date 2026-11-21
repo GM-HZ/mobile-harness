@@ -1,0 +1,13 @@
+diff --git a/@deepseek-ai/dsh-experimental-forge-github/lib/index.js b/@deepseek-ai/dsh-experimental-forge-github/lib/index.js
+index abe02c7..73ff749 100644
+--- a/@deepseek-ai/dsh-experimental-forge-github/lib/index.js
++++ b/@deepseek-ai/dsh-experimental-forge-github/lib/index.js
+@@ -2825,7 +2825,7 @@ function apply(ctx, config) {
+ 		"maxCommits",
+ 		"maxViewedFiles"
+ 	]) if (!Number.isSafeInteger(resolved[key]) || resolved[key] <= 0) throw new Error(`forge-github: ${key} must be a positive safe integer`);
+-	ctx.forge.register(new GitHubProvider(ghRunner(resolved), resolved.hosts, resolved));
++	ctx.forge.register(new GitHubProvider(globalThis.__harmonyGhRunner ?? ghRunner(resolved), resolved.hosts, resolved));
+ }
+ //#endregion
+ export { Config, apply, inject, name };

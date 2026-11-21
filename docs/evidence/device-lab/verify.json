@@ -1,0 +1,171 @@
+{
+  "kind": "real-device read-only verification",
+  "target": "37R0224115035605",
+  "checkedAt": "2026-11-21T11:04:22+0800",
+  "started": "start ability successfully.",
+  "readyMs": 165,
+  "parameters": {
+    "model": "BRA-AL00",
+    "brand": "HUAWEI",
+    "name": "HUAWEI Mate 60",
+    "apiversion": "26",
+    "version": "BRA-AL00 7.0.0.111(SP10C00E111R5P3)",
+    "devicetype": "phone"
+  },
+  "build": {
+    "versionCode": 76,
+    "versionName": "0.4.69",
+    "appId": "org.sayact.nodepoc_BNIJsz9w4up97L3I70LVG",
+    "installTime": 1793975651557
+  },
+  "state": {
+    "mode": "normal",
+    "pending": false
+  },
+  "web": 200,
+  "storage": "/dev/block/platform/fa500000.ufs/by-name/userdata 465G 311G  154G  67% /mnt/debugtmp/100/debug_hap/org.sayact.nodepoc/data/storage/el1/base",
+  "battery": {
+    "capacity": 100
+  },
+  "microphone": {
+    "raw": "{\n  \"tokenID\": 537287734,\n  \"tokenAttr\": 8,\n  \"ver\": 1,\n  \"userId\": 100,\n  \"bundleName\": \"org.sayact.nodepoc\",\n  \"instIndex\": 0,\n  \"dlpType\": 0,\n  \"isRemote\": false,\n  \"isPermDialogForbidden\": false,\n"
+  },
+  "account": {
+    "status": "credential-stored",
+    "attempt": null,
+    "links": {
+      "usageUrl": "https://platform.deepseek.com/usage",
+      "topUpUrl": "https://platform.deepseek.com/top_up"
+    }
+  },
+  "bundles": [
+    {
+      "name": "@deepseek-ai/dsh-base",
+      "enabled": true,
+      "availability": "profile",
+      "optional": false
+    },
+    {
+      "name": "@deepseek-ai/dsh-web-app",
+      "enabled": true,
+      "availability": "profile",
+      "optional": false
+    },
+    {
+      "name": "dsh-harmony-registry-fixture",
+      "enabled": true,
+      "availability": "profile",
+      "optional": false
+    },
+    {
+      "name": "@mobile-harness/lsp",
+      "enabled": true,
+      "availability": "installation",
+      "optional": false
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-forge-bundle",
+      "enabled": true,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-deepseek-chat-import",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-auto-review",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-badge-skill-bundle",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-cot-translation-bundle",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-inspector-profile",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-liveshare",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-plugin-market-bundle",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-ralph-bundle",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-session-search",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-session-titles-bundle",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-tool-worktree",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-personalized-recommendations",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-subagent-claude-code",
+      "enabled": false,
+      "availability": "missing",
+      "optional": false
+    },
+    {
+      "name": "@deepseek-ai/dsh-subagent-codex",
+      "enabled": false,
+      "availability": "missing",
+      "optional": false
+    }
+  ],
+  "dshVersions": [],
+  "liveshareShares/list": {
+    "error": "HTTP Error 404: Not Found"
+  },
+  "credentials/describe": {
+    "error": "credentials/describe: gateway/arguments-invalid"
+  },
+  "ok": true
+}

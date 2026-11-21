@@ -1,0 +1,41 @@
+{
+  "kind": "real-device model turn and session persistence",
+  "target": "37R0224115035605",
+  "checkedAt": "2026-11-21T08:11:45+0800",
+  "app": {
+    "versionName": "0.4.69",
+    "versionCode": 76,
+    "build": "signed self build (codex/harmonyos-architecture)"
+  },
+  "model": {
+    "provider": "deepseek-account",
+    "model": "deepseek-flash",
+    "reasoningEffort": "off"
+  },
+  "sessionId": "session-cc2fd694-3d40-4158-8f36-a0ac4773d4e7",
+  "turnEnd": "completed",
+  "eventsBeforeRestart": 21,
+  "assistantMessages": 1,
+  "afterRestart": {
+    "events": 21,
+    "types": {
+      "permission/preset": 1,
+      "sandbox/mode": 1,
+      "approval/policy": 1,
+      "model/selection": 1,
+      "agent/inbox/spliced": 2,
+      "turn/start": 1,
+      "step/start": 1,
+      "system/message": 1,
+      "user/message": 4,
+      "request/header": 1,
+      "request/context": 1,
+      "session/title": 2,
+      "session/title-llm-request": 1,
+      "assistant/message": 1,
+      "step/end": 1,
+      "turn/end": 1
+    }
+  },
+  "note": "Real account turn completed on the device and the session log survived an app restart; validates the session-persistence package patch and the Host boot path on real hardware."
+}

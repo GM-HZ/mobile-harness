@@ -1,0 +1,17 @@
+--- a/@deepseek-ai/dsh-bash-sandbox/lib/index.js
++++ b/@deepseek-ai/dsh-bash-sandbox/lib/index.js
+@@ -157,13 +157,13 @@
+ 	* @param policy - resolved confined execution policy.
+ 	* @param signal - cancellation of confinement preparation.
+ 	* @returns the provider's exact argv and settlement-classification facts.
+ 	*/
+ 	confine(command, policy, signal) {
+ 		return this.ctx.sandbox.confine([
+-			"bash",
++			"/bin/bash",
+ 			"-c",
+ 			command
+ 		], policy, signal);
+ 	}
+ };
+ //#endregion

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "dshRelease": "0.2.2-rc.5",
+  "npmLock": {
+    "path": "runtime/harmonyos/dsh/package-lock.json",
+    "sha256": "a2ba4190e0ed9b63a991bfd1c5dc32891a5fc846430c2d373ea98c9a9f4ccf0d"
+  },
+  "submodules": {
+    "dsh": "9c2670d3bce5275e0d1610272958121af87787bb",
+    "node": "d89bb1b482fa09245c4f2cbb3b5b6a70bea6deaf",
+    "proot": "60485d2646c1e09105099772da4a20deda8d020d",
+    "dshm": "1cb0db693ea5121f0dab0208b1144b4c1b8ee2c0",
+    "termony": "2fe84795201dbe14a586819f7de641db6b6c18b7",
+    "typescript": "050880ce59e30b356b686bd3144efe24f875ebc8",
+    "typescript-language-server": "048a362038fdf5656a4917fc7b57b3d70aa60efe",
+    "pyright": "a28cce4077d87b80bead12de809f79845e39c8ba"
+  },
+  "buildInputs": {
+    "path": "docs/build-inputs.sha256",
+    "sha256": "ddfe0f3c161d2edc93d4f714f21334445acf0a750b3e388f921587c50d304fcb",
+    "bytes": 16223
+  },
+  "guestToolsLock": {
+    "path": "docs/guest-tools-lock.json",
+    "sha256": "ead2dd967e92aa55b5335fb5a84d3dab38d39b81d35f55cc5499a50a850ad07d",
+    "bytes": 11799
+  }
+}

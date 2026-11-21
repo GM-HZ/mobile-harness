@@ -1,0 +1,33 @@
+# Fast static gate for every pull request: G0 consistency + G1 host contracts.
+# No DevEco SDK or emulator needed; the anchor check self-skips when the
+# assembled DSH layer is unavailable (it runs on the nightly build machine).
+name: Gate PR
+
+on:
+  pull_request:
+    branches: [main, 'codex/*']
+
+permissions:
+  contents: read
+
+jobs:
+  static-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: G0 static/consistency
+        run: python3 gates/run.py --tier G0 --evidence-dir .build/gate-evidence
+      - name: G1 host contracts
+        run: python3 gates/run.py --tier G1 --evidence-dir .build/gate-evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gate-evidence-pr
+          path: .build/gate-evidence
+          if-no-files-found: ignore

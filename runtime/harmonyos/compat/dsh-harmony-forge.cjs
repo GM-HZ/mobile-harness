@@ -51,7 +51,10 @@ function createGhRunner(launch, quote) {
         child[stream].on('error', error => { launchError ??= error; });
       }
       child.on('error', error => { launchError ??= error; });
-      child.once('close', code => {
+      let finished = false;
+      const finish = code => {
+        if (finished) return;
+        finished = true;
         clearTimeout(timeout);
         clearTimeout(killTimer);
         signal.removeEventListener('abort', terminate);
@@ -62,11 +65,19 @@ function createGhRunner(launch, quote) {
           isCanceled: signal.aborted, timedOut, isMaxBuffer,
           shortMessage: launchError ? (launchError.code ?? launchError.name) : 'Harmony gh did not return an exit code',
         });
-      });
-      child.stdin.on('error', error => {
-        if (error.code !== 'EPIPE') launchError ??= error;
-      });
-      child.stdin.end(options.input);
+      };
+      child.once('close', code => finish(code));
+      // The packaged non-streaming launcher emits exit after both output
+      // streams drain; give the streams a tick to deliver remaining data.
+      child.once('exit', code => setTimeout(() => finish(Number.isInteger(code) ? code : undefined), 100));
+      if (child.stdin) {
+        child.stdin.on('error', error => {
+          if (error.code !== 'EPIPE') launchError ??= error;
+        });
+        child.stdin.end(options.input);
+      } else if (options.input !== undefined) {
+        launchError ??= Object.assign(new Error('Harmony gh cannot receive stdin'), { code: 'ENOSYS' });
+      }
     });
   };
 }

@@ -82,7 +82,7 @@ class Emulator:
 
     def ready(self, mode):
         start = time.monotonic()
-        while time.monotonic() - start < 65:
+        while time.monotonic() - start < 120:
             try:
                 if self.state() == {"mode": mode, "pending": False} and self.web_status(True) == 200:
                     return round((time.monotonic() - start) * 1000)

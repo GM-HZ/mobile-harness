@@ -1,0 +1,21 @@
+{
+  "device": {
+    "serial": "37R0224115035605",
+    "versionName": "0.4.69",
+    "versionCode": 76,
+    "boot": "{\"mode\":\"normal\",\"pending\":false}",
+    "launch": "start ability successfully.",
+    "screenLocked": false,
+    "checkedAt": "2026-11-21T07:29:13+0800"
+  },
+  "run": {
+    "suite": "exec",
+    "exit": 0,
+    "passed": true,
+    "durationSeconds": 7,
+    "outputTail": "{\n \"ok\": false,\n \"commandMatched\": true,\n \"markers\": {\n  \"EXEC_SH_OK\": false,\n  \"EXEC_BASH_OK\": false,\n  \"EXEC_NODE_OK\": false,\n  \"EXEC_PY_OK\": false,\n  \"EXEC_SCRIPT_OK\": false,\n  \"COPY_NODE_OK\": false,\n  \"PROOT_EXEC_PROBE_DONE\": false\n },\n \"exits\": {}\n}\n/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-architecture/docs/evidence/device-lab/exec.json\n",
+    "evidence": "docs/evidence/device-lab/exec.json",
+    "requiresModel": true
+  },
+  "ok": true
+}

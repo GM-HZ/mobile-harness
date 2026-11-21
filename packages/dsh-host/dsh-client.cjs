@@ -37,17 +37,6 @@ const launchFile = '/tmp/dsh-client-launch';
 const packages = '/dsh/node_modules/@deepseek-ai';
 const bashPath = '/bin/bash';
 const landlockPath = packages + '/node-addon-system-linux-arm64/bin/landlock-run';
-const sessionModule = 'file://' + packages + '/dsh-session-persistence-jsonl/lib/index.js';
-const bashModules = new Set([
-  'file://' + packages + '/dsh-bash-local/lib/index.js',
-  'file://' + packages + '/dsh-bash-sandbox/lib/index.js',
-]);
-
-function replacePinned(source, original, replacement, url) {
-  if (source.split(original).length !== 2) throw new Error('Unexpected pinned DSH implementation: ' + url);
-  return source.replace(original, replacement);
-}
-
 function activateSelfBuildTools() {
   const target = '/usr/bin/mh-exec';
   try {
@@ -156,13 +145,8 @@ async function start() {
         moduleLoads.count++;
         moduleLoads.ms += performance.now() - started;
       }
-      if (url !== sessionModule && !bashModules.has(url)) return loaded;
-      const text = typeof loaded.source === 'string' ? loaded.source : Buffer.from(loaded.source).toString('utf8');
-      const source = url === sessionModule
-        ? replacePinned(text, 'await link(tmp, finalPath);',
-          "try { await link(tmp, finalPath); } catch (error) { if (error?.code !== 'EACCES') throw error; globalThis.__dshClientRenameNoReplace(tmp, finalPath); }", url)
-        : replacePinned(text, '"bash",\n\t\t\t"-c",', JSON.stringify(bashPath) + ',\n\t\t\t"-c",', url);
-      return { ...loaded, source };
+      // All source-level adaptations now live in patches/series.json.
+      return loaded;
     }
   });
   globalThis.__dshClientRenameNoReplace = (source, target) => {

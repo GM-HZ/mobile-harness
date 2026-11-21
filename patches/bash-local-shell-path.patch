@@ -1,0 +1,17 @@
+--- a/@deepseek-ai/dsh-bash-local/lib/index.js
++++ b/@deepseek-ai/dsh-bash-local/lib/index.js
+@@ -136,13 +136,13 @@
+ 			stdout,
+ 			stderr
+ 		};
+ 	}
+ 	async execute(spec) {
+ 		return this.executeArgv(spec, [
+-			"bash",
++			"/bin/bash",
+ 			"-c",
+ 			spec.command
+ 		]);
+ 	}
+ 	/**
+ 	* Execute an explicit argv with the lifecycle, environment, output,

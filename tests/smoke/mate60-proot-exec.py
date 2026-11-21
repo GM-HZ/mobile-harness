@@ -9,6 +9,7 @@ works in the packaged PRoot rootfs, and how unsigned copies behave.
 """
 import argparse
 import json
+import re
 from pathlib import Path
 import subprocess
 import time
@@ -486,6 +487,10 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
         for marker in ("EXEC_SH_OK", "EXEC_BASH_OK", "EXEC_NODE_OK", "EXEC_PY_OK", "EXEC_SCRIPT_OK",
                        "COPY_NODE_OK", "PROOT_EXEC_PROBE_DONE"):
             markers[marker] = marker in text
+        # Each probe ends with its own DONE marker (e.g. NATIVE_OVERLAY_PROBE_DONE,
+        # SHIM_ENV_DONE); the shared EXEC_* markers only belong to the exec probe.
+        done = re.search(r"\b([A-Z][A-Z0-9_]*_DONE)\b", probe)
+        expected_done = done.group(1) if done else None
         exits = {}
         for line in text.splitlines():
             if "=" in line and line.split("=", 1)[0].endswith("_EXIT"):
@@ -493,7 +498,7 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
                 exits[key] = value.strip()
         evidence["markers"] = markers
         evidence["exits"] = exits
-        evidence["ok"] = markers["PROOT_EXEC_PROBE_DONE"]
+        evidence["ok"] = bool(expected_done) and expected_done in text
     finally:
         try:
             if session:

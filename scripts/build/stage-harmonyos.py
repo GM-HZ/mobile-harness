@@ -24,7 +24,6 @@ SELF_BUILD = os.environ.get("HARMONY_SELF_BUILD") == "1"
 STAGE = ROOT / ".build/stage" / ("harmonyos-process-probe" if EXPERIMENTAL else "harmonyos")
 RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
-SETTINGS_CLIENT = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
 
 
 def copy(source, destination):
@@ -71,17 +70,6 @@ def stage_assets(inputs):
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, destination)
 
-
-def stage_settings_client():
-    # Keep the pinned DSH layer intact. Only overlay its settings client at launch.
-    with ZipFile(RAW / "dsh-layer.zip") as layer:
-        source = layer.read(SETTINGS_CLIENT).decode("utf-8")
-    entry = "function apply(ctx){"
-    if source.count(entry) != 1:
-        raise SystemExit("The pinned DSH General Settings entry point changed")
-    row = (RUNTIME / "web/settings-recovery.js").read_text().rstrip()
-    injection = "\n" + row + "\n" + entry + "\n\t\t\tregisterMobileHarnessRecovery(ctx);"
-    (RAW / "dsh-settings-client.js").write_text(source.replace(entry, injection, 1), encoding="utf-8")
 
 def stage_workflow_worker():
     source = ROOT / "vendor/repos/dsh/packages/workflow/workflow-ptc/src/guest-source.ts"
@@ -170,7 +158,8 @@ def main():
         cmake = CPP / "CMakeLists.txt"
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MH_SELF_BUILD=1)\n")
-    stage_settings_client()
+    # settings recovery now ships as a package patch (patches/series.json).
+    (RAW / "dsh-settings-client.js").unlink(missing_ok=True)
     (RAW / "dsh-self-build.json").write_text(json.dumps({
         "selfBuild": SELF_BUILD,
         "signedExecBypass": SELF_BUILD,

@@ -1,0 +1,44 @@
+{
+  "version": "0.4.69",
+  "commit": "74a1072dd291e6c1eb8e3ba2812d09a704496a55",
+  "generatedAt": "2026-11-20T23:26:46+0800",
+  "artifacts": {
+    "store": {
+      "file": "store.hap",
+      "sha256": "47df6a9ca92a561b9871f30e99b1f9e389154fc3d29fba4af6d5fe7b2b8dbe3b",
+      "bytes": 768498560,
+      "maxBytes": 790000000
+    },
+    "self": {
+      "file": "self.hap",
+      "sha256": "553d23410231981b4aa3a3e6e4f7aee3f2cd8451a0a2219e0d0e14cbc17e2a77",
+      "bytes": 773562265,
+      "maxBytes": 800000000
+    }
+  },
+  "checks": [
+    {
+      "command": "scripts/adaptation/store_build_check.py --hap .build/release-check/store.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 store shape OK: store.hap (209 entries)"
+    },
+    {
+      "command": "scripts/adaptation/variant_check.py --variant store --hap .build/release-check/store.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: store <- store.hap"
+    },
+    {
+      "command": "scripts/adaptation/variant_check.py --variant self --hap .build/release-check/self.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: self <- self.hap"
+    }
+  ],
+  "rsiScoreboard": {
+    "path": "docs/evidence/rsi/scoreboard.md",
+    "sha256": "31ec70645e74b54ed048ac058799dd321c970404a244111c6ba7d3ec3355ce1b"
+  },
+  "ok": true
+}

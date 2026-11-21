@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "description": "HarmonyOS compatibility layer: our implementations of upstream capabilities that cannot run unchanged on the phone. These are feature adapters, not rewrites of upstream source; each needs a manifest row, a gate and a documented seam decision.",
+  "modules": [
+    {
+      "file": "dsh-boot-cache.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-client.cjs"
+      ],
+      "upstream": "startup module loading / boot readiness",
+      "decision": "keep-compat",
+      "gates": [
+        "capability-parity-gate"
+      ],
+      "gateNote": "startup + capability gate cover the boot path",
+      "priority": "P3"
+    },
+    {
+      "file": "fetch-shim-boot.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-harmony-subprocess.mjs"
+      ],
+      "upstream": "outbound fetch on HarmonyOS (no native fetch shim)",
+      "decision": "keep-compat",
+      "gates": [
+        "capability-parity-gate",
+        "emulator-liveshare-relay"
+      ],
+      "gateNote": "network features depend on the shim",
+      "priority": "P2"
+    },
+    {
+      "file": "dsh-harmony-forge.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-native-web.cjs"
+      ],
+      "upstream": "forge/GitHub runner account bridge",
+      "decision": "keep-compat",
+      "gates": [
+        "emulator-forge-account",
+        "emulator-forge-github"
+      ],
+      "gateNote": "follows the upstream forge bundle surface",
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-experimental-forge",
+          "@deepseek-ai/dsh-experimental-forge-github",
+          "@deepseek-ai/dsh-experimental-client-ui-forge"
+        ],
+        "note": "Upstream GitHubProvider accepts any GhRunner. execa is present in the DSH layer, so a package patch can inject our guest runner at the registration site; planned migration in docs/architecture/seams/forge-upstream-seam.md.",
+        "seamDoc": "docs/architecture/seams/forge-upstream-seam.md"
+      },
+      "current": "guest gh transport + account bridge; upstream GitHubProvider/session/UI with patches/forge-github-guest-runner.patch; no load-time source rewrite"
+    },
+    {
+      "file": "dsh-harmony-inspector-worker.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-native-web.cjs"
+      ],
+      "upstream": "Node inspector / internal module exposure",
+      "decision": "keep-compat",
+      "gates": [
+        "emulator-inspector",
+        "emulator-inspector-availability"
+      ],
+      "gateNote": "debug-only path",
+      "priority": "P3"
+    },
+    {
+      "file": "dsh-harmony-liveshare.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-native-web.cjs"
+      ],
+      "upstream": "experimental-liveshare relay/WebRTC transport",
+      "decision": "upstream-seam-candidate",
+      "gates": [
+        "emulator-liveshare-relay",
+        "emulator-liveshare-browser"
+      ],
+      "gateNote": "relay acceptance plus local fixture",
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-experimental-liveshare",
+          "@deepseek-ai/dsh-experimental-liveshare-protocol"
+        ],
+        "note": "No upstream injection point for the owner-gateway spawn (TunnelWorker uses child_process.spawn internally; Config has no spawn/worker factory). keep-compat; optional package-patch migration for upload patches. See seam doc.",
+        "seamDoc": "docs/architecture/seams/liveshare-upstream-seam.md"
+      }
+    },
+    {
+      "file": "dsh-harmony-package.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-native-web.cjs"
+      ],
+      "upstream": "package manager (pnpm) bridge",
+      "decision": "keep-compat",
+      "gates": [
+        "emulator-plugin-market",
+        "emulator-plugin-public-graph"
+      ],
+      "gateNote": "plugin install path",
+      "priority": "P2"
+    },
+    {
+      "file": "dsh-harmony-pnpm-fetch.cjs",
+      "consumers": [
+        "runtime/harmonyos/compat/dsh-harmony-package.cjs"
+      ],
+      "upstream": "pnpm outbound fetch",
+      "decision": "keep-compat",
+      "gates": [
+        "emulator-plugin-market",
+        "emulator-plugin-git-update"
+      ],
+      "gateNote": "2-line preload; covered by pnpm install tests",
+      "priority": "P3"
+    },
+    {
+      "file": "dsh-harmony-sharp.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-native-web.cjs"
+      ],
+      "upstream": "image processing (`sharp`) native module",
+      "decision": "upstream-seam-candidate",
+      "gates": [
+        "emulator-toolkit",
+        "capability-parity-gate"
+      ],
+      "gateNote": "images/attachments path",
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-compaction-image-offload"
+        ],
+        "note": "only a weak image seam upstream (1 hit); keep compat for now."
+      }
+    },
+    {
+      "file": "dsh-harmony-speech.cjs",
+      "consumers": [
+        "packages/dsh-host/dsh-native-web.cjs"
+      ],
+      "upstream": "voice input / speech recognition launcher",
+      "decision": "keep-compat",
+      "gates": [
+        "emulator-voice-input"
+      ],
+      "gateNote": "device audio path",
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice",
+          "@deepseek-ai/dsh-experimental-voice-input-bundle"
+        ],
+        "note": "Upstream Config has no worker/spawn factory; the provider uses ctx.subprocess.spawn and a pipe token handshake. We launch a Host Worker thread and call the handle directly. keep-compat until upstream adds a worker factory seam.",
+        "seamDoc": "docs/architecture/seams/speech-upstream-seam.md"
+      }
+    },
+    {
+      "file": "dsh-harmony-office-worker.mjs",
+      "consumers": [
+        "packages/dsh-host/dsh-harmony-office-launch.cjs"
+      ],
+      "upstream": "office document conversion worker",
+      "decision": "keep-compat",
+      "gates": [
+        "emulator-office",
+        "emulator-office-provider",
+        "emulator-office-cancel"
+      ],
+      "gateNote": "office build/test pipeline",
+      "priority": "P2",
+      "seamEvidence": {
+        "evidence": "docs/evidence/upstream-seams/0.2.2-rc.5.json",
+        "upstreamPackages": [
+          "@deepseek-ai/dsh-office-kit",
+          "@deepseek-ai/dsh-tool-office",
+          "@deepseek-ai/dsh-skill-office"
+        ],
+        "note": "office-kit is already the upstream provider (79 hits); our worker only adapts the phone runtime \u2014 keep compat."
+      }
+    }
+  ]
+}

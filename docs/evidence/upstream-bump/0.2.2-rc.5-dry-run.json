@@ -1,0 +1,125 @@
+{
+  "pinned": "0.2.2-rc.5",
+  "target": "0.2.2-rc.5",
+  "newerThanPinned": false,
+  "startedAt": "2026-11-21T10:53:09+0800",
+  "packages": {
+    "@deepseek-ai/dsh-bash-local": {
+      "locked": "0.2.2-rc.5",
+      "version": "0.2.2-rc.5",
+      "tarball": "@deepseek-ai__dsh-bash-local.tgz",
+      "bytes": 25150
+    },
+    "@deepseek-ai/dsh-bash-sandbox": {
+      "locked": "0.2.2-rc.5",
+      "version": "0.2.2-rc.5",
+      "tarball": "@deepseek-ai__dsh-bash-sandbox.tgz",
+      "bytes": 19158
+    },
+    "@deepseek-ai/dsh-client-ui-settings-general": {
+      "locked": "0.2.2-rc.5",
+      "version": "0.2.2-rc.5",
+      "tarball": "@deepseek-ai__dsh-client-ui-settings-general.tgz",
+      "bytes": 127963
+    },
+    "@deepseek-ai/dsh-experimental-forge-github": {
+      "locked": "0.2.2-rc.5",
+      "version": "0.2.2-rc.5",
+      "tarball": "@deepseek-ai__dsh-experimental-forge-github.tgz",
+      "bytes": 104505
+    },
+    "@deepseek-ai/dsh-session-persistence-jsonl": {
+      "locked": "0.2.2-rc.5",
+      "version": "0.2.2-rc.5",
+      "tarball": "@deepseek-ai__dsh-session-persistence-jsonl.tgz",
+      "bytes": 281232
+    },
+    "@deepseek-ai/node-addon-system-linux-arm64": {
+      "locked": "0.1.2",
+      "version": "0.1.2",
+      "tarball": "@deepseek-ai__node-addon-system-linux-arm64.tgz",
+      "bytes": 36806
+    }
+  },
+  "anchors": [
+    {
+      "id": "bash-local-patch",
+      "package": "@deepseek-ai/dsh-bash-local",
+      "member": "package/lib/index.js",
+      "version": "0.2.2-rc.5",
+      "ok": true,
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
+    },
+    {
+      "id": "bash-sandbox-patch",
+      "package": "@deepseek-ai/dsh-bash-sandbox",
+      "member": "package/lib/index.js",
+      "version": "0.2.2-rc.5",
+      "ok": true,
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
+    },
+    {
+      "id": "session-persistence-patch",
+      "package": "@deepseek-ai/dsh-session-persistence-jsonl",
+      "member": "package/lib/index.js",
+      "version": "0.2.2-rc.5",
+      "ok": true,
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
+    },
+    {
+      "id": "settings-client-apply",
+      "package": "@deepseek-ai/dsh-client-ui-settings-general",
+      "member": "package/lib/client.js",
+      "version": "0.2.2-rc.5",
+      "ok": true,
+      "expected": 1,
+      "actual": 1
+    },
+    {
+      "id": "native-system-addon",
+      "package": "@deepseek-ai/node-addon-system-linux-arm64",
+      "member": "package/bin/musl/system.node",
+      "version": "0.1.2",
+      "ok": true,
+      "kind": "exists"
+    },
+    {
+      "id": "ripgrep-binary",
+      "skipped": "not an @deepseek-ai package file"
+    },
+    {
+      "id": "forge-github-guest-runner",
+      "package": "@deepseek-ai/dsh-experimental-forge-github",
+      "member": "package/lib/index.js",
+      "version": "0.2.2-rc.5",
+      "ok": true,
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
+    }
+  ],
+  "affected": [
+    "diagnostics:runtime/harmonyos/diagnostics/dsh-probe.cjs",
+    "patches:patches/TARGETS.md",
+    "patches:patches/bash-local-shell-path.patch",
+    "patches:patches/bash-sandbox-shell-path.patch",
+    "patches:patches/forge-github-guest-runner.patch",
+    "patches:patches/series.json",
+    "patches:patches/session-persistence-eacces-fallback.patch",
+    "patches:patches/settings-client-recovery.patch",
+    "patches:patches/targets.json"
+  ],
+  "fullAnchorRows": [],
+  "fullAnchors": {
+    "checked": 29,
+    "ambiguous": 15,
+    "drift": 0,
+    "skipped": 0,
+    "note": "unambiguous literal anchors verified against target package tarballs; ambiguous anchors are layer-indexed but not drift-verified",
+    "driftRows": []
+  },
+  "failures": 0,
+  "ok": true
+}

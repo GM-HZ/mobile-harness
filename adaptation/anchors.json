@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "description": "Literal upstream anchors our runtime hooks depend on. Checked by scripts/adaptation/anchors.py; contracts live in docs/architecture/seams/.",
+  "anchors": [
+    {
+      "id": "bash-local-patch",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-bash-local/lib/index.js",
+      "replacement": "\"/bin/bash\",\n\t\t\t\"-c\",",
+      "patch": "patches/bash-local-shell-path.patch",
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "bash-sandbox-patch",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-bash-sandbox/lib/index.js",
+      "replacement": "\"/bin/bash\",\n\t\t\t\"-c\",",
+      "patch": "patches/bash-sandbox-shell-path.patch",
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "session-persistence-patch",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js",
+      "contract": "docs/architecture/seams/host-bash-hooks.md",
+      "replacement": "globalThis.__dshClientRenameNoReplace(tmp, finalPath)",
+      "patch": "patches/session-persistence-eacces-fallback.patch"
+    },
+    {
+      "id": "settings-client-apply",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js",
+      "pattern": "function apply(ctx){",
+      "count": 1,
+      "contract": "docs/architecture/seams/web-settings-injection.md"
+    },
+    {
+      "id": "native-system-addon",
+      "file": "dsh/node_modules/@deepseek-ai/node-addon-system-linux-arm64/bin/musl/system.node",
+      "exists": true,
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "ripgrep-binary",
+      "file": "dsh/node_modules/@vscode/ripgrep-linux-arm64/bin/rg",
+      "exists": true,
+      "contract": "docs/architecture/seams/host-bash-hooks.md"
+    },
+    {
+      "id": "forge-github-guest-runner",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-experimental-forge-github/lib/index.js",
+      "replacement": "globalThis.__harmonyGhRunner ?? ghRunner(resolved)",
+      "patch": "patches/forge-github-guest-runner.patch",
+      "contract": "docs/architecture/seams/forge-upstream-seam.md"
+    }
+  ]
+}

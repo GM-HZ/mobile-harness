@@ -1,0 +1,123 @@
+{
+  "version": "0.2.2-rc.5",
+  "packages": {
+    "@deepseek-ai/dsh-experimental-forge": {
+      "files": 5,
+      "hits": {
+        "Service": 16,
+        "provider": 304
+      },
+      "area": "forge"
+    },
+    "@deepseek-ai/dsh-experimental-forge-bundle": {
+      "files": 2,
+      "hits": {},
+      "area": "forge"
+    },
+    "@deepseek-ai/dsh-experimental-forge-github": {
+      "files": 15,
+      "hits": {
+        "client": 12,
+        "provider": 18
+      },
+      "area": "forge"
+    },
+    "@deepseek-ai/dsh-experimental-forge-session": {
+      "files": 7,
+      "hits": {
+        "Service": 12,
+        "client": 2,
+        "provider": 17
+      },
+      "area": "forge"
+    },
+    "@deepseek-ai/dsh-experimental-client-ui-forge": {
+      "files": 73,
+      "hits": {
+        "Service": 9,
+        "bundle": 4,
+        "client": 2842,
+        "provider": 381
+      },
+      "area": "forge"
+    },
+    "@deepseek-ai/dsh-experimental-liveshare": {
+      "files": 92,
+      "hits": {
+        "Service": 16,
+        "bundle": 77,
+        "client": 138,
+        "provider": 58
+      },
+      "area": "liveshare"
+    },
+    "@deepseek-ai/dsh-experimental-liveshare-protocol": {
+      "files": 9,
+      "hits": {
+        "bundle": 1,
+        "client": 6,
+        "provider": 36
+      },
+      "area": "liveshare"
+    },
+    "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice": {
+      "files": 12,
+      "hits": {
+        "bundle": 2,
+        "client": 1,
+        "provider": 17
+      },
+      "area": "speech"
+    },
+    "@deepseek-ai/dsh-experimental-voice-input-bundle": {
+      "files": 2,
+      "hits": {},
+      "area": "speech"
+    },
+    "@deepseek-ai/dsh-office-kit": {
+      "files": 21,
+      "hits": {
+        "Service": 6,
+        "client": 1,
+        "provider": 79
+      },
+      "area": "office"
+    },
+    "@deepseek-ai/dsh-tool-office": {
+      "files": 4,
+      "hits": {
+        "provider": 5
+      },
+      "area": "office"
+    },
+    "@deepseek-ai/dsh-skill-office": {
+      "files": 2,
+      "hits": {
+        "bundle": 5,
+        "provider": 3,
+        "registerProvider": 1
+      },
+      "area": "office"
+    },
+    "@deepseek-ai/dsh-compaction-image-offload": {
+      "files": 9,
+      "hits": {
+        "provider": 1
+      },
+      "area": "image"
+    }
+  },
+  "candidates": [
+    "@deepseek-ai/dsh-experimental-forge",
+    "@deepseek-ai/dsh-experimental-forge-github",
+    "@deepseek-ai/dsh-experimental-forge-session",
+    "@deepseek-ai/dsh-experimental-client-ui-forge",
+    "@deepseek-ai/dsh-experimental-liveshare",
+    "@deepseek-ai/dsh-experimental-liveshare-protocol",
+    "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice",
+    "@deepseek-ai/dsh-office-kit",
+    "@deepseek-ai/dsh-tool-office",
+    "@deepseek-ai/dsh-skill-office",
+    "@deepseek-ai/dsh-compaction-image-offload"
+  ]
+}
