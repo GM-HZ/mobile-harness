@@ -1,0 +1,100 @@
+{
+  "target": "37R0224115035605",
+  "mode": "warm",
+  "ready": true,
+  "wallSeconds": 10.3,
+  "nativeLoopbackMs": 6521,
+  "readyMs": 9563,
+  "phases": [
+    {
+      "at": "15:01:51.425",
+      "message": "ability foreground"
+    },
+    {
+      "at": "15:01:51.596",
+      "message": "startup archive node-layer.zip extracted=false ms=1"
+    },
+    {
+      "at": "15:01:51.596",
+      "message": "startup archive shell-tools-layer.zip extracted=false ms=0"
+    },
+    {
+      "at": "15:01:51.596",
+      "message": "startup archive shell-extras-v3.zip extracted=false ms=0"
+    },
+    {
+      "at": "15:01:51.596",
+      "message": "startup archive pnpm-layer-v2.zip extracted=false ms=0"
+    },
+    {
+      "at": "15:01:51.596",
+      "message": "startup archive workspace-python-v1.zip extracted=false ms=0"
+    },
+    {
+      "at": "15:01:51.597",
+      "message": "startup archive dsh-layer.zip extracted=false ms=2"
+    },
+    {
+      "at": "15:01:51.646",
+      "message": "starting native Web ms=54"
+    },
+    {
+      "at": "15:01:58.113",
+      "message": "native loopback ready ms=6521 mode=normal"
+    },
+    {
+      "at": "15:02:00.988",
+      "message": "ArkWeb loaded \"{\\\"title\\\":\\\"Probe PRoot exec semantics \u2014 DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":3790}\""
+    }
+  ],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 3,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 166
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 4491,
+      "pid": 1675
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 4538,
+      "pid": 1676
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5035,
+      "pid": 1675
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5036,
+      "pid": 1676
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 5638
+    },
+    {
+      "event": "web-announced",
+      "ms": 5644,
+      "loadCount": 5772,
+      "loadMs": 406
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 5903,
+      "exchange": 303,
+      "page": 200
+    }
+  ],
+  "measuredAt": "2026-11-21T15:02:01+0800"
+}

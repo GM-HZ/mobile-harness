@@ -1,0 +1,69 @@
+{
+  "target": "37R0224115035605",
+  "mode": "cold",
+  "ready": false,
+  "wallSeconds": 301.2,
+  "nativeLoopbackMs": null,
+  "readyMs": null,
+  "phases": [],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 3,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 166
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 4491,
+      "pid": 1675
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 4538,
+      "pid": 1676
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5035,
+      "pid": 1675
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5036,
+      "pid": 1676
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 5638
+    },
+    {
+      "event": "web-announced",
+      "ms": 5644,
+      "loadCount": 5772,
+      "loadMs": 406
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 5903,
+      "exchange": 303,
+      "page": 200
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 16435,
+      "pid": 2017
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 16679,
+      "pid": 2017
+    }
+  ],
+  "measuredAt": "2026-11-21T15:08:46+0800"
+}

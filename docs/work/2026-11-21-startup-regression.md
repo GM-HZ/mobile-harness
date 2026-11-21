@@ -155,3 +155,23 @@ A/B 对比：同一台真机、同一 clean profile（base + web-app + LSP），
 
 后续若要真机温启动继续下降，需要单独做 **Host 启动优化**（模块/启动路径裁剪、jitless 限制评估），
 不再属于解包优化范围；增量升级解包仍未实现（需要 chunked layer 设计）。
+
+
+## 7. Host 温启动优化：self/lab 构建启用 V8 JIT
+
+真机时间线显示温启动瓶颈在 Host：`cli-imported` → `web-announced` 约 8-9s（5,768 个模块，
+jitless V8 在手机上解释执行）。
+
+`runtime/harmonyos/native/nativehost.c`：
+- **self/lab 构建**：Host Node 去掉 `--jitless`，启用 V8 JIT；
+- **store 构建**：保持 `--jitless`，等商店侧策略确认后再切换。
+
+验证（Mate 60）：
+- 温启动 前景 → ArkWeb：**13.3s → 9.6-9.9s**；
+- native loopback：**9.9s → 6.5-6.7s**；
+- 模拟器温启动：7.7-9.2s → **6.9-7.4s**；
+- JIT 在真机/模拟器均可稳定启动，G3 verify/exec 通过（overlay 因锁屏未跑）。
+
+冷启动（解包为主）仍在 29-40s 区间，受设备空闲/锁屏影响波动；下一步做增量解包降低升级成本。
+
+证据：`docs/evidence/startup/device-jit-warm-{1,2}.json`。
