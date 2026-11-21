@@ -1,0 +1,86 @@
+{
+  "target": "127.0.0.1:5555",
+  "mode": "warm",
+  "ready": true,
+  "wallSeconds": 16.3,
+  "phases": [
+    {
+      "at": "12:32:14.256",
+      "message": "native loopback ready ms=6973 mode=normal"
+    },
+    {
+      "at": "12:32:17.653",
+      "message": "ArkWeb loaded \"{\\\"title\\\":\\\"DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":35}\""
+    }
+  ],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 1,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 110
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 4762,
+      "pid": 1754
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 4782,
+      "pid": 1756
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5133,
+      "pid": 1754
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5204,
+      "pid": 1756
+    },
+    {
+      "event": "web-announced",
+      "ms": 5782,
+      "loadCount": 6295,
+      "loadMs": 570
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 5877
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 6122,
+      "exchange": 303,
+      "page": 200
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 10024,
+      "pid": 2004
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 11367,
+      "pid": 2004
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 11382,
+      "pid": 2025
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 11675,
+      "pid": 2025
+    }
+  ],
+  "measuredAt": "2026-11-21T12:32:22+0800"
+}
