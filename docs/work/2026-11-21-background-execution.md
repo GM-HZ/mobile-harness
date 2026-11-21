@@ -31,18 +31,22 @@ iOS 端不是常驻 daemon，而是基于 audio/PiP/`BGContinuedProcessingTask` 
   - 提供 `stop()`，后续可接入 UI 的"停止后台运行"。
 - `DshEngine.runNative` 在 loopback ready 后启动 keeper。
 
-## 3. 验证
+## 3. 验证（真机 Mate 60）
 
 - 申请后系统日志：`CONTINUOUS_TASK ... background task mode: 1`（dataTransfer），heartbeat 文件生成；
-- 按 Home 退后台 + Power 锁屏后：进程 pid 保持，heartbeat 持续更新（短时验证）；
-- 10 分钟级后台持久性验证在长跑任务中记录；
-- 证据/截图待补：后台 heartbeat、通知栏截图。
+- 仅长时任务时：后台 heartbeat 到第 9 分钟正常，第 10 分钟进程被系统回收（dataTransfer 无进度取消规则），
+  随后被系统重新拉起（新 pid，Host 会重建）；
+- 增加 **`BACKGROUND_USER_IDLE` running lock** 后（`ohos.permission.RUNNING_LOCK` + `hold(-1)`）：
+  - Home 退后台连续 **14 分钟** pid 不变、heartbeat 每 5s 持续更新；
+  - Power 锁屏 60s 后 heartbeat 仍更新，pid 不变；
+  - 回前台后 boot 仍为 normal、同一 pid，Host 可继续服务；
+- 证据：`background-heartbeat.json` 时间序列（见提交记录/设备文件）。
 
 ## 4. 已知限制
 
-1. `dataTransfer` 是"数据传输"语义，系统对 10 分钟无进度会取消；当前用 60s 续期尝试规避，
-   需要 10min 真机验证确认；
-2. 通知由系统长时任务通知提供，尚未做自定义"停止任务"action；
-3. 设备省电策略/厂商电池优化仍可能压制；后续加设置引导；
+1. `dataTransfer` 是"数据传输"语义，10 分钟无进度会被取消；当前用 **running lock + cancel/suspend 事件重试**
+   保持进程存活（实测 14 分钟）。更长时间（小时级）仍需持续验证；
+2. 进程存活依赖 running lock；设备厂商省电策略仍可能干预；
+3. 通知由系统长时任务通知提供，尚未做自定义"停止任务"action；
 4. store 上架合规风险（当前阶段不考虑上架）；
-5. 若要真正无限制常驻，需要 `KEEP_BACKGROUND_RUNNING_SYSTEM`/special scenario ACL 或云端执行。
+5. 真正"系统保证永久常驻"仍需 `KEEP_BACKGROUND_RUNNING_SYSTEM`/special scenario ACL 或云端执行。
