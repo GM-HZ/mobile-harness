@@ -25,6 +25,7 @@
 | PTY / 终端 | ⏸ 延期 | 平台无 `/dev/ptmx`；不作为当前目标 |
 | GUI/手机操控、容器/systemd/dbus | ⏸ 范围外 | 平台边界 |
 | Node JIT | ⏸ 当前 jitless | 构建默认 `--jitless`；可另评估 |
+| 后台常驻（HarmonyOS 长时任务） | 🔶 | dataTransfer 长时任务 + heartbeat；需 10min 级真机验证 |
 | 真机自动化门禁 | 🔶 | device_lab 协议就绪；需解锁/在线，脚本化调度待接 CI |
 | CI runner 实跑 | 🔶 | 4 个 workflow 已定义；本地等价验证完成，未在 runner 实跑 |
 

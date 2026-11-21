@@ -7,6 +7,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n } from '@kit.LocalizationKit';
 import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
+import { backgroundKeeper } from './BackgroundKeeper';
 
 interface LayerChunk {
   file: string;
@@ -194,6 +195,7 @@ class DshEngine {
           ready = true;
           session.safe = mode === 'safe';
           this.publish('', session, { phase: '加载界面', percent: 90 });
+          void backgroundKeeper.start(context);
           hilog.info(0xD005, 'DSHClient', 'native loopback ready ms=%{public}d mode=%{public}s',
             Date.now() - started, mode);
         } else if (!ready && Date.now() - nativeStarted > 60000) {
