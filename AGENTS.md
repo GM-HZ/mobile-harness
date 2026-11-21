@@ -9,6 +9,15 @@
 2. `docs/architecture/feature-roadmap.md` —— 能力矩阵与新增功能的落点；
 3. 你要改的目录下的 `AGENTS.md`（`packages/dsh-host/`、`runtime/harmonyos/{compat,native,packaging}/`、`apps/harmonyos/`、`tests/smoke/`、`gates/`、`patches/`）。
 
+## 当前阶段（2026-11-21 起）：功能锁定 / 第一可用版本
+
+- `main` 进入 **feature freeze**：不再新增能力；只做 **bugfix、稳定性、体验、性能、文档**。
+- 功能状态以 `docs/architecture/feature-roadmap.md` 的能力矩阵为准；任何新增能力需要先在
+  `docs/work/` 写明理由并明确"解锁功能"，否则不合并。
+- 所有改动先在 feature/bugfix 分支验证，再合并回 `main`；合并后在 `main` 重跑
+  G0/G1/G2/G3 回归，证据落盘。
+- 第一可用版本的验收口径见 `docs/work/2026-11-21-first-usable-version.md`。
+
 ## 常驻规则（违反任何一条视为 blocking）
 
 1. **适配面单一来源**：任何 overlay、原生绑定、输入 pin、变体开关、运行时 patch 都必须出现在

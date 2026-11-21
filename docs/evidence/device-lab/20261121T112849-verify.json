@@ -1,0 +1,22 @@
+{
+  "device": {
+    "serial": "37R0224115035605",
+    "versionName": "0.4.69",
+    "versionCode": 76,
+    "boot": "{\"mode\":\"normal\",\"pending\":false}",
+    "launch": "start ability successfully.",
+    "screenLocked": false,
+    "checkedAt": "2026-11-21T11:28:45+0800"
+  },
+  "run": {
+    "suite": "verify",
+    "exit": 0,
+    "passed": true,
+    "probeOk": true,
+    "durationSeconds": 4,
+    "outputTail": "{\n \"ok\": true,\n \"readyMs\": 136,\n \"web\": 200,\n \"account\": {\n  \"status\": \"credential-stored\",\n  \"attempt\": null,\n  \"links\": {\n   \"usageUrl\": \"https://platform.deepseek.com/usage\",\n   \"topUpUrl\": \"https://platform.deepseek.com/top_up\"\n  }\n },\n \"build\": {\n  \"versionCode\": 76,\n  \"versionName\": \"0.4.69\",\n  \"appId\": \"org.sayact.nodepoc_BNIJsz9w4up97L3I70LVG\",\n  \"installTime\": 1793975651557\n }\n}\n/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/main/docs/evidence/device-lab/verify.json\n",
+    "evidence": "docs/evidence/device-lab/verify.json",
+    "requiresModel": false
+  },
+  "ok": true
+}

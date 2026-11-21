@@ -1,9 +1,9 @@
 {
   "kind": "real-device read-only verification",
   "target": "37R0224115035605",
-  "checkedAt": "2026-11-21T11:04:22+0800",
+  "checkedAt": "2026-11-21T11:28:45+0800",
   "started": "start ability successfully.",
-  "readyMs": 165,
+  "readyMs": 136,
   "parameters": {
     "model": "BRA-AL00",
     "brand": "HUAWEI",

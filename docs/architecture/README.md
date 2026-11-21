@@ -4,6 +4,7 @@ This directory owns the **adaptation and gate architecture** of Mobile Harness:
 how we layer meaning onto upstream DeepSeek Harness, how we track upstream,
 and how a change is proven before it reaches `main`.
 
+- [第一可用版本计划](../work/2026-11-21-first-usable-version.md) — feature freeze, v1 acceptance and UX optimization list (current phase).
 - [framework.md](framework.md) — framework law: layers, ownership, hard invariants, change placement, gate model, known boundaries.
 - [feature-roadmap.md](feature-roadmap.md) — capability matrix, extension recipes, priorities.
 - [2026-11-20 adaptation and gates plan](2026-11-20-adaptation-and-gates-plan.md) — current plan, patch layers, upstream bumping, gate tiers, RSI loop.
