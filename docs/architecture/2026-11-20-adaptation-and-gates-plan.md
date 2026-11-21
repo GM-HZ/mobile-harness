@@ -487,3 +487,12 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
      两者都已修正。
 - 剩余：真实模型 turn 的 session 写入回归（需 `MH_TEST_DEEPSEEK_API_KEY`）、forge fixture
   的 `forgePanel/diff` 环境问题。
+
+
+### 2026-11-21（真机 session 写入回归）
+
+- 真机（签名 self 构建、设备账号 deepseek-account/deepseek-flash）完成一次真实模型 turn：
+  `turn/end reason=completed`、1 条 assistant message、21 条事件；
+- 强制停止并重启 App 后再次读取同一 session：**21 条事件完整保留**（含 turn/end）；
+- 证据 `docs/evidence/device-lab/20261121-session-turn.json`，验证了 session-persistence 包补丁
+  在真机上的写入与恢复路径。

@@ -45,8 +45,11 @@ upstream DeepSeek Harness, per the round-19 plan.
      through the same packaged path as `bash`;
    - `device_lab` now requires the probe's own `ok:true`, and the probe derives its DONE marker
      per probe instead of requiring the exec probe's markers for every probe.
-2. **Real model turn / session write regression**: no `MH_TEST_DEEPSEEK_API_KEY`; G2 recovery covers
-   persistence paths but a real turn remains unverified.
+2. **Real model turn / session write regression (complete 2026-11-21)**: on the unlocked Mate 60 with
+   the signed self build, a real `deepseek-account`/`deepseek-flash` turn completed
+   (`turn/end reason=completed`, 1 assistant message, 21 events) and the session log survived an app
+   restart (21 events after restart, including `turn/end`). Evidence:
+   `docs/evidence/device-lab/20261121-session-turn.json`; validates the session-persistence package patch.
 3. **forge fixture**: `emulator-forge-account` reaches OAuth sign-in and the forge panel RPC, but
    `forgePanel/changeRequestText` → `forgePanel/diff-failed` (fixture/TLS/GH_CONFIG environment).
    The forge provider migration itself is validated by build + G1 contract + G2 recovery.
