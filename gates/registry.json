@@ -60,6 +60,12 @@
           "timeout": 120
         },
         {
+          "id": "guidance-docs",
+          "command": "python3 scripts/adaptation/guidance_check.py",
+          "covers": "AGENTS/framework/roadmap/module guidance files, sections and indexes",
+          "timeout": 120
+        },
+        {
           "id": "workflow-check",
           "command": "python3 scripts/adaptation/workflow_check.py",
           "covers": "gate workflows stay wired to gate scripts and steps",

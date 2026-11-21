@@ -26,3 +26,9 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 | 签名包、实测范围及失败记录 | [版本记录](docs/releases.md) · [回归矩阵](docs/workspace-validation.md) · [证据目录](docs/evidence/) |
 
 `apps/harmonyos/` 是 DevEco 源工程，`packages/dsh-host/` 和 `packages/bundles/` 持有 DSH 装配，`runtime/harmonyos/` 持有平台代码，`vendor/repos/` 记录上游子模块。构建在 `.build/stage/` 生成可打开的 DevEco 工程。
+
+## 开发规则（AI 与人类共用）
+
+这个仓库由 AI 连续开发，改动前先读 [AGENTS.md](AGENTS.md)、[框架法](docs/architecture/framework.md) 和
+[能力矩阵](docs/architecture/feature-roadmap.md)；每个模块目录都有自己的 `AGENTS.md` 写明改动规则。
+任何适配/补丁/门禁/证据都必须走 [门禁系统](gates/README.md)，没有 gate 与证据的"能跑"不算完成。

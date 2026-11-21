@@ -23,7 +23,8 @@ def main():
     doc = DOC.read_text()
     failures = []
     modules = {row["file"]: row for row in inventory["modules"]}
-    present = {path.name for path in COMPAT.glob("*") if path.is_file() and not path.name.startswith("LICENSE")}
+    present = {path.name for path in COMPAT.glob("*")
+               if path.is_file() and not path.name.startswith("LICENSE") and path.name != "AGENTS.md"}
     for name in sorted(present - set(modules)):
         failures.append(f"compat module not in adaptation/compat.json: {name}")
     for name, row in modules.items():

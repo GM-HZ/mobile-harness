@@ -578,3 +578,17 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 - 回归：真机 G3 verify/exec/overlay 在该构建上全部 PASS；G1 `host-regressions` 增加 forge launcher 守卫。
 - 清理：真机/模拟器上的临时 token 已删除；临时私有仓库 `GM-HZ/mh-forge-fixture-100341`
   仍存在（token 缺 `delete_repo` scope，需手动删除或授权后删除）。
+
+
+### 2026-11-21（框架定稿：AGENTS 与模块开发规则）
+
+- 新增根 [AGENTS.md](../../AGENTS.md)：常驻规则、改动落点、常用命令、完成定义（DoD）。
+- 新增 [framework.md](framework.md)：框架"宪法"——分层、所有权、8 条硬性不变量、改动落点决策树、
+  补丁/适配生命周期、上游 bump 流程、门禁模型、已知边界。
+- 新增 [feature-roadmap.md](feature-roadmap.md)：能力矩阵、按类型的扩展 recipe（库/补丁/host/compat/门禁/上游 bundle）、
+  优先级待办（全量锚点、PRoot 供应链、CI 真跑、真机调度、任意 dlopen）。
+- 新增 [docs/AGENTS.md](../AGENTS.md)：文档分层与写作规则，要求"一条事实一个家"、同改、证据不进正文。
+- 每个模块新增 `AGENTS.md` 开发规则：`packages/dsh-host`、`runtime/harmonyos/{compat,native,packaging}`、
+  `apps/harmonyos`、`tests/smoke`、`gates`、`patches`，各有规则与检查清单。
+- 新增 G1 门禁 `guidance-docs`（`scripts/adaptation/guidance_check.py`）：必需文件、关键章节、索引链接缺失即 fail；
+  G1 现 12 项。README 增加开发规则入口。

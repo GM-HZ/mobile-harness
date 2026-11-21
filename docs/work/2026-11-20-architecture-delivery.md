@@ -112,3 +112,16 @@ python3 scripts/adaptation/gate_report.py
   Evidence: `docs/evidence/forge/real-account-device-20261121.json`,
   `docs/evidence/forge/real-account-emulator-launcher-fix-20261121.json`.
 - G3 verify/exec/overlay re-run PASS on the same signed build.
+
+
+## 8. 2026-11-21 framework & AI development guidance
+
+- Root `AGENTS.md` (standing orders, change placement, commands, definition of done),
+  `docs/AGENTS.md` (documentation tiers and writing rules), and
+  `docs/architecture/framework.md` (layers, ownership, hard invariants, patch lifecycle,
+  gate model, known boundaries) are the authoritative framework.
+- Per-module `AGENTS.md` files exist for `packages/dsh-host`, `runtime/harmonyos/{compat,native,packaging}`,
+  `apps/harmonyos`, `tests/smoke`, `gates`, `patches`; each has rules and a checklist.
+- `docs/architecture/feature-roadmap.md` records the capability matrix, extension recipes and priorities.
+- G1 now includes `guidance-docs` (`scripts/adaptation/guidance_check.py`), so missing/renamed guidance
+  files or indexes fail the gate.
