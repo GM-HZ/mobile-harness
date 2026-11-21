@@ -25,7 +25,7 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
 | --- | --- |
 | 上游版本与输入 hash | `versions.lock.json` + `docs/build-inputs.sha256` + `docs/guest-tools-lock.json` |
 | 适配面清单 | `adaptation/manifest.json`（自动生成） |
-| 锚点/补丁/目标 | `adaptation/anchors.json`、`patches/series.json`、`patches/TARGETS.md`、`patches/targets.json` |
+| 锚点/补丁/目标 | `adaptation/anchors.json`、`adaptation/anchors.full.json`、`patches/series.json`、`patches/TARGETS.md`、`patches/targets.json` |
 | 收敛状态与迁移目标 | `adaptation/convergence.json` |
 | compat 决策 | `adaptation/compat.json` + `docs/architecture/compat-layer.md` |
 | 上游接触点合同 | `docs/architecture/seams/*.md` |

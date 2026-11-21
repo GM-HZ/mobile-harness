@@ -1,0 +1,422 @@
+{
+  "schema": 1,
+  "source": "scripts/adaptation/anchor_scan.py",
+  "entries": [
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 0,
+      "function": "addon",
+      "module": null,
+      "anchor": "point",
+      "dynamic": true
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 1,
+      "function": "harmonyProfileFetch",
+      "module": null,
+      "anchor": "call",
+      "dynamic": true
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 2,
+      "function": "resolvePrimaryRuntime",
+      "module": null,
+      "anchor": "resolver",
+      "dynamic": true
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 3,
+      "function": "resolvePrimaryRuntime",
+      "module": null,
+      "anchor": "This does not change PATH or package-manager settings.",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 4,
+      "function": "patchPtc",
+      "module": "dsh-ptc-runtime-node/lib/index.js",
+      "anchor": "import { stripTypeScriptTypes } from \"node:module\";",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 5,
+      "function": "patchPtc",
+      "module": "dsh-ptc-runtime-node/lib/index.js",
+      "anchor": "validateConfig(this.config);\n\t\tthis.processes = new PolicyProcesses(ctx);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 6,
+      "function": "patchSharedPtcExecutor",
+      "module": "dsh-tool-executor-ptc/lib/index.js",
+      "anchor": "let policy = standingPolicy;",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 7,
+      "function": "patchSharedPtcExecutor",
+      "module": "dsh-tool-executor-ptc/lib/index.js",
+      "anchor": "...exec.agent === void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 8,
+      "function": "patchLivesharePolicies",
+      "module": "dsh-experimental-liveshare/lib/index.js",
+      "anchor": "noteViewerTurn(String(agent.session.id), turn, requests.length > 0);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 9,
+      "function": "patchLivesharePolicies",
+      "module": "dsh-experimental-liveshare/lib/index.js",
+      "anchor": "if (execution.name === \"run_code\") return void 0;",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 10,
+      "function": "patchLivesharePolicies",
+      "module": "dsh-experimental-liveshare/lib/index.js",
+      "anchor": "verdictSource: async (execution) => {\n\t\t\tconst { token } = execution;",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 11,
+      "function": "patchCompaction",
+      "module": "dsh-compaction-basic/lib/index.js",
+      "anchor": "function selectCompactableRange(session, measurement, retainTokens) {",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 12,
+      "function": "selectCompactableRange",
+      "module": null,
+      "anchor": "guard",
+      "dynamic": true
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 13,
+      "function": "selectCompactableRange",
+      "module": null,
+      "anchor": "case \"context-overflow\": {\n\t\t\t\tthis.ctx.get(\"toolResultPruner\")?.pruneSession(agent.session);\n\t\t\t\tconst measurement = this.ctx.tokenMeter.measure(agent.session);\n\t\t\t\tconst range = selectCompactableRange(agent.session, measurement, 0);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 14,
+      "function": "main",
+      "module": null,
+      "anchor": "...loadOptionalPatches(binName, join(context.home, \"cordis.patch.yml\")) ?? [],",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 15,
+      "function": "main",
+      "module": null,
+      "anchor": "execArgv: []",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 16,
+      "function": "main",
+      "module": null,
+      "anchor": "workerData: boot,",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 17,
+      "function": "main",
+      "module": null,
+      "anchor": "for (const [key, value] of Object.entries(req.headers)) if (key.startsWith(\"sec-websocket-\")",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 18,
+      "function": "main",
+      "module": null,
+      "anchor": "console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 19,
+      "function": "main",
+      "module": null,
+      "anchor": "this.config = config;",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 20,
+      "function": "main",
+      "module": null,
+      "anchor": "import { spawn } from \"node:child_process\";",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 21,
+      "function": "main",
+      "module": null,
+      "anchor": "withoutManifestLink(read) : read;",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 22,
+      "function": "main",
+      "module": null,
+      "anchor": "\"darwin-arm64\",",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 23,
+      "function": "main",
+      "module": null,
+      "anchor": "const token = randomBytes(32).toString(\"hex\");",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 24,
+      "function": "main",
+      "module": null,
+      "anchor": "const worker = {\n\t\t\t\t\thandle,\n\t\t\t\t\turl: `http://127.0.0.1:${await readReady(handle, this.config.maxLogBytes, setup.signal)}`,\n\t\t\t\t\ttoken,",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 25,
+      "function": "main",
+      "module": null,
+      "anchor": "Read and use the cordis-plugin-development skill.",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 26,
+      "function": "main",
+      "module": null,
+      "anchor": "they supplement the cordis-plugin-development skill.",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 27,
+      "function": "main",
+      "module": null,
+      "anchor": "Build and export all runtime entry points before reporting ready.",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 28,
+      "function": "main",
+      "module": null,
+      "anchor": "phase: result.application === \"applied\" ? \"removed\" : previous.phase",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 29,
+      "function": "main",
+      "module": null,
+      "anchor": "env: buildChildEnv(config.env),",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 30,
+      "function": "main",
+      "module": null,
+      "anchor": "...getDefaultEnvironment(),",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 31,
+      "function": "main",
+      "module": null,
+      "anchor": "import spawn from \"cross-spawn\";",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 32,
+      "function": "main",
+      "module": null,
+      "anchor": "internals = {};",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 33,
+      "function": "main",
+      "module": null,
+      "anchor": "(await import(\"@vscode/ripgrep\")).rgPath",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 34,
+      "function": "main",
+      "module": null,
+      "anchor": "\t\t\"--sort=modified\",\n",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 35,
+      "function": "main",
+      "module": null,
+      "anchor": "paths: all",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 36,
+      "function": "main",
+      "module": null,
+      "anchor": "import { execa } from \"execa\";",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 37,
+      "function": "main",
+      "module": null,
+      "anchor": "this.installedFrom.set(name, used);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 38,
+      "function": "main",
+      "module": null,
+      "anchor": "this.installedFrom.delete(name);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 39,
+      "function": "main",
+      "module": null,
+      "anchor": "const previousRegistry = this.installedFrom.get(name);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 40,
+      "function": "main",
+      "module": null,
+      "anchor": "return requested !== void 0 ? requested : this.installedFrom.get(name);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 41,
+      "function": "main",
+      "module": null,
+      "anchor": "ensureDurableDirectory(home, parse(home).root)",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 42,
+      "function": "main",
+      "module": null,
+      "anchor": "createLazyRequire(\"sharp\", import.meta.url)",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 43,
+      "function": "main",
+      "module": null,
+      "anchor": "await image.raw().toBuffer();",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 44,
+      "function": "main",
+      "module": null,
+      "anchor": "await link(staged.path, target);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 45,
+      "function": "main",
+      "module": null,
+      "anchor": "await unlink(staged.path);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 46,
+      "function": "main",
+      "module": null,
+      "anchor": "await link(source, target);",
+      "dynamic": false
+    },
+    {
+      "file": "packages/dsh-host/dsh-native-web.cjs",
+      "index": 47,
+      "function": "main",
+      "module": null,
+      "anchor": "point",
+      "dynamic": true
+    },
+    {
+      "file": "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs",
+      "index": 0,
+      "function": "patchFileUploads",
+      "module": null,
+      "anchor": "async upload(agent, request, signal) {",
+      "dynamic": false
+    },
+    {
+      "file": "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs",
+      "index": 1,
+      "function": "patchFileUploadSchemas",
+      "module": null,
+      "anchor": "resultStart",
+      "dynamic": true
+    },
+    {
+      "file": "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs",
+      "index": 2,
+      "function": "patchFileUploadSchemas",
+      "module": null,
+      "anchor": "resultEnd",
+      "dynamic": true
+    },
+    {
+      "file": "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs",
+      "index": 3,
+      "function": "patchFileUploadSchemas",
+      "module": null,
+      "anchor": "match[0]",
+      "dynamic": true
+    }
+  ]
+}

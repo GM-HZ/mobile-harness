@@ -57,7 +57,37 @@
 优先把上游 bundle 挂进 mobile profile，而不是在 host overlay 里重写；参考 forge
 （`patches/forge-github-guest-runner.patch` + `__harmonyPackagedShell`）。
 
-## 3. 待办优先级
+## 3. 动态 dlopen 待办（独立项目，当前不支持）
+
+运行时任意未签名 `.so` 的 dlopen 仍是 ❌。要做成需要用户态共享库加载器；按以下顺序拆项：
+
+| ID | 事项 | 验收 |
+| --- | --- | --- |
+| D1 | `LD_PRELOAD` 拦截 `dlopen/dlsym/dlerror/dlclose`，未签名文件转交用户态 loader | 简单 `.so` 可 dlopen，签名文件仍走系统路径 |
+| D2 | ELF 映射与重定位（PT_LOAD/RELATIVE/GLOB_DAT/JUMP_SLOT…） | 无外部依赖的 PIE `.so` 可加载并调用函数 |
+| D3 | 符号解析（dlsym 宿主动态表）与 DT_NEEDED 依赖（签名库直映，未签名递归） | `.so` 依赖签名库/未签名库混合可用 |
+| D4 | TLS、`DT_INIT/INIT_ARRAY` 构造器、析构 | 带构造器/TLS 的库可加载 |
+| D5 | Python C 扩展（wheel） | `import` 一个 C 扩展模块成功 |
+| D6 | Node `.node` addon（`process.dlopen` 路径） | 简单 N-API 扩展可 require |
+| D7 | ABI/版本检查与错误诊断（缺符号、ABI 不匹配） | 错误可定位，不崩溃进程 |
+| D8 | 安全门禁：仅 self/lab 构建启用，store 关闭 | `store_build_check` 断言、G4 |
+| D9 | G2/G3 证据（模拟器 + 真机） | loader 用例进 nightly/device lab |
+| D10 | 文档与回滚（支持边界、已知限制） | framework/README 更新 |
+
+当前进度：①exec（main executable）已实现；②动态可执行文件依赖库仅覆盖签名 overlay；
+③dlopen loader 未开始。
+
+## 4. 插件支持策略与稳定性待办
+
+- **P1** 插件支持策略文档：支持纯 JS/Cordis、bundle；不支持运行时原生 `.so`/需编译/PTY/桌面能力；
+- **P1** 崩溃安全：坏插件导致 Host 退出后，下次启动自动进入安全模式，并提供"禁用最近插件"的恢复路径
+  （现有 `BootRecovery` 已能自动安全模式，需补 UI 与 profile 回滚）；
+- **P1** 插件门禁：`nightly-plugin-git-update` 已加入 nightly（本地 git 插件安装/启用）；
+  市场/公开图用例需要模型 key，暂不纳入；
+- **P2** 原生插件走构建期 `extensions[]` 签名 overlay（不承诺运行时任意 dlopen）；
+- **P2** 安全模型：插件拥有 App 权限，需明示来源/信任与审核策略。
+
+## 5. 待办优先级
 
 | 优先级 | 事项 | 落点 |
 | --- | --- | --- |

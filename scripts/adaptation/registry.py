@@ -75,6 +75,10 @@ def main():
                "command": "python3 tests/smoke/emulator-native-addon-location.py \"$MH_EMULATOR\" .build/gate-evidence/native-addon.json",
                "covers": "native addon location + Inspector evaluation on the native Host",
                "requires": ["MH_EMULATOR env"], "timeout": 1200})
+    g2.append({"id": "nightly-plugin-git-update",
+               "command": "python3 tests/smoke/emulator-plugin-git-update.py \"$MH_EMULATOR\" .build/gate-evidence/plugin-git-update.json",
+               "covers": "plugin manager installs a local git plugin and enables it",
+               "requires": ["MH_EMULATOR env"], "timeout": 1200})
     g2.append({"id": "nightly-mcp-stdio",
                "command": "python3 tests/smoke/emulator-mcp-stdio.py \"$MH_EMULATOR\" .build/gate-evidence/mcp-stdio.json",
                "covers": "Node/Python MCP stdio servers on the native Host", "requires": ["MH_EMULATOR env"],
@@ -132,6 +136,9 @@ def main():
                  "timeout": 120},
                 {"id": "workflow-check", "command": "python3 scripts/adaptation/workflow_check.py",
                  "covers": "gate workflows stay wired to gate scripts and steps", "timeout": 120},
+                {"id": "anchor-coverage", "command": "python3 scripts/adaptation/anchor_scan.py --check",
+                 "covers": "every replacePinned anchor is indexed in adaptation/anchors.full.json",
+                 "timeout": 120},
                 {"id": "host-regressions", "command": "python3 scripts/adaptation/host_regressions.py",
                  "covers": "/bin/bash routing, padded status parsing, probe done/ok checks", "timeout": 120},
                 {"id": "forge-account-fixture",

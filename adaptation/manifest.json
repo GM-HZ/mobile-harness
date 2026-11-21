@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "1aea067c72ae5a082596b1a5936c1d17cedbf84d",
+  "generatedFrom": "1600bb3d3011935ee2e5bb599bd1788836967352",
   "layers": [
     "host",
     "web",
@@ -15,6 +15,21 @@
     "app"
   ],
   "entries": [
+    {
+      "id": "host:packages/dsh-host/AGENTS.md",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/AGENTS.md",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "39049c5470a5ea495bae4d7393cf53faeeb5e02c8bcfce644339485e93b69a91",
+      "bytes": 1821,
+      "fragility": "high",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
     {
       "id": "host:packages/dsh-host/dsh-client.cjs",
       "layer": "host",
@@ -248,6 +263,21 @@
       ]
     },
     {
+      "id": "compat:runtime/harmonyos/compat/AGENTS.md",
+      "layer": "compat",
+      "kind": "file",
+      "source": "runtime/harmonyos/compat/AGENTS.md",
+      "role": "upstream capability shim",
+      "sha256": "bb9f9d925f497bea13d8137a4658f152584ab4b8359105b28c303997de6ef778",
+      "bytes": 1373,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
       "id": "compat:runtime/harmonyos/compat/LICENSE.gh.txt",
       "layer": "compat",
       "kind": "file",
@@ -441,6 +471,20 @@
       "sha256": "30a6f954be426c3fd59705f8997bcbfcad75f3678bdeed05aa72cfb3d8e53142",
       "bytes": 1490,
       "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/AGENTS.md",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/AGENTS.md",
+      "role": "native runtime / adapter",
+      "sha256": "11e85fa74a2eb5e4bc63a45afeb3a08fb6de5e8f5323d139738506c50f234b77",
+      "bytes": 1307,
+      "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
         "G0"
@@ -650,6 +694,20 @@
       "role": "native runtime / adapter",
       "sha256": "c849cd2aea0debb740400bf30d0b7b723fd790ce2f94ffa72f5ed26448ea97eb",
       "bytes": 641,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/AGENTS.md",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/AGENTS.md",
+      "role": "build and packaging scripts",
+      "sha256": "7838e0b44246b17e86653e24938d90cd2a3883b226c2f25b54ab4ffab083f3a5",
+      "bytes": 1383,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -889,6 +947,20 @@
       ]
     },
     {
+      "id": "patches:patches/AGENTS.md",
+      "layer": "patches",
+      "kind": "file",
+      "source": "patches/AGENTS.md",
+      "role": "npm package patch series applied while assembling the DSH layer",
+      "sha256": "a45b48e056f005cc7ecf9f84ea7055f5af2faf36aa8600bb5ee9544fe233ff61",
+      "bytes": 954,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
       "id": "patches:patches/README.md",
       "layer": "patches",
       "kind": "file",
@@ -1053,8 +1125,8 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "cc66ba19ebd40b35fc194f9a3ed078a02d3bc69ca8b6c3937d5aad900516c9a6",
-      "files": 26,
+      "sha256": "5e4842dfadc4948fc0d87f5c9fab7eba137ff2175cffea1829f13ea6895341bf",
+      "files": 27,
       "fragility": "medium",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1071,13 +1143,14 @@
       "places": [
         ".github/workflows/gate-release.yml",
         ".github/workflows/harmonyos.yml",
+        "runtime/harmonyos/native/AGENTS.md",
+        "runtime/harmonyos/packaging/AGENTS.md",
         "runtime/harmonyos/packaging/build-native-shell.sh",
         "runtime/harmonyos/tools/mh-exec.py",
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",
         "scripts/adaptation/release_dry_run.sh",
-        "scripts/build/harmonyos_guest_extras.py",
-        "scripts/build/stage-harmonyos.py"
+        "scripts/build/harmonyos_guest_extras.py"
       ],
       "gates": [
         "G0",
@@ -1091,6 +1164,7 @@
       "source": "HARMONY_GUEST_LIB_GROUPS",
       "role": "signed native library/extension groups (common,media,extensions)",
       "places": [
+        "runtime/harmonyos/packaging/AGENTS.md",
         "scripts/adaptation/inventory.py",
         "scripts/build/harmonyos_guest_extras.py",
         "scripts/build/stage-harmonyos.py"
@@ -1110,6 +1184,7 @@
         ".github/workflows/gate-nightly.yml",
         ".github/workflows/gate-release.yml",
         ".github/workflows/harmonyos.yml",
+        "runtime/harmonyos/packaging/AGENTS.md",
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",
         "scripts/adaptation/release_dry_run.sh",

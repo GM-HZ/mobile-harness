@@ -592,3 +592,18 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
   `apps/harmonyos`、`tests/smoke`、`gates`、`patches`，各有规则与检查清单。
 - 新增 G1 门禁 `guidance-docs`（`scripts/adaptation/guidance_check.py`）：必需文件、关键章节、索引链接缺失即 fail；
   G1 现 12 项。README 增加开发规则入口。
+
+
+### 2026-11-21（框架稳定性：全量锚点索引、插件 nightly、dlopen TODO）
+
+- **全量锚点索引**：新增 `scripts/adaptation/anchor_scan.py` + `adaptation/anchors.full.json`：
+  从 host/compat 抽取全部 `replacePinned` 锚点（**52 个：44 字面量 + 8 动态**），G1 `anchor-coverage`
+  要求每次改动索引同步；`--layer` 可对装配后的 dsh-layer 抽查模块锚点（当前 8 个可映射模块 0 缺失，
+  其余 main 内嵌锚点待映射，见 roadmap P0）。之前只登记 7 个，覆盖缺口已显式化。
+- **插件门禁**：`nightly-plugin-git-update` 加入 G2 nightly（本地 git 插件安装/启用，实测通过）；
+  workflow `--only` 同步；插件市场/公开图用例因需要模型 key 暂不纳入。
+- **动态 dlopen 立项 TODO**：feature-roadmap 新增 D1–D10（dlopen shim、ELF 映射/重定位、符号与依赖、
+  TLS/构造器、Python wheel、Node addon、诊断、安全门禁、证据、文档），明确"未开始"与验收标准。
+- **插件支持策略 TODO**：支持纯 JS/Cordis；不支持运行时原生/编译/PTY/桌面；崩溃安全（BootRecovery 已有
+  自动安全模式，补 UI/回滚）；原生插件走构建期签名 overlay。
+- framework 的锚点闭包不变量已更新；G1 现 **13 项**，registry：G0=3、G1=13、G2=70、G3=3、G4=7。
