@@ -211,7 +211,9 @@ function installProotSpawn(workspace) {
   globalThis.__harmonyHostSpawn = (program, args, options) => {
     if (safeMode) throw new Error('Guest subprocesses are disabled in HarmonyOS recovery mode');
     // Keep the existing bounded search adapter and its signed /bin/rg mapping.
-    if (program === 'bash' || program === ripgrep) return globalThis.__harmonyProotSpawn(program, args, options);
+    if (program === 'bash' || program === '/bin/bash' || program === ripgrep) {
+      return globalThis.__harmonyProotSpawn(program, args, options);
+    }
     if (!Array.isArray(options.stdio) || options.stdio.length !== 3 ||
         !['ignore', 'pipe'].includes(options.stdio[0]) ||
         options.stdio.slice(1).some(mode => !['pipe', 'inherit'].includes(mode))) {
@@ -258,7 +260,7 @@ function installProotSpawn(workspace) {
     return launchGuest(guest, 'exec -- ' + [program, ...args].map(quoteShellArgument).join(' '), environment);
   };
   globalThis.__harmonyProotSpawn = (program, args, options) => {
-    if (program !== 'bash' && program !== ripgrep) return spawn(program, args, options);
+    if (program !== 'bash' && program !== '/bin/bash' && program !== ripgrep) return spawn(program, args, options);
     if (options.stdio.join(',') !== 'ignore,pipe,pipe') throw new Error('Harmony tools require captured output');
     const cwd = fs.realpathSync(options.cwd);
     const guest = path.posix.join('/workspace-native', relativeInWorkspace(allowedRoot, cwd));

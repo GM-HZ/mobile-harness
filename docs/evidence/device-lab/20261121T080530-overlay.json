@@ -1,0 +1,22 @@
+{
+  "device": {
+    "serial": "37R0224115035605",
+    "versionName": "0.4.69",
+    "versionCode": 76,
+    "boot": "{\"mode\":\"normal\",\"pending\":false}",
+    "launch": "start ability successfully.",
+    "screenLocked": false,
+    "checkedAt": "2026-11-21T08:04:36+0800"
+  },
+  "run": {
+    "suite": "overlay",
+    "exit": 1,
+    "passed": false,
+    "probeOk": null,
+    "durationSeconds": 54,
+    "outputTail": "Traceback (most recent call last):\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-architecture/tests/smoke/mate60-proot-exec.py\", line 543, in <module>\n    main()\n    ~~~~^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-architecture/tests/smoke/mate60-proot-exec.py\", line 535, in main\n    run(Device(args.target, args.port), args.port, args.output, probe,\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        loader_file=(args.loader_file if args.probe == \"elf-loader\" else None),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        payload_file=(args.payload_file if args.probe == \"elf-run\" else None),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        elf_args=args.elf_args, elf_argv0=args.elf_argv0)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-architecture/tests/smoke/mate60-proot-exec.py\", line 491, in run\n    done = re.search(r\"\\b([A-Z][A-Z0-9_]*_DONE)\\b\", probe)\n           ^^\nNameError: name 're' is not defined. Did you forget to import 're'?\n",
+    "evidence": "docs/evidence/device-lab/overlay.json",
+    "requiresModel": true
+  },
+  "ok": false
+}

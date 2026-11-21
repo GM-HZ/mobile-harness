@@ -31,18 +31,20 @@ upstream DeepSeek Harness, per the round-19 plan.
 
 ## 3. Known gaps (environment-blocked, tracked)
 
-1. **G3 real-device evidence (partial)**: on 2026-11-21 with an unlocked Mate 60 and the signed
-   self build installed:
-   - `device_lab run --suite verify` **PASS** (23 s; web 200, account credential-stored,
-     evidence `docs/evidence/device-lab/20261121T073808-verify.json`);
-   - `device_lab run --suite exec|overlay` **FAIL**: the bash tool now reaches PRoot but PRoot
-     reports `embedded loader descriptors: No such file or directory` and
-     `execve("/bin/bash"): Permission denied` (real-device compat PRoot mode; emulator fast mode
-     passes the same suites). The same run exposed and fixed a real bug: signed builds return a
-     3-byte status cell with binary padding (`30 00 18`), so the bash exit-status parser now
-     extracts digits instead of requiring `ddd`. `device_lab` also now requires the probe's own
-     `ok:true`, not just exit code 0.
-   - the phone auto-locked during the long session, so exec/overlay are pending another unlocked run.
+1. **G3 real-device evidence (complete 2026-11-21)**: unlocked Mate 60, signed self build
+   (0.4.69/76) installed; all three suites pass:
+   - `verify` PASS (3 s; web 200, account credential-stored);
+   - `exec` PASS (36 s; all exec/redirect markers, COPY_NODE_OK, fake-ELF 126/127 as designed);
+   - `overlay` PASS (60 s; signed libs present, node dlopen returns 42, downloaded dynamic jq runs).
+   Evidence: `docs/evidence/device-lab/20261121T08*.json`.
+   Root causes found and fixed during validation:
+   - signed builds return a 3-byte bash exit-status cell with binary padding (`30 00 18`);
+     the parser now extracts digits instead of requiring `^\d{3}$`;
+   - patched bash argv (`/bin/bash`) bypassed the packaged spawn path on real devices and hit
+     PRoot's signed-exec loader handoff ("embedded loader descriptors"); `/bin/bash` now routes
+     through the same packaged path as `bash`;
+   - `device_lab` now requires the probe's own `ok:true`, and the probe derives its DONE marker
+     per probe instead of requiring the exec probe's markers for every probe.
 2. **Real model turn / session write regression**: no `MH_TEST_DEEPSEEK_API_KEY`; G2 recovery covers
    persistence paths but a real turn remains unverified.
 3. **forge fixture**: `emulator-forge-account` reaches OAuth sign-in and the forge panel RPC, but

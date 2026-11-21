@@ -471,3 +471,19 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
     导致 "Bash exited without a valid command status"；改为提取数字；
   - `device_lab` 之前只看探针退出码，现要求探针证据 `ok:true`。
 - 真机在长时间验证中自动锁屏，剩余 exec/overlay 与 compat PRoot 问题需再次解锁后续跑。
+
+
+### 2026-11-21（真机 G3 完成）
+
+- 真机 Mate 60（签名 self 构建）三个 G3 套件全部 PASS：
+  `verify 3s` / `exec 36s`（全 exec 标记、COPY_NODE_OK、未签名复制 126/127）/ `overlay 60s`
+  （签名库 + node dlopen 42 + 动态 jq 1.8.2）。证据在 `docs/evidence/device-lab/`。
+- 验证中发现并修复三个真实问题：
+  1. 签名构建 bash 退出状态是 ASCII 数字 + 二进制填充（`30 00 18`），旧解析要求 `^\d{3}$`；
+  2. bash 包补丁把 argv 改成 `/bin/bash` 后绕过了 host 的 packaged spawn 路径，真机签名构建
+     进入 PRoot signed-exec loader handoff 并失败（"embedded loader descriptors"）；现在
+     `/bin/bash` 与 `bash` 走同一路径；
+  3. `device_lab` 只看探针 exit code（探针 ok:false 也算 PASS），且探针 ok 逻辑只认 exec 标记；
+     两者都已修正。
+- 剩余：真实模型 turn 的 session 写入回归（需 `MH_TEST_DEEPSEEK_API_KEY`）、forge fixture
+  的 `forgePanel/diff` 环境问题。
