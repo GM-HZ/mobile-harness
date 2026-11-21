@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "90ecc86e3195a4e8c0742d606b48f6cb688007b3",
+  "generatedFrom": "fc3c6965878c8bc36db6426b6caf3538d4af1007",
   "layers": [
     "host",
     "web",
@@ -210,8 +210,8 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-native-web.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "d1100a5534f35bc86d7c3ab6ff03888f47698c4990be7411df6a1cf6cfd756d7",
-      "bytes": 47798,
+      "sha256": "d45daf31e5d53f4e42987b33f70893e114125c33a4094fbf37b98638a64d0d8d",
+      "bytes": 48280,
       "fragility": "high",
       "upstreamTouchpoints": [
         "\"darwin-arm64\",",
@@ -283,8 +283,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/compat/dsh-harmony-forge.cjs",
       "role": "upstream capability shim",
-      "sha256": "4c4e2e4b28160e28b422c543d88025eba15ae623009f025b684faa48fda9fc57",
-      "bytes": 7331,
+      "sha256": "68f4538d9925992119b923358694291533ba89300200d331e3160ccae074c707",
+      "bytes": 7908,
       "fragility": "high",
       "upstreamTouchpoints": [],
       "gates": [

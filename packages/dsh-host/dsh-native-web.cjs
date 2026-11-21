@@ -361,6 +361,14 @@ function installProotSpawn(workspace) {
     }, 25);
     return child;
   }
+  globalThis.__harmonyPackagedShell = (command, environment) => {
+    const commandLine = environment && environment.length
+      ? 'exec env ' + environment.map(quoteShellArgument).join(' ') + ' ' + command.replace(/^exec\s+/, '')
+      : command;
+    return globalThis.__harmonyProotSpawn('bash', ['-c', commandLine], {
+      stdio: ['ignore', 'pipe', 'pipe'], cwd: allowedRoot,
+    });
+  };
   return launchGuest;
 }
 function relativeInWorkspace(root, target) {
@@ -489,7 +497,9 @@ async function main() {
   const launchGuest = installProotSpawn(workspace);
   globalThis.__harmonyGh = safeMode
     ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
-    : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(launchGuest, quoteShellArgument);
+    : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(
+      (cwd, command, environment) => globalThis.__harmonyPackagedShell(command, environment),
+      quoteShellArgument);
   globalThis.__harmonyGhRunner = safeMode
     ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
     : async (args, signal, input) => {

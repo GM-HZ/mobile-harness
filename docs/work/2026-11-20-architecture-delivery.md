@@ -97,3 +97,18 @@ python3 scripts/adaptation/gate_report.py
   only accepts a loopback emulator target`), so the forge proxy fix was validated on the emulator
   (`docs/evidence/forge/forge-account-emulator-20261121.json`); the mobile Host JS path is identical
   in both builds.
+
+
+## 7. 2026-11-21 real-account forge validation (device + emulator)
+
+- Real GitHub account `GM-HZ`, private temp repo `mh-forge-fixture-100341`, PR #1
+  (head `0b5b9795…`).
+- Fixed the forge guest-gh launcher: it now runs through `__harmonyPackagedShell`
+  (non-streaming packaged PRoot spawn with embedded env) instead of the streaming
+  guest-shell path that triggered PRoot signed-exec errors on signed builds.
+- Validated on the sign-attached Mate 60 (signed build `3d08e50d2a147a962ab7f0a78a6abbe75c839a0b82a65f7d6f623d80ea4ae35d`) and on the emulator:
+  `forgePanel/track` OK, `changeRequestText` = `hello fixture`,
+  `changeRequestCommits` headSha matches and lists 1 commit.
+  Evidence: `docs/evidence/forge/real-account-device-20261121.json`,
+  `docs/evidence/forge/real-account-emulator-launcher-fix-20261121.json`.
+- G3 verify/exec/overlay re-run PASS on the same signed build.

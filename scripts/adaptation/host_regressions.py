@@ -37,6 +37,11 @@ def main():
         failures.append("bash status parser regressed to requiring three digits")
     if "proxyEnv" not in host or "'HTTPS_PROXY'" not in host:
         failures.append("guest gh runner no longer forwards proxy environment variables")
+    compat = (ROOT / "runtime/harmonyos/compat/dsh-harmony-forge.cjs").read_text()
+    if "__harmonyPackagedShell" not in host or "createGhRunner(\n      (cwd, command, environment)" not in host:
+        failures.append("forge gh no longer routes through the packaged shell helper")
+    if "child.once('exit', code => setTimeout(() => finish(" not in compat:
+        failures.append("forge gh child lifecycle no longer handles exit-only children")
     if "expected_done in text" not in probe:
         failures.append("probe success no longer uses its own *_DONE marker")
     if "probe.get(\"ok\", True) is not False" not in device_lab:

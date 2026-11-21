@@ -1,0 +1,12 @@
+{
+  "url": "https://github.com/GM-HZ/mh-forge-fixture-100341/pull/1",
+  "headSha": "0b5b97956098735770b467a0535eb76fd5c34abf",
+  "device": "emulator 5555 (new launcher build)",
+  "bundle": "applied",
+  "track": null,
+  "fileText": "hello fixture",
+  "commits": {
+    "headSha": "0b5b97956098735770b467a0535eb76fd5c34abf",
+    "count": 1
+  }
+}

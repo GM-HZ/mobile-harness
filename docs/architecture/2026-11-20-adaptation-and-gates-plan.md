@@ -558,3 +558,23 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
   已回退未验证改动，保持分支干净；下一步在 launcher 层（与 `/bin/bash` 路由修复同源）继续。
 - 清理：已从真机与模拟器删除注入的 token；临时私有仓库因 token 缺 `delete_repo` scope
   未能删除（仓库仍为 private），需要用户删除或授权 scope 后再删。
+
+
+### 2026-11-21（真机 forge launcher 修复 + 真实账号验收通过）
+
+- 根因：forge 的 guest gh 走 compat `createGhRunner` 的 **streaming launch**（经 guest shell），
+  在签名真机上触发 PRoot signed-exec loader handoff；而 bash/exec 的 packaged spawn 路径已经修过。
+- 修复：
+  1. `packages/dsh-host/dsh-native-web.cjs` 新增 `__harmonyPackagedShell(command, environment)`，
+     把固定 env 以 `exec env … /usr/bin/gh …` 嵌入后走 `__harmonyProotSpawn('bash', ...)` 的
+     非 streaming packaged 路径；forge 的 `createGhRunner` 改为通过它启动 gh；
+  2. `runtime/harmonyos/compat/dsh-harmony-forge.cjs` 适配非 streaming 子进程：允许无 stdin，
+     并在只有 `exit`（没有 `close`）时等输出流结束后结算。
+- **真实验收通过（真机 Mate 60，签名构建 `3d08e50d2a147a962ab7f0a78a6abbe75c839a0b82a65f7d6f623d80ea4ae35d`）**，真实账号 `GM-HZ` + 私有 PR：
+  `track` OK、`changeRequestText` = `hello fixture`、`changeRequestCommits` headSha 一致（1 commit）；
+  同一修复在模拟器上也通过。
+  证据：`docs/evidence/forge/real-account-device-20261121.json`、
+  `docs/evidence/forge/real-account-emulator-launcher-fix-20261121.json`。
+- 回归：真机 G3 verify/exec/overlay 在该构建上全部 PASS；G1 `host-regressions` 增加 forge launcher 守卫。
+- 清理：真机/模拟器上的临时 token 已删除；临时私有仓库 `GM-HZ/mh-forge-fixture-100341`
+  仍存在（token 缺 `delete_repo` scope，需手动删除或授权后删除）。
