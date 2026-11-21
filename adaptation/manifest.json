@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "b997be634f744b524068945817fd856f042b4354",
+  "generatedFrom": "90ecc86e3195a4e8c0742d606b48f6cb688007b3",
   "layers": [
     "host",
     "web",
@@ -210,8 +210,8 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-native-web.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "231e8e16db03a0e944c4b41a3d971b84681bd5439f50ab35983e5bc121dfe9b5",
-      "bytes": 47294,
+      "sha256": "d1100a5534f35bc86d7c3ab6ff03888f47698c4990be7411df6a1cf6cfd756d7",
+      "bytes": 47798,
       "fragility": "high",
       "upstreamTouchpoints": [
         "\"darwin-arm64\",",

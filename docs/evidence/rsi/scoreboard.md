@@ -1,11 +1,11 @@
 # Gate scoreboard
 
-Generated 2026-11-21 08:26 from 58 ledger runs (of 58 recorded).
+Generated 2026-11-21 08:38 from 60 ledger runs (of 60 recorded).
 
 | Tier | Registry entries | Runs | First-pass | Flake-pass | Fail | Last run |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| G0 | 3 | 19 | 18 | 0 | 1 | dbe4b09ca975 PASS 2026-11-20T23:50:29+0800 |
-| G1 | 10 | 19 | 19 | 0 | 0 | dbe4b09ca975 PASS 2026-11-20T23:50:30+0800 |
+| G0 | 3 | 20 | 19 | 0 | 1 | 90ecc86e3195 PASS 2026-11-21T08:38:33+0800 |
+| G1 | 10 | 20 | 20 | 0 | 0 | 90ecc86e3195 PASS 2026-11-21T08:38:34+0800 |
 | G2 | 69 | 9 | 9 | 0 | 0 | 4caa066437d7 PASS 2026-11-21T08:26:43+0800 |
 | G3 | 3 | 6 | 5 | 0 | 1 | cfa49885f18f PASS 2026-11-21T08:11:45+0800 |
 | G4 | 7 | 5 | 5 | 0 | 0 | b997be634f74 PASS 2026-11-20T23:49:43+0800 |

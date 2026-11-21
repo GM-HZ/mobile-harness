@@ -511,5 +511,9 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
     forgeUsesDeviceCredential / nativeLogout` 全部 true，fixture 记录 `issue/issue/exchange/viewer/forge-read`。
 - 新增 G1 `host-regressions` 回归守卫（`/bin/bash` 路由、padded status 数字解析、per-probe DONE、
   device_lab ok 校验），防止真机修复被回退；G1 现 10 项全绿。
-- 遗留：`emulator-forge-github` 在测试自改 profile 并重启后等待 Host ready 超时（forge-account 已覆盖
-  账号/凭据/读取路径）；需继续排查其 proxy plugin 注入与重启时序。
+- 遗留：`emulator-forge-github` 需要注入一个临时 file-URL proxy plugin 到 profile；我们的移动 Host
+  在该 profile 下以 status -3 退出（hilog 里 `native Host unavailable status=-3`），测试随后 ready 超时。
+  该测试是为原生 Host 的任意本地插件加载设计的，和移动端"限制 profile/插件注入"的安全边界冲突；
+  forge 的凭据/账号/读取路径已由 `emulator-forge-account` 覆盖并通过。后续若要跑通该用例，需要
+  用我们的 pluginManager/受支持配置方式注入 proxy，而不是临时 file-URL plugin。
+- 同时把 smoke `ready()` 超时从 65s 提到 120s（数据清理后的首次 Host 解包在模拟器/真机可到 70s+）。
