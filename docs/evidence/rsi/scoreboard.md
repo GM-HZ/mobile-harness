@@ -1,14 +1,14 @@
 # Gate scoreboard
 
-Generated 2026-11-21 08:38 from 60 ledger runs (of 60 recorded).
+Generated 2026-11-21 08:42 from 62 ledger runs (of 62 recorded).
 
 | Tier | Registry entries | Runs | First-pass | Flake-pass | Fail | Last run |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | G0 | 3 | 20 | 19 | 0 | 1 | 90ecc86e3195 PASS 2026-11-21T08:38:33+0800 |
-| G1 | 10 | 20 | 20 | 0 | 0 | 90ecc86e3195 PASS 2026-11-21T08:38:34+0800 |
-| G2 | 69 | 9 | 9 | 0 | 0 | 4caa066437d7 PASS 2026-11-21T08:26:43+0800 |
+| G1 | 11 | 20 | 20 | 0 | 0 | 90ecc86e3195 PASS 2026-11-21T08:38:34+0800 |
+| G2 | 69 | 10 | 10 | 0 | 0 | e9d2559e2e70 PASS 2026-11-21T08:42:28+0800 |
 | G3 | 3 | 6 | 5 | 0 | 1 | cfa49885f18f PASS 2026-11-21T08:11:45+0800 |
-| G4 | 7 | 5 | 5 | 0 | 0 | b997be634f74 PASS 2026-11-20T23:49:43+0800 |
+| G4 | 7 | 6 | 6 | 0 | 0 | e9d2559e2e70 PASS 2026-11-21T08:39:44+0800 |
 
 ## Recent failures
 
@@ -18,7 +18,7 @@ Generated 2026-11-21 08:38 from 60 ledger runs (of 60 recorded).
 ## Gate registry snapshot
 
 - G0 (static/consistency): 3 entries
-- G1 (host contracts): 10 entries
+- G1 (host contracts): 11 entries
 - G2 (emulator capability): 69 entries
 - G3 (real-device lab): 3 entries
 - G4 (build/release): 7 entries

@@ -517,3 +517,16 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
   forge 的凭据/账号/读取路径已由 `emulator-forge-account` 覆盖并通过。后续若要跑通该用例，需要
   用我们的 pluginManager/受支持配置方式注入 proxy，而不是临时 file-URL plugin。
 - 同时把 smoke `ready()` 超时从 65s 提到 120s（数据清理后的首次 Host 解包在模拟器/真机可到 70s+）。
+
+
+### 2026-11-21（模拟器最终复验 + 门禁加固）
+
+- 用最新构建（含 forge 代理转发修复）安装在模拟器（compat PRoot 模式）复验：
+  exec/overlay 探针 **PASS**，nightly 7/7 **PASS**（recovery 30.1s 等）。
+- forge fixture：`emulator-forge-account` **PASS**（证据 `docs/evidence/forge/forge-account-emulator-20261121.json`）。
+- G1 增加到 **11 项**：新增 `workflow-check`（4 个 gate workflow 与脚本/步骤的一致性）和
+  `host-regressions` 中的 forge proxy 转发守卫；G0/G1 全绿。
+- G4 在最新 commit 上重跑：`release gate OK: 0.4.69 @ e9d2559`
+  （store 768,499,709 B / self 773,563,414 B；store/self 断言全过），evidence 已提交。
+- 结论：模拟器侧复验完成；真机侧 G3 与 session turn 已在上一轮完成；剩余仅
+  `emulator-forge-github` 的临时 file-URL 插件注入限制（已文档化，forge 核心路径由 forge-account 覆盖）。

@@ -73,3 +73,14 @@ python3 scripts/adaptation/device_lab.py run --suite verify --wait-unlock 120
 # weekly scoreboard
 python3 scripts/adaptation/gate_report.py
 ```
+
+
+## 5. 2026-11-21 emulator re-validation
+
+- Latest build (forge proxy forwarding + bash routing + status parser) installed on the API 26
+  emulator in compat PRoot mode: `exec` and `overlay` probes PASS, nightly 7/7 PASS.
+- Forge fixture: `emulator-forge-account` PASS after fixing proxy forwarding and cleaning app data;
+  `emulator-forge-github` remains blocked by its temporary file-URL plugin injection conflicting with
+  the mobile Host's plugin boundary (documented in the plan).
+- G1 now has 11 entries (adds workflow wiring and real-device regression guards); G4 release gate
+  re-run green at commit `e9d2559`.

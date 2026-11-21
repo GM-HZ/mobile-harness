@@ -35,6 +35,8 @@ def main():
         failures.append("bash status parser no longer extracts digits from padded status")
     if "^\\d{3}$" in host:
         failures.append("bash status parser regressed to requiring three digits")
+    if "proxyEnv" not in host or "'HTTPS_PROXY'" not in host:
+        failures.append("guest gh runner no longer forwards proxy environment variables")
     if "expected_done in text" not in probe:
         failures.append("probe success no longer uses its own *_DONE marker")
     if "probe.get(\"ok\", True) is not False" not in device_lab:

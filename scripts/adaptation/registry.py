@@ -127,6 +127,8 @@ def main():
                  "covers": "compat modules have inventory rows, consumers and documented gates", "timeout": 120},
                 {"id": "compat-contracts", "command": "python3 scripts/adaptation/compat_contracts.py",
                  "covers": "forge/package/liveshare/sharp public behavior contracts", "timeout": 120},
+                {"id": "workflow-check", "command": "python3 scripts/adaptation/workflow_check.py",
+                 "covers": "gate workflows stay wired to gate scripts and steps", "timeout": 120},
                 {"id": "host-regressions", "command": "python3 scripts/adaptation/host_regressions.py",
                  "covers": "/bin/bash routing, padded status parsing, probe done/ok checks", "timeout": 120},
                 {"id": "forge-account-fixture",

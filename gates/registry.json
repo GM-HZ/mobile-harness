@@ -60,6 +60,12 @@
           "timeout": 120
         },
         {
+          "id": "workflow-check",
+          "command": "python3 scripts/adaptation/workflow_check.py",
+          "covers": "gate workflows stay wired to gate scripts and steps",
+          "timeout": 120
+        },
+        {
           "id": "host-regressions",
           "command": "python3 scripts/adaptation/host_regressions.py",
           "covers": "/bin/bash routing, padded status parsing, probe done/ok checks",
