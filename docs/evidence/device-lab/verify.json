@@ -1,9 +1,9 @@
 {
   "kind": "real-device read-only verification",
   "target": "37R0224115035605",
-  "checkedAt": "2026-11-21T11:28:45+0800",
+  "checkedAt": "2026-11-21T15:28:29+0800",
   "started": "start ability successfully.",
-  "readyMs": 136,
+  "readyMs": 108,
   "parameters": {
     "model": "BRA-AL00",
     "brand": "HUAWEI",
@@ -23,7 +23,7 @@
     "pending": false
   },
   "web": 200,
-  "storage": "/dev/block/platform/fa500000.ufs/by-name/userdata 465G 311G  154G  67% /mnt/debugtmp/100/debug_hap/org.sayact.nodepoc/data/storage/el1/base",
+  "storage": "/dev/block/platform/fa500000.ufs/by-name/userdata 465G 312G  153G  68% /mnt/debugtmp/100/debug_hap/org.sayact.nodepoc/data/storage/el1/base",
   "battery": {
     "capacity": 100
   },
@@ -52,22 +52,10 @@
       "optional": false
     },
     {
-      "name": "dsh-harmony-registry-fixture",
-      "enabled": true,
-      "availability": "profile",
-      "optional": false
-    },
-    {
       "name": "@mobile-harness/lsp",
       "enabled": true,
       "availability": "installation",
       "optional": false
-    },
-    {
-      "name": "@deepseek-ai/dsh-experimental-forge-bundle",
-      "enabled": true,
-      "availability": "installation",
-      "optional": true
     },
     {
       "name": "@deepseek-ai/dsh-deepseek-chat-import",
@@ -89,6 +77,12 @@
     },
     {
       "name": "@deepseek-ai/dsh-experimental-cot-translation-bundle",
+      "enabled": false,
+      "availability": "installation",
+      "optional": true
+    },
+    {
+      "name": "@deepseek-ai/dsh-experimental-forge-bundle",
       "enabled": false,
       "availability": "installation",
       "optional": true

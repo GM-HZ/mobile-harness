@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -17,6 +18,49 @@ NATIVE_MODULES = (
     "@img/sharp-libvips-linuxmusl-arm64/lib/libvips-cpp.so.8.18.7",
 )
 ARCHIVE = "dsh-layer.zip"
+OPTIONAL_ARCHIVE = "dsh-layer-optional.zip"
+CHUNKS = 8
+MANIFEST = "dsh-chunks.json"
+# Runtime does not need type declarations, source maps, test suites or prose.
+# Dropping them cuts 1.08GB / 99,770 files by roughly a third and shortens the
+# first-boot extraction, which dominates cold start. Set HARMONY_DSH_PRUNE=0 to
+# keep the raw npm tree for debugging.
+PRUNE_PATTERNS = (
+    re.compile(r"\.map$"),
+    re.compile(r"\.d\.ts$"),
+    re.compile(r"/(?:test|tests|__tests__|spec)/"),
+)
+# Heavy payloads that are only imported when their feature is used. They stay
+# in the HAP but are extracted as a second archive in parallel with the core
+# layer, keeping first-boot wall time close to the core layer.
+OPTIONAL_PATTERNS = (
+    re.compile(r"libreoffice-kit-wasm/"),
+    re.compile(r"node_modules/sherpa-onnx/"),
+    re.compile(r"dsh-experimental-client-ui-forge/"),
+    re.compile(r"dsh-experimental-liveshare/"),
+    re.compile(r"dsh-client-ui-sidebar-documentpreview/"),
+    re.compile(r"node_modules/@img/sharp"),
+    re.compile(r"node_modules/@google/genai/"),
+    re.compile(r"node_modules/@anthropic-ai/"),
+)
+
+
+def pruned(name: str) -> bool:
+    if os.environ.get("HARMONY_DSH_PRUNE") == "0":
+        return False
+    return any(pattern.search(name) for pattern in PRUNE_PATTERNS)
+
+
+def chunk_index(name: str) -> int:
+    """Group every file of a package into one chunk so upgrades replace whole packages."""
+    parts = name.split("/")
+    if len(parts) >= 4 and parts[0] == "dsh" and parts[1] == "node_modules":
+        key = "/".join(parts[:4]) if parts[2].startswith("@") else "/".join(parts[:3])
+    elif len(parts) >= 2:
+        key = "/".join(parts[:2])
+    else:
+        key = name
+    return int(hashlib.sha256(key.encode()).hexdigest()[:8], 16) % CHUNKS
 # Advertise the official optional bundles validated on HarmonyOS. Selection
 # remains in the user's profile; an installation dependency only makes a
 # bundle available to PluginManager without downloading another copy.
@@ -69,7 +113,7 @@ def stage_dsh(root, raw, baseline):
             raise ValueError(f"LSP source / npm pin mismatch: {package}")
     cache = root / ".build/dsh-runtime" / key
     archive = cache / ARCHIVE
-    if not archive.is_file():
+    if not (cache / MANIFEST).is_file():
         cache.mkdir(parents=True, exist_ok=True)
         for source in (manifest / "package.json", lock):
             shutil.copy2(source, cache / source.name)
@@ -110,36 +154,70 @@ def stage_dsh(root, raw, baseline):
                 if entry["marker"] not in target.read_text():
                     raise ValueError(f"patch marker missing after apply: {entry['file']}")
 
-        pending = archive.with_suffix(".tmp")
+        chunk_paths = [cache / f"dsh-layer-{index}.zip" for index in range(CHUNKS)]
+        chunk_pending = [path.with_suffix(".tmp") for path in chunk_paths]
+        optional_pending = cache / (OPTIONAL_ARCHIVE + ".tmp")
         try:
-            with ZipFile(pending, "w") as output:
-                output.writestr(ZipInfo("dsh/package.json"), (json.dumps(application, indent=2) + '\n').encode(), compress_type=ZIP_DEFLATED, compresslevel=3)
+            outputs = [ZipFile(path, "w") for path in chunk_pending]
+            optional_output = ZipFile(optional_pending, "w")
+            try:
+                def write(name: str, payload: bytes) -> None:
+                    if any(pattern.search(name) for pattern in OPTIONAL_PATTERNS):
+                        target = optional_output
+                    else:
+                        target = outputs[chunk_index(name)]
+                    target.writestr(ZipInfo(name), payload, compress_type=ZIP_DEFLATED, compresslevel=3)
+
+                write("dsh/package.json", (json.dumps(application, indent=2) + '\n').encode())
                 for file in bundle_files:
-                    output.writestr(ZipInfo("dsh/node_modules/@mobile-harness/lsp/" + file.name), file.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
+                    write("dsh/node_modules/@mobile-harness/lsp/" + file.name, file.read_bytes())
                 for path in sorted(modules.rglob("*")):
                     if path.is_symlink():
                         raise ValueError(f"Unexpected npm symlink: {path}")
                     if path.is_file():
                         name = "dsh/" + path.relative_to(cache).as_posix()
-                        output.writestr(ZipInfo(name), path.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
-                # tsserver watches its nearest node_modules recursively. Keep
-                # its immutable compiler library away from DSH's large tree;
-                # workspace dependencies remain visible and fully watched.
+                        if pruned(name):
+                            continue
+                        write(name, path.read_bytes())
                 compiler = modules / "typescript"
                 for path in sorted(compiler.rglob("*")):
                     if path.is_file():
                         name = "toolchains/lsp/node_modules/typescript/" + path.relative_to(compiler).as_posix()
-                        output.writestr(ZipInfo(name), path.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
-            pending.replace(archive)
+                        if pruned(name):
+                            continue
+                        write(name, path.read_bytes())
+            finally:
+                for output in outputs:
+                    output.close()
+                optional_output.close()
+            manifest = {"schema": 1, "chunks": []}
+            for index, (path, pending) in enumerate(zip(chunk_paths, chunk_pending)):
+                pending.replace(path)
+                manifest["chunks"].append({
+                    "file": path.name,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                })
+            (cache / MANIFEST).write_text(json.dumps(manifest, indent=2) + "\n")
+            optional = cache / OPTIONAL_ARCHIVE
+            optional_pending.replace(optional)
         finally:
-            pending.unlink(missing_ok=True)
+            for pending in chunk_pending:
+                pending.unlink(missing_ok=True)
+            optional_pending.unlink(missing_ok=True)
 
-    shutil.copy2(archive, raw / ARCHIVE)
+    for path in sorted(cache.glob("dsh-layer-*.zip")):
+        if path.name == OPTIONAL_ARCHIVE:
+            continue
+        shutil.copy2(path, raw / path.name)
+    shutil.copy2(cache / MANIFEST, raw / MANIFEST)
+    optional = cache / OPTIONAL_ARCHIVE
+    if optional.is_file():
+        shutil.copy2(optional, raw / OPTIONAL_ARCHIVE)
+        (raw / "dsh-optional-runtime-id.txt").write_text(hashlib.sha256(optional.read_bytes()).hexdigest())
+    else:
+        (raw / "dsh-optional-runtime-id.txt").write_text("")
     (raw / "dsh-lsp.patch.yml").unlink(missing_ok=True)
     # A same-DSH-version production dependency change must invalidate unpack.
     # User profiles/workspaces live outside this immutable release directory.
-    digest = hashlib.sha256()
-    with archive.open("rb") as packed:
-        for block in iter(lambda: packed.read(1024 * 1024), b''):
-            digest.update(block)
-    (raw / "dsh-runtime-id.txt").write_text(digest.hexdigest())
+    (raw / "dsh-runtime-id.txt").write_text(
+        hashlib.sha256((cache / MANIFEST).read_bytes()).hexdigest())

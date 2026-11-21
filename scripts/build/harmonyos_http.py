@@ -17,10 +17,17 @@ OUTPUT_SHA256 = "c59f929a2c4edc035fac36b2e3e8c77eeb83428f90e4b2abeac2a9aafc8ea50
 ASSET = "dsh-harmony-llhttp.cjs"
 
 
+def layer_member(raw, name):
+    for path in sorted(raw.glob("dsh-layer-[0-9]*.zip")):
+        with ZipFile(path) as layer:
+            if name in layer.namelist():
+                return layer.read(name)
+    raise ValueError(f"Missing dsh layer member: {name}")
+
+
 def stage_http(root, raw):
-    with ZipFile(raw / "dsh-layer.zip") as layer:
-        source = layer.read("dsh/node_modules/undici/lib/llhttp/llhttp-wasm.js").decode()
-        license_text = layer.read("dsh/node_modules/undici/LICENSE")
+    source = layer_member(raw, "dsh/node_modules/undici/lib/llhttp/llhttp-wasm.js").decode()
+    license_text = layer_member(raw, "dsh/node_modules/undici/LICENSE")
     matches = re.findall(r"'([A-Za-z0-9+/=]{300,})'", source)
     if len(matches) != 1:
         raise ValueError("Unexpected locked Undici llhttp wrapper")

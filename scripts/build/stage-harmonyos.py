@@ -42,6 +42,14 @@ def files_from_index(directory):
     return [ROOT / os.fsdecode(name) for name in listed.split(b"\0") if name]
 
 
+def layer_member(name):
+    for path in sorted(RAW.glob("dsh-layer-[0-9]*.zip")):
+        with ZipFile(path) as layer:
+            if name in layer.namelist():
+                return layer.read(name)
+    raise SystemExit(f"Missing dsh layer member: {name}")
+
+
 def sha256(path):
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -90,9 +98,8 @@ def stage_ptc_worker():
     for name in PORTABLE_ASSETS:
         copy(assets / name, RAW / name)
     copy(ROOT / "vendor/repos/node/deps/amaro/LICENSE.md", RAW / "LICENSE.amaro.txt")
-    with ZipFile(RAW / "dsh-layer.zip") as layer:
-        path = "dsh/node_modules/@deepseek-ai/dsh-ptc-runtime-node/lib/process.js"
-        bundled = layer.read(path)
+    path = "dsh/node_modules/@deepseek-ai/dsh-ptc-runtime-node/lib/process.js"
+    bundled = layer_member(path)
     if hashlib.sha256(bundled).hexdigest() != "c01308c52fc52d5f13edd2b65008f3bbcf67bd753eb17af5e4bc023216eca6b4":
         raise SystemExit("Expected the locked DSH PTC bootstrap")
     entry = "runNodeMain(openInheritedControlChannel(), Number(process.argv[2]), process);"

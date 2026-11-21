@@ -8,6 +8,15 @@ import { i18n } from '@kit.LocalizationKit';
 import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
 
+interface LayerChunk {
+  file: string;
+  sha256: string;
+}
+
+interface LayerManifest {
+  chunks: LayerChunk[];
+}
+
 export interface BrowserSession {
   url: string;
   cookie?: string;
@@ -148,6 +157,15 @@ class DshEngine {
       hilog.info(0xD005, 'DSHClient', 'system child-process support native=%{public}s ark=%{public}s',
         String(childProcessManager.isNativeChildProcessSupported()), String(childProcessManager.isArkChildProcessSupported()));
     }
+    const dshRelease = root + '/.dsh-0.2.2-rc.5';
+    let optionalId = '';
+    try {
+      for (const byte of context.resourceManager.getRawFileContentSync('dsh-optional-runtime-id.txt')) {
+        optionalId += String.fromCharCode(byte);
+      }
+    } catch (error) {
+      optionalId = '';
+    }
     const nativeStarted = Date.now();
     poc.startNative(root, mode === 'safe');
     let ready = false;
@@ -165,6 +183,9 @@ class DshEngine {
           }
           recovery.write(mode, false);
           this.savePluginSnapshot(context, root);
+          if (mode !== 'safe' && /^[a-f0-9]{64}$/.test(optionalId)) {
+            void this.prepareOptionalLayer(context, dshRelease, optionalId);
+          }
           ready = true;
           session.safe = mode === 'safe';
           this.publish('', session);
@@ -187,6 +208,18 @@ class DshEngine {
     const profile = root + '/native-benchmark-home/profiles/web';
     return [profile + '/cordis.patch.yml', profile + '/cordis.yml',
       profile + '/package.json', profile + '/pnpm-lock.yaml'];
+  }
+
+  private async prepareOptionalLayer(context: common.UIAbilityContext, dshRelease: string,
+                                     identity: string): Promise<void> {
+    const phase = Date.now();
+    try {
+      const extracted = await this.unpack(context, 'dsh-layer-optional.zip', dshRelease, identity);
+      hilog.info(0xD005, 'DSHClient', 'optional layer extracted=%{public}s ms=%{public}d',
+        String(extracted), Date.now() - phase);
+    } catch (error) {
+      hilog.warn(0xD005, 'DSHClient', 'optional layer unavailable: %{public}s', String(error));
+    }
   }
 
   private savePluginSnapshot(context: common.UIAbilityContext, root: string): void {
@@ -280,6 +313,34 @@ class DshEngine {
       this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');
       this.copyGuest(context, 'alpine-ld-musl', root + '/lib/ld-musl-aarch64.so.1');
       this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
+      const dshRelease = root + '/.dsh-0.2.2-rc.5';
+      if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
+      // The layer is shipped as package-grouped chunks with a manifest. An
+      // upgrade only re-extracts chunks whose identity changed; a first boot
+      // extracts every chunk. This keeps upgrades fast without a custom zip
+      // reader on device.
+      let manifestText = '';
+      for (const byte of context.resourceManager.getRawFileContentSync('dsh-chunks.json')) {
+        manifestText += String.fromCharCode(byte);
+      }
+      const manifest = JSON.parse(manifestText) as LayerManifest;
+      if (!Array.isArray(manifest.chunks) || manifest.chunks.length === 0) {
+        throw new Error('Invalid packaged DSH chunk manifest');
+      }
+      const dshUnpackStarted = Date.now();
+      let extractedChunks = 0;
+      for (const chunk of manifest.chunks) {
+        if (!/^dsh-layer-[0-9]+\.zip$/.test(chunk.file) || !/^[a-f0-9]{64}$/.test(chunk.sha256)) {
+          throw new Error('Invalid packaged DSH chunk entry');
+        }
+      }
+      // Sequential extraction is faster on device: concurrent ArkTS zlib
+      // decompression into the same tree serializes on I/O and delays startup.
+      for (const chunk of manifest.chunks) {
+        if (await this.unpack(context, chunk.file, dshRelease, chunk.sha256)) extractedChunks++;
+      }
+      hilog.info(0xD005, 'DSHClient', 'startup chunks extracted=%{public}d/%{public}d ms=%{public}d',
+        extractedChunks, manifest.chunks.length, Date.now() - dshUnpackStarted);
       for (const archive of ['node-layer.zip', 'shell-tools-layer.zip',
         'shell-extras-v3.zip', 'pnpm-layer-v2.zip']) {
         const phase = Date.now();
@@ -301,17 +362,7 @@ class DshEngine {
         this.copyGuest(context, 'dsh-harmony-workspace-deps.json', root + '/dsh-harmony-workspace-deps.json');
       }
       this.prepareTimezone(root);
-      const dshRelease = root + '/.dsh-0.2.2-rc.5';
-      if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
-      const dshUnpackStarted = Date.now();
-      let runtimeId = '';
-      for (const byte of context.resourceManager.getRawFileContentSync('dsh-runtime-id.txt')) {
-        runtimeId += String.fromCharCode(byte);
-      }
-      if (!/^[a-f0-9]{64}$/.test(runtimeId)) throw new Error('Invalid packaged DSH runtime identity');
-      const unpackedDsh = await this.unpack(context, 'dsh-layer.zip', dshRelease, runtimeId);
-      hilog.info(0xD005, 'DSHClient', 'startup archive dsh-layer.zip extracted=%{public}s ms=%{public}d',
-        String(unpackedDsh), Date.now() - dshUnpackStarted);
+
       for (const name of ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
         'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {
         this.copyGuest(context, name, root + '/' + name);
@@ -453,6 +504,11 @@ class DshEngine {
 
   private copyGuest(context: common.UIAbilityContext, asset: string, path: string): void {
     const bytes = context.resourceManager.getRawFileContentSync(asset);
+    try {
+      if (fileIo.statSync(path).size === bytes.length) return;
+    } catch (error) {
+      // Missing target: write it below.
+    }
     const file = fileIo.openSync(path, fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
     try { fileIo.writeSync(file.fd, bytes.buffer); }
     finally { fileIo.closeSync(file.fd); }

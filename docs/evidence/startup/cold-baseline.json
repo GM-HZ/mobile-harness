@@ -1,0 +1,94 @@
+{
+  "target": "127.0.0.1:5557",
+  "mode": "cold",
+  "ready": true,
+  "wallSeconds": 40.2,
+  "phases": [
+    {
+      "at": "12:32:56.815",
+      "message": "startup archive node-layer.zip extracted=true ms=124"
+    },
+    {
+      "at": "12:32:57.021",
+      "message": "startup archive shell-tools-layer.zip extracted=true ms=206"
+    },
+    {
+      "at": "12:32:57.079",
+      "message": "startup archive shell-extras-v3.zip extracted=true ms=58"
+    },
+    {
+      "at": "12:32:57.260",
+      "message": "startup archive pnpm-layer-v2.zip extracted=true ms=181"
+    },
+    {
+      "at": "12:32:58.815",
+      "message": "startup archive workspace-python-v1.zip extracted=true ms=1555"
+    },
+    {
+      "at": "12:33:21.565",
+      "message": "startup archive dsh-layer.zip extracted=true ms=22745"
+    },
+    {
+      "at": "12:33:21.768",
+      "message": "starting native Web ms=25087"
+    },
+    {
+      "at": "12:33:28.978",
+      "message": "native loopback ready ms=32297 mode=normal"
+    },
+    {
+      "at": "12:33:33.952",
+      "message": "ArkWeb loaded \"{\\\"title\\\":\\\"DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":320}\""
+    }
+  ],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 1,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 103
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 5511,
+      "pid": 14464
+    },
+    {
+      "event": "host-subprocess-started",
+      "ms": 5542,
+      "pid": 14465
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 5943,
+      "pid": 14464
+    },
+    {
+      "event": "host-subprocess-reaped",
+      "ms": 6070,
+      "pid": 14465
+    },
+    {
+      "event": "web-announced",
+      "ms": 6118,
+      "loadCount": 5771,
+      "loadMs": 969
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 6203
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 6508,
+      "exchange": 303,
+      "page": 200
+    }
+  ],
+  "measuredAt": "2026-11-21T12:33:35+0800"
+}

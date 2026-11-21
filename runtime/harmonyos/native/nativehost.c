@@ -35,8 +35,16 @@ static int RunHost(void) {
         harmony_workflow_broker_close();
         return -2;
     }
+    // Signed self/lab builds enable V8 JIT (the anonymous executable mappings
+    // used by the signed ELF loader are available to the App). Store builds keep
+    // the conservative --jitless launch until store-side policy is verified.
+#ifdef MH_SELF_BUILD
+    char *argv[] = {"node", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
+    int code = start(4, argv);
+#else
     char *argv[] = {"node", "--jitless", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
     int code = start(5, argv);
+#endif
     harmony_workflow_broker_close();
     return code == 0 ? -3 : -4;
 }

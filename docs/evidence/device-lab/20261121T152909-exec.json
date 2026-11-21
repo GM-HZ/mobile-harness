@@ -1,0 +1,22 @@
+{
+  "device": {
+    "serial": "37R0224115035605",
+    "versionName": "0.4.69",
+    "versionCode": 76,
+    "boot": "{\"mode\":\"normal\",\"pending\":false}",
+    "launch": "start ability successfully.",
+    "screenLocked": false,
+    "checkedAt": "2026-11-21T15:28:34+0800"
+  },
+  "run": {
+    "suite": "exec",
+    "exit": 0,
+    "passed": true,
+    "probeOk": true,
+    "durationSeconds": 35,
+    "outputTail": "{\n \"ok\": true,\n \"commandMatched\": true,\n \"markers\": {\n  \"EXEC_SH_OK\": true,\n  \"EXEC_BASH_OK\": true,\n  \"EXEC_NODE_OK\": true,\n  \"EXEC_PY_OK\": true,\n  \"EXEC_SCRIPT_OK\": true,\n  \"COPY_NODE_OK\": true,\n  \"PROOT_EXEC_PROBE_DONE\": true\n },\n \"exits\": {\n  \"SH_EXIT\": \"0\",\n  \"BASH_EXIT\": \"0\",\n  \"NODE_EXIT\": \"0\",\n  \"PY_EXIT\": \"0\",\n  \"GIT_EXIT\": \"0\",\n  \"SCRIPT_EXIT\": \"0\",\n  \"XXD_EXIT\": \"126\",\n  \"COPY_BUSYBOX_EXIT\": \"127\",\n  \"COPY_NODE_EXIT\": \"0\",\n  \"FAKE_EXIT\": \"1\"\n }\n}\n/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/harmonyos-experience/docs/evidence/device-lab/exec.json\n",
+    "evidence": "docs/evidence/device-lab/exec.json",
+    "requiresModel": true
+  },
+  "ok": true
+}
