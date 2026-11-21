@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "cd448e83cf9cc10dd0dd7d80b10c2fa0b8949b59",
+  "generatedFrom": "72c2837b719fc3f0a40136de4e66fa3dcd6c2afe",
   "layers": [
     "host",
     "web",
@@ -225,8 +225,8 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-native-web.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "d45daf31e5d53f4e42987b33f70893e114125c33a4094fbf37b98638a64d0d8d",
-      "bytes": 48280,
+      "sha256": "bf8f5d81175de88089d561c4ba644e3a71959c27e8af385917397db3529c1a19",
+      "bytes": 48297,
       "fragility": "high",
       "upstreamTouchpoints": [
         "\"darwin-arm64\",",
@@ -594,8 +594,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/nativehost.c",
       "role": "native runtime / adapter",
-      "sha256": "5853e04018bbfa43fe922c5078b00eaa3a003e29f5475f28a0c9ec0c915cb7fe",
-      "bytes": 5284,
+      "sha256": "322a9e5c1923a2529fd6a58f41262606c9de889a385023550b4e02bc5d91bb9a",
+      "bytes": 5726,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1125,7 +1125,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "fe4b3c8bf4c6c01c0a39e035926a9bfca688df722d7f1d45556334ca266bd677",
+      "sha256": "b403947d46f05a1f7f9192720aa3b994651d5a3dd7fff74466d2d0d66b856a89",
       "files": 27,
       "fragility": "medium",
       "upstreamTouchpoints": [],

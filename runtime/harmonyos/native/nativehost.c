@@ -4,6 +4,7 @@
 #include <stdatomic.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "workflow-broker.h"
 #ifdef MOBILE_HARNESS_EXPERIMENTAL_FORK
 #include <errno.h>
@@ -39,6 +40,15 @@ static int RunHost(void) {
     // used by the signed ELF loader are available to the App). Store builds keep
     // the conservative --jitless launch until store-side policy is verified.
 #ifdef MH_SELF_BUILD
+    char cold_path[1100];
+    snprintf(cold_path, sizeof(cold_path), "%s/dsh-host-jitless", directory);
+    const bool cold_boot = access(cold_path, F_OK) == 0;
+    if (cold_boot) {
+        char *cold_argv[] = {"node", "--jitless", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
+        int code = start(5, cold_argv);
+        harmony_workflow_broker_close();
+        return code == 0 ? -3 : -4;
+    }
     char *argv[] = {"node", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
     int code = start(4, argv);
 #else

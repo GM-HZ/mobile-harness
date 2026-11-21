@@ -1,0 +1,80 @@
+{
+  "target": "37R0224115035605",
+  "mode": "cold",
+  "ready": true,
+  "wallSeconds": 22.4,
+  "nativeLoopbackMs": 13912,
+  "readyMs": 17297,
+  "phases": [
+    {
+      "at": "18:48:16.247",
+      "message": "ability foreground"
+    },
+    {
+      "at": "18:48:19.651",
+      "message": "startup archive node-layer.zip extracted=true ms=50"
+    },
+    {
+      "at": "18:48:19.739",
+      "message": "startup archive shell-tools-layer.zip extracted=true ms=88"
+    },
+    {
+      "at": "18:48:19.800",
+      "message": "startup archive shell-extras-v3.zip extracted=true ms=61"
+    },
+    {
+      "at": "18:48:19.936",
+      "message": "startup archive pnpm-layer-v2.zip extracted=true ms=136"
+    },
+    {
+      "at": "18:48:20.613",
+      "message": "startup archive workspace-python-v1.zip extracted=true ms=677"
+    },
+    {
+      "at": "18:48:20.614",
+      "message": "startup chunks extracted=8/8 ms=4183"
+    },
+    {
+      "at": "18:48:20.660",
+      "message": "starting native Web ms=4233"
+    },
+    {
+      "at": "18:48:30.339",
+      "message": "native loopback ready ms=13912 mode=normal"
+    },
+    {
+      "at": "18:48:33.544",
+      "message": "ArkWeb loaded \"{\\\"title\\\":\\\"Probe PRoot exec semantics \u2014 DeepSeek Harness\\\",\\\"ready\\\":\\\"complete\\\",\\\"atLoopback\\\":true,\\\"body\\\":87}\""
+    }
+  ],
+  "timeline": [
+    {
+      "event": "node-js",
+      "ms": 1,
+      "platform": "openharmony",
+      "node": "v24.14.1",
+      "safeMode": false
+    },
+    {
+      "event": "cli-imported",
+      "ms": 184
+    },
+    {
+      "event": "web-announced",
+      "ms": 8459,
+      "loadCount": 5768,
+      "loadMs": 619
+    },
+    {
+      "event": "profile-mounted",
+      "ms": 8633
+    },
+    {
+      "event": "loopback-ready",
+      "ms": 9097,
+      "exchange": 303,
+      "page": 200
+    }
+  ],
+  "measuredAt": "2026-11-21T18:48:38+0800"
+}
