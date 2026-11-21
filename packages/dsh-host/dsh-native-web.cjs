@@ -493,8 +493,13 @@ async function main() {
   globalThis.__harmonyGhRunner = safeMode
     ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
     : async (args, signal, input) => {
+      const proxyEnv = {};
+      for (const name of ['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY',
+                          'http_proxy', 'https_proxy', 'no_proxy']) {
+        if (typeof process.env[name] === 'string') proxyEnv[name] = process.env[name];
+      }
       const result = await globalThis.__harmonyGh('gh', Array.from(args), {
-        env: {}, timeout: 120000, maxBuffer: 32 * 1024 * 1024, cancelSignal: signal,
+        env: proxyEnv, timeout: 120000, maxBuffer: 32 * 1024 * 1024, cancelSignal: signal,
         ...(input === undefined ? {} : { input }),
       });
       if (result.isCanceled) throw signal.reason ?? new Error('gh invocation canceled');

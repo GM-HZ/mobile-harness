@@ -496,3 +496,20 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 - 强制停止并重启 App 后再次读取同一 session：**21 条事件完整保留**（含 turn/end）；
 - 证据 `docs/evidence/device-lab/20261121-session-turn.json`，验证了 session-persistence 包补丁
   在真机上的写入与恢复路径。
+
+
+### 2026-11-21（模拟器复验 + forge fixture 修复）
+
+- 在模拟器（compat PRoot 模式）上复验真机修复：exec/overlay 探针 PASS、nightly 7/7 PASS。
+- **forge fixture 根因与修复**：
+  - `packages/dsh-host/dsh-native-web.cjs` 的 `__harmonyGhRunner` 之前只给 guest gh 传空 env，
+    丢掉了 Host 进程里的 `HTTPS_PROXY`（fixture 的 proxy.mjs 设置的 127.0.0.1:19772），
+    gh 无法连到 fixture → `forgePanel/diff-failed`；
+  - 现在只转发代理相关环境变量（HTTP(S)_PROXY/NO_PROXY，大小写）到 guest gh；
+  - 清理 App 数据（`bm clean -n org.sayact.nodepoc -d`）后 `emulator-forge-account` **PASS**：
+    `nativeLoginCanCancelBeforeConsent / nativeLoginAndCliStorage / accountRestoredAfterRestart /
+    forgeUsesDeviceCredential / nativeLogout` 全部 true，fixture 记录 `issue/issue/exchange/viewer/forge-read`。
+- 新增 G1 `host-regressions` 回归守卫（`/bin/bash` 路由、padded status 数字解析、per-probe DONE、
+  device_lab ok 校验），防止真机修复被回退；G1 现 10 项全绿。
+- 遗留：`emulator-forge-github` 在测试自改 profile 并重启后等待 Host ready 超时（forge-account 已覆盖
+  账号/凭据/读取路径）；需继续排查其 proxy plugin 注入与重启时序。

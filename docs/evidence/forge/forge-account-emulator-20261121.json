@@ -1,0 +1,15 @@
+{
+  "nativeLoginCanCancelBeforeConsent": true,
+  "nativeLoginAndCliStorage": true,
+  "accountRestoredAfterRestart": true,
+  "forgeUsesDeviceCredential": true,
+  "nativeLogout": true,
+  "profileAndTLSRestored": true,
+  "fixtureOperations": [
+    "issue",
+    "issue",
+    "exchange",
+    "viewer",
+    "forge-read"
+  ]
+}

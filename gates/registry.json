@@ -60,6 +60,23 @@
           "timeout": 120
         },
         {
+          "id": "host-regressions",
+          "command": "python3 scripts/adaptation/host_regressions.py",
+          "covers": "/bin/bash routing, padded status parsing, probe done/ok checks",
+          "timeout": 120
+        },
+        {
+          "id": "forge-account-fixture",
+          "command": "python3 tests/smoke/emulator-forge-account.py \"$MH_EMULATOR\" .build/gate-evidence/forge-account.json",
+          "covers": "Forge account device-flow fixture (clean app data required)",
+          "requires": [
+            "MH_EMULATOR env",
+            "bm clean -n org.sayact.nodepoc -d before the run"
+          ],
+          "optional": true,
+          "timeout": 1800
+        },
+        {
           "id": "patch-targets",
           "command": "python3 scripts/adaptation/patch_targets.py --check",
           "covers": "machine patch index matches series.json/anchors and TARGETS.md",
