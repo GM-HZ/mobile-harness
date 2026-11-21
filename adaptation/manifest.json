@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "fb92c611a638506d39248b77e1ee8c40578510a4",
+  "generatedFrom": "0aa176ec8d2ae776026059de938bae10717c10d3",
   "layers": [
     "host",
     "web",
@@ -594,8 +594,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/nativehost.c",
       "role": "native runtime / adapter",
-      "sha256": "ee880aad2a4ffef14d03c0ac5bf086d5f90523d090cbe838063f626766fbf9a2",
-      "bytes": 4885,
+      "sha256": "5853e04018bbfa43fe922c5078b00eaa3a003e29f5475f28a0c9ec0c915cb7fe",
+      "bytes": 5284,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -748,8 +748,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/packaging/build-startup-sources.py",
       "role": "build and packaging scripts",
-      "sha256": "64f5eb9d26588e11caf8bfa3fd5849afabb20d59e7e9e950baff1c570f8bceb6",
-      "bytes": 1675,
+      "sha256": "86e6ae68c77b546d5ec118ccd47ff1e07f71fd0b6e910454b4a3164d4c978d1e",
+      "bytes": 1971,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1125,7 +1125,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "0811cca2e4274c12ab4ae34d56bdd40285d4b906d06a2cc558e6ffc82a2969e9",
+      "sha256": "fe4b3c8bf4c6c01c0a39e035926a9bfca688df722d7f1d45556334ca266bd677",
       "files": 27,
       "fragility": "medium",
       "upstreamTouchpoints": [],

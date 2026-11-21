@@ -11,26 +11,35 @@ stage = Path(os.environ.get('HARMONY_STAGE', project / '.build/stage/harmonyos')
 raw = stage / 'entry/src/main/resources/rawfile'
 entries = {}
 sources = bytearray()
-with ZipFile(raw / 'dsh-layer.zip') as layer:
+chunks = sorted(raw.glob('dsh-layer-[0-9]*.zip'))
+if not chunks:
+    raise SystemExit('Missing chunked dsh layer')
+layers = [ZipFile(path) for path in chunks]
+try:
     types = {}
-    for entry in layer.infolist():
-        if entry.filename.endswith('/package.json'):
-            manifest = json.loads(layer.read(entry))
-            types[entry.filename.rsplit('/', 1)[0]] = manifest.get('type')
-    for info in layer.infolist():
-        if not re.fullmatch(r'dsh/node_modules/[-@a-zA-Z0-9_./]+\.(?:m?js)', info.filename):
-            continue
-        if info.file_size == 0 or info.file_size > 256 * 1024:
-            continue
-        if info.filename.endswith('.js'):
-            directory = info.filename.rsplit('/', 1)[0]
-            while '/' in directory and directory not in types:
-                directory = directory.rsplit('/', 1)[0]
-            if types.get(directory) != 'module':
+    for layer in layers:
+        for entry in layer.infolist():
+            if entry.filename.endswith('/package.json'):
+                manifest = json.loads(layer.read(entry))
+                types[entry.filename.rsplit('/', 1)[0]] = manifest.get('type')
+    for layer in layers:
+        for info in layer.infolist():
+            if not re.fullmatch(r'dsh/node_modules/[-@a-zA-Z0-9_./]+\.(?:m?js)', info.filename):
                 continue
-        source = layer.read(info)
-        entries['file:///' + info.filename] = [len(sources), len(source)]
-        sources.extend(source)
+            if info.file_size == 0 or info.file_size > 256 * 1024:
+                continue
+            if info.filename.endswith('.js'):
+                directory = info.filename.rsplit('/', 1)[0]
+                while '/' in directory and directory not in types:
+                    directory = directory.rsplit('/', 1)[0]
+                if types.get(directory) != 'module':
+                    continue
+            source = layer.read(info)
+            entries['file:///' + info.filename] = [len(sources), len(source)]
+            sources.extend(source)
+finally:
+    for layer in layers:
+        layer.close()
 header = json.dumps(entries, separators=(',', ':')).encode('ascii')
 with (raw / 'dsh-startup-sources.gz').open('wb') as output:
     with gzip.GzipFile(fileobj=output, mode='wb', compresslevel=5, mtime=0) as zipped:

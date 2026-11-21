@@ -8,6 +8,15 @@ import { i18n } from '@kit.LocalizationKit';
 import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
 
+interface LayerChunk {
+  file: string;
+  sha256: string;
+}
+
+interface LayerManifest {
+  chunks: LayerChunk[];
+}
+
 export interface BrowserSession {
   url: string;
   cookie?: string;
@@ -306,15 +315,32 @@ class DshEngine {
       this.copyGuest(context, 'alpine-release', root + '/etc/alpine-release');
       const dshRelease = root + '/.dsh-0.2.2-rc.5';
       if (!fileIo.accessSync(dshRelease)) fileIo.mkdirSync(dshRelease, true);
-      let runtimeId = '';
-      for (const byte of context.resourceManager.getRawFileContentSync('dsh-runtime-id.txt')) {
-        runtimeId += String.fromCharCode(byte);
+      // The layer is shipped as package-grouped chunks with a manifest. An
+      // upgrade only re-extracts chunks whose identity changed; a first boot
+      // extracts every chunk. This keeps upgrades fast without a custom zip
+      // reader on device.
+      let manifestText = '';
+      for (const byte of context.resourceManager.getRawFileContentSync('dsh-chunks.json')) {
+        manifestText += String.fromCharCode(byte);
       }
-      if (!/^[a-f0-9]{64}$/.test(runtimeId)) throw new Error('Invalid packaged DSH runtime identity');
-      // dsh-layer extraction dominates first boot; overlap the smaller archives
-      // with it instead of paying their cost sequentially.
+      const manifest = JSON.parse(manifestText) as LayerManifest;
+      if (!Array.isArray(manifest.chunks) || manifest.chunks.length === 0) {
+        throw new Error('Invalid packaged DSH chunk manifest');
+      }
       const dshUnpackStarted = Date.now();
-      const dshUnpacked = this.unpack(context, 'dsh-layer.zip', dshRelease, runtimeId);
+      let extractedChunks = 0;
+      for (const chunk of manifest.chunks) {
+        if (!/^dsh-layer-[0-9]+\.zip$/.test(chunk.file) || !/^[a-f0-9]{64}$/.test(chunk.sha256)) {
+          throw new Error('Invalid packaged DSH chunk entry');
+        }
+      }
+      // Sequential extraction is faster on device: concurrent ArkTS zlib
+      // decompression into the same tree serializes on I/O and delays startup.
+      for (const chunk of manifest.chunks) {
+        if (await this.unpack(context, chunk.file, dshRelease, chunk.sha256)) extractedChunks++;
+      }
+      hilog.info(0xD005, 'DSHClient', 'startup chunks extracted=%{public}d/%{public}d ms=%{public}d',
+        extractedChunks, manifest.chunks.length, Date.now() - dshUnpackStarted);
       for (const archive of ['node-layer.zip', 'shell-tools-layer.zip',
         'shell-extras-v3.zip', 'pnpm-layer-v2.zip']) {
         const phase = Date.now();
@@ -336,9 +362,6 @@ class DshEngine {
         this.copyGuest(context, 'dsh-harmony-workspace-deps.json', root + '/dsh-harmony-workspace-deps.json');
       }
       this.prepareTimezone(root);
-      const unpackedDsh = await dshUnpacked;
-      hilog.info(0xD005, 'DSHClient', 'startup archive dsh-layer.zip extracted=%{public}s ms=%{public}d',
-        String(unpackedDsh), Date.now() - dshUnpackStarted);
 
       for (const name of ['fetch-shim.cjs', 'fetch-shim-boot.cjs', 'dsh-client.cjs', 'dsh-boot-cache.cjs',
         'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {

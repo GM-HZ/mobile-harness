@@ -123,7 +123,7 @@
 
 ### 5.3 门禁
 
-新增 G2 `startup-warm-budget`：`startup.py --warm --max-wall 10`，nightly workflow 同步。
+新增 G2 `startup-warm-budget`：`startup.py --warm --max-wall 15`（nightly 用 store/jitless 构建，预算按 15s；self/JIT 构建真机目标 10s）。
 
 ### 5.4 已知限制与后续
 
@@ -175,3 +175,34 @@ jitless V8 在手机上解释执行）。
 冷启动（解包为主）仍在 29-40s 区间，受设备空闲/锁屏影响波动；下一步做增量解包降低升级成本。
 
 证据：`docs/evidence/startup/device-jit-warm-{1,2}.json`。
+
+
+## 8. 增量解包：chunked dsh layer
+
+`scripts/build/harmonyos_dsh.py` 现在把 core layer 按包分组写成 8 个 chunk
+（`dsh-layer-0..7.zip`）+ `dsh-chunks.json`（每 chunk 的 sha256）；optional 层继续保持独立。
+构建期读取层内容的脚本（PTC/HTTP/startup-sources）已改为扫描 chunk。
+
+`DshEngine` 启动时读取 manifest，只解压 **缺失或 sha256 变化** 的 chunk：
+- 首次安装：按顺序解 8 个 chunk（首次冷启动与之前单层相近）；
+- 升级：只有内容变化的包组 chunk 会重新解压，其余 marker 命中直接跳过；
+- 实测：模拟器删掉 1 个 chunk marker 后启动，日志 `startup chunks extracted=1/8 ms=808`，
+  温启动 8.9s；真机同法 1 个 chunk，温启动 11.1s（比全量首启 27.8s 快）；
+- 串行优于并发：同树并发 ArkTS zlib 解压会互相拖慢，已保留串行。
+
+最终真机数据（Mate 60，chunked + JIT self 构建）：
+| 指标 | 旧构建 | 优化后 |
+| --- | --- | --- |
+| 冷启动 前景 → ArkWeb | 59.7s | **27.8s** |
+| 温启动 前景 → ArkWeb | 13.1s | **9.65–9.96s** |
+| 首次安装后首启（全 chunk） | — | 约 28s（与冷启动一致） |
+| 增量升级首启（1 个 chunk 变化） | 约 28s | 约 11s |
+| G3 verify/exec/overlay | — | PASS |
+
+store 构建保持 jitless，且 chunked store HAP shape 检查通过。
+
+剩余已知问题：
+- optional 层（Office/语音/Forge 等）仍在 Host ready 后后台解包（约 1.5-6s 取决于设备），
+  极早使用这些能力可能遇到短暂未就绪；
+- 真机增量升级的“包内容实际变化”场景未单独构造，仅通过 marker 失效验证了 chunk 选择逻辑；
+- Host JIT 只影响 self/lab；store 仍 jitless（待商店策略确认后评估）。

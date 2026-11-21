@@ -90,8 +90,8 @@ def measure(target, warm=True, timeout=300):
     for line in seen:
         message = line.split("DSHClient: ", 1)[-1]
         match = TIME.search(line)
-        if any(key in message for key in ("ability foreground", "startup archive", "starting native Web",
-                                          "native loopback ready", "ArkWeb loaded")):
+        if any(key in message for key in ("ability foreground", "startup archive", "startup chunks",
+                                          "starting native Web", "native loopback ready", "ArkWeb loaded")):
             phases.append({"at": match.group(1) if match else None, "message": message.strip()[:200]})
     native_ms = None
     foreground = arkweb = None
