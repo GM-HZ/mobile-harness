@@ -82,7 +82,8 @@
 - **P1** 插件支持策略文档：支持纯 JS/Cordis、bundle；不支持运行时原生 `.so`/需编译/PTY/桌面能力；
 - **P1** 崩溃安全：坏插件导致 Host 退出后，下次启动自动进入安全模式，并提供"禁用最近插件"的恢复路径
   （现有 `BootRecovery` 已能自动安全模式，需补 UI 与 profile 回滚）；
-- **P1** 插件门禁：`nightly-plugin-git-update` 已加入 nightly（本地 git 插件安装/启用）；
+- **P0/P1** 插件门禁：`nightly-plugin-git-update` 已加入 nightly（本地 PASS）；
+  插件回滚（last-known-good snapshot + 恢复页按钮）已实现，UI 点击需解锁后的手工/自动化验证；
   市场/公开图用例需要模型 key，暂不纳入；
 - **P2** 原生插件走构建期 `extensions[]` 签名 overlay（不承诺运行时任意 dlopen）；
 - **P2** 安全模型：插件拥有 App 权限，需明示来源/信任与审核策略。
@@ -91,7 +92,7 @@
 
 | 优先级 | 事项 | 落点 |
 | --- | --- | --- |
-| P0 | 全量锚点扫描（host patch 全覆盖） | `scripts/adaptation/anchors.py` + bump |
+| P0 | ~~全量锚点扫描（host patch 全覆盖）~~ 已完成：44 literal 全映射/校验，15 ambiguous 仅存在性 | `anchors.full.json` + `anchor_scan.py` + bump |
 | P0 | pinned PRoot 供应链（源码/构建脚本/版本） | `docs/build-inputs.sha256` + 新 build 脚本 |
 | P1 | CI 真跑（PR/nightly/release） | `.github/workflows/*` + self-hosted runner |
 | P1 | 真机门禁调度（解锁检测、异步队列） | `device_lab.py` + gate-device |

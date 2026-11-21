@@ -24,6 +24,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 ANCHORS = ROOT / "adaptation/anchors.json"
+FULL_ANCHORS = ROOT / "adaptation/anchors.full.json"
 LOCK = ROOT / "runtime/harmonyos/dsh/package-lock.json"
 WATCH = [
     "@deepseek-ai/dsh",
@@ -88,9 +89,86 @@ def package_locks():
     lock = json.loads(LOCK.read_text())
     versions = {}
     for key, value in lock.get("packages", {}).items():
-        if key.startswith("node_modules/@deepseek-ai/") and value.get("version"):
+        if key.startswith("node_modules/") and value.get("version") and value.get("version") != "file:":
             versions[key[len("node_modules/"):]] = value["version"]
     return versions
+
+
+def parse_layer_module(name):
+    rest = name[len("dsh/node_modules/"):] if name.startswith("dsh/node_modules/") else name
+    parts = rest.split("/")
+    if len(parts) < 2:
+        return None
+    if parts[0].startswith("@"):
+        if len(parts) < 3:
+            return None
+        return parts[0] + "/" + parts[1], "/".join(parts[2:])
+    return parts[0], "/".join(parts[1:])
+
+
+def check_full_anchors(report, target, locks):
+    """Verify every literal runtime patch anchor against the target package tarball."""
+    if not FULL_ANCHORS.is_file():
+        return {"checked": 0, "drift": 0, "skipped": 0, "note": "anchors.full.json missing"}
+    entries = json.loads(FULL_ANCHORS.read_text()).get("entries", [])
+    checked = drift = skipped = ambiguous = 0
+    rows = []
+    for entry in entries:
+        if entry.get("dynamic") or not entry.get("layerModule"):
+            continue
+        if entry.get("layerAmbiguous"):
+            ambiguous += 1
+            continue
+        candidates = [entry["layerModule"], *entry.get("layerFiles", [])]
+        candidates = list(dict.fromkeys(candidates))
+        parsed = [(module, parse_layer_module(module)) for module in candidates]
+        parsed = [(module, value) for module, value in parsed if value]
+        if not parsed:
+            skipped += 1
+            continue
+        passed = False
+        detail = []
+        for module, (package, member) in parsed:
+            locked = locks.get(package)
+            version = None
+            try:
+                versions = package_versions(package)
+            except Exception:
+                versions = set()
+            if target in versions:
+                version = target
+            elif locked in versions:
+                version = locked
+            if not version:
+                detail.append(f"{package}: no target/locked version")
+                continue
+            try:
+                archive = acquire(package, version)
+            except Exception as error:
+                detail.append(f"{package}: {str(error)[:80]}")
+                continue
+            try:
+                with tarfile.open(archive, ignore_zeros=True) as tarball:
+                    payload = tarball.extractfile("package/" + member).read().decode("utf-8", "replace")
+            except Exception as error:
+                detail.append(f"{package}/{member}: {str(error)[:80]}")
+                continue
+            count = payload.count(entry["anchor"])
+            detail.append(f"{package}/{member}: {count}")
+            if count >= 1:
+                passed = True
+                break
+        checked += 1
+        if not passed:
+            drift += 1
+            rows.append({"file": entry["file"], "index": entry["index"],
+                         "function": entry.get("function"), "anchor": entry["anchor"][:120],
+                         "detail": detail[:4]})
+    report["fullAnchorRows"] = rows
+    return {"checked": checked, "ambiguous": ambiguous, "drift": drift, "skipped": skipped,
+            "note": "unambiguous literal anchors verified against target package tarballs; "
+                    "ambiguous anchors are layer-indexed but not drift-verified",
+            "driftRows": rows}
 
 
 def main():
@@ -189,6 +267,9 @@ def main():
                 row.update({"ok": False, "error": str(error)[:160]})
                 failures += 1
             report["anchors"].append(row)
+    report["fullAnchors"] = check_full_anchors(report, target, locks)
+    failures += report["fullAnchors"]["drift"]
+    report["failures"] = failures
     touched = {anchor["package"] for anchor in report["anchors"] if anchor.get("package")}
     manifest = json.loads((ROOT / "adaptation/manifest.json").read_text())
     for entry in manifest["entries"]:
@@ -208,6 +289,10 @@ def main():
             print(f"  OK   {row['id']}")
         else:
             print(f"  DRIFT {row['id']}: expected {row.get('expected')}, found {row.get('actual')} ({row.get('error', '')})")
+    full = report.get("fullAnchors") or {}
+    if full:
+        print(f"full anchors: {full.get('checked', 0)} verified, {full.get('ambiguous', 0)} ambiguous, "
+              f"{full.get('drift', 0)} drift")
     print(f"affected adaptation entries: {len(report['affected'])}")
     print(f"evidence: {output.relative_to(ROOT)}")
     return 0 if failures == 0 else 1

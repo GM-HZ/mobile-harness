@@ -2,7 +2,7 @@
   "pinned": "0.2.2-rc.5",
   "target": "0.2.2-rc.5",
   "newerThanPinned": false,
-  "startedAt": "2026-11-20T23:29:23+0800",
+  "startedAt": "2026-11-21T10:53:09+0800",
   "packages": {
     "@deepseek-ai/dsh-bash-local": {
       "locked": "0.2.2-rc.5",
@@ -21,6 +21,12 @@
       "version": "0.2.2-rc.5",
       "tarball": "@deepseek-ai__dsh-client-ui-settings-general.tgz",
       "bytes": 127963
+    },
+    "@deepseek-ai/dsh-experimental-forge-github": {
+      "locked": "0.2.2-rc.5",
+      "version": "0.2.2-rc.5",
+      "tarball": "@deepseek-ai__dsh-experimental-forge-github.tgz",
+      "bytes": 104505
     },
     "@deepseek-ai/dsh-session-persistence-jsonl": {
       "locked": "0.2.2-rc.5",
@@ -83,6 +89,15 @@
     {
       "id": "ripgrep-binary",
       "skipped": "not an @deepseek-ai package file"
+    },
+    {
+      "id": "forge-github-guest-runner",
+      "package": "@deepseek-ai/dsh-experimental-forge-github",
+      "member": "package/lib/index.js",
+      "version": "0.2.2-rc.5",
+      "ok": true,
+      "kind": "patch",
+      "note": "package patch; patch_rehearsal verifies application"
     }
   ],
   "affected": [
@@ -90,11 +105,21 @@
     "patches:patches/TARGETS.md",
     "patches:patches/bash-local-shell-path.patch",
     "patches:patches/bash-sandbox-shell-path.patch",
+    "patches:patches/forge-github-guest-runner.patch",
     "patches:patches/series.json",
     "patches:patches/session-persistence-eacces-fallback.patch",
     "patches:patches/settings-client-recovery.patch",
     "patches:patches/targets.json"
   ],
+  "fullAnchorRows": [],
+  "fullAnchors": {
+    "checked": 29,
+    "ambiguous": 15,
+    "drift": 0,
+    "skipped": 0,
+    "note": "unambiguous literal anchors verified against target package tarballs; ambiguous anchors are layer-indexed but not drift-verified",
+    "driftRows": []
+  },
   "failures": 0,
   "ok": true
 }

@@ -70,6 +70,9 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
 3. 验证：`patch_rehearsal`、`anchors.py`、`host_contracts.py`、对应 G2/G3 用例。
 4. 证据：gate 证据 + 台账；需要设备时 `device_lab`。
 5. 收敛：上游出现 seam 时按 `convergence.json` 迁移并删除运行时改写。
+6. 锚点映射：构建后运行 `python3 scripts/adaptation/anchor_scan.py --map --layer <dsh-layer.zip>`，
+   把每个字面量锚点映射到装配层模块；`anchors.full.json` 同时是 bump 全量校验的输入。
+   重复出现的锚点标记 `layerAmbiguous`，只做存在性覆盖、不做 drift 判定。
 
 ## 6. 上游 bump 流程
 

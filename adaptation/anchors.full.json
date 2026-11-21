@@ -1,6 +1,12 @@
 {
   "schema": 1,
   "source": "scripts/adaptation/anchor_scan.py",
+  "layer": "dsh-layer.zip",
+  "stats": {
+    "mapped": 29,
+    "ambiguous": 15,
+    "missing": 0
+  },
   "entries": [
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -32,7 +38,9 @@
       "function": "resolvePrimaryRuntime",
       "module": null,
       "anchor": "This does not change PATH or package-manager settings.",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-tool-workspace-dependencies/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -40,7 +48,9 @@
       "function": "patchPtc",
       "module": "dsh-ptc-runtime-node/lib/index.js",
       "anchor": "import { stripTypeScriptTypes } from \"node:module\";",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-ptc-runtime-node/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -48,7 +58,9 @@
       "function": "patchPtc",
       "module": "dsh-ptc-runtime-node/lib/index.js",
       "anchor": "validateConfig(this.config);\n\t\tthis.processes = new PolicyProcesses(ctx);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-ptc-runtime-node/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -56,7 +68,14 @@
       "function": "patchSharedPtcExecutor",
       "module": "dsh-tool-executor-ptc/lib/index.js",
       "anchor": "let policy = standingPolicy;",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-tool-executor-ptc/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-tool-executor-ptc/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-tool-executor-ptc/lib/types/ptc.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -64,7 +83,9 @@
       "function": "patchSharedPtcExecutor",
       "module": "dsh-tool-executor-ptc/lib/index.js",
       "anchor": "...exec.agent === void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-tool-executor-ptc/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -72,7 +93,9 @@
       "function": "patchLivesharePolicies",
       "module": "dsh-experimental-liveshare/lib/index.js",
       "anchor": "noteViewerTurn(String(agent.session.id), turn, requests.length > 0);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-liveshare/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -80,7 +103,9 @@
       "function": "patchLivesharePolicies",
       "module": "dsh-experimental-liveshare/lib/index.js",
       "anchor": "if (execution.name === \"run_code\") return void 0;",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-liveshare/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -88,7 +113,9 @@
       "function": "patchLivesharePolicies",
       "module": "dsh-experimental-liveshare/lib/index.js",
       "anchor": "verdictSource: async (execution) => {\n\t\t\tconst { token } = execution;",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-liveshare/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -96,7 +123,9 @@
       "function": "patchCompaction",
       "module": "dsh-compaction-basic/lib/index.js",
       "anchor": "function selectCompactableRange(session, measurement, retainTokens) {",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-compaction-basic/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -112,7 +141,9 @@
       "function": "selectCompactableRange",
       "module": null,
       "anchor": "case \"context-overflow\": {\n\t\t\t\tthis.ctx.get(\"toolResultPruner\")?.pruneSession(agent.session);\n\t\t\t\tconst measurement = this.ctx.tokenMeter.measure(agent.session);\n\t\t\t\tconst range = selectCompactableRange(agent.session, measurement, 0);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-compaction-basic/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -120,7 +151,9 @@
       "function": "main",
       "module": null,
       "anchor": "...loadOptionalPatches(binName, join(context.home, \"cordis.patch.yml\")) ?? [],",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -128,7 +161,15 @@
       "function": "main",
       "module": null,
       "anchor": "execArgv: []",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-inspector/lib/index.js",
+      "layerCount": 12,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-experimental-inspector/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-market/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-market/lib/types/parse-thread.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -136,7 +177,9 @@
       "function": "main",
       "module": null,
       "anchor": "workerData: boot,",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-inspector/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -144,7 +187,9 @@
       "function": "main",
       "module": null,
       "anchor": "for (const [key, value] of Object.entries(req.headers)) if (key.startsWith(\"sec-websocket-\")",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-inspector/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -152,7 +197,9 @@
       "function": "main",
       "module": null,
       "anchor": "console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-inspector/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -160,7 +207,15 @@
       "function": "main",
       "module": null,
       "anchor": "this.config = config;",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@aws-sdk/credential-provider-http/node_modules/@smithy/node-http-handler/dist-cjs/index.js",
+      "layerCount": 108,
+      "layerFiles": [
+        "dsh/node_modules/@aws-sdk/credential-provider-http/node_modules/@smithy/node-http-handler/dist-cjs/index.js",
+        "dsh/node_modules/@aws-sdk/credential-provider-http/node_modules/@smithy/node-http-handler/dist-es/node-http2-connection-manager.js",
+        "dsh/node_modules/@aws-sdk/nested-clients/node_modules/@smithy/node-http-handler/dist-cjs/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -168,7 +223,15 @@
       "function": "main",
       "module": null,
       "anchor": "import { spawn } from \"node:child_process\";",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@agentclientprotocol/sdk/dist/examples/client.js",
+      "layerCount": 8,
+      "layerFiles": [
+        "dsh/node_modules/@agentclientprotocol/sdk/dist/examples/client.js",
+        "dsh/node_modules/@deepseek-ai/dsh-experimental-liveshare/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-host-directory-picker-native/lib/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -176,7 +239,9 @@
       "function": "main",
       "module": null,
       "anchor": "withoutManifestLink(read) : read;",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-liveshare/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -184,7 +249,9 @@
       "function": "main",
       "module": null,
       "anchor": "\"darwin-arm64\",",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -192,7 +259,9 @@
       "function": "main",
       "module": null,
       "anchor": "const token = randomBytes(32).toString(\"hex\");",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -200,7 +269,9 @@
       "function": "main",
       "module": null,
       "anchor": "const worker = {\n\t\t\t\t\thandle,\n\t\t\t\t\turl: `http://127.0.0.1:${await readReady(handle, this.config.maxLogBytes, setup.signal)}`,\n\t\t\t\t\ttoken,",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -208,7 +279,14 @@
       "function": "main",
       "module": null,
       "anchor": "Read and use the cordis-plugin-development skill.",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/types/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -216,7 +294,14 @@
       "function": "main",
       "module": null,
       "anchor": "they supplement the cordis-plugin-development skill.",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/types/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -224,7 +309,14 @@
       "function": "main",
       "module": null,
       "anchor": "Build and export all runtime entry points before reporting ready.",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/types/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -232,7 +324,9 @@
       "function": "main",
       "module": null,
       "anchor": "phase: result.application === \"applied\" ? \"removed\" : previous.phase",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-creation-recommendations/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -240,7 +334,14 @@
       "function": "main",
       "module": null,
       "anchor": "env: buildChildEnv(config.env),",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-mcp-client/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-mcp-client/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-mcp-client/lib/types/transport.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -248,7 +349,14 @@
       "function": "main",
       "module": null,
       "anchor": "...getDefaultEnvironment(),",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@modelcontextprotocol/client/dist/stdio.cjs",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@modelcontextprotocol/client/dist/stdio.cjs",
+        "dsh/node_modules/@modelcontextprotocol/client/dist/stdio.mjs"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -256,7 +364,9 @@
       "function": "main",
       "module": null,
       "anchor": "import spawn from \"cross-spawn\";",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@modelcontextprotocol/client/dist/stdio.mjs",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -264,7 +374,15 @@
       "function": "main",
       "module": null,
       "anchor": "internals = {};",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-fs-local/lib/index.js",
+      "layerCount": 3,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-fs-local/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-sandbox-local/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-subprocess-local/lib/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -272,7 +390,9 @@
       "function": "main",
       "module": null,
       "anchor": "(await import(\"@vscode/ripgrep\")).rgPath",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-util-ripgrep/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -280,7 +400,9 @@
       "function": "main",
       "module": null,
       "anchor": "\t\t\"--sort=modified\",\n",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-tool-fs-search/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -288,7 +410,9 @@
       "function": "main",
       "module": null,
       "anchor": "paths: all",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-tool-fs-search/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -296,7 +420,15 @@
       "function": "main",
       "module": null,
       "anchor": "import { execa } from \"execa\";",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-experimental-forge-github/lib/index.js",
+      "layerCount": 3,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-experimental-forge-github/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-market/lib/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -304,7 +436,14 @@
       "function": "main",
       "module": null,
       "anchor": "this.installedFrom.set(name, used);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/types/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -312,7 +451,14 @@
       "function": "main",
       "module": null,
       "anchor": "this.installedFrom.delete(name);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/types/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -320,7 +466,14 @@
       "function": "main",
       "module": null,
       "anchor": "const previousRegistry = this.installedFrom.get(name);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/types/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -328,7 +481,9 @@
       "function": "main",
       "module": null,
       "anchor": "return requested !== void 0 ? requested : this.installedFrom.get(name);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-plugin-manager/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -336,7 +491,9 @@
       "function": "main",
       "module": null,
       "anchor": "ensureDurableDirectory(home, parse(home).root)",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-attachment-local/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -344,7 +501,9 @@
       "function": "main",
       "module": null,
       "anchor": "createLazyRequire(\"sharp\", import.meta.url)",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-attachment-local/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -352,7 +511,9 @@
       "function": "main",
       "module": null,
       "anchor": "await image.raw().toBuffer();",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-attachment-local/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -360,7 +521,9 @@
       "function": "main",
       "module": null,
       "anchor": "await link(staged.path, target);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-attachment-local/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -368,7 +531,9 @@
       "function": "main",
       "module": null,
       "anchor": "await unlink(staged.path);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-attachment-local/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -376,7 +541,9 @@
       "function": "main",
       "module": null,
       "anchor": "await link(source, target);",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-attachment-local/lib/index.js",
+      "layerCount": 1
     },
     {
       "file": "packages/dsh-host/dsh-native-web.cjs",
@@ -392,7 +559,14 @@
       "function": "patchFileUploads",
       "module": null,
       "anchor": "async upload(agent, request, signal) {",
-      "dynamic": false
+      "dynamic": false,
+      "layerModule": "dsh/node_modules/@deepseek-ai/dsh-client-file-upload/lib/index.js",
+      "layerCount": 2,
+      "layerFiles": [
+        "dsh/node_modules/@deepseek-ai/dsh-client-file-upload/lib/index.js",
+        "dsh/node_modules/@deepseek-ai/dsh-client-file-upload/lib/types/index.js"
+      ],
+      "layerAmbiguous": true
     },
     {
       "file": "runtime/harmonyos/compat/dsh-harmony-liveshare.cjs",

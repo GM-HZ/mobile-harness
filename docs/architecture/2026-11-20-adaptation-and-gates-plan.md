@@ -607,3 +607,21 @@ flake 分桶写进周报脚本；评估把 `patches/TARGETS.md` 生成自动化�
 - **插件支持策略 TODO**：支持纯 JS/Cordis；不支持运行时原生/编译/PTY/桌面；崩溃安全（BootRecovery 已有
   自动安全模式，补 UI/回滚）；原生插件走构建期签名 overlay。
 - framework 的锚点闭包不变量已更新；G1 现 **13 项**，registry：G0=3、G1=13、G2=70、G3=3、G4=7。
+
+
+### 2026-11-21（稳定性补齐：全量锚点映射、bump 全量校验、插件 nightly、插件回滚）
+
+- **全量锚点映射**：`anchor_scan.py --map --layer` 把 44 个字面量锚点全部映射到装配层模块
+  （29 唯一 + 15 重复出现标记 ambiguous）；`--layer` 校验 **44/44 通过、0 missing**；
+  G1 `anchor-coverage` 保持索引同步。重复锚点只做存在性覆盖，不做 drift 判定。
+- **bump 全量校验**：`bump.py` 增加 `fullAnchors`：对 29 个唯一锚点按 target/locked 版本
+  tarball 逐个验证（15 个 ambiguous 索引但不计 drift），本次 rc.5 自检 **29 verified / 0 drift**，
+  failures=0；证据写入 `docs/evidence/upstream-bump/0.2.2-rc.5-dry-run.json`。
+- **插件 nightly**：`nightly-plugin-git-update` 已加入 workflow 与 G2（本地 PASS 76.3s）。
+- **插件回滚（崩溃安全）**：`DshEngine` 每次成功启动后保存 `files/plugin-snapshot/`
+  （cordis.patch.yml/cordis.yml/package.json/pnpm-lock.yaml）；恢复页新增
+  **"回滚插件配置并正常重开"**（`restartWithPluginRollback`），恢复上次成功启动的插件集后按正常模式重启。
+  已在模拟器验证快照生成与"用快照文件恢复后可正常启动"；UI 端到端点击需屏幕解锁，列入手工步骤。
+- 回归守卫：`host_regressions` 增加插件快照/回滚与恢复按钮接线检查；`release-runbook` 增加插件恢复步骤。
+
+下一步：把重复锚点（15 个）的模块判定从"存在性"升级为"候选集合 drift 校验"；CI runner 实跑。

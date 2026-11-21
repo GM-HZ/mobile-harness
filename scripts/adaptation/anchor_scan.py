@@ -230,13 +230,65 @@ def locate_layer(explicit):
     return None
 
 
+def layer_js_files(layer):
+    with zipfile.ZipFile(layer) as archive:
+        for info in archive.infolist():
+            name = info.filename
+            if name.startswith("dsh/node_modules/") and name.endswith((".js", ".mjs", ".cjs")):
+                yield archive.read(name).decode("utf-8", "replace"), name
+
+
+def map_layer(entries, layer):
+    """No static mapping guess: find each literal anchor in the assembled layer."""
+    literals = [entry for entry in entries if not entry["dynamic"] and entry["anchor"]]
+    state = {id(entry): {"count": 0, "files": []} for entry in literals}
+    for text, name in layer_js_files(layer):
+        for entry in literals:
+            count = text.count(entry["anchor"])
+            if count:
+                row = state[id(entry)]
+                row["count"] += count
+                if len(row["files"]) < 3:
+                    row["files"].append(name)
+    mapped = ambiguous = missing = 0
+    for entry in literals:
+        row = state[id(entry)]
+        if row["count"] == 1:
+            entry["layerModule"] = row["files"][0]
+            entry["layerCount"] = 1
+            mapped += 1
+        elif row["count"] > 1:
+            entry["layerModule"] = row["files"][0]
+            entry["layerCount"] = row["count"]
+            entry["layerFiles"] = row["files"]
+            entry["layerAmbiguous"] = True
+            ambiguous += 1
+        else:
+            missing += 1
+    return {"mapped": mapped, "ambiguous": ambiguous, "missing": missing}
+
+
 def verify_layer(entries, layer):
     missing = []
     checked = 0
     with zipfile.ZipFile(layer) as archive:
         names = set(archive.namelist())
         for entry in entries:
-            if entry["dynamic"] or not entry["module"] or not entry["anchor"]:
+            if entry["dynamic"] or not entry["anchor"]:
+                continue
+            if entry.get("layerModule"):
+                checked += 1
+                if entry.get("layerAmbiguous"):
+                    good = any(archive.read(name).decode("utf-8", "replace").count(entry["anchor"]) >= 1
+                               for name in entry.get("layerFiles", [entry["layerModule"]]))
+                    if not good:
+                        missing.append({**entry, "reason": "ambiguous anchor missing from all candidate files"})
+                    continue
+                payload = archive.read(entry["layerModule"]).decode("utf-8", "replace")
+                if payload.count(entry["anchor"]) != 1:
+                    missing.append({**entry, "reason": f"layer anchor count {payload.count(entry['anchor'])} != 1"})
+                continue
+            if not entry["module"]:
                 continue
             candidates = [f"dsh/node_modules/@deepseek-ai/{entry['module']}"]
             # paths() values are dsh-<pkg>/lib/... without @deepseek-ai prefix
@@ -256,23 +308,44 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--layer")
+    parser.add_argument("--map", action="store_true", help="map layerModule for every literal anchor")
     args = parser.parse_args()
     entries = scan()
     data = {"schema": 1, "source": "scripts/adaptation/anchor_scan.py", "entries": entries}
     if args.check:
         current = json.loads(OUTPUT.read_text()) if OUTPUT.is_file() else None
-        if current != data:
+        def static(entries):
+            return [{key: value for key, value in entry.items()
+                     if key not in ("layerModule", "layerFiles", "layerCount", "layerAmbiguous")}
+                    for entry in entries]
+        current_static = (static(current.get("entries", [])) if current else None)
+        data_static = static(entries)
+        if current_static != data_static:
             print("anchors.full.json is stale; run scripts/adaptation/anchor_scan.py", file=sys.stderr)
             return 1
         literal_count = sum(1 for entry in entries if not entry["dynamic"])
         print(f"G1 anchor coverage OK: {len(entries)} anchors ({literal_count} literal, "
               f"{len(entries) - literal_count} dynamic) in {len(FILES)} files")
         return 0
+    if args.map:
+        layer = locate_layer(args.layer)
+        if not layer:
+            print("SKIP anchor mapping: dsh-layer.zip not available", file=sys.stderr)
+            return 2
+        stats = map_layer(entries, layer)
+        data = {"schema": 1, "source": "scripts/adaptation/anchor_scan.py",
+                "layer": layer.name, "stats": stats, "entries": entries}
+        OUTPUT.write_text(json.dumps(data, indent=2) + "\n")
+        print(f"anchor mapping: {stats['mapped']} mapped, {stats['ambiguous']} ambiguous, "
+              f"{stats['missing']} missing (layer {layer.name})")
+        return 0 if stats["missing"] == 0 and stats["ambiguous"] == 0 else 1
     if args.layer:
         layer = locate_layer(args.layer)
         if not layer:
             print("SKIP anchor layer verification: dsh-layer.zip not available", file=sys.stderr)
             return 2
+        if OUTPUT.is_file():
+            entries = json.loads(OUTPUT.read_text()).get("entries", entries)
         checked, missing = verify_layer(entries, layer)
         print(f"anchor layer scan: {checked} module anchors checked, {len(missing)} missing")
         for row in missing[:20]:

@@ -250,6 +250,19 @@ struct Index {
     }
   }
 
+  private async rollbackPlugins(): Promise<void> {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.restarting = true;
+    this.restartError = '';
+    try {
+      await dshEngine.restartWithPluginRollback(context);
+      this.recoveryOpen = false;
+    } catch (_) {
+      this.restartError = '没有可用的插件快照，或无法自动重开。';
+    }
+    this.restarting = false;
+  }
+
   @Builder
   private recoveryPage() {
     Column({ space: 12 }) {
@@ -259,6 +272,7 @@ struct Index {
         .fontSize(15)
       Button('以安全模式重开').enabled(!this.restarting).onClick(() => { this.restart('safe'); })
       Button('以正常模式重开').enabled(!this.restarting).onClick(() => { this.restart('normal'); })
+      Button('回滚插件配置并正常重开').enabled(!this.restarting).onClick(() => { this.rollbackPlugins(); })
       if (this.restartError) Text(this.restartError).fontSize(14)
       if (this.launchUrl && !this.webFailed) Button('返回会话').onClick(() => { this.recoveryOpen = false; })
     }.padding(24).width('100%').alignItems(HorizontalAlign.Start)

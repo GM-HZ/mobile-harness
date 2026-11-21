@@ -37,6 +37,12 @@ def main():
         failures.append("bash status parser regressed to requiring three digits")
     if "proxyEnv" not in host or "'HTTPS_PROXY'" not in host:
         failures.append("guest gh runner no longer forwards proxy environment variables")
+    engine = (ROOT / "apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets").read_text()
+    index = (ROOT / "apps/harmonyos/entry/src/main/ets/pages/Index.ets").read_text()
+    if "plugin-snapshot" not in engine or "restartWithPluginRollback" not in engine:
+        failures.append("plugin snapshot/rollback wiring missing from DshEngine")
+    if "回滚插件配置" not in index:
+        failures.append("plugin rollback action missing from the recovery UI")
     compat = (ROOT / "runtime/harmonyos/compat/dsh-harmony-forge.cjs").read_text()
     if "__harmonyPackagedShell" not in host or "createGhRunner(\n      (cwd, command, environment)" not in host:
         failures.append("forge gh no longer routes through the packaged shell helper")

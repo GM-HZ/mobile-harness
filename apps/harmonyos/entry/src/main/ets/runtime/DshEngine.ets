@@ -164,6 +164,7 @@ class DshEngine {
             throw new Error('Invalid native browser session');
           }
           recovery.write(mode, false);
+          this.savePluginSnapshot(context, root);
           ready = true;
           session.safe = mode === 'safe';
           this.publish('', session);
@@ -180,6 +181,56 @@ class DshEngine {
         hilog.error(0xD005, 'DSHClient', 'native launch descriptor invalid');
       }
     }, 200);
+  }
+
+  private pluginProfileFiles(root: string): string[] {
+    const profile = root + '/native-benchmark-home/profiles/web';
+    return [profile + '/cordis.patch.yml', profile + '/cordis.yml',
+      profile + '/package.json', profile + '/pnpm-lock.yaml'];
+  }
+
+  private savePluginSnapshot(context: common.UIAbilityContext, root: string): void {
+    const snapshot = context.filesDir + '/plugin-snapshot';
+    try {
+      if (!fileIo.accessSync(snapshot)) fileIo.mkdirSync(snapshot, true);
+      for (const source of this.pluginProfileFiles(root)) {
+        if (!fileIo.accessSync(source)) continue;
+        const name = source.substring(source.lastIndexOf('/') + 1);
+        fileIo.copyFileSync(source, snapshot + '/' + name + '.tmp');
+        fileIo.renameSync(snapshot + '/' + name + '.tmp', snapshot + '/' + name);
+      }
+      hilog.info(0xD005, 'DSHClient', 'plugin snapshot saved');
+    } catch (e) {
+      hilog.warn(0xD005, 'DSHClient', 'plugin snapshot unavailable');
+    }
+  }
+
+  private restorePluginSnapshot(context: common.UIAbilityContext, root: string): boolean {
+    const snapshot = context.filesDir + '/plugin-snapshot';
+    let restored = false;
+    try {
+      for (const target of this.pluginProfileFiles(root)) {
+        const name = target.substring(target.lastIndexOf('/') + 1);
+        const source = snapshot + '/' + name;
+        if (!fileIo.accessSync(source)) continue;
+        fileIo.copyFileSync(source, target + '.restore');
+        fileIo.renameSync(target + '.restore', target);
+        restored = true;
+      }
+    } catch (e) {
+      hilog.error(0xD005, 'DSHClient', 'plugin rollback failed');
+      return false;
+    }
+    if (restored) hilog.info(0xD005, 'DSHClient', 'plugin snapshot restored');
+    return restored;
+  }
+
+  async restartWithPluginRollback(context: common.UIAbilityContext): Promise<void> {
+    const root = context.filesDir + '/alpine';
+    if (!this.restorePluginSnapshot(context, root)) {
+      throw new Error('No plugin snapshot available');
+    }
+    await this.restart(context, 'normal');
   }
 
   async restart(context: common.UIAbilityContext, mode: string): Promise<void> {
