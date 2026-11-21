@@ -89,3 +89,45 @@
 - 温启动 ≤ 10s（模拟器目标，真机另测）、冷启动（清 marker）≤ 20s；
 - 升级后首次启动 ≤ 15s；
 - 启动阶段日志与证据落盘，列入第一可用版本 P0 清单。
+
+
+## 5. 已实施（第一轮）
+
+### 5.1 dsh-layer 瘦身 + 可选层拆分
+
+`scripts/build/harmonyos_dsh.py`：
+- 核心层剔除运行时不需要的内容：`*.map`、`*.d.ts`、`test/tests/__tests__/spec` 目录、
+  `node-pty/prebuilds`（PTY 已延期）；
+- 大体积按需内容拆到 `dsh-layer-optional.zip`（随包但不在启动关键路径）：
+  `libreoffice-kit-wasm`（Office）、`sherpa-onnx`（语音）、`dsh-experimental-inspector`（开发）、
+  `pyright` + LSP TypeScript（代码智能）；
+- 目标是在需要时按需解包，不阻塞聊天可用。
+
+`apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets`：
+- 核心 dsh-layer 解包与 node/shell/pnpm/python 层并行；
+- optional 层在 **Host ready 之后后台解包**（实测 1.4s），不占用首屏关键路径；
+- 新增 `dsh-optional-runtime-id.txt` 作为 optional 层的解包 identity。
+
+### 5.2 效果（模拟器 127.0.0.1:5557，当前构建）
+
+| 指标 | 优化前 | 优化后 |
+| --- | --- | --- |
+| 冷启动 解包（dsh-layer） | 22.7s | **9.7-11.5s** |
+| 冷启动 前景到 ArkWeb（readyMs） | 约 35-40s | **16.9s** |
+| 冷启动 wall（含脚本轮询开销） | 40.2s | 22.1s |
+| 温启动 前景到 ArkWeb（readyMs） | 约 10-11s | **6.4s** |
+| optional 层后台解包 | — | 1.4s（after ready） |
+
+证据：`docs/evidence/startup/cold-final.json`、`warm-split-opt2.json`、
+`cold-baseline.json`、`warm-baseline.json`。
+
+### 5.3 门禁
+
+新增 G2 `startup-warm-budget`：`startup.py --warm --max-wall 10`，nightly workflow 同步。
+
+### 5.4 已知限制与后续
+
+- 冷启动首次打开后约 1-2s 内 Office/语音/LSP 的可选文件仍在后台解包；
+  首次立即使用这些能力可能失败，需要能力入口等待或提示（后续优化）；
+- 下一步按顺序：升级增量解包（P1）、Host/profile 并行与 bundle 延迟（P1）、
+  copyGuest 去重（P2）、真机复测（需要设备重新连接）。

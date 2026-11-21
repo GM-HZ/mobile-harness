@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -17,6 +18,32 @@ NATIVE_MODULES = (
     "@img/sharp-libvips-linuxmusl-arm64/lib/libvips-cpp.so.8.18.7",
 )
 ARCHIVE = "dsh-layer.zip"
+OPTIONAL_ARCHIVE = "dsh-layer-optional.zip"
+# Runtime does not need type declarations, source maps, test suites or prose.
+# Dropping them cuts 1.08GB / 99,770 files by roughly a third and shortens the
+# first-boot extraction, which dominates cold start. Set HARMONY_DSH_PRUNE=0 to
+# keep the raw npm tree for debugging.
+PRUNE_PATTERNS = (
+    re.compile(r"\.map$"),
+    re.compile(r"\.d\.ts$"),
+    re.compile(r"/(?:test|tests|__tests__|spec)/"),
+)
+# Heavy payloads that are only imported when their feature is used. They stay
+# in the HAP but are extracted as a second archive in parallel with the core
+# layer, keeping first-boot wall time close to the core layer.
+OPTIONAL_PATTERNS = (
+    re.compile(r"libreoffice-kit-wasm/"),
+    re.compile(r"node_modules/sherpa-onnx/"),
+    re.compile(r"dsh-experimental-inspector/"),
+    re.compile(r"node_modules/pyright/"),
+    re.compile(r"toolchains/lsp/node_modules/typescript/"),
+)
+
+
+def pruned(name: str) -> bool:
+    if os.environ.get("HARMONY_DSH_PRUNE") == "0":
+        return False
+    return any(pattern.search(name) for pattern in PRUNE_PATTERNS)
 # Advertise the official optional bundles validated on HarmonyOS. Selection
 # remains in the user's profile; an installation dependency only makes a
 # bundle available to PluginManager without downloading another copy.
@@ -111,8 +138,9 @@ def stage_dsh(root, raw, baseline):
                     raise ValueError(f"patch marker missing after apply: {entry['file']}")
 
         pending = archive.with_suffix(".tmp")
+        optional_pending = cache / (OPTIONAL_ARCHIVE + ".tmp")
         try:
-            with ZipFile(pending, "w") as output:
+            with ZipFile(pending, "w") as output, ZipFile(optional_pending, "w") as optional_output:
                 output.writestr(ZipInfo("dsh/package.json"), (json.dumps(application, indent=2) + '\n').encode(), compress_type=ZIP_DEFLATED, compresslevel=3)
                 for file in bundle_files:
                     output.writestr(ZipInfo("dsh/node_modules/@mobile-harness/lsp/" + file.name), file.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
@@ -121,7 +149,10 @@ def stage_dsh(root, raw, baseline):
                         raise ValueError(f"Unexpected npm symlink: {path}")
                     if path.is_file():
                         name = "dsh/" + path.relative_to(cache).as_posix()
-                        output.writestr(ZipInfo(name), path.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
+                        if pruned(name):
+                            continue
+                        target = optional_output if any(pattern.search(name) for pattern in OPTIONAL_PATTERNS) else output
+                        target.writestr(ZipInfo(name), path.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
                 # tsserver watches its nearest node_modules recursively. Keep
                 # its immutable compiler library away from DSH's large tree;
                 # workspace dependencies remain visible and fully watched.
@@ -129,12 +160,25 @@ def stage_dsh(root, raw, baseline):
                 for path in sorted(compiler.rglob("*")):
                     if path.is_file():
                         name = "toolchains/lsp/node_modules/typescript/" + path.relative_to(compiler).as_posix()
+                        if pruned(name):
+                            continue
                         output.writestr(ZipInfo(name), path.read_bytes(), compress_type=ZIP_DEFLATED, compresslevel=3)
             pending.replace(archive)
+            optional = cache / OPTIONAL_ARCHIVE
+            optional_pending.replace(optional)
         finally:
             pending.unlink(missing_ok=True)
+            optional_pending.unlink(missing_ok=True)
 
     shutil.copy2(archive, raw / ARCHIVE)
+    optional = cache / OPTIONAL_ARCHIVE
+    if optional.is_file():
+        shutil.copy2(optional, raw / OPTIONAL_ARCHIVE)
+        with optional.open("rb") as packed:
+            optional_digest = hashlib.sha256(packed.read()).hexdigest()
+        (raw / "dsh-optional-runtime-id.txt").write_text(optional_digest)
+    else:
+        (raw / "dsh-optional-runtime-id.txt").write_text("")
     (raw / "dsh-lsp.patch.yml").unlink(missing_ok=True)
     # A same-DSH-version production dependency change must invalidate unpack.
     # User profiles/workspaces live outside this immutable release directory.

@@ -75,6 +75,10 @@ def main():
                "command": "python3 tests/smoke/emulator-native-addon-location.py \"$MH_EMULATOR\" .build/gate-evidence/native-addon.json",
                "covers": "native addon location + Inspector evaluation on the native Host",
                "requires": ["MH_EMULATOR env"], "timeout": 1200})
+    g2.append({"id": "startup-warm-budget",
+               "command": "python3 scripts/adaptation/startup.py \"$MH_EMULATOR\" --warm --max-wall 10 --output .build/gate-evidence/startup-warm.json",
+               "covers": "warm startup (ability foreground to ArkWeb) stays under the 10s budget",
+               "requires": ["MH_EMULATOR env"], "timeout": 300})
     g2.append({"id": "nightly-plugin-git-update",
                "command": "python3 tests/smoke/emulator-plugin-git-update.py \"$MH_EMULATOR\" .build/gate-evidence/plugin-git-update.json",
                "covers": "plugin manager installs a local git plugin and enables it",
