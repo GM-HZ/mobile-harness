@@ -63,9 +63,23 @@ def clear_unpack_markers(target):
                       "find . -maxdepth 3 -name '.validated-unpack-v2-*' -delete")
 
 
+def wait_ready(target, timeout=300):
+    """Wait for an already running App to finish its first/chunk extraction."""
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        state = app_shell(target, "cd data/storage/el2/base/haps/entry/files && "
+                                  "cat mobile-harness-boot.json 2>/dev/null").strip()
+        if '"pending":false' in state:
+            return True
+        time.sleep(2)
+    return False
+
+
 def measure(target, warm=True, timeout=300):
     if not warm:
         clear_unpack_markers(target)
+    else:
+        wait_ready(target, timeout)
     run(target, "aa force-stop " + BUNDLE)
     time.sleep(1)
     run(target, "hilog -r")

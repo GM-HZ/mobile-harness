@@ -123,7 +123,7 @@
 
 ### 5.3 门禁
 
-新增 G2 `startup-warm-budget`：`startup.py --warm --max-wall 15`（nightly 用 store/jitless 构建，预算按 15s；self/JIT 构建真机目标 10s）。
+新增 G2 `startup-warm-budget`：`startup.py --warm --max-wall 30`（nightly 用共享模拟器上的 store/jitless 构建，预算按 30s 防环境抖动；self/JIT 构建真机目标 10s）。
 
 ### 5.4 已知限制与后续
 

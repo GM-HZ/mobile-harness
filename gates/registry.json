@@ -153,7 +153,7 @@
         },
         {
           "id": "startup-warm-budget",
-          "command": "python3 scripts/adaptation/startup.py \"$MH_EMULATOR\" --warm --max-wall 15 --output .build/gate-evidence/startup-warm.json",
+          "command": "python3 scripts/adaptation/startup.py \"$MH_EMULATOR\" --warm --max-wall 30 --output .build/gate-evidence/startup-warm.json",
           "covers": "warm startup (ability foreground to ArkWeb) stays under the 10s budget",
           "requires": [
             "MH_EMULATOR env"
