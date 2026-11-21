@@ -1,8 +1,8 @@
 {
   "kind": "real-device probe",
   "target": "37R0224115035605",
-  "checkedAt": "2026-11-21T10:23:14+0800",
-  "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-8580ae88",
+  "checkedAt": "2026-11-21T11:05:08+0800",
+  "workspace": "/data/storage/el2/base/haps/entry/files/alpine/workspace-native/proot-exec-26d37f9b",
   "model": {
     "default": {
       "provider": "deepseek-account",
@@ -15,7 +15,7 @@
     {
       "turn": 1,
       "step": 1,
-      "callId": "call_00_6R1YmGLDm2p3sHUqYFpX3003",
+      "callId": "call_00_CCx0STbivwIz3w12I8iQ5062",
       "name": "bash",
       "arguments": "{\"command\": \"set +e\\necho \\\"--- signed libraries present ---\\\"\\nls -l /usr/lib/libonig.so.5 /usr/lib/libjq.so.1 /usr/lib/libarchive.so.13 /usr/lib/libpng16.so.16 2>&1\\necho \\\"--- dlopen a signed library from python ctypes ---\\\"\\npython3 -c \\\"import ctypes; ctypes.CDLL('/usr/lib/libarchive.so.13'); print('CTYPES_LIBARCHIVE_OK')\\\" 2>&1; echo \\\"CTYPES_EXIT=$?\\\"\\necho \\\"--- load a signed native extension through node dlopen ---\\\"\\nnode -e \\\"console.log('EXTENSION_ANSWER', require('/usr/lib/mh-demo.node').answer())\\\" 2>&1; echo \\\"EXT_EXIT=$?\\\"\\necho \\\"--- run a downloaded dynamic tool that needs the new libs (jq) ---\\\"\\nmh-install jq https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/jq-1.8.2-r0.apk usr/bin/jq jq\\necho \\\"JQ_INSTALL_EXIT=$?\\\"\\njq --version 2>&1; echo \\\"JQ_VERSION_EXIT=$?\\\"\\necho '{\\\"a\\\":1}' | jq .a 2>&1; echo \\\"JQ_RUN_EXIT=$?\\\"\\necho NATIVE_OVERLAY_PROBE_DONE\\n\", \"description\": \"Probe PRoot exec semantics\"}"
     }
@@ -23,7 +23,7 @@
   "bashCallCount": 1,
   "commandMatched": true,
   "command": "set +e\necho \"--- signed libraries present ---\"\nls -l /usr/lib/libonig.so.5 /usr/lib/libjq.so.1 /usr/lib/libarchive.so.13 /usr/lib/libpng16.so.16 2>&1\necho \"--- dlopen a signed library from python ctypes ---\"\npython3 -c \"import ctypes; ctypes.CDLL('/usr/lib/libarchive.so.13'); print('CTYPES_LIBARCHIVE_OK')\" 2>&1; echo \"CTYPES_EXIT=$?\"\necho \"--- load a signed native extension through node dlopen ---\"\nnode -e \"console.log('EXTENSION_ANSWER', require('/usr/lib/mh-demo.node').answer())\" 2>&1; echo \"EXT_EXIT=$?\"\necho \"--- run a downloaded dynamic tool that needs the new libs (jq) ---\"\nmh-install jq https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/jq-1.8.2-r0.apk usr/bin/jq jq\necho \"JQ_INSTALL_EXIT=$?\"\njq --version 2>&1; echo \"JQ_VERSION_EXIT=$?\"\necho '{\"a\":1}' | jq .a 2>&1; echo \"JQ_RUN_EXIT=$?\"\necho NATIVE_OVERLAY_PROBE_DONE\n",
-  "resultText": "--- signed libraries present ---\n-rw-r--r--    1 3060     3060        722816 Nov 21 10:21 /usr/lib/libarchive.so.13\n-rw-r--r--    1 3060     3060        329496 Nov 21 10:21 /usr/lib/libjq.so.1\n-rw-r--r--    1 3060     3060        617760 Nov 21 10:21 /usr/lib/libonig.so.5\n-rw-r--r--    1 3060     3060        198528 Nov 21 10:21 /usr/lib/libpng16.so.16\n--- dlopen a signed library from python ctypes ---\nCTYPES_LIBARCHIVE_OK\nCTYPES_EXIT=0\n--- load a signed native extension through node dlopen ---\nEXTENSION_ANSWER 42\nEXT_EXIT=0\n--- run a downloaded dynamic tool that needs the new libs (jq) ---\nMH_INSTALL_OK /usr/bin/jq\nMH_INSTALL_TOOL /usr/lib/mh-tools/jq/tool\nJQ_INSTALL_EXIT=0\njq-1.8.2\nCHILD_EXIT 0\nJQ_VERSION_EXIT=0\n1\nCHILD_EXIT 0\nJQ_RUN_EXIT=0\nNATIVE_OVERLAY_PROBE_DONE\n",
+  "resultText": "--- signed libraries present ---\n-rw-r--r--    1 3060     3060        722816 Nov 21 10:58 /usr/lib/libarchive.so.13\n-rw-r--r--    1 3060     3060        329496 Nov 21 10:58 /usr/lib/libjq.so.1\n-rw-r--r--    1 3060     3060        617760 Nov 21 10:58 /usr/lib/libonig.so.5\n-rw-r--r--    1 3060     3060        198528 Nov 21 10:58 /usr/lib/libpng16.so.16\n--- dlopen a signed library from python ctypes ---\nCTYPES_LIBARCHIVE_OK\nCTYPES_EXIT=0\n--- load a signed native extension through node dlopen ---\nEXTENSION_ANSWER 42\nEXT_EXIT=0\n--- run a downloaded dynamic tool that needs the new libs (jq) ---\nMH_INSTALL_OK /usr/bin/jq\nMH_INSTALL_TOOL /usr/lib/mh-tools/jq/tool\nJQ_INSTALL_EXIT=0\njq-1.8.2\nCHILD_EXIT 0\nJQ_VERSION_EXIT=0\n1\nCHILD_EXIT 0\nJQ_RUN_EXIT=0\nNATIVE_OVERLAY_PROBE_DONE\n",
   "markers": {
     "EXEC_SH_OK": false,
     "EXEC_BASH_OK": false,
