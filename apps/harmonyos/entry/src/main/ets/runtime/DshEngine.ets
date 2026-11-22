@@ -8,6 +8,7 @@ import { i18n } from '@kit.LocalizationKit';
 import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
 import { backgroundKeeper } from './BackgroundKeeper';
+import { RemoteHost, RemoteHostStore } from './RemoteHosts';
 
 interface LayerChunk {
   file: string;
@@ -18,12 +19,26 @@ interface LayerManifest {
   chunks: LayerChunk[];
 }
 
+interface SshRemoteConfig {
+  kind: string;
+  sshHost: string;
+  sshPort: string;
+  sshUser: string;
+  sshPassword: string;
+  sshKey: string;
+  sshPassphrase: string;
+  fingerprint: string;
+  token: string;
+}
+
 export interface EngineProgress {
   phase: string;
   percent: number;
 }
 
 export interface BrowserSession {
+  remote?: boolean;
+  hostName?: string;
   url: string;
   cookie?: string;
   safe?: boolean;
@@ -35,6 +50,8 @@ class DshEngine {
   private status: string = '正在准备本机 DSH…';
   private progress: EngineProgress = { phase: '环境准备', percent: 0 };
   private backgroundPreference: boolean = true;
+  private remoteHost?: RemoteHost;
+  private sshRemote?: RemoteHost;
   private session?: BrowserSession;
   private running: boolean = false;
   private nativePoll: number = -1;
@@ -195,6 +212,10 @@ class DshEngine {
           this.savePluginSnapshot(context, root);
           ready = true;
           session.safe = mode === 'safe';
+          if (this.remoteHost && this.remoteHost.kind === 'ssh') {
+            session.remote = true;
+            session.hostName = this.remoteHost.name;
+          }
           this.publish('', session, { phase: '加载界面', percent: 90 });
           if (this.backgroundPreference) void backgroundKeeper.start(context);
           hilog.info(0xD005, 'DSHClient', 'native loopback ready ms=%{public}d mode=%{public}s',
@@ -218,6 +239,23 @@ class DshEngine {
       profile + '/package.json', profile + '/pnpm-lock.yaml'];
   }
 
+  private writeSshRemoteConfig(path: string, host: RemoteHost): void {
+    const config: SshRemoteConfig = {
+      kind: 'ssh',
+      sshHost: host.sshHost || '',
+      sshPort: host.sshPort || '22',
+      sshUser: host.sshUser || '',
+      sshPassword: host.sshPassword || '',
+      sshKey: host.sshKey || '',
+      sshPassphrase: host.sshPassphrase || '',
+      fingerprint: host.fingerprint || '',
+      token: host.token || '',
+    };
+    const file = fileIo.openSync(path,
+      fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+    try { fileIo.writeSync(file.fd, JSON.stringify(config) + '\n'); } finally { fileIo.closeSync(file); }
+  }
+
   private loadBackgroundPreference(context: common.UIAbilityContext): void {
     try {
       const path = context.filesDir + '/background-enabled.json';
@@ -230,6 +268,46 @@ class DshEngine {
 
   isBackgroundEnabled(): boolean {
     return this.backgroundPreference;
+  }
+
+  currentRemoteHost(): RemoteHost | undefined {
+    return this.remoteHost;
+  }
+
+  async selectRemoteHost(context: common.UIAbilityContext, id: string): Promise<void> {
+    RemoteHostStore.select(context, id);
+    await context.restartApp({
+      bundleName: context.abilityInfo.bundleName,
+      abilityName: context.abilityInfo.name,
+    });
+  }
+
+  async removeRemoteHost(context: common.UIAbilityContext, id: string): Promise<void> {
+    RemoteHostStore.remove(context, id);
+  }
+
+  async addRemoteHost(context: common.UIAbilityContext, host: RemoteHost): Promise<void> {
+    RemoteHostStore.add(context, host);
+  }
+
+  remoteHosts(context: common.UIAbilityContext): RemoteHost[] {
+    return RemoteHostStore.list(context);
+  }
+
+  private startRemote(host: RemoteHost): void {
+    let target = host.url.trim();
+    if (!/^https?:\/\//i.test(target)) {
+      throw new Error('Remote URL must start with http:// or https://');
+    }
+    if (host.token && !/[?&]token=/.test(target)) {
+      target += (target.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(host.token);
+    }
+    const session: BrowserSession = {
+      url: target,
+      remote: true,
+      hostName: host.name || target,
+    };
+    this.publish('', session, { phase: '加载界面', percent: 100 });
   }
 
   async setBackgroundEnabled(context: common.UIAbilityContext, enabled: boolean): Promise<void> {
@@ -366,6 +444,11 @@ class DshEngine {
       for (const name of ['bin', 'lib', 'etc', 'tmp', 'root', 'dsh']) {
         const path = root + '/' + name;
         if (!fileIo.accessSync(path)) fileIo.mkdirSync(path, true);
+      }
+      const remoteConfig = root + '/tmp/remote-host.json';
+      try { fileIo.unlinkSync(remoteConfig); } catch (error) { /* absent */ }
+      if (this.sshRemote) {
+        this.writeSshRemoteConfig(remoteConfig, this.sshRemote);
       }
       this.copyGuest(context, 'alpine-busybox', root + '/bin/busybox');
       this.copyGuest(context, 'alpine-busybox', root + '/bin/sh');

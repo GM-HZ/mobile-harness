@@ -4,10 +4,12 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, EngineProgress, dshEngine } from '../runtime/DshEngine';
 import { ForgeAccount } from './ForgeAccount';
+import { RemoteHostsPage } from './RemoteHosts';
 
 const LOCAL_ORIGIN = 'http://127.0.0.1:19592';
 const RECOVERY_URL = LOCAL_ORIGIN + '/.mobile-harness/recovery';
 const GITHUB_URL = LOCAL_ORIGIN + '/.mobile-harness/github';
+const REMOTE_URL = LOCAL_ORIGIN + '/.mobile-harness/remote';
 type LoginFlow = 'unbound' | 'deepseek' | 'liveshare';
 
 @Entry
@@ -24,6 +26,9 @@ struct Index {
   @State splashVisible: boolean = true;
   @State splashOpacity: number = 1;
   @State backgroundEnabled: boolean = true;
+  @State hostsOpen: boolean = false;
+  @State remoteHostName: string = '';
+  @State remoteOrigin: string = '';
   @State restartError: string = '';
   @State restarting: boolean = false;
   private controller: webview.WebviewController = new webview.WebviewController();
@@ -46,6 +51,10 @@ struct Index {
       }
       this.safe = session?.safe === true;
       this.backgroundEnabled = dshEngine.isBackgroundEnabled();
+      if (session) {
+        this.remoteHostName = session.remote ? (session.hostName || '远程主机') : '';
+        this.remoteOrigin = session.remote ? this.originOf(session.url) : '';
+      }
       if (!session) {
         this.launchUrl = '';
         this.webFailed = false;
@@ -74,6 +83,21 @@ struct Index {
     this.detachEngine = undefined;
   }
 
+  private originOf(address: string): string {
+    try {
+      return url.URL.parseURL(address).origin;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  private allowedMainFrame(target: string): boolean {
+    if (this.remoteOrigin) {
+      return target === this.remoteOrigin || target.startsWith(this.remoteOrigin + '/');
+    }
+    return target.startsWith(LOCAL_ORIGIN + '/') || target === 'about:blank';
+  }
+
   private finishSplash(): void {
     if (!this.splashVisible) return;
     this.progressPhase = '就绪';
@@ -86,7 +110,8 @@ struct Index {
     const origin = request.getOrigin();
     const resources = request.getAccessibleResource();
     const session = this.launchUrl;
-    if ((origin !== LOCAL_ORIGIN && origin !== LOCAL_ORIGIN + '/') ||
+    if ((origin !== LOCAL_ORIGIN && origin !== LOCAL_ORIGIN + '/' &&
+         origin !== this.remoteOrigin && origin !== this.remoteOrigin + '/') ||
         resources.length !== 1 || resources[0] !== ProtectedResourceType.AUDIO_CAPTURE ||
         !session || this.safe || this.recoveryOpen || this.loginVisible || this.webFailed) {
       request.deny();
@@ -306,6 +331,7 @@ struct Index {
           })
       }.width('100%').padding({ top: 8, bottom: 8 })
       Button('回滚插件配置并正常重开').enabled(!this.restarting).onClick(() => { this.rollbackPlugins(); })
+      Button('远程主机').enabled(!this.restarting).onClick(() => { this.recoveryOpen = false; this.hostsOpen = true; })
       if (this.restartError) Text(this.restartError).fontSize(14)
       if (this.launchUrl && !this.webFailed) Button('返回会话').onClick(() => { this.recoveryOpen = false; })
     }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
@@ -379,11 +405,15 @@ struct Index {
               this.recoveryOpen = true;
               return true;
             }
+            if (url === REMOTE_URL) {
+              this.hostsOpen = true;
+              return true;
+            }
             if (url === GITHUB_URL) {
               if (!this.safe) this.forgeAccountOpen = true;
               return true;
             }
-            return !url.startsWith(LOCAL_ORIGIN + '/') && url !== 'about:blank';
+            return !this.allowedMainFrame(url);
           })
           .onPageEnd(() => {
             setTimeout(() => {
@@ -416,12 +446,22 @@ struct Index {
           })
           .onRenderExited(() => { this.webFailed = true; this.splashVisible = false; })
       }
-      if (this.webFailed || this.recoveryOpen) {
+      if (this.hostsOpen) {
+        RemoteHostsPage({ onClose: () => { this.hostsOpen = false; } })
+      } else if (this.webFailed || this.recoveryOpen) {
         this.recoveryPage()
       } else if (this.forgeAccountOpen) {
         ForgeAccount({ onClose: () => { this.forgeAccountOpen = false; } })
       } else if (this.loginVisible) {
         this.loginPage()
+      }
+      if (this.remoteHostName && !this.splashVisible && !this.recoveryOpen && !this.loginVisible &&
+          !this.forgeAccountOpen && !this.webFailed && !this.hostsOpen) {
+        Button('主机')
+          .fontSize(11).height(30).padding({ left: 12, right: 12 })
+          .backgroundColor('#CC20232E').fontColor('#FFFFFF')
+          .position({ x: '84%', y: 12 })
+          .onClick(() => { this.hostsOpen = true; })
       }
       if (this.splashVisible && !this.recoveryOpen && !this.loginVisible &&
           !this.forgeAccountOpen && !this.webFailed) {
