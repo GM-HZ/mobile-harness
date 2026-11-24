@@ -57,7 +57,7 @@ iOS 端不是常驻 daemon，而是基于 audio/PiP/`BGContinuedProcessingTask` 
 - BackgroundKeeper 发布常驻通知（`SERVICE_INFORMATION` slot、`isOngoing`），带
   **"停止后台"** action；action 的 WantAgent 回到 EntryAbility，`onCreate/onNewWant` 识别
   `stopBackground` 参数并释放 running lock/长时任务；
-- 发布前调用 `notificationManager.requestEnableNotification(context)`，首次使用会请求通知授权；
+- 后台常驻默认关闭。用户开启后调用 `notificationManager.requestEnableNotification(context)` 请求通知授权；
 - 恢复页新增 **"后台常驻"** Toggle：状态持久化到 `files/background-enabled.json`，
   关闭时释放 running lock + 长时任务，下次启动按设置决定是否恢复；
 - 真机 soak：开启 running lock 后连续 **35 分钟**后台运行，pid 不变、heartbeat 每 5s 更新；

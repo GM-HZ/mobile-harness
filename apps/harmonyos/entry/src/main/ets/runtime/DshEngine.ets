@@ -34,7 +34,7 @@ class DshEngine {
   private listeners: Set<EngineListener> = new Set<EngineListener>();
   private status: string = '正在准备本机 DSH…';
   private progress: EngineProgress = { phase: '环境准备', percent: 0 };
-  private backgroundPreference: boolean = true;
+  private backgroundPreference: boolean = false;
   private session?: BrowserSession;
   private running: boolean = false;
   private nativePoll: number = -1;
@@ -222,9 +222,9 @@ class DshEngine {
     try {
       const path = context.filesDir + '/background-enabled.json';
       const text = fileIo.readTextSync(path);
-      this.backgroundPreference = !text.includes('"enabled":false');
+      this.backgroundPreference = text.includes('"enabled":true');
     } catch (error) {
-      this.backgroundPreference = true;
+      this.backgroundPreference = false;
     }
   }
 

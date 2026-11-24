@@ -23,7 +23,7 @@ struct Index {
   @State progressPhase: string = '环境准备';
   @State splashVisible: boolean = true;
   @State splashOpacity: number = 1;
-  @State backgroundEnabled: boolean = true;
+  @State backgroundEnabled: boolean = false;
   @State restartError: string = '';
   @State restarting: boolean = false;
   private controller: webview.WebviewController = new webview.WebviewController();
@@ -298,7 +298,7 @@ struct Index {
       Row() {
         Column({ space: 2 }) {
           Text('后台常驻').fontSize(16)
-          Text(this.backgroundEnabled ? 'Host 在后台保持运行' : '后台已关闭，切后台将暂停')
+          Text(this.backgroundEnabled ? 'Host 在后台保持运行' : '切到后台后，系统可能暂停任务')
             .fontSize(12).fontColor('#8A8F9C')
         }.alignItems(HorizontalAlign.Start).layoutWeight(1)
         Toggle({ type: ToggleType.Switch, isOn: this.backgroundEnabled })
