@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "f243890e61a118acced12c9bb53951fae058be3f",
+  "generatedFrom": "b1a112b007c64362645680ce5fea55797bca6712",
   "layers": [
     "host",
     "web",
@@ -910,8 +910,8 @@
       "kind": "file",
       "source": "variants/lab.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "0af1a49ac3ecf92855e0703114ee3cfdda01904965c5e5e4aa0903483dc8f832",
-      "bytes": 606,
+      "sha256": "95db034ed13870c31998e5a29530539f32b03ef0fd4f9d58ebb262ff51437bf0",
+      "bytes": 652,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -924,8 +924,8 @@
       "kind": "file",
       "source": "variants/self.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "b4ac75f6f73d4557c0ef68a869e409af92c36366eb292d3f7c93b437ab4a15d9",
-      "bytes": 673,
+      "sha256": "54d60f6eb2455ba7978e584bcf2dff69b8e0fc21713bcd0bdd989c1165d17827",
+      "bytes": 719,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -938,8 +938,8 @@
       "kind": "file",
       "source": "variants/store.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "e0a739eb1f0d15fdc3c0b3a3c84abc08ad00e2780855f42a39b60c8598484095",
-      "bytes": 552,
+      "sha256": "d875939a17ed7b7cf1ddc1e275376a91e216deb77191427a5e4ccdbe8b003dd3",
+      "bytes": 606,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [

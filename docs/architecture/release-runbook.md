@@ -31,6 +31,7 @@ Triggered by a `v*` tag (or manual dispatch) on the self-hosted macOS/DevEco lab
   `signedExecBypass=false`; size within `variants/store.json` maxBytes.
 - self HAP: contains the loader tools/shim/overlay and
   `signedExecBypass=true`; size within `variants/self.json` maxBytes.
+- v1 HAPs exclude the remote SSH helper, including when the stage previously built the remote experiment.
 - evidence for the tagged commit exists under `docs/evidence/release/`;
 - the evidence embeds the current RSI scoreboard hash
   (`docs/evidence/rsi/scoreboard.md`) and the release gate fails if it drifted.
@@ -46,13 +47,13 @@ Triggered by a `v*` tag (or manual dispatch) on the self-hosted macOS/DevEco lab
 ## Plugin recovery (bad plugin)
 
 The App keeps a **last-known-good plugin snapshot** of the `web` profile
-(`cordis.patch.yml`, `cordis.yml`, `package.json`, `pnpm-lock.yaml`) after every
-successful Host boot (`files/plugin-snapshot/`). A plugin that crashes the Host
+(`cordis.patch.yml`, `cordis.yml`, `package.json`, `pnpm-lock.yaml`) after a
+successful normal Host boot (`files/plugin-snapshot/`). A plugin that crashes the Host
 leaves the boot marker pending; the next launch enters safe mode. From the
-recovery page ("运行时恢复"), use **回滚插件配置并正常重开** to restore the
+recovery page ("运行时恢复") that opens in safe mode, use **回滚插件配置并正常重开** to restore the
 snapshot (rolling the plugin set back to the last successful boot) and restart
 in normal mode. If no snapshot exists the action reports an error; use safe mode
 and remove the plugin manually.
 
 Preconditions: the snapshot is written only by the native Host boot path; a
-failed boot never overwrites it. E2E UI test requires an unlocked screen.
+Safe mode preserves the last normal boot snapshot. E2E UI test requires an unlocked screen.

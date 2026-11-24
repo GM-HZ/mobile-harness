@@ -13,7 +13,7 @@
       "libguest_lib_",
       "libguest_ext_"
     ],
-    "absent": [],
+    "absent": ["resources/rawfile/dsh-harmony-remote-ssh.cjs"],
     "minimum": {
       "libguest_lib_": 8
     },

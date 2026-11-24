@@ -165,8 +165,12 @@ def main():
         cmake = CPP / "CMakeLists.txt"
         with cmake.open("a") as stream:
             stream.write("\ntarget_compile_definitions(poc PRIVATE MH_SELF_BUILD=1)\n")
-    # settings recovery now ships as a package patch (patches/series.json).
-    (RAW / "dsh-settings-client.js").unlink(missing_ok=True)
+    # The stage is reused across builds and branches. Discard overlays removed
+    # from the v1 source tree before packing the HAP.
+    for obsolete in (RAW / "dsh-settings-client.js", RAW / "dsh-harmony-remote-ssh.cjs",
+                     STAGE / "entry/src/main/ets/pages/RemoteHosts.ets",
+                     STAGE / "entry/src/main/ets/runtime/RemoteHosts.ets"):
+        obsolete.unlink(missing_ok=True)
     (RAW / "dsh-self-build.json").write_text(json.dumps({
         "selfBuild": SELF_BUILD,
         "signedExecBypass": SELF_BUILD,
