@@ -17,7 +17,8 @@
    改动 `__harmonyGh`/账号桥时同时检查 `docs/architecture/seams/forge-upstream-seam.md`。
 6. **真机与模拟器差异**：签名构建走 packaged spawn 路径（`__harmonyPackagedShell`/`__harmonyProotSpawn`），
    不要回退到 streaming guest-shell 路径；由 G1 `host-regressions` 守卫。
-7. **每改一个文件跑**：`node --check <file>`、`python3 gates/run.py --tier G1`。
+7. **AppGallery**：由包内 `appgallery.patch.yml` 启用原生图片和工作区搜索，隔离本机 profile 配置。启动时只装配该变体随包的组件。
+8. **每改一个文件跑**：`node --check <file>`、`python3 gates/run.py --tier G1`。
 
 ## 快速检查清单
 

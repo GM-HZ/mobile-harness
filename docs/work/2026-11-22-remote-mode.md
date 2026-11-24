@@ -2,7 +2,15 @@
 
 日期：2026-11-22
 
-该实现保存在 `codex/harmonyos-remote-mode`（`302414e`），由路线图第二阶段继续验收。
+## v1 整合后的远程试用
+
+- 自编译 `self` 和 `lab` 构建提供 HTTPS 直连。常规 `store` 和 AppGallery 构建关闭此入口。页面使用独立的无痕 ArkWeb，退出后回到原本机界面。
+- 仅保存主机地址和名称。每次连接输入 DSH 登录 token，在 HTTPS 请求中换取会话 Cookie。请求停在登录重定向响应，验证目标同源，再将 Cookie 作为无痕会话 Cookie 导入 ArkWeb。页面地址中没有 token。 [ArkTS HTTP 拦截器](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/http-request/)
+- 远程页面的导航和资源加载限于该 HTTPS 源。无痕页面不接入本机 Forge、恢复、麦克风或文件选择器。登录和重连由用户发起。 [ArkWeb 请求拦截](https://developer.huawei.com/consumer/cn/doc/harmonyos-faqs/faqs-arkweb-195/)
+- `node tests/contract/remote-hosts.cjs` 核对变体、地址和重定向边界、Cookie 格式及地址持久化。真实 HTTPS 反代和候选包上的 ArkWeb 登录需另行验证。
+- SSH 原型留在合并历史的 `302414e`。安全存储、SSH 主机指纹、断线恢复及真机验收属于后续工作。
+
+## 2026-11-22 原型记录
 
 ## 1. 形态
 

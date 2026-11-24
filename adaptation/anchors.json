@@ -48,6 +48,20 @@
       "replacement": "globalThis.__harmonyGhRunner ?? ghRunner(resolved)",
       "patch": "patches/forge-github-guest-runner.patch",
       "contract": "docs/architecture/seams/forge-upstream-seam.md"
+    },
+    {
+      "id": "appgallery-profile-settings",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js",
+      "pattern": "...initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? [],",
+      "count": 1,
+      "contract": "docs/architecture/seams/appgallery-native-host.md"
+    },
+    {
+      "id": "appgallery-search-workdir",
+      "file": "dsh/node_modules/@deepseek-ai/dsh-tool-fs-search/lib/index.js",
+      "pattern": "\tconst workdir = exec.agent === void 0 ? process.cwd() : await ctx.workingDirectory.ensure(exec.agent, exec.signal);",
+      "count": 1,
+      "contract": "docs/architecture/seams/appgallery-native-host.md"
     }
   ]
 }

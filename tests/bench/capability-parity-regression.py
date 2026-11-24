@@ -19,7 +19,8 @@ ROOT = Path(__file__).resolve().parents[2]
 SMOKE = ROOT / "tests/smoke"
 HDC = os.environ.get("HARMONY_HDC", "/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc")
 DEVECO = Path(os.environ.get("DEVECO_HOME", "/Applications/DevEco-Studio.app/Contents"))
-ARTIFACT = ROOT / ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v0.4.69-unsigned.hap"
+VERSION = json.loads((ROOT / "apps/harmonyos/AppScope/app.json5").read_text())["app"]["versionName"]
+ARTIFACT = ROOT / f".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v{VERSION}-unsigned.hap"
 
 
 def step(name, script, arguments, output, timeout, critical=True):

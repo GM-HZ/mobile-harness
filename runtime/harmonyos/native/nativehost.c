@@ -5,7 +5,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
+#ifndef MOBILE_HARNESS_APPGALLERY
 #include "workflow-broker.h"
+#endif
 #ifdef MOBILE_HARNESS_EXPERIMENTAL_FORK
 #include <errno.h>
 #include <signal.h>
@@ -21,7 +23,14 @@ static char directory[900];
 static bool safe_mode = false;
 typedef int (*NodeStart)(int, char **);
 
+static void CloseWorkflow(void) {
+#ifndef MOBILE_HARNESS_APPGALLERY
+    harmony_workflow_broker_close();
+#endif
+}
+
 static int RunHost(void) {
+#ifndef MOBILE_HARNESS_APPGALLERY
     char workflow_entry[1024];
     snprintf(workflow_entry, sizeof(workflow_entry), "%s/dsh-harmony-workflow-worker.cjs", directory);
     if (!safe_mode) {
@@ -30,10 +39,11 @@ static int RunHost(void) {
             fprintf(stderr, "Workflow broker unavailable (%d)\n", broker_error);
         }
     }
+#endif
     void *node = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);
     NodeStart start = node ? (NodeStart)dlsym(node, "_ZN4node5StartEiPPc") : NULL;
     if (!start) {
-        harmony_workflow_broker_close();
+        CloseWorkflow();
         return -2;
     }
     // Signed self/lab builds enable V8 JIT (the anonymous executable mappings
@@ -46,7 +56,7 @@ static int RunHost(void) {
     if (cold_boot) {
         char *cold_argv[] = {"node", "--jitless", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
         int code = start(5, cold_argv);
-        harmony_workflow_broker_close();
+        CloseWorkflow();
         return code == 0 ? -3 : -4;
     }
     char *argv[] = {"node", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
@@ -55,7 +65,7 @@ static int RunHost(void) {
     char *argv[] = {"node", "--jitless", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
     int code = start(5, argv);
 #endif
-    harmony_workflow_broker_close();
+    CloseWorkflow();
     return code == 0 ? -3 : -4;
 }
 

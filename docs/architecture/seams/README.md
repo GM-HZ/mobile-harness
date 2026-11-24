@@ -19,3 +19,5 @@ Current contracts:
 - [host-bash-hooks.md](host-bash-hooks.md) — bash/session-persistence runtime hooks (`replacePinned` anchors).
 - [web-settings-injection.md](web-settings-injection.md) — settings client injection.
 - [native-overlay.md](native-overlay.md) — HAP native bindings and guest library/extension overlay.
+
+- [AppGallery 原生 Host 接入](appgallery-native-host.md) · 受限 profile、原生图片和工作区搜索

@@ -26,6 +26,10 @@ BASH_MODULES = [
     "dsh/node_modules/@deepseek-ai/dsh-bash-sandbox/lib/index.js",
 ]
 SESSION = "dsh/node_modules/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js"
+APP_BOOT = "dsh/node_modules/@deepseek-ai/dsh-app-boot/lib/index.js"
+SEARCH = "dsh/node_modules/@deepseek-ai/dsh-tool-fs-search/lib/index.js"
+APPGALLERY_PROFILE = "...initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? [],"
+APPGALLERY_SEARCH = "\tconst workdir = exec.agent === void 0 ? process.cwd() : await ctx.workingDirectory.ensure(exec.agent, exec.signal);"
 ANCHOR = '"bash",\n\t\t\t"-c",'
 
 
@@ -89,6 +93,28 @@ def main():
         checked.append({"id": "forge-guest-runner", "ok": ok})
         if not ok:
             failures.append("forge contract: patched registration + guest runner adapter + no boot rewrite")
+        profile = members[APP_BOOT].read(APP_BOOT).decode()
+        filtered = profile.replace(APPGALLERY_PROFILE,
+            "...globalThis.__harmonyStoreSettings(initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? []),")
+        search = members[SEARCH].read(SEARCH).decode()
+        delegated = search.replace(APPGALLERY_SEARCH, APPGALLERY_SEARCH + "\n\treturn globalThis.__harmonyWorkspaceSearch("
+            "workdir, exec.signal, toolName, argv, rawOutputMaxBytes, SearchError);")
+        mobile_bundles = ROOT / "packages/bundles/mobile"
+        appgallery_patch = (mobile_bundles / "dsh-client.patch.yml").read_text() + (mobile_bundles / "appgallery.patch.yml").read_text()
+        restricted = all(f"- id: {name}\n  disabled: true" in appgallery_patch for name in (
+            "plugin-manager", "mcp-manager", "terminal-controller", "tool-bash", "tool-pwsh", "workflow-ptc"))
+        boot_isolated = all(point in host for point in (
+            "const launchGuest = appGallery ? undefined : installProotSpawn(workspace);",
+            "if (appGallery) patchFiles.push(appGalleryPatch);",
+            "globalThis.__harmonyStoreSettings = appGallerySettings;",
+            "globalThis.__harmonyWorkspaceSearch = createWorkspaceSearch(",
+            "require(path.join(root, 'dsh-native-image.cjs'))",
+        ))
+        ok = (profile.count(APPGALLERY_PROFILE) == search.count(APPGALLERY_SEARCH) == 1 and restricted and boot_isolated
+              and node_check(filtered).returncode == node_check(delegated).returncode == 0)
+        checked.append({"id": "appgallery-native-host", "ok": ok})
+        if not ok:
+            failures.append("AppGallery contract: isolated Host, restricted overlay, valid profile and search hooks")
         session = members[SESSION].read(SESSION).decode()
         boot = (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         replacement = "globalThis.__dshClientRenameNoReplace(tmp, finalPath)"

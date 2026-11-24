@@ -86,6 +86,21 @@
       "risk": "low",
       "gate": "G0 adaptation-verify",
       "status": "converged"
+    },
+    {
+      "id": "appgallery-native-host",
+      "manifest": "host:packages/dsh-host/dsh-native-web.cjs",
+      "upstream": [
+        "@deepseek-ai/dsh-app-boot",
+        "@deepseek-ai/dsh-tool-fs-search",
+        "@deepseek-ai/dsh-attachment-local"
+      ],
+      "current": "AppGallery-only profile-settings filter and workspace search delegation, plus the shared attachment decoder hook",
+      "target": "Use upstream AppGallery-compatible profile policy and injectable search and image services when available",
+      "priority": "P1",
+      "risk": "high",
+      "gate": "G1 upstream-anchors + host-contracts; G2 emulator-appgallery-images + emulator-appgallery-search",
+      "status": "in-progress"
     }
   ]
 }

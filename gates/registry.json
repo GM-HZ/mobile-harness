@@ -66,6 +66,12 @@
           "timeout": 120
         },
         {
+          "id": "remote-hosts-contract",
+          "command": "node tests/contract/remote-hosts.cjs",
+          "covers": "self/lab gate, HTTPS origin, same-origin token exchange and metadata-only persistence",
+          "timeout": 120
+        },
+        {
           "id": "workflow-check",
           "command": "python3 scripts/adaptation/workflow_check.py",
           "covers": "gate workflows stay wired to gate scripts and steps",
@@ -222,6 +228,28 @@
             "MH_EMULATOR env"
           ],
           "timeout": 1200
+        },
+        {
+          "id": "appgallery-images",
+          "command": "python3 tests/smoke/emulator-appgallery-images.py \"$MH_APPGALLERY_EMULATOR\"",
+          "covers": "AppGallery Release native images through DSH",
+          "requires": [
+            "MH_APPGALLERY_EMULATOR env",
+            "AppGallery Release HAP after privacy consent"
+          ],
+          "optional": true,
+          "timeout": 600
+        },
+        {
+          "id": "appgallery-search",
+          "command": "python3 tests/smoke/emulator-appgallery-search.py \"$MH_APPGALLERY_EMULATOR\"",
+          "covers": "AppGallery Release native search through DSH",
+          "requires": [
+            "MH_APPGALLERY_EMULATOR env",
+            "AppGallery Release HAP after privacy consent"
+          ],
+          "optional": true,
+          "timeout": 600
         },
         {
           "id": "emulator-account",
@@ -719,6 +747,13 @@
     "G4": {
       "name": "build/release",
       "entries": [
+        {
+          "id": "release-dry-run",
+          "command": "./scripts/adaptation/release_dry_run.sh",
+          "covers": "release packages, shapes and same-commit evidence for store, self and AppGallery",
+          "optional": true,
+          "timeout": 3600
+        },
         {
           "id": "build-unsigned",
           "command": "HARMONY_UNSIGNED=1 ./build.sh --package",

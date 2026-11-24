@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G4: collect release evidence for the store and self HAP variants.
+"""G4: collect release evidence for the store, self and AppGallery variants.
 
 Runs the store shape check and the variant assertions, records artifact hashes and
 sizes, writes docs/evidence/release/<version>-<commit>.json and appends the run to
@@ -11,10 +11,13 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import subprocess
 import sys
+from tempfile import TemporaryDirectory
 import time
 from pathlib import Path
+from zipfile import BadZipFile, ZipFile
 
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / "docs/evidence/release"
@@ -34,13 +37,30 @@ def run_check(arguments):
             "output": (result.stdout + result.stderr).strip()[-1200:]}
 
 
+def appgallery_check(package):
+    with TemporaryDirectory() as directory, ZipFile(package) as archive:
+        entries = [entry for entry in archive.infolist() if entry.filename.endswith(".hap")]
+        if len(entries) != 1:
+            raise ValueError(f"Expected one HAP in {package}, found {len(entries)}")
+        hap = Path(directory) / "appgallery.hap"
+        with archive.open(entries[0]) as source, hap.open("wb") as output:
+            shutil.copyfileobj(source, output)
+        result = run_check(["scripts/adaptation/variant_check.py", "--variant", "appgallery", "--hap", str(hap)])
+    result["command"] = "AppGallery variant check on " + package.name
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--store", type=Path, required=True)
     parser.add_argument("--self", dest="self_hap", type=Path, required=True)
+    parser.add_argument("--appgallery", type=Path)
     parser.add_argument("--version", default=None)
     args = parser.parse_args()
-    for label, path in (("store", args.store), ("self", args.self_hap)):
+    inputs = {"store": args.store, "self": args.self_hap}
+    if args.appgallery:
+        inputs["appgallery"] = args.appgallery
+    for label, path in inputs.items():
         if not path.is_file():
             print(f"FAIL missing {label} HAP: {path}", file=sys.stderr)
             return 2
@@ -49,14 +69,20 @@ def main():
     if not version:
         match = re.search(r"-v(\d+\.\d+\.\d+)-", args.store.name)
         version = match.group(1) if match else "unknown"
-    variants = {name: json.loads((ROOT / f"variants/{name}.json").read_text()) for name in ("store", "self")}
+    variants = {name: json.loads((ROOT / f"variants/{name}.json").read_text()) for name in inputs}
     checks = [
         run_check(["scripts/adaptation/store_build_check.py", "--hap", str(args.store)]),
         run_check(["scripts/adaptation/variant_check.py", "--variant", "store", "--hap", str(args.store)]),
         run_check(["scripts/adaptation/variant_check.py", "--variant", "self", "--hap", str(args.self_hap)]),
     ]
+    if args.appgallery:
+        try:
+            checks.append(appgallery_check(args.appgallery))
+        except (BadZipFile, ValueError, OSError) as error:
+            checks.append({"command": "AppGallery variant check", "exit": 1, "passed": False,
+                           "output": str(error)})
     artifacts = {}
-    for label, path in (("store", args.store), ("self", args.self_hap)):
+    for label, path in inputs.items():
         artifacts[label] = {"file": path.name, "sha256": sha256(path), "bytes": path.stat().st_size,
                             "maxBytes": variants[label]["hap"].get("maxBytes")}
     subprocess.run(["python3", "scripts/adaptation/gate_report.py"], cwd=ROOT, check=False,
@@ -65,7 +91,10 @@ def main():
     rsi = None
     if scoreboard.is_file():
         rsi = {"path": str(scoreboard.relative_to(ROOT)), "sha256": sha256(scoreboard)}
-    ok = all(check["passed"] for check in checks)
+    ok = all(check["passed"] for check in checks) and all(
+        artifact["maxBytes"] is None or artifact["bytes"] <= artifact["maxBytes"]
+        for artifact in artifacts.values()
+    )
     evidence = {"version": version, "commit": commit, "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
                 "artifacts": artifacts, "checks": checks, "rsiScoreboard": rsi, "ok": ok}
     EVIDENCE.mkdir(parents=True, exist_ok=True)

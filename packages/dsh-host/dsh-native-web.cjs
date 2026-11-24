@@ -16,6 +16,9 @@ const mode = process.argv[2];
 if (mode !== 'normal' && mode !== 'safe') throw new Error('Invalid Harmony Host boot mode');
 const safeMode = mode === 'safe';
 const root = __dirname;
+const appGalleryPatch = path.join(root, 'appgallery.patch.yml');
+const appGallery = fs.existsSync(appGalleryPatch);
+const restrictedMode = safeMode || appGallery;
 const dsh = path.join(root, '.dsh-0.2.2-rc.5/dsh/node_modules');
 const cli = path.join(dsh, '@deepseek-ai/dsh/lib/bin.js');
 const home = path.join(root, 'native-benchmark-home');
@@ -40,6 +43,25 @@ function addon(name) {
 function replacePinned(source, point, replacement) {
   if (source.split(point).length !== 2) throw new Error('Unexpected pinned native integration source');
   return source.replace(point, replacement);
+}
+const editableStoreSettings = new Set([
+  'ui-settings-general', 'llm-pi-ai', 'llm-deepseek', 'agent-default-model',
+  'agent-preset-registry', 'subagent-model-selection-settings',
+]);
+function isPlainSetting(value) {
+  if (value === null || ['string', 'number', 'boolean'].includes(typeof value)) return true;
+  if (Array.isArray(value)) return value.every(isPlainSetting);
+  return typeof value === 'object' && Object.getPrototypeOf(value) === Object.prototype &&
+    Object.entries(value).every(([key, item]) =>
+      !['__jsExpr', '__proto__', 'constructor', 'prototype'].includes(key) && isPlainSetting(item));
+}
+function appGallerySettings(patches) {
+  return patches.filter(patch => patch && editableStoreSettings.has(patch.id) && !patch.insert &&
+    Object.hasOwn(patch, 'config') && isPlainSetting(patch.config))
+    .map(({ id, config }) => ({ id, config }));
+}
+function unavailable(message) {
+  return () => { throw new Error(message); };
 }
 function patchProfileFetch(source, proxyUrl, undiciUrl, call) {
   const adapter = `
@@ -420,7 +442,7 @@ async function publish(url) {
 }
 async function main() {
   fs.writeFileSync(timeline, '', { mode: 0o600 });
-  mark('node-js', { platform: process.platform, node: process.version, safeMode });
+  mark('node-js', { platform: process.platform, node: process.version, safeMode, appGallery });
   fs.mkdirSync(home, { recursive: true });
   fs.mkdirSync(workspace, { recursive: true });
   const passwd = path.join(root, 'etc/passwd');
@@ -480,28 +502,37 @@ async function main() {
   const creatorUrl = paths('dsh-creation-recommendations/lib/index.js');
   const speechUrl = paths('dsh-experimental-speech-to-text-sensevoice/lib/index.js');
   const speechEntry = path.join(dsh, '@deepseek-ai/dsh-experimental-speech-to-text-sensevoice/lib/worker.js');
-  globalThis.__harmonySpeechLaunch = safeMode
-    ? () => { throw new Error('Speech workers are disabled in HarmonyOS recovery mode'); }
+  globalThis.__harmonySpeechLaunch = restrictedMode
+    ? () => { throw new Error('Speech workers are unavailable in this HarmonyOS mode'); }
     : require(path.join(root, 'dsh-harmony-speech.cjs')).speechLauncher(root, speechEntry, mark);
   const httpParserUrl = pathToFileURL(path.join(dsh, 'undici/lib/dispatcher/client-h1.js')).href;
   const { patchClientH1 } = require(path.join(root, 'dsh-harmony-http.cjs'));
   globalThis.__harmonyLlhttp = imports => require(path.join(root, 'dsh-harmony-llhttp.cjs'))(imports);
   const officeAdapter = pathToFileURL(path.join(root, 'dsh-harmony-office-entry.mjs')).href;
-  const ptcEnabled = !safeMode && fs.readFileSync(path.join(root, 'dsh-harmony-ptc-enabled'), 'utf8') === '1';
-  const liveshareMobile = safeMode ? undefined : require(path.join(root, 'dsh-harmony-liveshare.cjs'));
+  const ptcEnabled = !restrictedMode && fs.readFileSync(path.join(root, 'dsh-harmony-ptc-enabled'), 'utf8') === '1';
+  const liveshareMobile = restrictedMode ? undefined : require(path.join(root, 'dsh-harmony-liveshare.cjs'));
   if (liveshareMobile) globalThis.__harmonySharedPtc = liveshareMobile.createSharedPtcPolicy(mark);
   if (ptcEnabled) {
     globalThis.__harmonyPtc = require(path.join(root, 'dsh-harmony-ptc.cjs')).bindPtc(addon('libdshworkflow.so'), mark);
   }
   const mcpStdioUrl = pathToFileURL(path.join(dsh, '@modelcontextprotocol/client/dist/stdio.mjs')).href;
-  const launchGuest = installProotSpawn(workspace);
-  globalThis.__harmonyGh = safeMode
-    ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
+  const launchGuest = appGallery ? undefined : installProotSpawn(workspace);
+  if (appGallery) {
+    // This Host installs providers before loading their pinned upstream consumers.
+    // The AppGallery variant keeps their service interfaces without guest spawning.
+    globalThis.__harmonyProotSpawn = unavailable('Subprocesses are unavailable in this build');
+    globalThis.__harmonyMcpSpawn = globalThis.__harmonyProotSpawn;
+    globalThis.__harmonyStoreSettings = appGallerySettings;
+    const { createWorkspaceSearch } = require(path.join(root, 'dsh-native-search.cjs'));
+    globalThis.__harmonyWorkspaceSearch = createWorkspaceSearch(workspace, () => addon('libdshsearch.so'));
+  }
+  globalThis.__harmonyGh = restrictedMode
+    ? () => { throw new Error('Forge is unavailable in this HarmonyOS mode'); }
     : require(path.join(root, 'dsh-harmony-forge.cjs')).createGhRunner(
       (cwd, command, environment) => globalThis.__harmonyPackagedShell(command, environment),
       quoteShellArgument);
-  globalThis.__harmonyGhRunner = safeMode
-    ? () => { throw new Error('Forge is disabled in HarmonyOS recovery mode'); }
+  globalThis.__harmonyGhRunner = restrictedMode
+    ? () => { throw new Error('Forge is unavailable in this HarmonyOS mode'); }
     : async (args, signal, input) => {
       const proxyEnv = {};
       for (const name of ['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY',
@@ -518,21 +549,30 @@ async function main() {
       if (result.exitCode === undefined) throw Object.assign(new Error('gh could not start: ' + String(result.shortMessage)), { name: 'GhUnavailableError' });
       return { exitCode: result.exitCode, stdout: result.stdout, stderr: result.stderr };
     };
-  if (!safeMode) {
+  if (!restrictedMode) {
     require(path.join(root, 'dsh-harmony-forge.cjs')).startForgeAccountBridge(root, globalThis.__harmonyGh, mark);
   }
-  globalThis.__harmonyOffice = safeMode ? {
-    createConverter() { throw Object.assign(new Error('Office workers are disabled in HarmonyOS recovery mode'), { code: 'unavailable' }); },
+  globalThis.__harmonyOffice = restrictedMode ? {
+    createConverter() { throw Object.assign(new Error('Office workers are unavailable in this HarmonyOS mode'), { code: 'unavailable' }); },
   } : require(path.join(root, 'dsh-harmony-office.cjs')).createOfficeFactory(root,
     require(path.join(root, 'dsh-harmony-office-launch.cjs')).createOfficeLauncher(addon('libdshworkflow.so'), globalThis.__harmonyMcpSpawn, mark),
     mark, pathToFileURL(path.join(dsh, '@deepseek-ai/libreoffice-kit/lib/index.js')).href);
-  const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
-  const { createPackageRunner, createRegistryOrigins } = require(path.join(root, 'dsh-harmony-package.cjs'));
-  globalThis.__harmonySharp = createSharp(root, launchGuest);
-  globalThis.__harmonyPackageRunner = createPackageRunner(root, home, launchGuest);
-  globalThis.__harmonyRegistryOrigins = createRegistryOrigins(home, mark);
-  globalThis.__harmonyWorkflowRun = safeMode
-    ? () => { throw new Error('Workflows are disabled while HarmonyOS recovery mode is active'); }
+  if (appGallery) {
+    const { createNativeSharp } = require(path.join(root, 'dsh-native-image.cjs'));
+    let runImage;
+    globalThis.__harmonySharp = createNativeSharp(root, (...args) => {
+      runImage ??= addon('libdshimage.so').runImage;
+      return runImage(...args);
+    });
+  } else {
+    const { createSharp } = require(path.join(root, 'dsh-harmony-sharp.cjs'));
+    const { createPackageRunner, createRegistryOrigins } = require(path.join(root, 'dsh-harmony-package.cjs'));
+    globalThis.__harmonySharp = createSharp(root, launchGuest);
+    globalThis.__harmonyPackageRunner = createPackageRunner(root, home, launchGuest);
+    globalThis.__harmonyRegistryOrigins = createRegistryOrigins(home, mark);
+  }
+  globalThis.__harmonyWorkflowRun = restrictedMode
+    ? unavailable('Workflows are unavailable in this HarmonyOS mode')
     : require(path.join(root, 'dsh-harmony-workflow.cjs')).createWorkflowRunner(addon('libdshworkflow.so'), mark);
   const flock = addon('libdshflock.so').tryLock;
   const rename = addon('libdshpublish.so').renameNoReplace;
@@ -562,7 +602,7 @@ async function main() {
   let booting = true;
   registerHooks({
     resolve(specifier, context, nextResolve) {
-      if (context.parentURL === officeUrl && specifier === '@deepseek-ai/libreoffice-kit') {
+      if (!appGallery && context.parentURL === officeUrl && specifier === '@deepseek-ai/libreoffice-kit') {
         return { url: officeAdapter, shortCircuit: true };
       }
       return nextResolve(specifier, context);
@@ -579,11 +619,17 @@ async function main() {
         loadCount++;
         loadMs += performance.now() - start;
       }
-      if (safeMode && url === appBootUrl) {
+      if (restrictedMode && url === appBootUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
-        return { ...result, source: replacePinned(source,
+        let patched = replacePinned(source,
           '...loadOptionalPatches(binName, join(context.home, "cordis.patch.yml")) ?? [],',
-          '...[],') };
+          '...[],');
+        if (appGallery) {
+          patched = replacePinned(patched,
+            '...initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? [],',
+            '...globalThis.__harmonyStoreSettings(initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? []),');
+        }
+        return { ...result, source: patched };
       }
       if (url === inspectorUrl) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
@@ -607,7 +653,7 @@ async function main() {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         return { ...result, source: patchWorkspaceDependencies(source) };
       }
-      if (url === agentPresetUrl && !safeMode) {
+      if (url === agentPresetUrl && !restrictedMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         globalThis.__harmonyMinimalPreset = adaptMinimalPreset;
         globalThis.__harmonyBashPipeMark = mark;
@@ -619,7 +665,7 @@ async function main() {
         const patch = url === fileUploadsUrl ? liveshareMobile.patchFileUploads : liveshareMobile.patchFileUploadSchemas;
         return { ...result, source: patch(source, replacePinned) };
       }
-      if (url === liveshareUrl && !safeMode) {
+      if (url === liveshareUrl && liveshareMobile) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         const entry = path.join(dsh, '@deepseek-ai/dsh-experimental-liveshare/lib/owner-gateway/cli.js');
         globalThis.__harmonyLiveshareSpawn = liveshareMobile.createTunnelLauncher(entry, mark);
@@ -629,7 +675,7 @@ async function main() {
         return { ...result, source: replacePinned(patched, 'withoutManifestLink(read) : read;',
           'globalThis.__harmonyShareViewerUploads(withoutManifestLink(read)) : read;') };
       }
-      if (url === ptcExecutorUrl && !safeMode) {
+      if (url === ptcExecutorUrl && !restrictedMode) {
         const source = typeof result.source === 'string' ? result.source : Buffer.from(result.source).toString();
         return { ...result, source: patchSharedPtcExecutor(source) };
       }
@@ -708,9 +754,15 @@ async function main() {
       if (url === searchUrl) {
         let patched = replacePinned(source, '\t\t"--sort=modified",\n', '');
         patched = replacePinned(patched, 'paths: all', 'paths: await globalThis.__harmonySortGlobPaths(all, run.workdir, exec.signal)');
+        if (appGallery) {
+          const workdir = '\tconst workdir = exec.agent === void 0 ? process.cwd() : await ctx.workingDirectory.ensure(exec.agent, exec.signal);';
+          patched = replacePinned(patched, workdir, workdir +
+            '\n\treturn globalThis.__harmonyWorkspaceSearch(workdir, exec.signal, toolName, argv, rawOutputMaxBytes, SearchError);');
+        }
         return { ...result, source: patched };
       }
       if (url === packageUrl) {
+        if (appGallery) return result;
         let patched = replacePinned(source, 'import { execa } from "execa";',
           'const execa = globalThis.__harmonyPackageRunner;');
         patched = replacePinned(patched, 'this.installedFrom.set(name, used);',
@@ -761,34 +813,43 @@ async function main() {
     print(...args);
   };
   const nativePatch = path.join(root, 'tmp/dsh-native.patch.yml');
+  const fileSystemOverlay = '- id: fs-sandbox\n  disabled: true\n- insert:\n    - id: harmony-fs\n      name: ' +
+    JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n';
   fs.writeFileSync(nativePatch, '- id: workspace-controller\n  config:\n    documentsDirectory: ' + JSON.stringify(workspace) + '\n' +
-    (safeMode ? '' : '- id: workspace-dependencies\n  disabled: false\n  config:\n    source: ' + JSON.stringify(root) +
+    (appGallery ? fileSystemOverlay : '') +
+    (restrictedMode ? '' : '- id: workspace-dependencies\n  disabled: false\n  config:\n    source: ' + JSON.stringify(root) +
       '\n    root: !!js undefined\n- id: skill-office\n  config:\n    pythonEnvironment: workspace-dependencies\n' +
       '- id: preset-minimal\n  disabled: false\n' +
-      '- id: subprocess\n  disabled: true\n- id: fs-sandbox\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
-      JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n    - id: harmony-fs\n      name: ' +
-      JSON.stringify(path.join(root, 'dsh-harmony-fs.mjs')) + '\n'), { mode: 0o600 });
-  const profileArgs = safeMode
-    ? ['--profile', 'mobile-recovery', '--from-default-profile', 'web']
-    : ['--profile', 'web'];
-  process.argv = ['node', cli, '--patch', path.join(root, 'dsh-client.patch.yml'), '--patch', nativePatch,
-    ...profileArgs, '--host', '127.0.0.1', '--port', '19592', '--no-open'];
+      '- id: subprocess\n  disabled: true\n- insert:\n    - id: harmony-subprocess\n      name: ' +
+      JSON.stringify(path.join(root, 'dsh-harmony-subprocess.mjs')) + '\n' + fileSystemOverlay), { mode: 0o600 });
+  const profileName = appGallery
+    ? (safeMode ? 'mobile-appgallery-recovery' : 'mobile-appgallery')
+    : (safeMode ? 'mobile-recovery' : 'web');
+  const patchFiles = [path.join(root, 'dsh-client.patch.yml'), nativePatch];
+  if (appGallery) patchFiles.push(appGalleryPatch);
+  const args = ['--host', '127.0.0.1', '--port', '19592', '--no-open'];
+  const profileArgs = safeMode && !appGallery
+    ? ['--profile', profileName, '--from-default-profile', 'web']
+    : ['--profile', profileName];
+  process.argv = ['node', cli, ...patchFiles.flatMap(file => ['--patch', file]), ...profileArgs, ...args];
   // The CLI's own installation anchor declares only its published dependency
   // closure. Our carrier declares additional official plugins and must supply
   // that manifest through the public application-owned profile API.
-  const { prepareProfile, runProfile } = await import(pathToFileURL(path.join(dsh, '@deepseek-ai/dsh/lib/profile-boot.js')).href);
-  const { loadLayeredEnv, loadProfile, readProfileManifest, writeProfileManifest } = await import(appBootUrl);
+  const { initializeProfileFromDefault, prepareProfile, runProfile } = await import(pathToFileURL(path.join(dsh, '@deepseek-ai/dsh/lib/profile-boot.js')).href);
+  const { loadLayeredEnv, loadProfile } = await import(appBootUrl);
   mark('cli-imported');
-  const profileName = safeMode ? 'mobile-recovery' : 'web';
   const installAnchor = path.join(root, '.dsh-0.2.2-rc.5/dsh/package.json');
   let profile;
-  if (safeMode) {
+  if (appGallery) {
+    const manifest = path.join(home, 'profiles', profileName, 'package.json');
+    if (!fs.existsSync(manifest)) initializeProfileFromDefault(profileName, 'web', home);
+    profile = loadProfile('dsh', profileName, installAnchor, home, { userLayer: !safeMode });
+  } else if (safeMode) {
     profile = prepareProfile(profileName, true, 'web');
   } else {
     profile = loadProfile('dsh', profileName, installAnchor, home);
     const migration = path.join(profile.dir, '.mobile-harness-default-lsp-v1');
     if (!fs.existsSync(migration)) {
-      const manifest = readProfileManifest('dsh', profile.dir);
       // LSP payload is large and only needed for code navigation; it is no
       // longer enabled for fresh profiles. Users can enable the shipped bundle
       // from PluginManager after the optional layer has been extracted.
@@ -799,8 +860,7 @@ async function main() {
   await runProfile({
     environment: loadLayeredEnv('dsh'), profile: profileName,
     resolvedProfile: { profile, installAnchor },
-    patchFiles: [path.join(root, 'dsh-client.patch.yml'), nativePatch],
-    args: ['--host', '127.0.0.1', '--port', '19592', '--no-open'],
+    patchFiles, args,
   });
   mark('profile-mounted');
 }

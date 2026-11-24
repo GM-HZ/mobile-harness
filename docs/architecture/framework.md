@@ -30,7 +30,7 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
 | compat 决策 | `adaptation/compat.json` + `docs/architecture/compat-layer.md` |
 | 上游接触点合同 | `docs/architecture/seams/*.md` |
 | 门禁定义/运行/证据 | `gates/registry.json`、`gates/run.py`、`docs/evidence/gates/` |
-| 构建变体 | `variants/{store,self,lab}.json` + `scripts/adaptation/variant_check.py` |
+| 构建变体 | `variants/{store,self,lab,appgallery}.json` + `scripts/adaptation/variant_check.py` |
 | 发布记录/闸门 | `scripts/adaptation/release_evidence.py`、`release_gate.py`、`docs/evidence/release/` |
 | RSI 台账/周报 | `docs/evidence/rsi/ledger.jsonl`、`scoreboard.md` |
 | 模块开发规则 | 各目录 `AGENTS.md` |
@@ -44,7 +44,7 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
    `anchors.py` 在当前工作树的装配层上校验；bump 时全量重验。
 4. **boot 期零字符串改写为默认**：session/bash/settings 已收敛；新的运行时改写需要
    convergence 条目 + 迁移目标，否则不合并。
-5. **变体隔离**：store 无 loader/shim/overlay；self 有；lab 固定全组。G4 断言强制。
+5. **变体隔离**。store 使用常规本机配置，self/lab 提供自建工具和实验入口。AppGallery 使用独立包名及原生运行时。G4 校验各发行产物。
 6. **凭据边界**：真实 token 不落仓库/证据；设备夹具只跑 loopback 模拟器。
 7. **输入不可变**：构建所需外部输入走 `docs/build-inputs.sha256` / lock；禁止构建时隐式下载未 pin 文件。
 8. **证据可追溯到 commit**：每个 gate/release 证据包含 commit；release gate 只认当前 commit 的绿色记录。
@@ -79,7 +79,7 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
 1. `scripts/adaptation/bump.py`（dry-run：拉 npm 包、逐条锚点、列受影响 manifest 条目）；
 2. 更新 `versions.lock.json`/lock/子模块 gitlink；
 3. 应用到 `patches/` 的包版本（`patch_rehearsal`）；
-4. 构建 store/self（或 release dry run）；
+4. 构建 store、self、AppGallery，并跑发布演练。
 5. G0–G4 全绿 + 证据 → 合并；失败项按锚点定位到 manifest 条目。
 
 ## 7. 门禁与证据模型
@@ -90,7 +90,7 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
 | G1 | 每次改动/PR | host 语法、锚点、host 行为合同、compat 清单/合同、真实设备回归守卫 |
 | G2 | nightly/合并前 | capability gate + 无模型 nightly 子集（模拟器） |
 | G3 | 设备在线/lab | verify/exec/overlay + forge 等；解锁检测、flock、证据 |
-| G4 | 发布/每日 | store/self 构建、形状/体积断言、release evidence + gate |
+| G4 | 发布/每日 | store、self、AppGallery 构建和形状、体积断言、release evidence + gate |
 
 证据目录与 schema 由 `gates/run.py` 统一写入；`docs/evidence/rsi/ledger.jsonl` 记录每次运行，
 `gate_report.py` 生成周报。flake 重试上限 2 次并单独计数。

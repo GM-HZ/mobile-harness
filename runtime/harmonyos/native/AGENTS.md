@@ -12,7 +12,8 @@ C/CMake 层：PRoot 桥、shell、workflow、PTC、exec shim、N-API 扩展。AB
 4. **内存与 fd**：新增 fd/映射必须成对释放；exec shim/loader 改动要在真机（签名构建）验证，
    模拟器 unsigned 通过不构成证据。
 5. **ABI**：N-API 扩展必须用打包 Node 的 headers/ABI；`.node` 缺 `libnode.so` 依赖要显式处理。
-6. **证据**：真机 G3 `device_lab` 或对应 `--probe`，记录到 `docs/evidence/device-lab/`。
+6. **AppGallery**：CMake 禁用 Workflow 和 PTC 编译入口，Image Kit 和原生搜索桥按 Host 的 Node-API ABI 装配。
+7. **证据**：真机 G3 `device_lab` 或对应 `--probe`，记录到 `docs/evidence/device-lab/`。
 
 ## 检查清单
 

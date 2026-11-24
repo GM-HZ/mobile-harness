@@ -1,0 +1,34 @@
+{
+  "name": "appgallery",
+  "description": "Native-only HarmonyOS distribution with the AppGallery privacy, image, and search adapters.",
+  "env": {
+    "HARMONY_APPGALLERY_BUILD": "1",
+    "HARMONY_UNSIGNED": "1",
+    "HARMONY_SELF_BUILD": "0"
+  },
+  "hap": {
+    "present": [
+      "dsh-appgallery-layer.zip",
+      "dsh-appgallery-layer.zip.sha256",
+      "appgallery.patch.yml",
+      "libnode.so",
+      "libdshimage.so",
+      "libdshsearch.so",
+      "NOTICE.workspace-search.txt"
+    ],
+    "absent": [
+      "dsh-chunks.json",
+      "dsh-layer-",
+      "node-layer.zip",
+      "shell-tools-layer.zip",
+      "pnpm-layer-",
+      "libproot",
+      "libdshshell",
+      "libguest_",
+      "mh-exec",
+      "mh-install",
+      "dsh-harmony-remote-ssh.cjs"
+    ],
+    "maxBytes": 300000000
+  }
+}

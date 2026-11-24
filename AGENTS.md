@@ -29,8 +29,8 @@
    没有 gate 的"能跑"不算完成。
 4. **证据即交付**：门禁运行写 `docs/evidence/gates/`；真机/模拟器证据写 `docs/evidence/device-lab/`、
    `docs/evidence/forge/` 等；发布记录写 `docs/evidence/release/`；RSI 台账自动记录。
-5. **store / self / lab 变体语义不可混用**：store 构建 **不得** 包含 `mh-exec`、exec shim、overlay 库；
-   self 构建才包含。改 `HARMONY_SELF_BUILD` 相关行为必须同时跑 `store_build_check` 与 `variant_check`。
+5. **store / self / lab / AppGallery 变体语义不可混用**：store 构建 **不得** 包含 `mh-exec`、exec shim、overlay 库；
+   self 构建才包含。AppGallery 使用独立包名与原生运行时，发布演练一并验收。改 `HARMONY_SELF_BUILD` 相关行为必须同时跑 `store_build_check` 与 `variant_check`。
 6. **安全与凭据**：不得把真实 token/密码写入仓库、日志或证据；夹具只能用 loopback 模拟器；
    真机验证用的临时凭据结束即清理。
 7. **上游锁定图**：升级 DSH 版本 = 改 `versions.lock.json` + 跑 bump 排练 + 全门禁；
@@ -47,7 +47,7 @@ python3 gates/run.py --tier G0,G1            # 静态/合同门禁（每次改�
 python3 gates/run.py --tier G1 --record      # + 写 RSI 台账
 MH_EMULATOR=127.0.0.1:5555 python3 gates/run.py --tier G2 --only capability-parity-gate,nightly-recovery
 python3 scripts/adaptation/device_lab.py run --suite verify|exec|overlay    # 真机
-./scripts/adaptation/release_dry_run.sh 0.4.69                               # G4 发布演练
+./scripts/adaptation/release_dry_run.sh                               # G4 发布演练
 python3 scripts/adaptation/bump.py                                           # 上游 bump 排练
 python3 scripts/adaptation/gate_report.py                                    # 周报 scoreboard
 ```

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "b1a112b007c64362645680ce5fea55797bca6712",
+  "generatedFrom": "54ca4654ff0ff07a229bc92d4d68f39b9df0cc67",
   "layers": [
     "host",
     "web",
@@ -21,8 +21,8 @@
       "kind": "file",
       "source": "packages/dsh-host/AGENTS.md",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "39049c5470a5ea495bae4d7393cf53faeeb5e02c8bcfce644339485e93b69a91",
-      "bytes": 1821,
+      "sha256": "1250eb3ef14ec90aee5fd868e90ba643f443e06b47f320e3f01581720c616289",
+      "bytes": 1989,
       "fragility": "high",
       "upstreamTouchpoints": [],
       "gates": [
@@ -220,28 +220,73 @@
       ]
     },
     {
+      "id": "host:packages/dsh-host/dsh-native-image.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-native-image.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "87317119161c63d0347f097272b27a1b7a72ae9c9a4cc2e2156d606af9d12b44",
+      "bytes": 6759,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "host:packages/dsh-host/dsh-native-search.cjs",
+      "layer": "host",
+      "kind": "file",
+      "source": "packages/dsh-host/dsh-native-search.cjs",
+      "role": "runtime overlay copied into the guest root",
+      "sha256": "17c64272e01186645c1e13c964ff95a4ed3bb1c7af7fc39fa09afe2536731286",
+      "bytes": 2474,
+      "fragility": "medium",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
       "id": "host:packages/dsh-host/dsh-native-web.cjs",
       "layer": "host",
       "kind": "file",
       "source": "packages/dsh-host/dsh-native-web.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "bf8f5d81175de88089d561c4ba644e3a71959c27e8af385917397db3529c1a19",
-      "bytes": 48297,
+      "sha256": "d52aa3b70798d0c8efb6729250abaf21d2535ef4e29386f370b9766a51da2961",
+      "bytes": 51628,
       "fragility": "high",
       "upstreamTouchpoints": [
         "\"darwin-arm64\",",
         "...exec.agent === void 0 || policy?.mode !== standingPolicy?.mode ? {} : { stateOwner: exec.agent },",
+        "...initialProfile?.patches ?? loadOptionalPatches(binName, context.patchPath) ?? [],",
         "...loadOptionalPatches(binName, join(context.home, \"cordis.patch.yml\")) ?? [],",
         "@deepseek-ai/dsh-experimental-liveshare",
         "@deepseek-ai/dsh-experimental-speech-to-text-sensevoice",
         "@deepseek-ai/dsh-terminal-bash",
         "@deepseek-ai/dsh-tool-bash-persistent",
-        "Build and export all runtime entry points before reporting ready.",
-        "Read and use the cordis-plugin-development skill.",
         "This does not change PATH or package-manager settings.",
         "case \"context-overflow\": {\\n\\t\\t\\t\\tthis.ctx.get(\"toolResultPruner\")?.pruneSession(agent.session);\\n\\t\\t\\t\\tconst measurement = this.ctx.tokenMeter.measure(agent.session);\\n\\t\\t\\t\\tconst range = selectCompactableRange(agent.session, measurement, 0);",
-        "console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);"
+        "console.log(`dsh inspector: ${handle.endpoint.devtoolsFrontendUrl}`);",
+        "const token = randomBytes(32).toString(\"hex\");"
       ],
+      "gates": [
+        "G0",
+        "G1"
+      ]
+    },
+    {
+      "id": "web:runtime/harmonyos/web/settings-appgallery.js",
+      "layer": "web",
+      "kind": "file",
+      "source": "runtime/harmonyos/web/settings-appgallery.js",
+      "role": "web client injection",
+      "sha256": "8b13d38d1df4aea6dd207d1576be6771cfdbd78965b36d9e368f9061ff03cdce",
+      "bytes": 1218,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
       "gates": [
         "G0",
         "G1"
@@ -482,8 +527,36 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/AGENTS.md",
       "role": "native runtime / adapter",
-      "sha256": "11e85fa74a2eb5e4bc63a45afeb3a08fb6de5e8f5323d139738506c50f234b77",
-      "bytes": 1307,
+      "sha256": "c1fb870938e81d7cefc6b849ad37891b6253615ca65b86c2b77aaefc168912cc",
+      "bytes": 1436,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/dsh-image.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/dsh-image.c",
+      "role": "native runtime / adapter",
+      "sha256": "b589e8aa673d4bb8b6d24e3f691c028ec71a907820d8c97b9cf1a0aa39f1e3cf",
+      "bytes": 10928,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/dsh-search.c",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/dsh-search.c",
+      "role": "native runtime / adapter",
+      "sha256": "2378f8eaa6efbbef72ac3907b5d4657f225032862a73ce070b3b6ce2485982f8",
+      "bytes": 3911,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -594,8 +667,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/nativehost.c",
       "role": "native runtime / adapter",
-      "sha256": "322a9e5c1923a2529fd6a58f41262606c9de889a385023550b4e02bc5d91bb9a",
-      "bytes": 5726,
+      "sha256": "7fc6c511fdeac5f3e0ebacd161ba476075617d189f329847c49623b1c7e2f24a",
+      "bytes": 5875,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -608,8 +681,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/poc.c",
       "role": "native runtime / adapter",
-      "sha256": "d130b5fd4fd82b4d543339130421cc97bf05018af410b3a4fa4ad20051ba4d18",
-      "bytes": 35634,
+      "sha256": "a90c93218e1f4859dda724dfa0ac478bbaff08ad68aa4c47a009762cbb4bac3c",
+      "bytes": 35717,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -841,6 +914,20 @@
       ]
     },
     {
+      "id": "bundles:packages/bundles/mobile/appgallery.patch.yml",
+      "layer": "bundles",
+      "kind": "file",
+      "source": "packages/bundles/mobile/appgallery.patch.yml",
+      "role": "profile/bundle overlays",
+      "sha256": "d9b501006b7febf5d194d5107f46725c0aef159b29e37a16158a8277173a5e20",
+      "bytes": 705,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
       "id": "bundles:packages/bundles/mobile/dsh-client.patch.yml",
       "layer": "bundles",
       "kind": "file",
@@ -898,6 +985,20 @@
       "role": "store/self/lab build variant definitions",
       "sha256": "a82fb73a39e7d1bdbceb09f8df3113b345a243a9bb7bec961933a185015ad2fc",
       "bytes": 609,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "variants:variants/appgallery.json",
+      "layer": "variants",
+      "kind": "file",
+      "source": "variants/appgallery.json",
+      "role": "store/self/lab build variant definitions",
+      "sha256": "ef6375f3beb62d7b7335e0ad47675df2d7abac0b0d162a0e8a873719713085da",
+      "bytes": 801,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1125,8 +1226,8 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "0e88319f840c3bf44864fa01b66964b2a601860acfed12df0d9ce391a2dcb8f1",
-      "files": 28,
+      "sha256": "2c9c5ccaf6e4e07f49d15557f677f6bb5e2c9d1517a5b797dc8565bb40a0076e",
+      "files": 31,
       "fragility": "medium",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1141,7 +1242,6 @@
       "source": "HARMONY_SELF_BUILD",
       "role": "self-built variant: exec shim, mh-exec, native overlay, self signed-exec bypass",
       "places": [
-        ".github/workflows/gate-release.yml",
         ".github/workflows/harmonyos.yml",
         "runtime/harmonyos/native/AGENTS.md",
         "runtime/harmonyos/packaging/AGENTS.md",
@@ -1150,6 +1250,7 @@
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",
         "scripts/adaptation/release_dry_run.sh",
+        "scripts/build/harmonyos.sh",
         "scripts/build/harmonyos_guest_extras.py"
       ],
       "gates": [

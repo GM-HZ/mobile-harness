@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", required=True)
     parser.add_argument("--commit", default=None)
+    parser.add_argument("--require-appgallery", action="store_true")
     args = parser.parse_args()
     commit = args.commit or subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     path = EVIDENCE / f"{args.version}-{commit}.json"
@@ -42,7 +43,13 @@ def main():
             import hashlib
             if hashlib.sha256(scoreboard.read_bytes()).hexdigest() != rsi["sha256"]:
                 failures.append("RSI scoreboard hash drifted: " + rsi["path"])
-    for label, artifact in evidence.get("artifacts", {}).items():
+    artifacts = evidence.get("artifacts", {})
+    required = {"store", "self"}
+    if args.require_appgallery:
+        required.add("appgallery")
+    for label in sorted(required - artifacts.keys()):
+        failures.append(f"missing {label} artifact evidence")
+    for label, artifact in artifacts.items():
         maximum = artifact.get("maxBytes")
         if maximum and artifact.get("bytes", 0) > maximum:
             failures.append(f"{label} HAP {artifact['bytes']} > budget {maximum}")
@@ -50,8 +57,8 @@ def main():
         for failure in failures:
             print("FAIL", failure, file=sys.stderr)
         return 1
-    print(f"G4 release gate OK: {evidence['version']} @ {commit[:12]} "
-          f"(store {evidence['artifacts']['store']['bytes']:,} B, self {evidence['artifacts']['self']['bytes']:,} B)")
+    sizes = ", ".join(f"{label} {artifact['bytes']:,} B" for label, artifact in artifacts.items())
+    print(f"G4 release gate OK: {evidence['version']} @ {commit[:12]} ({sizes})")
     return 0
 
 

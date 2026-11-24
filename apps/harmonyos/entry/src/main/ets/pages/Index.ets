@@ -1,19 +1,38 @@
 import { abilityAccessCtrl, common } from '@kit.AbilityKit';
-import { url } from '@kit.ArkTS';
+import { url, util } from '@kit.ArkTS';
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, EngineProgress, dshEngine } from '../runtime/DshEngine';
 import { ForgeAccount } from './ForgeAccount';
+import { RemoteHostsPage } from './RemoteHosts';
+import { isRemoteHostsEnabled } from '../runtime/RemoteHosts';
+import { hasPrivacyConsent, isAppGalleryBuild, readAppGalleryLink, savePrivacyConsent } from '../runtime/PrivacyConsent';
 
 const LOCAL_ORIGIN = 'http://127.0.0.1:19592';
 const RECOVERY_URL = LOCAL_ORIGIN + '/.mobile-harness/recovery';
 const GITHUB_URL = LOCAL_ORIGIN + '/.mobile-harness/github';
+const PRIVACY_URL = LOCAL_ORIGIN + '/.mobile-harness/privacy';
+const NOTICES_URL = LOCAL_ORIGIN + '/.mobile-harness/notices';
 type LoginFlow = 'unbound' | 'deepseek' | 'liveshare';
 
 @Entry
 @Component
 struct Index {
   @State status: string = '正在准备本机 DSH…';
+  @State consentRequired: boolean = false;
+  @State appGallery: boolean = false;
+  @State privacyDetails: boolean = false;
+  @State noticesOpen: boolean = false;
+  @State noticeTitle: string = '';
+  @State noticeText: string = '';
+  @State decliningPrivacy: boolean = false;
+  @State consentError: string = '';
+  @State privacyPolicyUrl: string = '';
+  @State sourceDeliveryUrl: string = '';
+  @State sourceLinkError: boolean = false;
+  @State privacyLinkError: boolean = false;
+  @State remoteHostsEnabled: boolean = false;
+  @State remoteHostsOpen: boolean = false;
   @State launchUrl: string = '';
   @State recoveryOpen: boolean = false;
   @State forgeAccountOpen: boolean = false;
@@ -37,15 +56,26 @@ struct Index {
 
   aboutToAppear(): void {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.appGallery = isAppGalleryBuild(context);
+    this.remoteHostsEnabled = !this.appGallery && isRemoteHostsEnabled(context);
+    if (this.appGallery) {
+      this.privacyPolicyUrl = readAppGalleryLink(context, 'appgallery-privacy-url');
+      this.sourceDeliveryUrl = readAppGalleryLink(context, 'appgallery-source-url');
+      this.consentRequired = !hasPrivacyConsent(context, this.privacyPolicyUrl);
+    }
+    if (!this.consentRequired) this.attachEngine(context);
+  }
+
+  private attachEngine(context: common.UIAbilityContext): void {
     this.detachEngine = dshEngine.attach(context, (status: string, session?: BrowserSession,
-      progress?: EngineProgress) => {
+      progress?: EngineProgress, failed?: boolean) => {
       this.status = status;
       if (progress) {
         this.progressPhase = progress.phase;
         this.progressPercent = Math.max(this.progressPercent, progress.percent);
       }
       this.safe = session?.safe === true;
-      if (this.safe && !this.launchUrl) {
+      if (failed || (this.safe && !this.launchUrl)) {
         this.recoveryOpen = true;
         this.splashVisible = false;
       }
@@ -190,6 +220,18 @@ struct Index {
   }
 
   onBackPress(): boolean {
+    if (this.remoteHostsOpen) {
+      this.remoteHostsOpen = false;
+      return true;
+    }
+    if (this.noticesOpen) {
+      this.backFromNotices();
+      return true;
+    }
+    if (this.privacyDetails) {
+      this.privacyDetails = false;
+      return true;
+    }
     if (this.recoveryOpen && this.launchUrl && !this.webFailed) {
       this.recoveryOpen = false;
       return true;
@@ -197,6 +239,118 @@ struct Index {
     if (!this.loginVisible) return false;
     this.closeLogin();
     return true;
+  }
+
+  private acceptPrivacy(): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    try {
+      savePrivacyConsent(context, this.privacyPolicyUrl);
+      this.consentRequired = false;
+      this.attachEngine(context);
+    } catch (_) {
+      this.consentError = '无法保存同意状态，请重试。';
+    }
+  }
+
+  private declinePrivacy(): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.decliningPrivacy = true;
+    context.terminateSelf().catch(() => {
+      this.decliningPrivacy = false;
+      this.consentError = '无法退出，请使用系统返回键。';
+    });
+  }
+
+  private openPrivacyPolicy(): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.privacyLinkError = false;
+    context.openLink(this.privacyPolicyUrl, { appLinkingOnly: false }).catch(() => {
+      this.privacyLinkError = true;
+    });
+  }
+
+  @Builder
+  private privacyPage() {
+    Scroll() {
+      Column({ space: 16 }) {
+        Text(this.privacyDetails ? '个人信息处理说明' : '隐私提示')
+          .fontSize(24).fontWeight(FontWeight.Medium)
+        if (this.privacyDetails) {
+          Text('工作区和会话保存在本应用的私有目录，用于继续编辑文件和恢复会话。清除应用数据或卸载应用可删除本机存储。')
+          Text('使用联网模型时，应用会向所选模型服务发送请求。请求可能包含输入的提示词、会话上下文、附件，以及任务使用的工作区内容或工具结果。')
+          Text('选择 DeepSeek 账号登录时，应用打开 DeepSeek 登录页面。选择 API Key 时，应用使用你配置的凭据向对应服务发起请求。模型服务按其自身政策处理收到的数据。')
+          Text('联网及网络状态权限用于连接模型服务和配置网络连接。应用市场版本关闭外部插件安装及远程接入。')
+          if (this.privacyPolicyUrl) {
+            Button('打开完整隐私政策').onClick(() => this.openPrivacyPolicy())
+            if (this.privacyLinkError) Text('无法打开链接。可在浏览器中访问：' + this.privacyPolicyUrl)
+          }
+          Button('返回').onClick(() => { this.privacyDetails = false; })
+        } else {
+          Text('会话和工作区保存在本机。使用联网模型时，所选模型服务会收到请求所需的提示词、上下文和附件。请阅读个人信息处理说明后再继续。')
+          Button('查看个人信息处理说明').onClick(() => { this.privacyDetails = true; })
+          Row({ space: 12 }) {
+            Button('不同意并退出').enabled(!this.decliningPrivacy).onClick(() => this.declinePrivacy())
+            Button('同意并继续').enabled(!this.decliningPrivacy).onClick(() => this.acceptPrivacy())
+          }
+          if (this.consentError) Text(this.consentError)
+        }
+      }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
+    }.width('100%')
+  }
+
+  private openSourceDelivery(): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    this.sourceLinkError = false;
+    context.openLink(this.sourceDeliveryUrl, { appLinkingOnly: false }).catch(() => {
+      this.sourceLinkError = true;
+    });
+  }
+
+  private backFromNotices(): void {
+    if (this.noticeTitle) this.noticeTitle = '';
+    else this.noticesOpen = false;
+  }
+
+  private selectNotice(title: string, filename: string): void {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    try {
+      this.noticeText = util.TextDecoder.create('utf-8')
+        .decodeToString(context.resourceManager.getRawFileContentSync(filename));
+    } catch (_) {
+      this.noticeText = '无法读取此声明。';
+    }
+    this.noticeTitle = title;
+  }
+
+  @Builder
+  private noticesPage() {
+    Scroll() {
+      Column({ space: 12 }) {
+        Button('返回').onClick(() => this.backFromNotices())
+        Text(this.noticeTitle || '开源软件声明').fontSize(24).fontWeight(FontWeight.Medium)
+        if (this.noticeTitle) {
+          Text(this.noticeText).fontSize(14).copyOption(CopyOptions.LocalDevice)
+        } else {
+          if (this.sourceDeliveryUrl) {
+            Button('获取对应源码').onClick(() => this.openSourceDelivery())
+            if (this.sourceLinkError) {
+              Text('无法打开链接。可在浏览器中访问：' + this.sourceDeliveryUrl)
+                .copyOption(CopyOptions.LocalDevice)
+            }
+          }
+          Button('DeepSeek Harness').onClick(() => this.selectNotice('DeepSeek Harness', 'LICENSE.dsh.txt'))
+          Button('dshm').onClick(() => this.selectNotice('dshm', 'LICENSE.dshm.txt'))
+          Button('Node.js').onClick(() => this.selectNotice('Node.js', 'LICENSE.node.txt'))
+          Button('sharp').onClick(() => this.selectNotice('sharp', 'LICENSE.sharp.txt'))
+          Button('工作区搜索').onClick(() => this.selectNotice('工作区搜索', 'NOTICE.workspace-search.txt'))
+          Button('ripgrep').onClick(() => this.selectNotice('ripgrep', 'LICENSE.ripgrep.txt'))
+          Button('Koffi').onClick(() => this.selectNotice('Koffi', 'LICENSE.koffi.txt'))
+          Button('DSH System').onClick(() => this.selectNotice('DSH System', 'LICENSE.dsh-system.txt'))
+          Button('Node.js require-builtin').onClick(() =>
+            this.selectNotice('Node.js require-builtin', 'LICENSE.require-builtin.txt'))
+        }
+      }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
+    }.width('100%').layoutWeight(1)
   }
 
   @Builder
@@ -295,21 +449,26 @@ struct Index {
         .fontSize(15)
       Button('以安全模式重开').enabled(!this.restarting).onClick(() => { this.restart('safe'); })
       Button('以正常模式重开').enabled(!this.restarting).onClick(() => { this.restart('normal'); })
-      Row() {
-        Column({ space: 2 }) {
-          Text('后台常驻').fontSize(16)
-          Text(this.backgroundEnabled ? 'Host 在后台保持运行' : '切到后台后，系统可能暂停任务')
-            .fontSize(12).fontColor('#8A8F9C')
-        }.alignItems(HorizontalAlign.Start).layoutWeight(1)
-        Toggle({ type: ToggleType.Switch, isOn: this.backgroundEnabled })
-          .selectedColor('#4D6BFE')
-          .onChange((isOn: boolean) => {
-            this.backgroundEnabled = isOn;
-            const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
-            dshEngine.setBackgroundEnabled(context, isOn);
-          })
-      }.width('100%').padding({ top: 8, bottom: 8 })
-      Button('回滚插件配置并正常重开').enabled(!this.restarting).onClick(() => { this.rollbackPlugins(); })
+      if (!this.appGallery) {
+        Row() {
+          Column({ space: 2 }) {
+            Text('后台常驻').fontSize(16)
+            Text(this.backgroundEnabled ? 'Host 在后台保持运行' : '切到后台后，系统可能暂停任务')
+              .fontSize(12).fontColor('#8A8F9C')
+          }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+          Toggle({ type: ToggleType.Switch, isOn: this.backgroundEnabled })
+            .selectedColor('#4D6BFE')
+            .onChange((isOn: boolean) => {
+              this.backgroundEnabled = isOn;
+              const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+              dshEngine.setBackgroundEnabled(context, isOn);
+            })
+        }.width('100%').padding({ top: 8, bottom: 8 })
+        Button('回滚插件配置并正常重开').enabled(!this.restarting).onClick(() => { this.rollbackPlugins(); })
+      }
+      if (this.remoteHostsEnabled && !this.safe) {
+        Button('远程主机（实验）').onClick(() => { this.remoteHostsOpen = true; })
+      }
       if (this.restartError) Text(this.restartError).fontSize(14)
       if (this.launchUrl && !this.webFailed) Button('返回会话').onClick(() => { this.recoveryOpen = false; })
     }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
@@ -360,12 +519,12 @@ struct Index {
 
   build() {
     Stack({ alignContent: Alignment.Center }) {
-      if (this.launchUrl) {
+      if (!this.consentRequired && this.launchUrl) {
         Web({ src: this.launchUrl, controller: this.controller })
           .layoutWeight(1)
           .width('100%')
-          .visibility(this.loginVisible || this.recoveryOpen || this.forgeAccountOpen || this.webFailed
-            ? Visibility.None : Visibility.Visible)
+          .visibility(this.loginVisible || this.recoveryOpen || this.forgeAccountOpen || this.webFailed ||
+            this.privacyDetails || this.noticesOpen || this.remoteHostsOpen ? Visibility.None : Visibility.Visible)
           .javaScriptAccess(true)
           .domStorageAccess(true)
           .fileAccess(false)
@@ -384,7 +543,17 @@ struct Index {
               return true;
             }
             if (url === GITHUB_URL) {
-              if (!this.safe) this.forgeAccountOpen = true;
+              if (!this.safe && !this.appGallery) this.forgeAccountOpen = true;
+              return true;
+            }
+            if (this.appGallery && url === PRIVACY_URL) {
+              this.privacyDetails = true;
+              return true;
+            }
+            if (this.appGallery && url === NOTICES_URL) {
+              this.noticeTitle = '';
+              this.sourceLinkError = false;
+              this.noticesOpen = true;
               return true;
             }
             return !url.startsWith(LOCAL_ORIGIN + '/') && url !== 'about:blank';
@@ -405,7 +574,7 @@ struct Index {
           })
           .onErrorReceive((event) => {
             if (event?.request.isMainFrame() && event.error.getErrorCode() !== -3 &&
-                event.request.getRequestUrl() !== RECOVERY_URL && event.request.getRequestUrl() !== GITHUB_URL) {
+                ![RECOVERY_URL, GITHUB_URL, PRIVACY_URL, NOTICES_URL].includes(event.request.getRequestUrl())) {
               this.webFailed = true;
               this.splashVisible = false;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb main error %{public}d', event.error.getErrorCode());
@@ -420,14 +589,20 @@ struct Index {
           })
           .onRenderExited(() => { this.webFailed = true; this.splashVisible = false; })
       }
-      if (this.webFailed || this.recoveryOpen) {
+      if (this.consentRequired || this.privacyDetails) {
+        this.privacyPage()
+      } else if (this.noticesOpen) {
+        this.noticesPage()
+      } else if (this.remoteHostsOpen && this.remoteHostsEnabled) {
+        RemoteHostsPage({ onClose: () => { this.remoteHostsOpen = false; } })
+      } else if (this.webFailed || this.recoveryOpen) {
         this.recoveryPage()
       } else if (this.forgeAccountOpen) {
         ForgeAccount({ onClose: () => { this.forgeAccountOpen = false; } })
       } else if (this.loginVisible) {
         this.loginPage()
       }
-      if (this.splashVisible && !this.recoveryOpen && !this.loginVisible &&
+      if (this.splashVisible && !this.consentRequired && !this.recoveryOpen && !this.loginVisible &&
           !this.forgeAccountOpen && !this.webFailed) {
         this.splashScreen()
       }

@@ -1,0 +1,108 @@
+certdata.txt
+
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#
+# certdata.txt
+#
+# This file contains the object definitions for the certs and other
+# information "built into" NSS.
+#
+# Object definitions:
+#
+#    Certificates
+#
+#  -- Attribute --               -- type --          -- value --
+#  CKA_CLASS                     CK_OBJECT_CLASS     CKO_CERTIFICATE
+#  CKA_TOKEN                     CK_BBOOL            CK_TRUE
+#  CKA_PRIVATE                   CK_BBOOL            CK_FALSE
+#  CKA_MODIFIABLE                CK_BBOOL            CK_FALSE
+#  CKA_LABEL                     UTF8                (varies)
+#  CKA_CERTIFICATE_TYPE          CK_CERTIFICATE_TYPE CKC_X_509
+#  CKA_SUBJECT                   DER+base64          (varies)
+#  CKA_ID                        byte array          (varies)
+#  CKA_ISSUER                    DER+base64          (varies)
+#  CKA_SERIAL_NUMBER             DER+base64          (varies)
+#  CKA_VALUE                     DER+base64          (varies)
+#  CKA_NSS_EMAIL                 ASCII7              (unused here)
+#  CKA_NSS_SERVER_DISTRUST_AFTER DER+base64          (varies)
+#  CKA_NSS_EMAIL_DISTRUST_AFTER  DER+base64          (varies)
+#
+#    Trust
+#
+#  -- Attribute --              -- type --          -- value --
+#  CKA_CLASS                    CK_OBJECT_CLASS     CKO_TRUST
+#  CKA_TOKEN                    CK_BBOOL            CK_TRUE
+#  CKA_PRIVATE                  CK_BBOOL            CK_FALSE
+#  CKA_MODIFIABLE               CK_BBOOL            CK_FALSE
+#  CKA_LABEL                    UTF8                (varies)
+#  CKA_ISSUER                   DER+base64          (varies)
+#  CKA_SERIAL_NUMBER            DER+base64          (varies)
+#  CKA_CERT_HASH                binary+base64       (varies)
+#  CKA_EXPIRES                  CK_DATE             (not used here)
+#  CKA_TRUST_DIGITAL_SIGNATURE  CK_TRUST            (varies)
+#  CKA_TRUST_NON_REPUDIATION    CK_TRUST            (varies)
+#  CKA_TRUST_KEY_ENCIPHERMENT   CK_TRUST            (varies)
+#  CKA_TRUST_DATA_ENCIPHERMENT  CK_TRUST            (varies)
+#  CKA_TRUST_KEY_AGREEMENT      CK_TRUST            (varies)
+#  CKA_TRUST_KEY_CERT_SIGN      CK_TRUST            (varies)
+#  CKA_TRUST_CRL_SIGN           CK_TRUST            (varies)
+#  CKA_TRUST_SERVER_AUTH        CK_TRUST            (varies)
+#  CKA_TRUST_CLIENT_AUTH        CK_TRUST            (varies)
+#  CKA_TRUST_CODE_SIGNING       CK_TRUST            (varies)
+#  CKA_TRUST_EMAIL_PROTECTION   CK_TRUST            (varies)
+#  CKA_TRUST_IPSEC_END_SYSTEM   CK_TRUST            (varies)
+#  CKA_TRUST_IPSEC_TUNNEL       CK_TRUST            (varies)
+#  CKA_TRUST_IPSEC_USER         CK_TRUST            (varies)
+#  CKA_TRUST_TIME_STAMPING      CK_TRUST            (varies)
+#  CKA_TRUST_STEP_UP_APPROVED   CK_BBOOL            (varies)
+#  (other trust attributes can be defined)
+#
+
+#
+# The object to tell NSS that this is a root list and we don't
+# have to go looking for others.
+#
+
+mk-ca-bundle.pl
+
+#!/usr/bin/env perl
+# ***************************************************************************
+# *                                  _   _ ____  _
+# *  Project                     ___| | | |  _ \| |
+# *                             / __| | | | |_) | |
+# *                            | (__| |_| |  _ <| |___
+# *                             \___|\___/|_| \_\_____|
+# *
+# * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
+# *
+# * This software is licensed as described in the file COPYING, which
+# * you should have received as part of this distribution. The terms
+# * are also available at https://curl.se/docs/copyright.html.
+# *
+# * You may opt to use, copy, modify, merge, publish, distribute and/or sell
+# * copies of the Software, and permit persons to whom the Software is
+# * furnished to do so, under the terms of the COPYING file.
+# *
+# * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+# * KIND, either express or implied.
+# *
+# * SPDX-License-Identifier: curl
+# *
+# ***************************************************************************
+# This Perl script creates a fresh ca-bundle.crt file for use with libcurl.
+# It downloads certdata.txt from Mozilla's source tree (see URL below),
+# then parses certdata.txt and extracts CA Root Certificates into PEM format.
+# These are then processed with the OpenSSL commandline tool to produce the
+# final ca-bundle.crt file.
+# The script is based on the parse-certs script written by Roland Krikava.
+# This Perl script works on almost any platform since its only external
+# dependency is the OpenSSL commandline tool for optional text listing.
+# Hacked by Guenter Knauf.
+#
+use Encode;
+use Getopt::Std;
+use MIME::Base64;

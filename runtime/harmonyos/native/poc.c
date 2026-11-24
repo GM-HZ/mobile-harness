@@ -1,5 +1,6 @@
 #define _GNU_SOURCE
 #include <napi/native_api.h>
+#ifndef MOBILE_HARNESS_APPGALLERY
 #include <hilog/log.h>
 #include <dlfcn.h>
 #include <dirent.h>
@@ -802,13 +803,17 @@ static napi_value Run(napi_env env, napi_callback_info info) {
     return promise;
 }
 
+#endif
+
 extern napi_value StartNative(napi_env env, napi_callback_info info);
 extern napi_value NativeStatus(napi_env env, napi_callback_info info);
 napi_value UsesHostProcess(napi_env env, napi_callback_info info);
 napi_value StopNative(napi_env env, napi_callback_info info);
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor methods[] = {
+#ifndef MOBILE_HARNESS_APPGALLERY
         {"run", NULL, Run, NULL, NULL, NULL, napi_default, NULL},
+#endif
         {"startNative", NULL, StartNative, NULL, NULL, NULL, napi_default, NULL},
         {"nativeStatus", NULL, NativeStatus, NULL, NULL, NULL, napi_default, NULL},
         {"usesHostProcess", NULL, UsesHostProcess, NULL, NULL, NULL, napi_default, NULL},

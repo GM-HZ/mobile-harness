@@ -23,6 +23,9 @@ G0 = [
      "optional": True, "timeout": 180},
 ]
 G4 = [
+    {"id": "release-dry-run", "command": "./scripts/adaptation/release_dry_run.sh",
+     "covers": "release packages, shapes and same-commit evidence for store, self and AppGallery",
+     "optional": True, "timeout": 3600},
     {"id": "build-unsigned", "command": "HARMONY_UNSIGNED=1 ./build.sh --package",
      "covers": "emulator HAP builds", "timeout": 1800},
     {"id": "build-self", "command": "HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 ./build.sh --package",
@@ -107,8 +110,14 @@ def main():
                "command": "python3 tests/smoke/emulator-recovery.py \"$MH_EMULATOR\" .build/gate-evidence/recovery.json",
                "covers": "plugin crash, safe startup and rollback in the recovery UI", "requires": ["MH_EMULATOR env"],
                "timeout": 1200})
+    for capability in ("images", "search"):
+        g2.append({"id": f"appgallery-{capability}",
+                   "command": f'python3 tests/smoke/emulator-appgallery-{capability}.py "$MH_APPGALLERY_EMULATOR"',
+                   "covers": f"AppGallery Release native {capability} through DSH",
+                   "requires": ["MH_APPGALLERY_EMULATOR env", "AppGallery Release HAP after privacy consent"],
+                   "optional": True, "timeout": 600})
     for name in sorted(emulator):
-        if name.endswith("emulator-recovery.py"):
+        if name.endswith("emulator-recovery.py") or Path(name).name.startswith("emulator-appgallery-"):
             continue
         g2.append({"id": Path(name).stem, "command": f"python3 {name} <target> <output> [scenario flags]",
                    "covers": "smoke acceptance", "requires": requirements(name), "timeout": 1800})
@@ -137,6 +146,9 @@ def main():
                  "covers": "forge/package/liveshare/sharp public behavior contracts", "timeout": 120},
                 {"id": "guidance-docs", "command": "python3 scripts/adaptation/guidance_check.py",
                  "covers": "AGENTS/framework/roadmap/module guidance files, sections and indexes",
+                 "timeout": 120},
+                {"id": "remote-hosts-contract", "command": "node tests/contract/remote-hosts.cjs",
+                 "covers": "self/lab gate, HTTPS origin, same-origin token exchange and metadata-only persistence",
                  "timeout": 120},
                 {"id": "workflow-check", "command": "python3 scripts/adaptation/workflow_check.py",
                  "covers": "gate workflows stay wired to gate scripts and steps", "timeout": 120},

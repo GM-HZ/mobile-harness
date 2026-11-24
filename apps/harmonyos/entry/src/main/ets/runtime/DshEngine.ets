@@ -8,6 +8,7 @@ import { i18n } from '@kit.LocalizationKit';
 import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
 import { backgroundKeeper } from './BackgroundKeeper';
+import { isAppGalleryBuild, readAppGalleryLink } from './PrivacyConsent';
 
 interface LayerChunk {
   file: string;
@@ -28,10 +29,12 @@ export interface BrowserSession {
   cookie?: string;
   safe?: boolean;
 }
-type EngineListener = (status: string, session?: BrowserSession, progress?: EngineProgress) => void;
+type EngineListener = (status: string, session?: BrowserSession, progress?: EngineProgress,
+  failed?: boolean) => void;
 
 class DshEngine {
   private listeners: Set<EngineListener> = new Set<EngineListener>();
+  private failed: boolean = false;
   private status: string = '正在准备本机 DSH…';
   private progress: EngineProgress = { phase: '环境准备', percent: 0 };
   private backgroundPreference: boolean = false;
@@ -41,7 +44,7 @@ class DshEngine {
 
   attach(context: common.UIAbilityContext, listener: EngineListener): () => void {
     this.listeners.add(listener);
-    listener(this.status, this.session, this.progress);
+    listener(this.status, this.session, this.progress, this.failed);
     if (!this.running) {
       this.running = true;
       this.start(context);
@@ -51,11 +54,13 @@ class DshEngine {
     return () => { this.listeners.delete(listener); };
   }
 
-  private publish(status: string, session?: BrowserSession, progress?: EngineProgress): void {
+  private publish(status: string, session?: BrowserSession, progress?: EngineProgress,
+    failed: boolean = false): void {
     this.status = status;
+    this.failed = failed;
     this.session = session;
     if (progress) this.progress = progress;
-    this.listeners.forEach(listener => listener(status, session, progress ?? this.progress));
+    this.listeners.forEach(listener => listener(status, session, progress ?? this.progress, failed));
   }
 
   private writeMode(path: string, mode: string): void {
@@ -110,7 +115,7 @@ class DshEngine {
         }
       } catch (e) {
         clearInterval(poll);
-        this.publish('本机 DSH 页面初始化失败。');
+        this.publish('本机 DSH 页面初始化失败。', undefined, undefined, true);
         hilog.error(0xD005, 'DSHClient', 'browser session setup failed');
       }
     }, 300);
@@ -131,31 +136,41 @@ class DshEngine {
     const launchFile = root + '/tmp/dsh-client-native-launch';
     if (fileIo.accessSync(launchFile)) fileIo.unlinkSync(launchFile);
     if (fileIo.accessSync(root + '/tmp/dsh-native-timeline.log')) fileIo.unlinkSync(root + '/tmp/dsh-native-timeline.log');
-    this.copyGuest(context, 'dsh-native-web.cjs', root + '/dsh-native-web.cjs');
-    this.copyGuest(context, 'dsh-harmony-subprocess.mjs', root + '/dsh-harmony-subprocess.mjs');
-    this.copyGuest(context, 'dsh-harmony-bash-pipe.mjs', root + '/dsh-harmony-bash-pipe.mjs');
-    this.copyGuest(context, 'dsh-harmony-fs.mjs', root + '/dsh-harmony-fs.mjs');
-    this.copyGuest(context, 'dsh-harmony-signed-programs.json', root + '/dsh-harmony-signed-programs.json');
-    this.copyGuest(context, 'dsh-harmony-http.cjs', root + '/dsh-harmony-http.cjs');
-    this.copyGuest(context, 'dsh-harmony-llhttp.cjs', root + '/dsh-harmony-llhttp.cjs');
-    this.copyGuest(context, 'dsh-harmony-sharp.cjs', root + '/dsh-harmony-sharp.cjs');
-    this.copyGuest(context, 'dsh-harmony-package.cjs', root + '/dsh-harmony-package.cjs');
-    this.copyGuest(context, 'dsh-harmony-forge.cjs', root + '/dsh-harmony-forge.cjs');
-    this.copyGuest(context, 'dsh-harmony-inspector-worker.cjs', root + '/dsh-harmony-inspector-worker.cjs');
-    this.copyGuest(context, 'dsh-harmony-liveshare.cjs', root + '/dsh-harmony-liveshare.cjs');
-    this.copyGuest(context, 'dsh-harmony-speech.cjs', root + '/dsh-harmony-speech.cjs');
-    this.copyGuest(context, 'dsh-harmony-pnpm-fetch.cjs', root + '/dsh-harmony-pnpm-fetch.cjs');
-    this.copyGuest(context, 'dsh-harmony-workflow.cjs', root + '/dsh-harmony-workflow.cjs');
-    this.copyGuest(context, 'dsh-harmony-workflow-wire.cjs', root + '/dsh-harmony-workflow-wire.cjs');
-    this.copyGuest(context, 'dsh-harmony-workflow-worker.cjs', root + '/dsh-harmony-workflow-worker.cjs');
-    for (const name of ['dsh-harmony-office.cjs', 'dsh-harmony-office-launch.cjs', 'dsh-harmony-office-entry.mjs', 'dsh-harmony-office-worker.mjs']) {
+    const appGallery = isAppGalleryBuild(context);
+    for (const name of ['dsh-native-web.cjs', 'dsh-harmony-http.cjs', 'dsh-harmony-llhttp.cjs']) {
       this.copyGuest(context, name, root + '/' + name);
     }
-    const ptc = context.resourceManager.getRawFileContentSync('dsh-harmony-ptc-enabled');
-    this.copyGuest(context, 'dsh-harmony-ptc-enabled', root + '/dsh-harmony-ptc-enabled');
-    if (ptc[0] === 49) {
-      for (const name of ['amaro.cjs', 'instantiate.cjs', 'dsh-harmony-ptc.cjs', 'dsh-harmony-ptc-worker.mjs']) {
+    if (appGallery) {
+      for (const name of ['appgallery.patch.yml', 'dsh-native-image.cjs', 'dsh-native-search.cjs',
+        'dsh-harmony-fs.mjs']) {
         this.copyGuest(context, name, root + '/' + name);
+      }
+    } else {
+      const appGalleryPatch = root + '/appgallery.patch.yml';
+      if (fileIo.accessSync(appGalleryPatch)) fileIo.unlinkSync(appGalleryPatch);
+      this.copyGuest(context, 'dsh-harmony-subprocess.mjs', root + '/dsh-harmony-subprocess.mjs');
+      this.copyGuest(context, 'dsh-harmony-bash-pipe.mjs', root + '/dsh-harmony-bash-pipe.mjs');
+      this.copyGuest(context, 'dsh-harmony-fs.mjs', root + '/dsh-harmony-fs.mjs');
+      this.copyGuest(context, 'dsh-harmony-signed-programs.json', root + '/dsh-harmony-signed-programs.json');
+      this.copyGuest(context, 'dsh-harmony-sharp.cjs', root + '/dsh-harmony-sharp.cjs');
+      this.copyGuest(context, 'dsh-harmony-package.cjs', root + '/dsh-harmony-package.cjs');
+      this.copyGuest(context, 'dsh-harmony-forge.cjs', root + '/dsh-harmony-forge.cjs');
+      this.copyGuest(context, 'dsh-harmony-inspector-worker.cjs', root + '/dsh-harmony-inspector-worker.cjs');
+      this.copyGuest(context, 'dsh-harmony-liveshare.cjs', root + '/dsh-harmony-liveshare.cjs');
+      this.copyGuest(context, 'dsh-harmony-speech.cjs', root + '/dsh-harmony-speech.cjs');
+      this.copyGuest(context, 'dsh-harmony-pnpm-fetch.cjs', root + '/dsh-harmony-pnpm-fetch.cjs');
+      this.copyGuest(context, 'dsh-harmony-workflow.cjs', root + '/dsh-harmony-workflow.cjs');
+      this.copyGuest(context, 'dsh-harmony-workflow-wire.cjs', root + '/dsh-harmony-workflow-wire.cjs');
+      this.copyGuest(context, 'dsh-harmony-workflow-worker.cjs', root + '/dsh-harmony-workflow-worker.cjs');
+      for (const name of ['dsh-harmony-office.cjs', 'dsh-harmony-office-launch.cjs', 'dsh-harmony-office-entry.mjs', 'dsh-harmony-office-worker.mjs']) {
+        this.copyGuest(context, name, root + '/' + name);
+      }
+      const ptc = context.resourceManager.getRawFileContentSync('dsh-harmony-ptc-enabled');
+      this.copyGuest(context, 'dsh-harmony-ptc-enabled', root + '/dsh-harmony-ptc-enabled');
+      if (ptc[0] === 49) {
+        for (const name of ['amaro.cjs', 'instantiate.cjs', 'dsh-harmony-ptc.cjs', 'dsh-harmony-ptc-worker.mjs']) {
+          this.copyGuest(context, name, root + '/' + name);
+        }
       }
     }
     const recovery = new BootRecovery(context.filesDir);
@@ -184,7 +199,7 @@ class DshEngine {
         const status = poc.nativeStatus();
         if (status < 0) {
           this.stopPolling();
-          this.publish('本机 DSH 未运行。可在恢复选项中选择安全模式。');
+          this.publish('本机 DSH 未运行。可在恢复选项中选择安全模式。', undefined, undefined, true);
           hilog.error(0xD005, 'DSHClient', 'native Host unavailable status=%{public}d', status);
         } else if (!ready && fileIo.accessSync(launchFile)) {
           const session = JSON.parse(fileIo.readTextSync(launchFile)) as BrowserSession;
@@ -196,24 +211,25 @@ class DshEngine {
           ready = true;
           session.safe = mode === 'safe';
           this.publish('', session, { phase: '加载界面', percent: 90 });
-          if (this.backgroundPreference) void backgroundKeeper.start(context);
+          if (!appGallery && this.backgroundPreference) void backgroundKeeper.start(context);
           hilog.info(0xD005, 'DSHClient', 'native loopback ready ms=%{public}d mode=%{public}s',
             Date.now() - started, mode);
         } else if (!ready && Date.now() - nativeStarted > 60000) {
           this.stopPolling();
-          this.publish('本机 DSH 启动超时。可在恢复选项中选择安全模式。');
+          this.publish('本机 DSH 启动超时。可在恢复选项中选择安全模式。', undefined, undefined, true);
           hilog.error(0xD005, 'DSHClient', 'native Host startup timed out status=%{public}d', status);
         }
       } catch (e) {
         this.stopPolling();
-        this.publish('本机 DSH 页面初始化失败。可从恢复选项重试。');
+        this.publish('本机 DSH 页面初始化失败。可从恢复选项重试。', undefined, undefined, true);
         hilog.error(0xD005, 'DSHClient', 'native launch descriptor invalid');
       }
     }, 200);
   }
 
-  private pluginProfileFiles(root: string): string[] {
-    const profile = root + '/native-benchmark-home/profiles/web';
+  private pluginProfileFiles(context: common.UIAbilityContext, root: string): string[] {
+    const name = isAppGalleryBuild(context) ? 'mobile-appgallery' : 'web';
+    const profile = root + '/native-benchmark-home/profiles/' + name;
     return [profile + '/cordis.patch.yml', profile + '/cordis.yml',
       profile + '/package.json', profile + '/pnpm-lock.yaml'];
   }
@@ -253,6 +269,7 @@ class DshEngine {
 
   extractOptional(context: common.UIAbilityContext): void {
     const root = context.filesDir + '/alpine';
+    if (isAppGalleryBuild(context)) return;
     const dshRelease = root + '/.dsh-0.2.2-rc.5';
     let identity = '';
     try {
@@ -283,7 +300,7 @@ class DshEngine {
     const snapshot = context.filesDir + '/plugin-snapshot';
     try {
       if (!fileIo.accessSync(snapshot)) fileIo.mkdirSync(snapshot, true);
-      for (const source of this.pluginProfileFiles(root)) {
+      for (const source of this.pluginProfileFiles(context, root)) {
         if (!fileIo.accessSync(source)) continue;
         const name = source.substring(source.lastIndexOf('/') + 1);
         fileIo.copyFileSync(source, snapshot + '/' + name + '.tmp');
@@ -299,7 +316,7 @@ class DshEngine {
     const snapshot = context.filesDir + '/plugin-snapshot';
     let restored = false;
     try {
-      for (const target of this.pluginProfileFiles(root)) {
+      for (const target of this.pluginProfileFiles(context, root)) {
         const name = target.substring(target.lastIndexOf('/') + 1);
         const source = snapshot + '/' + name;
         if (!fileIo.accessSync(source)) continue;
@@ -358,11 +375,16 @@ class DshEngine {
     try {
       const state = new BootRecovery(context.filesDir).read();
       if (state.pending && state.mode === 'safe') {
-        this.publish('上次安全启动未完成。请选择恢复选项。');
+        this.publish('上次安全启动未完成。请选择恢复选项。', undefined, undefined, true);
         return;
       }
       const mode = state.pending ? 'safe' : state.mode;
       this.publish('正在准备运行环境…', undefined, { phase: '环境准备', percent: 5 });
+      if (isAppGalleryBuild(context)) {
+        await this.startAppGallery(context, root, started, mode);
+        nativeStarted = true;
+        return;
+      }
       for (const name of ['bin', 'lib', 'etc', 'tmp', 'root', 'dsh']) {
         const path = root + '/' + name;
         if (!fileIo.accessSync(path)) fileIo.mkdirSync(path, true);
@@ -436,13 +458,30 @@ class DshEngine {
         this.writeMode(modeFile, 'compat');
         await this.run(context, launchFile, false, started);
       }
-      this.publish('本机 DSH 服务已退出。重新打开可重试。');
+      this.publish('本机 DSH 服务已退出。重新打开可重试。', undefined, undefined, true);
     } catch (e) {
-      this.publish('本机 DSH 准备失败。重新打开可重试。');
+      this.publish('本机 DSH 准备失败。重新打开可重试。', undefined, undefined, true);
       hilog.error(0xD005, 'DSHClient', 'setup error %{public}s', String(e));
     } finally {
       if (!nativeStarted) this.running = false;
     }
+  }
+
+  private async startAppGallery(context: common.UIAbilityContext, root: string,
+                                started: number, mode: string): Promise<void> {
+    const release = root + '/.dsh-0.2.2-rc.5';
+    for (const directory of [release, root + '/tmp', root + '/etc']) {
+      if (!fileIo.accessSync(directory)) fileIo.mkdirSync(directory, true);
+    }
+    const archive = 'dsh-appgallery-layer.zip';
+    const identity = readAppGalleryLink(context, archive + '.sha256').trim();
+    if (!/^[a-f0-9]{64}$/.test(identity)) throw new Error('Invalid AppGallery runtime identity');
+    this.publish('正在解包核心组件…', undefined, { phase: '解包核心组件', percent: 20 });
+    await this.unpack(context, archive, release, identity);
+    for (const name of ['fetch-shim.cjs', 'dsh-client.patch.yml']) {
+      this.copyGuest(context, name, root + '/' + name);
+    }
+    this.runNative(context, root, started, mode);
   }
 
   private async unpackAuxLayers(context: common.UIAbilityContext, root: string, mode: string): Promise<void> {

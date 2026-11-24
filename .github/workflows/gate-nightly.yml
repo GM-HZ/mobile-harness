@@ -34,7 +34,8 @@ jobs:
       - name: Install on the emulator
         run: |
           HDC="$DEVECO_HOME/sdk/default/openharmony/toolchains/hdc"
-          "$HDC" -t "$MH_EMULATOR" install -r .build/artifacts/harmonyos/*-unsigned.hap
+          VERSION=$(python3 -c 'import json; print(json.load(open("apps/harmonyos/AppScope/app.json5"))["app"]["versionName"])')
+          "$HDC" -t "$MH_EMULATOR" install -r ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v$VERSION-unsigned.hap"
           "$HDC" -t "$MH_EMULATOR" shell aa force-stop org.sayact.nodepoc
           "$HDC" -t "$MH_EMULATOR" shell aa start -a EntryAbility -b org.sayact.nodepoc
           sleep 10

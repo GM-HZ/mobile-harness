@@ -25,7 +25,8 @@
 | PTY / 终端 | ⏸ 延期 | 平台无 `/dev/ptmx`；不作为当前目标 |
 | GUI/手机操控、容器/systemd/dbus | ⏸ 范围外 | 平台边界 |
 | Node JIT | ⏸ 当前 jitless | 构建默认 `--jitless`；可另评估 |
-| 远程主机（直连 DSH Web / SSH 隧道） | ⏸ 第二阶段 | 实验分支 `codex/harmonyos-remote-mode` 已验证模拟器连接；真机、重连、安全存储和 SSH 主机确认待验 |
+| 远程主机 | 🔶 | self/lab 提供 HTTPS 直连实验入口。SSH 隧道、断线续接和真机待验 |
+| AppGallery 发布变体 | 🔶 | 独立包名与隐私入口、原生图片处理和搜索。发布演练校验原生包形状 |
 | 后台常驻（HarmonyOS 长时任务） | ✅ | 默认关闭，开启后申请通知权限；真机后台 35 分钟/锁屏通过；通知停止 action 待点击验证 |
 | 真机自动化门禁 | 🔶 | device_lab 协议就绪；需解锁/在线，脚本化调度待接 CI |
 | CI runner 实跑 | 🔶 | 4 个 workflow 已定义；本地等价验证完成，未在 runner 实跑 |

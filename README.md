@@ -6,6 +6,8 @@ Mobile Harness 是面向手机的原生 Agent 执行工程。手机接收用户�
 
 ## 当前基线
 
+鸿蒙 `1.0.0` 候选从同一份源码生成普通包、自建包和 AppGallery 原生发行包。用户体验和发布验收按[第一可用版本计划](docs/work/2026-11-21-first-usable-version.md)推进。
+
 鸿蒙原型固定使用 Node.js 24.14.1 和官方 npm DSH 0.2.2-rc.5，源码子模块同步锁定官方 RC.5 标签。DSH Host 原生运行，Linux 命令行工具由 Alpine／PRoot 按需执行。普通包默认带通用 PTC；Office 与 HTTP/1 适配沿用已有实现。
 
 0.4.69 在合并后的基线上补齐遗留验收：PTC 单链接读取加固与并发父目录边界、LiveShare 自建 Relay 的双模拟器跨设备 viewer（owner 实际 ArkWeb 授权后，第二台设备真实浏览器读取共享会话）、本机 Ollama 非 DeepSeek 端点接入、原生 addon 加载位置实测，以及 Forge 公开读与全新安装账号入口复验。Forge 真实账号授权与托管仓库写操作已在临时私有仓库完成（仓库已删除）；真机麦克风采集与官方公网 LiveShare Relay／真实身份提供方仍待外部条件，在批次记录中单列。

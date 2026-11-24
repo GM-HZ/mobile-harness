@@ -46,6 +46,25 @@ gh release create "v$version" --target "$(git rev-parse HEAD)" \
   .build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v"$version"-unsigned.hap{,.sha256}
 ```
 
+## AppGallery 候选包
+
+构建工作区搜索共享库需要 Rust 和 OHOS ARM64 标准库。当前使用 Rust 1.96.1 验证，依赖由 `runtime/harmonyos/search/Cargo.lock` 固定。
+
+```sh
+rustup target add aarch64-unknown-linux-ohos
+```
+
+```sh
+HARMONY_APPGALLERY_BUNDLE='org.mobileharness.dshmh' \
+HARMONY_APPGALLERY_SOURCE_URL='https://your-domain.example/dsh-mh/source' \
+HARMONY_APPGALLERY_PRIVACY_URL='https://your-domain.example/dsh-mh/privacy' \
+./build.sh --appgallery
+```
+
+此命令在 `.build/stage/harmonyos-appgallery/` 生成独立的 DevEco 工程，在 `.build/artifacts/harmonyos-appgallery/` 输出 Release 模式的未签名 `.app` 和校验文件。用 DevEco Studio 26 打开该暂存工程，通过「构建 → 上传产品」选择对应的 HarmonyOS 应用并使用开发者中心云管理证书签名。随包 HAP 可在 Phone 模拟器验证。默认使用仓库的版本名和构建号。可使用 `HARMONY_APPGALLERY_VERSION_NAME` 和 `HARMONY_APPGALLERY_VERSION_CODE` 同时覆盖，覆盖后的构建号须大于仓库值。送审包的构建号需高于之前上传的版本。命令行重新构建保留已有的 DevEco 云签名包。随包 HAP 可用 `python3 scripts/adaptation/variant_check.py --variant appgallery --hap <HAP>` 检查。 [华为发布说明](https://developer.huawei.com/consumer/cn/doc/harmonyos-guides/ide-publish-app/)
+
+应用市场版本在用户同意隐私提示后启动本机 Host。该版本使用独立的 DSH profile，限制外部插件安装、远程接入和通用子进程执行，保留本机工作区、会话和原生工作区搜索。AppGallery 从当前锁定的 DSH 层生成独立归档，移除 Linux 原生载荷和 Office 转换组件。图片、搜索和 Host 使用鸿蒙原生运行时。普通调试包仍按原配方构建 Alpine 层。提交审核前按实际分发方式核对应用主体、备案及 AI 资质，将正式隐私政策的 HTTPS 地址同时用于 `HARMONY_APPGALLERY_PRIVACY_URL` 和华为后台。包内「个人信息处理说明」会显示该链接。将随包软件的对应源码和构建材料发布到可公开访问的页面，通过 `HARMONY_APPGALLERY_SOURCE_URL` 接入「开源软件声明」。仅供开发的候选包可以省略两个地址。若原地址上的政策内容发生实质变化，更新 ArkTS 中的 `POLICY_REVISION`，使应用重新提示用户同意。随包工具需要对应源码和许可证。
+
 ## Phone 模拟器回归
 
 显式选定回环 HDC 目标，安装并启动待测 HAP。故障夹具会在独立 Phone 模拟器上安装一个测试 DSH bundle，主动让 Host 进程崩溃并恢复正常 profile。测试使用模拟器测试数据。

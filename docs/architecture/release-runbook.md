@@ -7,42 +7,37 @@ green evidence for the exact commit.
 ## Local dry run
 
 ```sh
-./scripts/adaptation/release_dry_run.sh 0.4.69
+./scripts/adaptation/release_dry_run.sh
 ```
 
-This builds the store variant, builds the self variant, runs
-`release_evidence.py` (hashes/sizes + store shape + variant assertions) and then
-`release_gate.py`. Evidence lands in
-`docs/evidence/release/<version>-<commit>.json`.
+The script uses the version in `apps/harmonyos/AppScope/app.json5`. It builds
+store and self HAPs and an AppGallery Release `.app`, then validates their
+shapes and sizes. The AppGallery check opens the HAP inside the `.app`.
+Artifacts are copied to `.build/release-check/<version>/`. The record in
+`docs/evidence/release/<version>-<commit>.json` includes each SHA-256 and the RSI
+scoreboard hash.
 
-## CI tag flow (`gate-release.yml`)
+The tag workflow runs the same script. The release gate requires green evidence
+for the exact commit. AppGallery signing and submission use the steps in the
+[AppGallery release guide](../appgallery-release.md).
 
-Triggered by a `v*` tag (or manual dispatch) on the self-hosted macOS/DevEco lab:
+## Build variants
 
-1. G0 + G1 gates;
-2. build store → `store_build_check.py` + `variant_check --variant store`;
-3. build self → `variant_check --variant self` + `release_evidence.py`;
-4. `release_gate.py` (fails if evidence is missing or red);
-5. upload `gate-evidence-release` artifact.
+- `store` is the regular HarmonyOS package. Its checks require the default
+  build flags and prohibit the self-build loader, shim and overlay.
+- `self` includes the self-build tools. `lab` uses the same source baseline and
+  pins the overlay groups used in developer verification.
+- `appgallery` is the native distribution package. Its HAP must contain the
+  native image and search adapters and the AppGallery archive. Its package
+  assertions rule out Alpine/PRoot and self-build tools.
 
-## Requirements
+The emulator gates use separate application identities for the regular and
+AppGallery builds. Select the actual AppGallery simulator using
+`MH_APPGALLERY_EMULATOR` after installing its HAP and completing privacy consent.
 
-- store HAP: no `mh-exec`/`mh-install`, no exec shim, no overlay libraries,
-  `signedExecBypass=false`; size within `variants/store.json` maxBytes.
-- self HAP: contains the loader tools/shim/overlay and
-  `signedExecBypass=true`; size within `variants/self.json` maxBytes.
-- v1 HAPs exclude the remote SSH helper, including when the stage previously built the remote experiment.
-- evidence for the tagged commit exists under `docs/evidence/release/`;
-- the evidence embeds the current RSI scoreboard hash
-  (`docs/evidence/rsi/scoreboard.md`) and the release gate fails if it drifted.
-
-## Rollback / checks
-
-- The store artifact is the distributable; self builds stay lab-only.
-- If `release_gate.py` fails, do not tag: rebuild, re-run `release_dry_run.sh`,
-  then inspect `docs/evidence/gates/**` and the RSI ledger
-  (`python3 scripts/adaptation/rsi_ledger.py report`).
-
+```sh
+python3 gates/run.py --tier G2 --only appgallery-images,appgallery-search
+```
 
 ## Plugin recovery (bad plugin)
 

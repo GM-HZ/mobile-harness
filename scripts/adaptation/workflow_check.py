@@ -15,7 +15,7 @@ EXPECTED = {
     "gate-pr.yml": ["gates/run.py --tier G0", "gates/run.py --tier G1"],
     "gate-nightly.yml": ["capability-parity-gate", "nightly-recovery", "nightly-native-addon"],
     "gate-device.yml": ["device_lab.py run --suite verify", "device_lab.py status"],
-    "gate-release.yml": ["release_evidence.py", "release_gate.py", "store_build_check.py"],
+    "gate-release.yml": ["gates/run.py --tier G0", "gates/run.py --tier G1", "./scripts/adaptation/release_dry_run.sh"],
 }
 SCRIPT = re.compile(r"(?:python3\s+|\./)((?:scripts|tests)/[A-Za-z0-9_./-]+?\.(?:py|sh))")
 

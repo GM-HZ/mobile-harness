@@ -6,9 +6,11 @@ import re
 from pathlib import Path, PurePosixPath
 import shutil
 import subprocess
+from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 from urllib.parse import quote
 
+import harmonyos_appgallery as appgallery
 from harmonyos_dsh import stage_dsh
 from harmonyos_guest_extras import stage_guest_extras
 from harmonyos_ptc import PORTABLE_ASSETS, portable_assets
@@ -21,7 +23,10 @@ APP = ROOT / "apps/harmonyos"
 RUNTIME = ROOT / "runtime/harmonyos"
 EXPERIMENTAL = os.environ.get("HARMONY_EXPERIMENTAL_HOST_PROCESS") == "1"
 SELF_BUILD = os.environ.get("HARMONY_SELF_BUILD") == "1"
-STAGE = ROOT / ".build/stage" / ("harmonyos-process-probe" if EXPERIMENTAL else "harmonyos")
+APPGALLERY = os.environ.get("HARMONY_APPGALLERY_BUILD") == "1"
+STAGE = ROOT / ".build/stage" / (
+    "harmonyos-appgallery" if APPGALLERY else "harmonyos-process-probe" if EXPERIMENTAL else "harmonyos"
+)
 RAW = STAGE / "entry/src/main/resources/rawfile"
 CPP = STAGE / "entry/src/main/cpp"
 
@@ -58,12 +63,14 @@ def sha256(path):
     return digest.hexdigest()
 
 
-def stage_assets(inputs):
+def stage_assets(inputs, allowed=None):
     for row in (ROOT / "docs/build-inputs.sha256").read_text().splitlines():
         checksum, filename = row.split(maxsplit=1)
         relative = PurePosixPath(filename)
         if relative.is_absolute() or ".." in relative.parts:
             raise SystemExit(f"Invalid input path: {filename}")
+        if allowed is not None and relative.name not in allowed:
+            continue
         source = inputs / relative
         if not source.is_file():
             raise SystemExit(f"Missing pinned HarmonyOS input: {source}")
@@ -111,22 +118,99 @@ def stage_ptc_worker():
     subprocess.run([str(node), "--check", str(worker)], check=True)
 
 
+def stage_signing_profile():
+    signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
+    profile = Path(signing_profile or ROOT / "build-profile.json5")
+    unsigned = APPGALLERY or os.environ.get("HARMONY_UNSIGNED") == "1"
+    if signing_profile and not unsigned and not EXPERIMENTAL and not profile.is_file():
+        raise SystemExit(f"HarmonyOS signing profile not found: {profile}")
+    if EXPERIMENTAL or unsigned or not profile.is_file():
+        profile = APP / "build-profile.example.json5"
+    signing = STAGE / "build-profile.json5"
+    signing.unlink(missing_ok=True)
+    copy(profile, signing)
+    signing.chmod(0o600)
+    print(f"Prepared HarmonyOS project: {STAGE}")
+
+
+def stage_appgallery(inputs):
+    stage_assets(inputs, appgallery.PINNED_INPUTS)
+    bundle = os.environ.get("HARMONY_APPGALLERY_BUNDLE", "")
+    if not re.fullmatch(r"[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+", bundle):
+        raise ValueError("Invalid HARMONY_APPGALLERY_BUNDLE")
+    app_config = STAGE / "AppScope/app.json5"
+    config = json.loads(app_config.read_text())
+    config["app"]["bundleName"] = bundle
+    config["app"]["vendor"] = "Mobile Harness"
+    appgallery.set_appgallery_version(config["app"])
+    app_config.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
+    for directory in (STAGE / "AppScope", STAGE / "entry/src/main"):
+        strings = directory / "resources/base/element/string.json"
+        config = json.loads(strings.read_text())
+        for item in config["string"]:
+            if item["name"] == "app_name":
+                item["value"] = "DSH-MH"
+        strings.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
+    module_config = STAGE / "entry/src/main/module.json5"
+    config = json.loads(module_config.read_text())
+    for ability in config["module"]["abilities"]:
+        ability.pop("backgroundModes", None)
+    disabled_permissions = {"ohos.permission.KEEP_BACKGROUND_RUNNING", "ohos.permission.RUNNING_LOCK"}
+    config["module"]["requestPermissions"] = [
+        permission for permission in config["module"]["requestPermissions"]
+        if permission["name"] not in disabled_permissions
+    ]
+    module_config.write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n")
+    cmake = CPP / "CMakeLists.txt"
+    cmake.write_text("set(MOBILE_HARNESS_APPGALLERY ON)\n" + cmake.read_text())
+    appgallery.stage_appgallery_url(RAW, "HARMONY_APPGALLERY_PRIVACY_URL", "appgallery-privacy-url")
+    appgallery.stage_appgallery_url(RAW, "HARMONY_APPGALLERY_SOURCE_URL", "appgallery-source-url")
+    for name in ("dsh", "node"):
+        copy(ROOT / "vendor/repos" / name / "LICENSE", RAW / f"LICENSE.{name}.txt")
+    with TemporaryDirectory(prefix="prepare-appgallery-", dir=STAGE) as directory:
+        full_layer = Path(directory)
+        stage_dsh(ROOT, full_layer, inputs / "entry/src/main/resources/rawfile/dsh-layer.zip")
+        stage_http(ROOT, full_layer)
+        for name in ("dsh-harmony-llhttp.cjs", "LICENSE.llhttp.txt", "LICENSE.undici.txt"):
+            copy(full_layer / name, RAW / name)
+        appgallery.stage_layer(ROOT, full_layer, RAW)
+    libraries = STAGE / "entry/libs/arm64-v8a"
+    appgallery.stage_appgallery_image(ROOT, libraries)
+    appgallery.stage_appgallery_search(ROOT, libraries, RAW)
+    stage_signing_profile()
+
+
 def main():
+    if APPGALLERY and (EXPERIMENTAL or SELF_BUILD):
+        raise ValueError("AppGallery is a separate build variant")
+    if APPGALLERY:
+        # The AppGallery stage is isolated and all rawfiles and native libraries
+        # are regenerated. Prevent earlier stages from leaking guest assets.
+        for directory in (RAW, STAGE / "entry/libs/arm64-v8a"):
+            for generated in directory.glob("*"):
+                if generated.is_file():
+                    generated.unlink()
     inputs = Path(os.environ.get("HARMONY_INPUTS_DIR") or ROOT / ".build/inputs/harmonyos").resolve()
     for source in files_from_index(APP):
-        copy(source, STAGE / source.relative_to(APP))
+        if not APPGALLERY or source.name != "alpine-release":
+            copy(source, STAGE / source.relative_to(APP))
     for directory in (ROOT / "packages/dsh-host", ROOT / "packages/bundles/mobile",
                       RUNTIME / "compat", RUNTIME / "diagnostics"):
         for source in sorted(directory.iterdir()):
-            if source.is_file():
+            if source.is_file() and (
+                source.name in appgallery.HOST_FILES if APPGALLERY else source.name not in appgallery.APPGALLERY_ONLY
+            ):
                 copy(source, RAW / source.name)
     dshm = ROOT / "vendor/repos/dshm"
     copy(dshm / "hostcore/app/fetch-shim.js", RAW / "fetch-shim.cjs")
     copy(dshm / "LICENSE", RAW / "LICENSE.dshm.txt")
-    stage_workflow_worker()
     for name in ("poc.c", "nativehost.c", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h",
                  "ptc-supervisor.c", "ptc-supervisor.h", "ptc-file-filter.c", "ptc-file-filter.h"):
         copy(RUNTIME / "native" / name, CPP / name)
+    if APPGALLERY:
+        stage_appgallery(inputs)
+        return
+    stage_workflow_worker()
     if EXPERIMENTAL:
         app_config = STAGE / "AppScope/app.json5"
         source = (APP / "AppScope/app.json5").read_text()
@@ -167,10 +251,8 @@ def main():
             stream.write("\ntarget_compile_definitions(poc PRIVATE MH_SELF_BUILD=1)\n")
     # The stage is reused across builds and branches. Discard overlays removed
     # from the v1 source tree before packing the HAP.
-    for obsolete in (RAW / "dsh-settings-client.js", RAW / "dsh-harmony-remote-ssh.cjs",
-                     STAGE / "entry/src/main/ets/pages/RemoteHosts.ets",
-                     STAGE / "entry/src/main/ets/runtime/RemoteHosts.ets"):
-        obsolete.unlink(missing_ok=True)
+    for name in appgallery.APPGALLERY_ONLY | {"dsh-settings-client.js", "dsh-harmony-remote-ssh.cjs"}:
+        (RAW / name).unlink(missing_ok=True)
     (RAW / "dsh-self-build.json").write_text(json.dumps({
         "selfBuild": SELF_BUILD,
         "signedExecBypass": SELF_BUILD,
@@ -185,18 +267,7 @@ def main():
         loader.unlink(missing_ok=True)
         installer.unlink(missing_ok=True)
     print(f"Self-build signed-exec bypass: {'enabled' if SELF_BUILD else 'disabled'}")
-    signing_profile = os.environ.get("HARMONY_SIGNING_PROFILE")
-    profile = Path(signing_profile or ROOT / "build-profile.json5")
-    unsigned = os.environ.get("HARMONY_UNSIGNED") == "1"
-    if signing_profile and not unsigned and not EXPERIMENTAL and not profile.is_file():
-        raise SystemExit(f"HarmonyOS signing profile not found: {profile}")
-    if EXPERIMENTAL or unsigned or not profile.is_file():
-        profile = APP / "build-profile.example.json5"
-    signing = STAGE / "build-profile.json5"
-    signing.unlink(missing_ok=True)
-    copy(profile, signing)
-    signing.chmod(0o600)
-    print(f"Prepared HarmonyOS project: {STAGE}")
+    stage_signing_profile()
 
 
 if __name__ == "__main__":
