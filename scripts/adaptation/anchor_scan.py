@@ -4,18 +4,19 @@
 `gates/run.py --tier G1` runs this in `--check` mode: adding a `replacePinned`
 call without a matching anchors.full.json entry (or changing a literal anchor)
 fails the gate. `--layer` additionally verifies every literal anchor against an
-assembled dsh-layer.zip so a build/bump cannot silently lose an anchor.
+assembled DSH layer so a build/bump cannot silently lose an anchor.
 
     python3 scripts/adaptation/anchor_scan.py            # write index
     python3 scripts/adaptation/anchor_scan.py --check
-    python3 scripts/adaptation/anchor_scan.py --layer <dsh-layer.zip>
+    python3 scripts/adaptation/anchor_scan.py --layer <dsh-chunks.json|dsh-layer.zip>
 """
 import argparse
 import json
 import re
 import sys
-import zipfile
 from pathlib import Path
+
+from dsh_layer import locate_layer, open_layer
 
 ROOT = Path(__file__).resolve().parents[2]
 FILES = [
@@ -25,10 +26,6 @@ FILES = [
     "runtime/harmonyos/compat/dsh-harmony-forge.cjs",
 ]
 OUTPUT = ROOT / "adaptation/anchors.full.json"
-CANDIDATE_LAYERS = [
-    ROOT / ".build/stage/harmonyos/entry/src/main/resources/rawfile/dsh-layer.zip",
-    ROOT.parent / "harmonyos-capability-parity/.build/stage/harmonyos/entry/src/main/resources/rawfile/dsh-layer.zip",
-]
 CALL = re.compile(r"replacePinned\(")
 FUNCTION = re.compile(r"function\s+([A-Za-z0-9_$]+)\s*\(")
 MODULE = re.compile(r"paths\('([^']+)'\)|path\.join\(dsh,\s*'([^']+)'\)|path\.join\(dsh,\s*\"([^\"]+)\"\)")
@@ -221,19 +218,9 @@ def scan():
     return entries
 
 
-def locate_layer(explicit):
-    if explicit:
-        return Path(explicit)
-    for candidate in CANDIDATE_LAYERS:
-        if candidate.is_file():
-            return candidate
-    return None
-
-
 def layer_js_files(layer):
-    with zipfile.ZipFile(layer) as archive:
-        for info in archive.infolist():
-            name = info.filename
+    with open_layer(layer) as members:
+        for name, archive in members.items():
             if name.startswith("dsh/node_modules/") and name.endswith((".js", ".mjs", ".cjs")):
                 yield archive.read(name).decode("utf-8", "replace"), name
 
@@ -271,20 +258,23 @@ def map_layer(entries, layer):
 def verify_layer(entries, layer):
     missing = []
     checked = 0
-    with zipfile.ZipFile(layer) as archive:
-        names = set(archive.namelist())
+    with open_layer(layer) as members:
         for entry in entries:
             if entry["dynamic"] or not entry["anchor"]:
                 continue
             if entry.get("layerModule"):
                 checked += 1
                 if entry.get("layerAmbiguous"):
-                    good = any(archive.read(name).decode("utf-8", "replace").count(entry["anchor"]) >= 1
-                               for name in entry.get("layerFiles", [entry["layerModule"]]))
+                    good = any(members[name].read(name).decode("utf-8", "replace").count(entry["anchor"]) >= 1
+                               for name in entry.get("layerFiles", [entry["layerModule"]]) if name in members)
                     if not good:
                         missing.append({**entry, "reason": "ambiguous anchor missing from all candidate files"})
                     continue
-                payload = archive.read(entry["layerModule"]).decode("utf-8", "replace")
+                module = entry["layerModule"]
+                if module not in members:
+                    missing.append({**entry, "reason": "mapped module not found in layer"})
+                    continue
+                payload = members[module].read(module).decode("utf-8", "replace")
                 if payload.count(entry["anchor"]) != 1:
                     missing.append({**entry, "reason": f"layer anchor count {payload.count(entry['anchor'])} != 1"})
                 continue
@@ -292,12 +282,12 @@ def verify_layer(entries, layer):
                 continue
             candidates = [f"dsh/node_modules/@deepseek-ai/{entry['module']}"]
             # paths() values are dsh-<pkg>/lib/... without @deepseek-ai prefix
-            candidates = [name for name in candidates if name in names]
+            candidates = [name for name in candidates if name in members]
             if not candidates:
                 missing.append({**entry, "reason": "module not found in layer"})
                 continue
             checked += 1
-            payload = archive.read(candidates[0]).decode("utf-8", "replace")
+            payload = members[candidates[0]].read(candidates[0]).decode("utf-8", "replace")
             if payload.count(entry["anchor"]) != 1:
                 missing.append({**entry, "reason": f"anchor count {payload.count(entry['anchor'])} != 1",
                                 "moduleFile": candidates[0]})
@@ -330,7 +320,7 @@ def main():
     if args.map:
         layer = locate_layer(args.layer)
         if not layer:
-            print("SKIP anchor mapping: dsh-layer.zip not available", file=sys.stderr)
+            print("SKIP anchor mapping: assembled DSH layer not available", file=sys.stderr)
             return 2
         stats = map_layer(entries, layer)
         data = {"schema": 1, "source": "scripts/adaptation/anchor_scan.py",
@@ -342,7 +332,7 @@ def main():
     if args.layer:
         layer = locate_layer(args.layer)
         if not layer:
-            print("SKIP anchor layer verification: dsh-layer.zip not available", file=sys.stderr)
+            print("SKIP anchor layer verification: assembled DSH layer not available", file=sys.stderr)
             return 2
         if OUTPUT.is_file():
             entries = json.loads(OUTPUT.read_text()).get("entries", entries)

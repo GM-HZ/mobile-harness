@@ -25,7 +25,7 @@
 | PTY / 终端 | ⏸ 延期 | 平台无 `/dev/ptmx`；不作为当前目标 |
 | GUI/手机操控、容器/systemd/dbus | ⏸ 范围外 | 平台边界 |
 | Node JIT | ⏸ 当前 jitless | 构建默认 `--jitless`；可另评估 |
-| 远程主机（直连 DSH Web / SSH 隧道） | 🔶 | 模拟器端到端通过；真机/断线重连/安全存储待补 |
+| 远程主机（直连 DSH Web / SSH 隧道） | ⏸ 第二阶段 | 实验分支 `codex/harmonyos-remote-mode` 已验证模拟器连接；真机、重连、安全存储和 SSH 主机确认待验 |
 | 后台常驻（HarmonyOS 长时任务） | ✅ | dataTransfer + running lock + cancel 重试；真机后台 35 分钟/锁屏通过；通知停止 action 待点击验证 |
 | 真机自动化门禁 | 🔶 | device_lab 协议就绪；需解锁/在线，脚本化调度待接 CI |
 | CI runner 实跑 | 🔶 | 4 个 workflow 已定义；本地等价验证完成，未在 runner 实跑 |
@@ -88,9 +88,9 @@
 
 - **P1** 插件支持策略文档：支持纯 JS/Cordis、bundle；不支持运行时原生 `.so`/需编译/PTY/桌面能力；
 - **P1** 崩溃安全：坏插件导致 Host 退出后，下次启动自动进入安全模式，并提供"禁用最近插件"的恢复路径
-  （现有 `BootRecovery` 已能自动安全模式，需补 UI 与 profile 回滚）；
+  （`BootRecovery` 自动进入安全模式，保留正常启动快照并打开恢复页）；
 - **P0/P1** 插件门禁：`nightly-plugin-git-update` 已加入 nightly（本地 PASS）；
-  插件回滚（last-known-good snapshot + 恢复页按钮）已实现，UI 点击需解锁后的手工/自动化验证；
+  `nightly-recovery` 在模拟器通过恢复页点击回滚，核对配置和原会话。真机装包后复验；
   市场/公开图用例需要模型 key，暂不纳入；
 - **P2** 原生插件走构建期 `extensions[]` 签名 overlay（不承诺运行时任意 dlopen）；
 - **P2** 安全模型：插件拥有 App 权限，需明示来源/信任与审核策略。

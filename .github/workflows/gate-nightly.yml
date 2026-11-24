@@ -29,6 +29,8 @@ jobs:
         run: python3 gates/run.py --tier G0 --evidence-dir .build/gate-evidence
       - name: Build the emulator package
         run: ./build.sh --package
+      - name: G1 host contracts on the packaged layer
+        run: python3 gates/run.py --tier G1 --evidence-dir .build/gate-evidence
       - name: Install on the emulator
         run: |
           HDC="$DEVECO_HOME/sdk/default/openharmony/toolchains/hdc"

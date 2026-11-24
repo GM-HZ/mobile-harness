@@ -9,9 +9,10 @@ ArkTS 层负责生命周期、rawfile 装配、模式/开关、把 Host 拉起�
 2. **rawfile 清单与 stage 对齐**：新增 rawfile 资产必须同步 `scripts/build/stage-harmonyos.py`；
    `DshEngine.ets` 只复制 stage 产出的文件。
 3. **失败要可恢复**：启动失败要有 fallback（fast→compat）与用户可见错误；不要 silent catch。
-4. **安全**：不落盘凭据；不把 token/Account 信息写 hilog；权限申请最小化。
-5. **UI/客户端**：优先官方 DSH client plugin/bundle 扩展点；本目录只保留手机壳能力。
-6. **验证**：改变启动流程必须跑真机 G3（verify/exec/overlay）+ 模拟器 nightly；证据落盘。
+4. **插件回滚**：只在正常 Host 就绪后保存配置快照。安全模式保留上一份快照，并在恢复页提供回滚和返回会话入口。
+5. **安全**：不落盘凭据；不把 token/Account 信息写 hilog；权限申请最小化。
+6. **UI/客户端**：优先官方 DSH client plugin/bundle 扩展点；本目录只保留手机壳能力。
+7. **验证**：改变启动流程必须跑真机 G3（verify/exec/overlay）+ 模拟器 nightly；证据落盘。
 
 ## 检查清单
 

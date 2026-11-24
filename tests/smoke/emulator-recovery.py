@@ -1,4 +1,4 @@
-"""Inject a crash-only DSH bundle on an isolated loopback Phone emulator."""
+"""Verify safe startup and recovery UI rollback after a plugin crash on a loopback emulator."""
 import argparse
 import base64
 import hashlib
@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import re
+import runpy
 import subprocess
 import tarfile
 import tempfile
@@ -120,7 +121,7 @@ def test(emulator, output):
     backup = f"{PROFILE}/{name}.bak"
     lock_backup = backup + '.lock'
     boot_backup = 'mobile-harness-boot.json.' + name
-    result = {"fixture": name}
+    result = {"fixture": name, "ok": False}
     modified = False
     forwarded = False
     had_lock = False
@@ -136,6 +137,7 @@ def test(emulator, output):
         assert emulator.app(f'cp {PROFILE}/package.json {backup} && cp mobile-harness-boot.json {boot_backup} && printf SAVED') == 'SAVED'
         modified = True
         result['manifestBeforeSha256'] = digest(PROFILE + '/package.json')
+        assert digest('plugin-snapshot/package.json') == result['manifestBeforeSha256']
         had_lock = emulator.app(f'test -e {PROFILE}/pnpm-lock.yaml && printf PRESENT') == 'PRESENT'
         if had_lock: emulator.app(f'cp {PROFILE}/pnpm-lock.yaml {lock_backup}')
         result['lockBeforeSha256'] = digest(PROFILE + '/pnpm-lock.yaml') if had_lock else None
@@ -179,6 +181,19 @@ def test(emulator, output):
         state = emulator.rpc("session/state", {"request": {"sessionId": session}})
         result["sameSessionInSafeMode"] = isinstance(state.get("cursor"), int)
         assert result["pluginNotLoadedAgain"] and result["sameSessionInSafeMode"]
+        result['normalSnapshotPreservedInSafeMode'] = (
+            digest('plugin-snapshot/package.json') == result['manifestBeforeSha256']
+        )
+        assert result['normalSnapshotPreservedInSafeMode']
+        ui = runpy.run_path(str(Path(__file__).with_name('emulator-chat-import-ui.py')))
+        rollback = ui['wait_control'](emulator, {'回滚插件配置并正常重开'}, 'Button')
+        ui['tap'](emulator, rollback)
+        result['rollbackReadyMs'] = emulator.ready('normal')
+        result['rollbackRestoredManifest'] = digest(PROFILE + '/package.json') == result['manifestBeforeSha256']
+        state = emulator.rpc('session/state', {'request': {'sessionId': session}})
+        result['sameSessionAfterRollback'] = isinstance(state.get('cursor'), int)
+        assert result['rollbackRestoredManifest'] and result['sameSessionAfterRollback']
+        result['ok'] = True
     finally:
         try:
             if modified:
@@ -195,6 +210,9 @@ def test(emulator, output):
                 result['lockAfterSha256'] = digest(PROFILE + '/pnpm-lock.yaml') if had_lock else None
                 assert result['manifestBeforeSha256'] == result['manifestAfterSha256']
                 assert result['lockBeforeSha256'] == result['lockAfterSha256']
+        except Exception:
+            result['ok'] = False
+            raise
         finally:
             emulator.hdc('shell', 'rm', '-f', remote + '.tgz', remote + '.json')
             if forwarded:

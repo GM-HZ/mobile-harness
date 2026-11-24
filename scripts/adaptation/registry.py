@@ -105,7 +105,7 @@ def main():
                "requires": ["MH_EMULATOR env"], "timeout": 1200})
     g2.append({"id": "nightly-recovery",
                "command": "python3 tests/smoke/emulator-recovery.py \"$MH_EMULATOR\" .build/gate-evidence/recovery.json",
-               "covers": "crash recovery on the isolated emulator", "requires": ["MH_EMULATOR env"],
+               "covers": "plugin crash, safe startup and rollback in the recovery UI", "requires": ["MH_EMULATOR env"],
                "timeout": 1200})
     for name in sorted(emulator):
         if name.endswith("emulator-recovery.py"):
@@ -130,7 +130,7 @@ def main():
                  "covers": "node --check for host/compat overlays", "timeout": 180},
                 {"id": "upstream-anchors", "command": "python3 scripts/adaptation/anchors.py",
                  "covers": "literal upstream anchors used by runtime hooks",
-                 "requires": ["assembled dsh-layer.zip"], "timeout": 300},
+                 "requires": ["assembled DSH layer in the current worktree"], "timeout": 300},
                 {"id": "compat-inventory", "command": "python3 scripts/adaptation/compat_check.py",
                  "covers": "compat modules have inventory rows, consumers and documented gates", "timeout": 120},
                 {"id": "compat-contracts", "command": "python3 scripts/adaptation/compat_contracts.py",

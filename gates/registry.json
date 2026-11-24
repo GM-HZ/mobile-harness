@@ -43,7 +43,7 @@
           "command": "python3 scripts/adaptation/anchors.py",
           "covers": "literal upstream anchors used by runtime hooks",
           "requires": [
-            "assembled dsh-layer.zip"
+            "assembled DSH layer in the current worktree"
           ],
           "timeout": 300
         },
@@ -217,7 +217,7 @@
         {
           "id": "nightly-recovery",
           "command": "python3 tests/smoke/emulator-recovery.py \"$MH_EMULATOR\" .build/gate-evidence/recovery.json",
-          "covers": "crash recovery on the isolated emulator",
+          "covers": "plugin crash, safe startup and rollback in the recovery UI",
           "requires": [
             "MH_EMULATOR env"
           ],

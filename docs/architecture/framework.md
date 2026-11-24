@@ -41,7 +41,7 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
 2. **补丁闭环**：`series.json` 的每条补丁必须能在 `patch_rehearsal` 中应用到 pin 的 tarball，
    必须在 `TARGETS.md` 有行，必须有 Gate（至少 G1）。
 3. **锚点闭环**：`anchors.json` 的每个锚点要么是字面量、要么是 patch marker，必须能被
-   `anchors.py` 在装配后的 dsh-layer 上校验；bump 时全量重验。
+   `anchors.py` 在当前工作树的装配层上校验；bump 时全量重验。
 4. **boot 期零字符串改写为默认**：session/bash/settings 已收敛；新的运行时改写需要
    convergence 条目 + 迁移目标，否则不合并。
 5. **变体隔离**：store 无 loader/shim/overlay；self 有；lab 固定全组。G4 断言强制。
@@ -70,7 +70,7 @@ G  门禁/证据         gates/, scripts/adaptation/, docs/evidence
 3. 验证：`patch_rehearsal`、`anchors.py`、`host_contracts.py`、对应 G2/G3 用例。
 4. 证据：gate 证据 + 台账；需要设备时 `device_lab`。
 5. 收敛：上游出现 seam 时按 `convergence.json` 迁移并删除运行时改写。
-6. 锚点映射：构建后运行 `python3 scripts/adaptation/anchor_scan.py --map --layer <dsh-layer.zip>`，
+6. 锚点映射：构建后运行 `python3 scripts/adaptation/anchor_scan.py --map --layer <dsh-chunks.json>`，
    把每个字面量锚点映射到装配层模块；`anchors.full.json` 同时是 bump 全量校验的输入。
    重复出现的锚点标记 `layerAmbiguous`，只做存在性覆盖、不做 drift 判定。
 

@@ -2,6 +2,8 @@
 
 日期：2026-11-22
 
+该实现保存在 `codex/harmonyos-remote-mode`（`302414e`），由路线图第二阶段继续验收。
+
 ## 1. 形态
 
 - **A. direct**：手机不启动本地 Host，WebView 直接加载服务器 DSH Web（URL + token）。

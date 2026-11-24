@@ -40,20 +40,7 @@ function MobileHarnessGitHubRow() {
 		chinese ? "管理账号" : "Manage account", "/.mobile-harness/github");
 }
 
-function MobileHarnessRemoteRow() {
-	const chinese = document.documentElement.lang.startsWith("zh");
-	return MobileHarnessNavigationRow(chinese ? "远程主机" : "Remote hosts",
-		chinese ? "连接电脑或服务器上的 DSH Web。" : "Connect to DSH Web on a computer or server.",
-		chinese ? "管理主机" : "Manage hosts", "/.mobile-harness/remote");
-}
-
 function registerMobileHarnessRecovery(ctx) {
-	ctx.slots.inject("settings.general.item", () => ctx.slots.register({
-		name: "settings.general.item",
-		id: "mobile-harness-remote",
-		order: 96,
-		locale: NS,
-	}, MobileHarnessRemoteRow));
 	ctx.slots.inject("settings.general.item", () => ctx.slots.register({
 		name: "settings.general.item",
 		id: "mobile-harness-github",

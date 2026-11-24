@@ -15,14 +15,11 @@ import re
 import subprocess
 import sys
 import tempfile
-import zipfile
 from pathlib import Path
 
+from dsh_layer import locate_layer, open_layer
+
 ROOT = Path(__file__).resolve().parents[2]
-CANDIDATES = [
-    ROOT / ".build/stage/harmonyos/entry/src/main/resources/rawfile/dsh-layer.zip",
-    ROOT.parent / "harmonyos-capability-parity/.build/stage/harmonyos/entry/src/main/resources/rawfile/dsh-layer.zip",
-]
 SETTINGS = "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
 BASH_MODULES = [
     "dsh/node_modules/@deepseek-ai/dsh-bash-local/lib/index.js",
@@ -30,13 +27,6 @@ BASH_MODULES = [
 ]
 SESSION = "dsh/node_modules/@deepseek-ai/dsh-session-persistence-jsonl/lib/index.js"
 ANCHOR = '"bash",\n\t\t\t"-c",'
-
-
-def locate():
-    for candidate in CANDIDATES:
-        if candidate.is_file():
-            return candidate
-    return None
 
 
 def node_check(source):
@@ -53,14 +43,14 @@ def main():
     parser = __import__("argparse").ArgumentParser(description=__doc__)
     parser.add_argument("--layer")
     args = parser.parse_args()
-    layer = Path(args.layer) if args.layer else locate()
+    layer = locate_layer(args.layer)
     if not layer:
         print("SKIP host contracts: assembled DSH layer unavailable", file=sys.stderr)
         return 2
     failures = []
     checked = []
-    with zipfile.ZipFile(layer) as archive:
-        settings = archive.read(SETTINGS).decode()
+    with open_layer(layer) as members:
+        settings = members[SETTINGS].read(SETTINGS).decode()
         marker = "registerMobileHarnessRecovery(ctx);"
         stage = (ROOT / "scripts/build/stage-harmonyos.py").read_text()
         engine = (ROOT / "apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets").read_text()
@@ -82,7 +72,7 @@ def main():
                             f"{syntax.stderr.strip()[:200]}")
         boot_no_replacement = ANCHOR not in (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         for module in BASH_MODULES:
-            source = archive.read(module).decode()
+            source = members[module].read(module).decode()
             patched = '"/bin/bash",\n\t\t\t"-c",' in source
             syntax = node_check(source)
             ok = patched and boot_no_replacement and syntax.returncode == 0
@@ -91,14 +81,15 @@ def main():
             if not ok:
                 failures.append(f"{module}: patched={patched} bootNoReplacement={boot_no_replacement} "
                                 f"syntax={syntax.returncode} {syntax.stderr.strip()[:200]}")
-        forge = archive.read("dsh/node_modules/@deepseek-ai/dsh-experimental-forge-github/lib/index.js").decode()
+        forge_module = "dsh/node_modules/@deepseek-ai/dsh-experimental-forge-github/lib/index.js"
+        forge = members[forge_module].read(forge_module).decode()
         host = (ROOT / "packages/dsh-host/dsh-native-web.cjs").read_text()
         forge_marker = "globalThis.__harmonyGhRunner ?? ghRunner(resolved)"
         ok = forge_marker in forge and "__harmonyGhRunner" in host and "const execa = globalThis.__harmonyGh;" not in host
         checked.append({"id": "forge-guest-runner", "ok": ok})
         if not ok:
             failures.append("forge contract: patched registration + guest runner adapter + no boot rewrite")
-        session = archive.read(SESSION).decode()
+        session = members[SESSION].read(SESSION).decode()
         boot = (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         replacement = "globalThis.__dshClientRenameNoReplace(tmp, finalPath)"
         patched = replacement in session

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "717cc3312ebb6b913b94a0a5d37b4d802eb72530",
+  "generatedFrom": "302414eba1c76bc19c7215057b8a6787da5ecc16",
   "layers": [
     "host",
     "web",
@@ -36,8 +36,8 @@
       "kind": "file",
       "source": "packages/dsh-host/dsh-client.cjs",
       "role": "runtime overlay copied into the guest root",
-      "sha256": "2bc6ac4199467635c58967ae1316f516515b58d77ec1f689c4bb78b176e26dcd",
-      "bytes": 9172,
+      "sha256": "1a54fa2650dc1d515c4e14a5a7396477d7f45c603632bb46a10bfcd9cdb3948b",
+      "bytes": 8939,
       "fragility": "high",
       "upstreamTouchpoints": [],
       "gates": [
@@ -253,8 +253,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/web/settings-recovery.js",
       "role": "web client injection",
-      "sha256": "d5849cca4777a513d55573a9062e239bcda190722bb9faed644c8e0e271e8979",
-      "bytes": 2488,
+      "sha256": "7222288a0d844d504e217e56741b403f5284688d65ce72d56813dbe6460f28dc",
+      "bytes": 1937,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -393,21 +393,6 @@
       "sha256": "210db0480cf38bfe061b8bb375ebc40c6eda9d0e1e8e47b35eb1a79396dc3cb8",
       "bytes": 61,
       "fragility": "medium",
-      "upstreamTouchpoints": [],
-      "gates": [
-        "G0",
-        "G1"
-      ]
-    },
-    {
-      "id": "compat:runtime/harmonyos/compat/dsh-harmony-remote-ssh.cjs",
-      "layer": "compat",
-      "kind": "file",
-      "source": "runtime/harmonyos/compat/dsh-harmony-remote-ssh.cjs",
-      "role": "upstream capability shim",
-      "sha256": "f164dead19ed33f6cd140b8397b99c4cc195c174763a303a68be0ce640ca10b9",
-      "bytes": 4344,
-      "fragility": "high",
       "upstreamTouchpoints": [],
       "gates": [
         "G0",
@@ -1140,8 +1125,8 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "27086758e8c5b20f6d6ad05b2480488c22b70033c01b039d1ffd2f604ecd1ea7",
-      "files": 30,
+      "sha256": "802f93c563f26169cf692a97b7da28072164ec543db97e91e94928b59fa76e03",
+      "files": 28,
       "fragility": "medium",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1252,8 +1237,8 @@
       "bytes": 11799
     },
     "runtime/harmonyos/dsh/package-lock.json": {
-      "sha256": "c0f5ea4c8bee232f1521a2ce70a5c450b455fb7f159ffba44d5e5572c35e1e38",
-      "bytes": 453744
+      "sha256": "a2ba4190e0ed9b63a991bfd1c5dc32891a5fc846430c2d373ea98c9a9f4ccf0d",
+      "bytes": 451595
     },
     ".gitmodules": {
       "sha256": "5f8c50079f05351e48de4bbea361a06aeaa3e1770aca65ca1512ce27e09c63ee",
@@ -1272,7 +1257,7 @@
     "dshRelease": "0.2.2-rc.5",
     "npmLock": {
       "path": "runtime/harmonyos/dsh/package-lock.json",
-      "sha256": "c0f5ea4c8bee232f1521a2ce70a5c450b455fb7f159ffba44d5e5572c35e1e38"
+      "sha256": "a2ba4190e0ed9b63a991bfd1c5dc32891a5fc846430c2d373ea98c9a9f4ccf0d"
     }
   }
 }

@@ -130,14 +130,6 @@ async function start() {
   fs.mkdirSync('/workspace', { recursive: true });
   process.chdir('/workspace');
 
-  if (fs.existsSync('/tmp/remote-host.json')) {
-    const remote = JSON.parse(fs.readFileSync('/tmp/remote-host.json', 'utf8'));
-    if (remote.kind === 'ssh') {
-      require('/dsh-harmony-remote-ssh.cjs');
-      return;
-    }
-  }
-
   const native = require('/harmony-publish.node');
   let collectBootMetrics = true;
   let getStartupSource = openStartupSources();
