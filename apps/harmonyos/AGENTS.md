@@ -13,6 +13,7 @@ ArkTS 层负责生命周期、rawfile 装配、模式/开关、把 Host 拉起�
 5. **安全**：不落盘凭据；不把 token/Account 信息写 hilog；权限申请最小化。后台常驻默认关闭，用户开启开关后再请求通知权限。远程连接入口只在 self/lab 开放。
 6. **UI/客户端**：优先官方 DSH client plugin/bundle 扩展点；本目录只保留手机壳能力。
 7. **验证**：改变启动流程必须跑真机 G3（verify/exec/overlay）+ 模拟器 nightly；证据落盘。
+8. **运行时策略**：嵌入式 Node 的启动参数由原生层统一设置。ArkTS 的分块解包状态只用于装配、进度和启动计时。
 
 ## 检查清单
 

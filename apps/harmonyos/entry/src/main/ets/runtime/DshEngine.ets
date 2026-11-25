@@ -432,17 +432,6 @@ class DshEngine {
         this.copyGuest(context, name, root + '/' + name);
       }
       if (mode !== 'safe') this.prepareSelfBuildTools(context, root);
-      try {
-        const coldBootMarker = root + '/dsh-host-jitless';
-        if (extractedChunks > 0) {
-          fileIo.writeSync(fileIo.openSync(coldBootMarker,
-            fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC).fd, new ArrayBuffer(0));
-        } else {
-          try { fileIo.unlinkSync(coldBootMarker); } catch (error) { /* warm boot */ }
-        }
-      } catch (error) {
-        // Marker is an optimization; ignore failures.
-      }
       if (mode === 'safe' || !fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
         await this.prepareResolver(root);
         this.runNative(context, root, started, mode);

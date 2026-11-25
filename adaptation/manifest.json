@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "e32f45a16c669ab22a16c6a8f2bf22e479a30208",
+  "generatedFrom": "a4b022b343e60918a9d81c509db51050c5e05bd2",
   "layers": [
     "host",
     "web",
@@ -527,8 +527,22 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/AGENTS.md",
       "role": "native runtime / adapter",
-      "sha256": "c1fb870938e81d7cefc6b849ad37891b6253615ca65b86c2b77aaefc168912cc",
-      "bytes": 1436,
+      "sha256": "09697066df9c4237900aa641234fc065d376279386dd65ab2ac53e550eb8df28",
+      "bytes": 1710,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/child-descriptors.h",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/child-descriptors.h",
+      "role": "native runtime / adapter",
+      "sha256": "2be61bef16cdf3c928e47941e02ccf743307d4c03d2757c2a3b4346d13865373",
+      "bytes": 1084,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -667,8 +681,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/nativehost.c",
       "role": "native runtime / adapter",
-      "sha256": "7fc6c511fdeac5f3e0ebacd161ba476075617d189f329847c49623b1c7e2f24a",
-      "bytes": 5875,
+      "sha256": "5a77fc8cfaadf66ea36ed9ce0b3a5a52f626cfbfc215e15da99849d9845fb244",
+      "bytes": 5157,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -681,8 +695,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/poc.c",
       "role": "native runtime / adapter",
-      "sha256": "a90c93218e1f4859dda724dfa0ac478bbaff08ad68aa4c47a009762cbb4bac3c",
-      "bytes": 35717,
+      "sha256": "a2817c05b9d42d1bf5738d7d8f4e4639564b38fb49db1e92eaaee9f6ee2bdd80",
+      "bytes": 35344,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -723,8 +737,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/ptc-supervisor.c",
       "role": "native runtime / adapter",
-      "sha256": "fc9ab976eb0cb22bf5055a44d065a237ec408ea81ff6a2a049e6a9c5859e674c",
-      "bytes": 17811,
+      "sha256": "980913d4acdd084da00cdd4827b9b75385eaafbcff38b1989b5cecc7d6777189",
+      "bytes": 17807,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -751,8 +765,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/workflow-broker.c",
       "role": "native runtime / adapter",
-      "sha256": "1c9d8cd2e1a22375319fe8613a67352bd33ed995a66ba09a1f463eb520e7f8e4",
-      "bytes": 13416,
+      "sha256": "e2d198d29435435529206522c3facdc09ab88495c21c000ef1befa9570b23a66",
+      "bytes": 13466,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1226,7 +1240,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "ddc0c4624e9c9ecceaad790e701267e707f9be5ea7fa3d8b4f3480beb1771fac",
+      "sha256": "6177795a09d7e58cd738b5c70656f012edb5db913c83cb10448b6f118dfe07cb",
       "files": 31,
       "fragility": "medium",
       "upstreamTouchpoints": [],

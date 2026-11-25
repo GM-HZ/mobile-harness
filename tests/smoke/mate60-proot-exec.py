@@ -394,6 +394,50 @@ def texts(results):
     return "\n".join(item.get("text", "") for result in results for item in result["content"])
 
 
+def record_probe_result(evidence, command, calls, results):
+    bash_calls = [call for call in calls if call["name"] == "bash"]
+    bash_call = bash_calls[0] if bash_calls else None
+    arguments = {}
+    if bash_call:
+        try:
+            arguments = json.loads(bash_call.get("arguments", ""))
+        except (TypeError, ValueError):
+            pass
+    actual_command = arguments.get("command") if isinstance(arguments, dict) else None
+    bash_results = [result for result in results
+                    if bash_call and result.get("toolCallId") == bash_call["callId"]]
+    bash_result_ok = len(bash_results) == 1 and bash_results[0].get("isError") is False
+    text = texts(bash_results)
+    lines = {line.strip() for line in text.splitlines()}
+
+    done = re.search(r"\becho ([A-Z][A-Z0-9_]*_DONE)\b", command)
+    markers = {done.group(1): done.group(1) in lines} if done else {}
+    expected_exits = {}
+    if command == PROBE:
+        markers.update({marker: marker in lines for marker in (
+            "EXEC_SH_OK", "EXEC_BASH_OK", "EXEC_NODE_OK", "EXEC_PY_OK", "EXEC_SCRIPT_OK", "COPY_NODE_OK",
+        )})
+        expected_exits = dict.fromkeys(("SH_EXIT", "BASH_EXIT", "NODE_EXIT", "PY_EXIT", "GIT_EXIT",
+                                        "SCRIPT_EXIT", "COPY_NODE_EXIT"), "0")
+        # Unbound xxd, BusyBox under an unknown applet name, and a truncated ELF should fail.
+        expected_exits.update(XXD_EXIT="126", COPY_BUSYBOX_EXIT="127", FAKE_EXIT="1")
+    elif command == NATIVE_OVERLAY_PROBE:
+        markers.update({marker: marker in lines for marker in (
+            "CTYPES_LIBARCHIVE_OK", "EXTENSION_ANSWER 42", "MH_INSTALL_OK /usr/bin/jq", "jq-1.8.2", "1",
+        )})
+        expected_exits = dict.fromkeys(("CTYPES_EXIT", "EXT_EXIT", "JQ_INSTALL_EXIT",
+                                        "JQ_VERSION_EXIT", "JQ_RUN_EXIT"), "0")
+
+    exits = dict(re.findall(r"^([A-Z0-9_]+_EXIT)=([^\r\n]*)", text, re.MULTILINE))
+    command_matched = actual_command == command
+    evidence.update(toolCalls=calls, bashCallCount=len(bash_calls), bashResultOk=bash_result_ok,
+                    command=actual_command, commandMatched=command_matched,
+                    resultText=text, markers=markers, exits=exits, expectedExits=expected_exits)
+    evidence["ok"] = (len(calls) == len(bash_calls) == 1 and command_matched and bash_result_ok
+                      and done is not None and all(markers.values())
+                      and all(exits.get(key) == value for key, value in expected_exits.items()))
+
+
 def run(device, port, output, probe=None, loader_file=None, payload_file=None, elf_args="", elf_argv0=None):
     name = "proot-exec-" + uuid.uuid4().hex[:8]
     native = FILES + "/alpine/workspace-native/" + name
@@ -473,32 +517,7 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
                        + json.dumps({"command": command, "description": "Probe PRoot exec semantics"})
                        + ". Use no other tools. Report the result and stop.")
         calls, results, _ = prompt(device, session, instruction)
-        evidence["toolCalls"] = calls
-        bash_calls = [call for call in calls if call["name"] == "bash"]
-        evidence["bashCallCount"] = len(bash_calls)
-        if not bash_calls:
-            raise AssertionError("The model did not call bash")
-        arguments = json.loads(bash_calls[0]["arguments"])
-        evidence["commandMatched"] = arguments.get("command") == command
-        evidence["command"] = arguments.get("command")
-        text = texts(results)
-        evidence["resultText"] = text
-        markers = {}
-        for marker in ("EXEC_SH_OK", "EXEC_BASH_OK", "EXEC_NODE_OK", "EXEC_PY_OK", "EXEC_SCRIPT_OK",
-                       "COPY_NODE_OK", "PROOT_EXEC_PROBE_DONE"):
-            markers[marker] = marker in text
-        # Each probe ends with its own DONE marker (e.g. NATIVE_OVERLAY_PROBE_DONE,
-        # SHIM_ENV_DONE); the shared EXEC_* markers only belong to the exec probe.
-        done = re.search(r"\b([A-Z][A-Z0-9_]*_DONE)\b", probe)
-        expected_done = done.group(1) if done else None
-        exits = {}
-        for line in text.splitlines():
-            if "=" in line and line.split("=", 1)[0].endswith("_EXIT"):
-                key, value = line.split("=", 1)
-                exits[key] = value.strip()
-        evidence["markers"] = markers
-        evidence["exits"] = exits
-        evidence["ok"] = bool(expected_done) and expected_done in text
+        record_probe_result(evidence, command, calls, results)
     finally:
         try:
             if session:
@@ -508,7 +527,8 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
         device.hdc("fport", "rm", "tcp:" + str(port), "tcp:19592")
         Path(output).write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps({key: evidence.get(key) for key in
-                      ("ok", "commandMatched", "markers", "exits")}, ensure_ascii=False, indent=1))
+                      ("ok", "commandMatched", "bashCallCount", "bashResultOk", "markers", "exits", "expectedExits")},
+                     ensure_ascii=False, indent=1))
     return evidence
 
 

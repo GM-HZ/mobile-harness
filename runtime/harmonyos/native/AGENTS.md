@@ -14,6 +14,7 @@ C/CMake 层：PRoot 桥、shell、workflow、PTC、exec shim、N-API 扩展。AB
 5. **ABI**：N-API 扩展必须用打包 Node 的 headers/ABI；`.node` 缺 `libnode.so` 依赖要显式处理。
 6. **AppGallery**：CMake 禁用 Workflow 和 PTC 编译入口，Image Kit 和原生搜索桥按 Host 的 Node-API ABI 装配。
 7. **证据**：真机 G3 `device_lab` 或对应 `--probe`，记录到 `docs/evidence/device-lab/`。
+8. **Host 启动与子进程**：嵌入式 Node 在正常、安全、冷启动和热启动均使用 `--jitless`。Workflow、PTC 和 shell 子进程在分配 IPC 描述符后用 `child-descriptors.h` 清理继承描述符。Mate 60 的应用沙箱会拦截 `close_range`。
 
 ## 检查清单
 

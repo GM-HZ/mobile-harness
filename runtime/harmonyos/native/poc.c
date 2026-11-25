@@ -1,9 +1,9 @@
 #define _GNU_SOURCE
 #include <napi/native_api.h>
 #ifndef MOBILE_HARNESS_APPGALLERY
+#include "child-descriptors.h"
 #include <hilog/log.h>
 #include <dlfcn.h>
-#include <dirent.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -121,20 +121,6 @@ static void close_pair(int pair[2]) {
 
 static int shell_channel(int pair[2], int streaming) {
     return streaming ? socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, pair) : pipe2(pair, O_CLOEXEC);
-}
-
-static int close_host_descriptors(int keep) {
-    DIR *dir = opendir("/proc/self/fd");
-    if (!dir) return errno;
-    int own = dirfd(dir);
-    struct dirent *entry;
-    while ((entry = readdir(dir))) {
-        char *end;
-        long fd = strtol(entry->d_name, &end, 10);
-        if (*end == 0 && fd > STDERR_FILENO && fd != own && fd != keep) close((int)fd);
-    }
-    closedir(dir);
-    return 0;
 }
 
 static void run_proot(const char *stage, const char *directory, char *out, size_t size, struct ShellLaunch *shell) {
@@ -477,7 +463,7 @@ static void run_proot(const char *stage, const char *directory, char *out, size_
                 dup2(shell_stdout[1], STDOUT_FILENO) < 0 ||
                 dup2(shell_stderr[1], STDERR_FILENO) < 0 ||
                 dup2(shell_status[1], status_channel) < 0 || fcntl(status_channel, F_SETFD, 0) < 0) _exit(47);
-            if (close_host_descriptors(status_channel) != 0) _exit(48);
+            if (close_child_descriptors(STDERR_FILENO + 1, status_channel) != 0) _exit(48);
             clearenv();
             setenv("HARMONY_PROOT_MANAGED_SHELL", "1", 1);
             setenv("HARMONY_GUEST_LIB_DIR", native, 1);

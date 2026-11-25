@@ -12,6 +12,8 @@ rediscover on hardware:
 3. Each probe determines success from its own `*_DONE` marker, not the exec
    probe's markers.
 4. device_lab requires the probe's `ok:true`, not only exit code 0.
+5. Embedded Host startup uses jitless, and children keep their intended
+   descriptors while avoiding an unsupported bulk-close syscall.
 """
 import sys
 from pathlib import Path
@@ -20,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 HOST = ROOT / "packages/dsh-host/dsh-native-web.cjs"
 PROBE = ROOT / "tests/smoke/mate60-proot-exec.py"
 DEVICE_LAB = ROOT / "scripts/adaptation/device_lab.py"
+NATIVE = ROOT / "runtime/harmonyos/native"
 
 
 def main():
@@ -48,15 +51,34 @@ def main():
         failures.append("forge gh no longer routes through the packaged shell helper")
     if "child.once('exit', code => setTimeout(() => finish(" not in compat:
         failures.append("forge gh child lifecycle no longer handles exit-only children")
-    if "expected_done in text" not in probe:
+    if "done.group(1) in lines" not in probe or "done is not None and all(markers.values())" not in probe:
         failures.append("probe success no longer uses its own *_DONE marker")
-    if "probe.get(\"ok\", True) is not False" not in device_lab:
+    if 'probe.get("ok") is True' not in device_lab:
         failures.append("device_lab no longer requires the probe's ok:true")
+    nativehost = (NATIVE / "nativehost.c").read_text()
+    if ('"node", "--jitless", "--expose-internals"' not in nativehost or "MH_SELF_BUILD" in nativehost
+            or "dsh-host-jitless" in nativehost or "dsh-host-jitless" in engine):
+        failures.append("embedded Host startup must use jitless on every launch")
+    descriptor_calls = {
+        "workflow-broker.c": ("STDERR_FILENO + 1, -1", "STDIN_FILENO + 1, -1"),
+        "ptc-supervisor.c": ("STDERR_FILENO + 1, 7",),
+        "poc.c": ("STDERR_FILENO + 1, status_channel",),
+    }
+    for name, arguments in descriptor_calls.items():
+        source = (NATIVE / name).read_text()
+        if "SYS_close_range" in source or any(f"close_child_descriptors({args})" not in source for args in arguments):
+            failures.append(f"{name} no longer closes child descriptors with the expected IPC exceptions")
+    descriptors = (NATIVE / "child-descriptors.h").read_text()
+    if not all(check in descriptors for check in ('opendir("/proc/self/fd")', "fd == own", "fd == keep")):
+        failures.append("child descriptor cleanup must preserve its directory and IPC descriptors")
+    staging = (ROOT / "scripts/build/stage-harmonyos.py").read_text()
+    if '"child-descriptors.h"' not in staging:
+        failures.append("HarmonyOS native staging omits the child descriptor helper")
     if failures:
         for failure in failures:
             print("FAIL", failure, file=sys.stderr)
         return 1
-    print("G1 host regressions OK: bash routing, padded status, probe/done and ok checks")
+    print("G1 host regressions OK: bash routing, padded status, probe acceptance, startup and child descriptors")
     return 0
 
 

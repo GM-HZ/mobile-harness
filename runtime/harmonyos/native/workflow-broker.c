@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include "child-descriptors.h"
 #include "workflow-broker.h"
 #include <dlfcn.h>
 #include <errno.h>
@@ -56,7 +57,7 @@ static void run_worker(const char *entry, int channel, pid_t parent, int office)
         dup2(channel, STDIN_FILENO) < 0 ||
         dup2(channel, STDOUT_FILENO) < 0 ||
         dup2(channel, STDERR_FILENO) < 0 ||
-        syscall(SYS_close_range, 3u, ~0u, 0u) < 0 ||
+        close_child_descriptors(STDERR_FILENO + 1, -1) != 0 ||
         clearenv() != 0 || disable_io_uring() != 0) _exit(125);
     if (office) {
         char directory[1100], home[1100];
@@ -113,7 +114,7 @@ static void serve(int channel, const char *entry, pid_t parent)
 {
     const struct sigaction child_signal = {.sa_handler = SIG_DFL};
     if (!follow_parent(parent) || dup2(channel, STDIN_FILENO) < 0 ||
-        syscall(SYS_close_range, 1u, ~0u, 0u) < 0 ||
+        close_child_descriptors(STDIN_FILENO + 1, -1) != 0 ||
         sigaction(SIGCHLD, &child_signal, NULL) < 0) _exit(125);
     channel = STDIN_FILENO;
     const pid_t broker_pid = getpid();

@@ -46,25 +46,9 @@ static int RunHost(void) {
         CloseWorkflow();
         return -2;
     }
-    // Signed self/lab builds enable V8 JIT (the anonymous executable mappings
-    // used by the signed ELF loader are available to the App). Store builds keep
-    // the conservative --jitless launch until store-side policy is verified.
-#ifdef MH_SELF_BUILD
-    char cold_path[1100];
-    snprintf(cold_path, sizeof(cold_path), "%s/dsh-host-jitless", directory);
-    const bool cold_boot = access(cold_path, F_OK) == 0;
-    if (cold_boot) {
-        char *cold_argv[] = {"node", "--jitless", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
-        int code = start(5, cold_argv);
-        CloseWorkflow();
-        return code == 0 ? -3 : -4;
-    }
-    char *argv[] = {"node", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
-    int code = start(4, argv);
-#else
+    // HarmonyOS can deny V8's executable page permissions even in signed self builds.
     char *argv[] = {"node", "--jitless", "--expose-internals", entry, safe_mode ? "safe" : "normal", NULL};
     int code = start(5, argv);
-#endif
     CloseWorkflow();
     return code == 0 ? -3 : -4;
 }

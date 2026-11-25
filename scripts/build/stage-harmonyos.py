@@ -204,7 +204,7 @@ def main():
     dshm = ROOT / "vendor/repos/dshm"
     copy(dshm / "hostcore/app/fetch-shim.js", RAW / "fetch-shim.cjs")
     copy(dshm / "LICENSE", RAW / "LICENSE.dshm.txt")
-    for name in ("poc.c", "nativehost.c", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h",
+    for name in ("poc.c", "nativehost.c", "child-descriptors.h", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h",
                  "ptc-supervisor.c", "ptc-supervisor.h", "ptc-file-filter.c", "ptc-file-filter.h"):
         copy(RUNTIME / "native" / name, CPP / name)
     if APPGALLERY:

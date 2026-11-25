@@ -83,11 +83,13 @@ def run_suite(serial, suite):
     probe = {}
     if output.is_file():
         try:
-            probe = json.loads(output.read_text())
+            payload = json.loads(output.read_text())
+            if isinstance(payload, dict):
+                probe = payload
         except (ValueError, OSError):
-            probe = {}
+            pass
     # Probe scripts exit 0 even when they report a failed acceptance; require both.
-    passed = result.returncode == 0 and probe.get("ok", True) is not False
+    passed = result.returncode == 0 and probe.get("ok") is True
     return {"suite": suite, "exit": result.returncode, "passed": passed, "probeOk": probe.get("ok"),
             "durationSeconds": elapsed, "outputTail": (result.stdout + result.stderr)[-1500:],
             "evidence": str(output.relative_to(ROOT)) if output.is_file() else None,

@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include "child-descriptors.h"
 #include "ptc-supervisor.h"
 #include "ptc-file-filter.h"
 #include <dlfcn.h>
@@ -41,7 +42,7 @@ static void start_node(const char *entry, int control, int setup, int root, pid_
     setup = fcntl(setup, F_DUPFD_CLOEXEC, 8);
     if (!follow(parent) || fchdir(root) < 0 ||
         dup2(control, 7) < 0 || dup2(setup, 0) < 0 || dup2(setup, 1) < 0 || dup2(setup, 2) < 0 ||
-        syscall(SYS_close_range, 3u, 6u, 0u) < 0 || syscall(SYS_close_range, 8u, ~0u, 0u) < 0 ||
+        close_child_descriptors(STDERR_FILENO + 1, 7) != 0 ||
         clearenv() != 0 || setenv("DSH_SUBPROCESS_CONTROL", "pipe", 1) < 0 ||
         ptc_deny_io_uring() != 0) _exit(125);
     void *library = dlopen("libnode.so", RTLD_NOW | RTLD_LOCAL);

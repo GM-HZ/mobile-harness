@@ -34,13 +34,15 @@ ERRORS = {"ENOENT", "EACCES", "EXDEV", "ELOOP", "ENOTDIR", "EPERM"}
 SELF_ERRORS = {"EPERM", "EACCES", "ENOSYS", "EINVAL"}
 
 
-def session(emulator, evidence):
+def session(emulator, evidence, use_fixture_model):
     workspace = emulator.rpc("workspace/create", {"request": {"path": WORKSPACE}})["workspace"]["workspaceId"]
     sid = emulator.rpc("session/create", {"request": {
         "workspaceId": workspace, "agentPreset": "ptc"}})["sessionId"]
-    catalog = emulator.rpc("session/modelCatalog", {})
-    provider = catalog["default"]["provider"]
-    model = catalog["default"]["model"]
+    if use_fixture_model:
+        provider, model = "deepseek-official", "deepseek-flash"
+    else:
+        default = emulator.rpc("session/modelCatalog", {})["default"]
+        provider, model = default["provider"], default["model"]
     emulator.rpc("session/selectModel", {"request": {
         "sessionId": sid, "provider": provider, "model": model, "reasoningEffort": "off"}})
     evidence["model"] = {"provider": provider, "model": model}
@@ -353,9 +355,10 @@ def run(device, args):
         boot = continuation["read_bytes"](device, "mobile-harness-boot.json")
         evidence["manifestBeforeSha256"] = hashlib.sha256(manifest).hexdigest()
         install_actuator(device, actuator, evidence)
-        workspace, sid = session(device, evidence)
-        self_privilege(device, sid, evidence)
-        concurrent_parent_rename(device, sid, evidence, actuator)
+        with support["model_key"](device) as use_fixture_model:
+            workspace, sid = session(device, evidence, use_fixture_model)
+            self_privilege(device, sid, evidence)
+            concurrent_parent_rename(device, sid, evidence, actuator)
     finally:
         if sid:
             try:

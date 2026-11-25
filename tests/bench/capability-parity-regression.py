@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import time
 
@@ -20,7 +21,14 @@ SMOKE = ROOT / "tests/smoke"
 HDC = os.environ.get("HARMONY_HDC", "/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchains/hdc")
 DEVECO = Path(os.environ.get("DEVECO_HOME", "/Applications/DevEco-Studio.app/Contents"))
 VERSION = json.loads((ROOT / "apps/harmonyos/AppScope/app.json5").read_text())["app"]["versionName"]
-ARTIFACT = ROOT / f".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v{VERSION}-unsigned.hap"
+DEFAULT_ARTIFACT = ROOT / f".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v{VERSION}-unsigned.hap"
+
+
+def loopback_target(value):
+    match = re.fullmatch(r"127\.0\.0\.1:([0-9]{1,5})", value)
+    if match is None or not 0 < int(match[1]) <= 65535:
+        raise argparse.ArgumentTypeError("expected a loopback emulator at 127.0.0.1:<port>")
+    return value
 
 
 def step(name, script, arguments, output, timeout, critical=True):
@@ -106,13 +114,18 @@ def reset_account_device(target):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", default="127.0.0.1:5555")
-    parser.add_argument("--second-target", default="127.0.0.1:5557", help="Second emulator for the cross-device viewer")
-    parser.add_argument("--account-target", default=None, help="Signed-out emulator for the account entry step")
+    parser.add_argument("--target", type=loopback_target, default=os.environ.get("MH_EMULATOR", "127.0.0.1:5555"))
+    parser.add_argument("--second-target", type=loopback_target,
+                        default=os.environ.get("MH_SECOND_EMULATOR", "127.0.0.1:5557"),
+                        help="Second emulator for the cross-device viewer (MH_SECOND_EMULATOR)")
+    parser.add_argument("--account-target", type=loopback_target, default=os.environ.get("MH_ACCOUNT_EMULATOR"),
+                        help="Disposable emulator for the account entry reset (MH_ACCOUNT_EMULATOR, defaults to second)")
     parser.add_argument("--forge-target", default=None, help="Emulator without a Forge GitHub config for the public-read step")
     parser.add_argument("--voice-model-root", default=str(ROOT.parent/"harmonyos-package-management/.build/voice-native/models"))
     parser.add_argument("--voice-audio", default=str(ROOT.parent/"harmonyos-package-management/.build/voice-native/mandarin-sample.wav"))
     parser.add_argument("--ollama-model", default="mh-smoke-ollama-079:latest")
+    parser.add_argument("--artifact", type=Path, default=os.environ.get("MH_PARITY_HAP", DEFAULT_ARTIFACT),
+                        help="Exact HAP already installed on the test targets (MH_PARITY_HAP)")
     parser.add_argument("--output", type=Path, default=ROOT/".build/batch-011/capability-parity-gate.json")
     parser.add_argument("--only", help="Comma separated step names")
     args = parser.parse_args()
@@ -124,15 +137,31 @@ def main():
     steps = build_steps(args)
     if args.only:
         wanted = {name.strip() for name in args.only.split(",") if name.strip()}
+        if not wanted or not wanted.issubset({row["name"] for row in steps}):
+            parser.error("--only must name one or more known capability cases")
         steps = [row for row in steps if row["name"] in wanted]
-    targets = subprocess.check_output([HDC, "list", "targets"], text=True).strip().splitlines()
+    artifact = args.artifact.resolve()
+    if not artifact.is_file():
+        parser.error(f"HAP artifact not found: {artifact}")
+    sha256 = hashlib.sha256()
+    with artifact.open("rb") as contents:
+        for block in iter(lambda: contents.read(1024 * 1024), b""):
+            sha256.update(block)
+        artifact_size = contents.tell()
+    targets = {row["arguments"][0] for row in steps}
+    if any(row["name"] == "liveshare-cross-device" for row in steps):
+        targets.add(args.second_target)
+    for target in sorted(targets):
+        product = subprocess.check_output([HDC, "-t", target, "shell", "param get const.product.model"],
+                                          text=True, timeout=30).strip()
+        if product != "emulator":
+            parser.error(f"{target} is not a connected HarmonyOS emulator")
     summary = {
         "kind": "capability parity regression gate",
         "startedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-        "targets": targets,
-        "artifact": {"path": str(ARTIFACT.relative_to(ROOT)),
-                     "sha256": hashlib.sha256(ARTIFACT.read_bytes()).hexdigest(),
-                     "bytes": ARTIFACT.stat().st_size},
+        "targets": sorted(targets),
+        "artifact": {"path": str(artifact.relative_to(ROOT) if artifact.is_relative_to(ROOT) else artifact),
+                     "sha256": sha256.hexdigest(), "bytes": artifact_size},
         "sourceCommit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
         "steps": [],
     }
