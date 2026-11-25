@@ -36,4 +36,5 @@ jobs:
           path: |
             .build/gate-evidence
             docs/evidence/release/*.json
+            docs/evidence/release/rsi-*.md
           if-no-files-found: ignore

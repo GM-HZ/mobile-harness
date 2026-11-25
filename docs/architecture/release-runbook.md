@@ -15,7 +15,10 @@ store and self HAPs and an AppGallery Release `.app`, then validates their
 shapes and sizes. The AppGallery check opens the HAP inside the `.app`.
 Artifacts are copied to `.build/release-check/<version>/`. The record in
 `docs/evidence/release/<version>-<commit>.json` includes each SHA-256 and the RSI
-scoreboard hash.
+scoreboard hash. The record points to the report captured for that release in
+`docs/evidence/release/rsi-<sha256>.md`. Refreshing the weekly scoreboard leaves
+previous release snapshots available for verification. CI uploads the snapshots
+with the release records.
 
 The tag workflow runs the same script. The release gate requires green evidence
 for the exact commit. AppGallery signing and submission use the steps in the

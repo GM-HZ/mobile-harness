@@ -50,6 +50,26 @@ def appgallery_check(package):
     return result
 
 
+def archive_scoreboard(staging):
+    report = staging / "scoreboard.md"
+    result = subprocess.run(["python3", "scripts/adaptation/gate_report.py", "--output", str(report)],
+                            cwd=ROOT, capture_output=True)
+    if result.returncode != 0:
+        return None
+
+    content = report.read_bytes()
+    digest = hashlib.sha256(content).hexdigest()
+    snapshot = EVIDENCE / f"rsi-{digest}.md"
+    pending_snapshot = staging / snapshot.name
+    pending_snapshot.write_bytes(content)
+    pending_snapshot.replace(snapshot)
+
+    scoreboard = ROOT / "docs/evidence/rsi/scoreboard.md"
+    scoreboard.parent.mkdir(parents=True, exist_ok=True)
+    report.replace(scoreboard)
+    return {"path": str(snapshot.relative_to(ROOT)), "sha256": digest}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--store", type=Path, required=True)
@@ -85,21 +105,20 @@ def main():
     for label, path in inputs.items():
         artifacts[label] = {"file": path.name, "sha256": sha256(path), "bytes": path.stat().st_size,
                             "maxBytes": variants[label]["hap"].get("maxBytes")}
-    subprocess.run(["python3", "scripts/adaptation/gate_report.py"], cwd=ROOT, check=False,
-                   capture_output=True)
-    scoreboard = ROOT / "docs/evidence/rsi/scoreboard.md"
-    rsi = None
-    if scoreboard.is_file():
-        rsi = {"path": str(scoreboard.relative_to(ROOT)), "sha256": sha256(scoreboard)}
     ok = all(check["passed"] for check in checks) and all(
         artifact["maxBytes"] is None or artifact["bytes"] <= artifact["maxBytes"]
         for artifact in artifacts.values()
     )
-    evidence = {"version": version, "commit": commit, "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-                "artifacts": artifacts, "checks": checks, "rsiScoreboard": rsi, "ok": ok}
     EVIDENCE.mkdir(parents=True, exist_ok=True)
     output = EVIDENCE / f"{version}-{commit}.json"
-    output.write_text(json.dumps(evidence, indent=2) + "\n")
+    with TemporaryDirectory(dir=EVIDENCE) as directory:
+        staging = Path(directory)
+        rsi = archive_scoreboard(staging)
+        evidence = {"version": version, "commit": commit, "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                    "artifacts": artifacts, "checks": checks, "rsiScoreboard": rsi, "ok": ok}
+        pending_evidence = staging / output.name
+        pending_evidence.write_text(json.dumps(evidence, indent=2) + "\n")
+        pending_evidence.replace(output)
     subprocess.run(["python3", "scripts/adaptation/rsi_ledger.py", "record", "--tiers", "G4",
                     "--evidence", str(output.relative_to(ROOT))] + (["--ok"] if ok else []),
                    cwd=ROOT, check=False)

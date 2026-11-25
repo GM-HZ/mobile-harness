@@ -20,6 +20,7 @@ OUTPUT = ROOT / "docs/evidence/rsi/scoreboard.md"
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--limit", type=int, default=200)
+    parser.add_argument("--output", type=Path, default=OUTPUT)
     args = parser.parse_args()
     registry = json.loads(REGISTRY.read_text())["tiers"]
     rows = []
@@ -59,9 +60,11 @@ def main():
     lines += ["", "## Gate registry snapshot", ""]
     for tier, info in registry.items():
         lines.append(f"- {tier} ({info['name']}): {len(info['entries'])} entries")
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text("\n".join(lines) + "\n")
-    print(f"scoreboard: {OUTPUT.relative_to(ROOT)}")
+    output = args.output.resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text("\n".join(lines) + "\n")
+    displayed_path = output.relative_to(ROOT) if output.is_relative_to(ROOT) else output
+    print(f"scoreboard: {displayed_path}")
     for tier, row in stats.items():
         print(f"  {tier}: {row['runs']} runs = {row['first']} first + {row['flake']} flake + {row['fail']} fail")
     return 0
