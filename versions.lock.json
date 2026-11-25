@@ -22,7 +22,7 @@
   },
   "guestToolsLock": {
     "path": "docs/guest-tools-lock.json",
-    "sha256": "ead2dd967e92aa55b5335fb5a84d3dab38d39b81d35f55cc5499a50a850ad07d",
-    "bytes": 11799
+    "sha256": "9f6fbe297e533c256818a95aa2facdfd2bd415cc61dc381ad5de8515d21bca04",
+    "bytes": 11924
   }
 }

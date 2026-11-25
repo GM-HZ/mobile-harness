@@ -285,7 +285,7 @@ echo "--- dlopen a signed library from python ctypes ---"
 python3 -c "import ctypes; ctypes.CDLL('/usr/lib/libarchive.so.13'); print('CTYPES_LIBARCHIVE_OK')" 2>&1; echo "CTYPES_EXIT=$?"
 echo "--- load a signed native extension through node dlopen ---"
 node -e "console.log('EXTENSION_ANSWER', require('/usr/lib/mh-demo.node').answer())" 2>&1; echo "EXT_EXIT=$?"
-echo "--- run a downloaded dynamic tool that needs the new libs (jq) ---"
+echo "--- verify the pinned jq package and run the signed CLI with its dynamic libraries ---"
 mh-install jq https://dl-cdn.alpinelinux.org/alpine/v3.22/main/aarch64/jq-1.8.2-r0.apk usr/bin/jq jq
 echo "JQ_INSTALL_EXIT=$?"
 jq --version 2>&1; echo "JQ_VERSION_EXIT=$?"
@@ -423,7 +423,8 @@ def record_probe_result(evidence, command, calls, results):
         expected_exits.update(XXD_EXIT="126", COPY_BUSYBOX_EXIT="127", FAKE_EXIT="1")
     elif command == NATIVE_OVERLAY_PROBE:
         markers.update({marker: marker in lines for marker in (
-            "CTYPES_LIBARCHIVE_OK", "EXTENSION_ANSWER 42", "MH_INSTALL_OK /usr/bin/jq", "jq-1.8.2", "1",
+            "CTYPES_LIBARCHIVE_OK", "EXTENSION_ANSWER 42", "MH_INSTALL_OK /usr/bin/jq",
+            "MH_INSTALL_TOOL /usr/bin/.mh-jq", "jq-1.8.2", "1",
         )})
         expected_exits = dict.fromkeys(("CTYPES_EXIT", "EXT_EXIT", "JQ_INSTALL_EXIT",
                                         "JQ_VERSION_EXIT", "JQ_RUN_EXIT"), "0")

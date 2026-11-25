@@ -232,7 +232,7 @@ def main():
     # Exact native launcher overlay paths, rather than a second manually kept
     # executable list. Harmony's signed loader can execute these while POSIX
     # X_OK returns false for the app UID on owner-executable package libraries.
-    bindings = (CPP / "poc.c").read_text() + (CPP / "guest-tools.inc").read_text()
+    bindings = "\n".join((CPP / name).read_text() for name in ("poc.c", "guest-tools.inc", "guest-libs.inc"))
     programs = sorted({guest for guest in re.findall(r'\{\s*"libguest_[^"]+",\s*"([^"]+)"\s*\}', bindings)
                        if re.match(r'^/(?:usr/)?s?bin/', guest) and not guest.endswith(('.node', '.so'))})
     if not {'/bin/node', '/bin/bash', '/usr/bin/git'} <= set(programs):

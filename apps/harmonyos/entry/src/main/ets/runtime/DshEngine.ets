@@ -475,7 +475,7 @@ class DshEngine {
 
   private async unpackAuxLayers(context: common.UIAbilityContext, root: string, mode: string): Promise<void> {
     for (const archive of ['node-layer.zip', 'shell-tools-layer.zip',
-      'shell-extras-v3.zip', 'pnpm-layer-v2.zip']) {
+      'shell-extras-v4.zip', 'pnpm-layer-v2.zip']) {
       const phase = Date.now();
       const extracted = await this.unpack(context, archive, root);
       hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',

@@ -10,6 +10,7 @@
     "present": [
       "resources/rawfile/mh-exec.py",
       "libs/arm64-v8a/libguest_mh_exec_shim.so",
+      "libs/arm64-v8a/libguest_lib_3c26017340d1.so",
       "libguest_lib_",
       "libguest_ext_"
     ],

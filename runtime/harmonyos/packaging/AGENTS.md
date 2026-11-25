@@ -14,6 +14,7 @@
    `variants/*.json` 定义；新增开关先加变体与断言。
 5. **体积/许可证**：overlay 库受 `variants/*.json` 的 maxBytes 限制；新增库要更新 NOTICE/LICENSE。
 6. **可诊断**：装配日志写 `.build/batch-*/`；失败信息要指出文件/哈希/步骤。
+7. **包内签名工具**：`guest-tools-lock.json` 中的 `installAs` 生成校验清单，CLI 和动态依赖随同组的 HAP 签名。更新附加层后要核对覆盖安装会重新解包。
 
 ## 检查清单
 

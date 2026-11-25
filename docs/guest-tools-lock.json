@@ -187,6 +187,11 @@
         {
           "member": "usr/lib/libjq.so.1.0.4",
           "guestPath": "/usr/lib/libjq.so.1"
+        },
+        {
+          "member": "usr/bin/jq",
+          "guestPath": "/usr/bin/.mh-jq",
+          "installAs": "jq"
         }
       ]
     },

@@ -12,6 +12,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 ZONEINFO = "usr/share/zoneinfo/"
 PYTHON = "usr/lib/python3.12/"
 PIP_WHEEL = "ensurepip/_bundled/pip-25.0.1-py3-none-any.whl"
+SIGNED_TOOLS = "usr/share/mobile-harness/signed-tools.json"
 EXECUTABLES = {
     "curl": ("usr/bin/curl", "libguest_tool_curl.so"),
     "sqlite": ("usr/bin/sqlite3", "libguest_tool_sqlite3.so"),
@@ -57,10 +58,12 @@ def stage_native_layers(root, stage, raw, lock, cache):
         selected = os.environ.get("HARMONY_GUEST_LIB_GROUPS", "common,media,extensions")
         groups = tuple(part.strip() for part in selected.split(",") if part.strip())
     bindings = []
+    signed_tools = {}
     for library in lock.get("libraries", []):
         if library["group"] not in groups:
             continue
-        source = locked_archive(library.get("base", lock["base"]), library, cache)
+        base = library.get("base", lock["base"])
+        source = locked_archive(base, library, cache)
         with tarfile.open(source, ignore_zeros=True) as package:
             for entry in library["files"]:
                 payload = package.extractfile(entry["member"]).read()
@@ -70,6 +73,14 @@ def stage_native_layers(root, stage, raw, lock, cache):
                 (native / hap_name).write_bytes(payload)
                 (native / hap_name).chmod(0o755)
                 bindings.append((hap_name, entry["guestPath"]))
+                if "installAs" in entry:
+                    signed_tools[entry["installAs"]] = {
+                        "url": base + library["archive"],
+                        "sha256": library["sha256"],
+                        "bytes": source.stat().st_size,
+                        "member": entry["member"],
+                        "guestPath": entry["guestPath"],
+                    }
     for extension in lock.get("extensions", []):
         if extension["group"] not in groups:
             continue
@@ -88,6 +99,7 @@ def stage_native_layers(root, stage, raw, lock, cache):
         + "".join(f'{{ "{hap}", "{guest}" }},\n' for hap, guest in bindings)
     )
     print(f"signed native overlay: {len(bindings)} bindings, groups={','.join(groups) or 'none'}")
+    return signed_tools
 
 def stage_guest_extras(root, stage, raw):
     lock = json.loads((root / "docs/guest-tools-lock.json").read_text())
@@ -143,10 +155,16 @@ def stage_guest_extras(root, stage, raw):
     if data[ZONEINFO + "Asia/Shanghai"][:4] != b"TZif":
         raise ValueError("Alpine timezone layer does not contain valid TZif data")
 
-    stage_native_layers(root, stage, raw, lock, cache)
+    signed_tools = stage_native_layers(root, stage, raw, lock, cache)
+    data[SIGNED_TOOLS] = (json.dumps(signed_tools, sort_keys=True) + "\n").encode()
+    if "jq" in signed_tools:
+        data["usr/share/licenses/jq/COPYING"] = (
+            root / "runtime/harmonyos/packaging/licenses/jq-1.8.2.txt"
+        ).read_bytes()
     (raw / "shell-extras-v1.zip").unlink(missing_ok=True)
     (raw / "shell-extras-v2.zip").unlink(missing_ok=True)
-    target = raw / "shell-extras-v3.zip"
+    (raw / "shell-extras-v3.zip").unlink(missing_ok=True)
+    target = raw / "shell-extras-v4.zip"
     parents = {parent for name in data for parent in Path(name).parents if parent != Path(".")}
     with ZipFile(target, "w") as archive:
         for parent in sorted(parents):

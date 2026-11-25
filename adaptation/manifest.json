@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "a4b022b343e60918a9d81c509db51050c5e05bd2",
+  "generatedFrom": "542c510bb4522620ccd852f4246312537594dd7b",
   "layers": [
     "host",
     "web",
@@ -793,8 +793,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/packaging/AGENTS.md",
       "role": "build and packaging scripts",
-      "sha256": "7838e0b44246b17e86653e24938d90cd2a3883b226c2f25b54ab4ffab083f3a5",
-      "bytes": 1383,
+      "sha256": "3c52056583391c207554f4ffc3c2a3451848423e120c3c42b8f220ab426dd827",
+      "bytes": 1578,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -837,6 +837,20 @@
       "role": "build and packaging scripts",
       "sha256": "86e6ae68c77b546d5ec118ccd47ff1e07f71fd0b6e910454b4a3164d4c978d1e",
       "bytes": 1971,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/licenses/jq-1.8.2.txt",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/licenses/jq-1.8.2.txt",
+      "role": "build and packaging scripts",
+      "sha256": "ad2b4a266b2268939c1446979759706077421cf906a203aa188c6f396e8cfd74",
+      "bytes": 7887,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -919,8 +933,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/tools/mh-install.py",
       "role": "guest tools shipped inside the HAP",
-      "sha256": "9049ae22d641c99649ad33156fbd6cffd9b188d6321677e42789a2e1a2811c78",
-      "bytes": 4020,
+      "sha256": "79be5b2369a35f4ef918ab3083c3ede6a4928dcb7f0ccc9358cc5bc9ccc8f028",
+      "bytes": 6042,
       "fragility": "high",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1025,8 +1039,8 @@
       "kind": "file",
       "source": "variants/lab.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "95db034ed13870c31998e5a29530539f32b03ef0fd4f9d58ebb262ff51437bf0",
-      "bytes": 652,
+      "sha256": "82343075002251025325ca5432130a8304833cd2a03eed6870cb03aece8acf3e",
+      "bytes": 705,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1039,8 +1053,8 @@
       "kind": "file",
       "source": "variants/self.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "54d60f6eb2455ba7978e584bcf2dff69b8e0fc21713bcd0bdd989c1165d17827",
-      "bytes": 719,
+      "sha256": "e9afc2ea63604e985d67d894bd1ab4cb826b776033b8085bfc23b52e692119cf",
+      "bytes": 772,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1240,7 +1254,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "6177795a09d7e58cd738b5c70656f012edb5db913c83cb10448b6f118dfe07cb",
+      "sha256": "0c126d6a1c1c2c22f166cae6f7339e422fb31522817b22c6cfd7506886fd9963",
       "files": 31,
       "fragility": "medium",
       "upstreamTouchpoints": [],
@@ -1348,8 +1362,8 @@
       "bytes": 16223
     },
     "docs/guest-tools-lock.json": {
-      "sha256": "ead2dd967e92aa55b5335fb5a84d3dab38d39b81d35f55cc5499a50a850ad07d",
-      "bytes": 11799
+      "sha256": "9f6fbe297e533c256818a95aa2facdfd2bd415cc61dc381ad5de8515d21bca04",
+      "bytes": 11924
     },
     "runtime/harmonyos/dsh/package-lock.json": {
       "sha256": "a2ba4190e0ed9b63a991bfd1c5dc32891a5fc846430c2d373ea98c9a9f4ccf0d",

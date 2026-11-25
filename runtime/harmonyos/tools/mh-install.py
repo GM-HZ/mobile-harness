@@ -1,8 +1,11 @@
 #!/usr/bin/python3
-"""Download a statically linked tool and register it as a PATH command.
+"""Download a tool and register it as a PATH command.
 
-Shipped only in self-built HAPs (alongside /usr/bin/mh-exec). The tool is stored
-under /usr/lib/mh-tools/<name>/ and a shim is written to /usr/bin/<name>:
+When a pinned APK has a matching signed tool in the HAP, verify the APK and
+register a launcher for that bundled executable. Other existing installations
+are stored under /usr/lib/mh-tools/<name>/ with a shim in /usr/bin/<name>.
+
+Shipped only in self-built HAPs (alongside /usr/bin/mh-exec):
 
     #!/bin/sh
     export MH_ELF_ARGV0=<argv0>
@@ -17,18 +20,53 @@ Usage:
 defaults to <name> and is what the tool sees as argv[0] (busybox needs its
 applet name or "busybox").
 """
+import hashlib
 import json
 import os
+from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
+from tempfile import NamedTemporaryFile, TemporaryDirectory
 
 ROOT = "/usr/lib/mh-tools"
 MH_EXEC = "/usr/bin/mh-exec"
+SIGNED_TOOLS = Path("/usr/share/mobile-harness/signed-tools.json")
 
 
 def run(command, **kwargs):
     return subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, **kwargs)
+
+
+def install_signed(name, package):
+    program = package["guestPath"]
+    if not os.path.isfile(program):
+        print("MH_INSTALL_ERROR signed tool is missing: " + program)
+        return 1
+    shim = Path("/usr/bin") / name
+    pending = None
+    try:
+        with TemporaryDirectory(prefix="mh-install-") as folder:
+            archive = Path(folder) / "archive"
+            run(["curl", "-fsSL", "--proto", "=https", "--proto-redir", "=https", "--max-time", "45",
+                 "--max-filesize", str(package["bytes"]), "-o", str(archive), package["url"]])
+            with archive.open("rb") as stream:
+                checksum = hashlib.file_digest(stream, "sha256").hexdigest()
+            if checksum != package["sha256"]:
+                print("MH_INSTALL_ERROR signed tool package checksum mismatch")
+                return 1
+        with NamedTemporaryFile(mode="w", dir=shim.parent, prefix=".mh-install-", delete=False) as handle:
+            pending = Path(handle.name)
+            handle.write("#!/bin/sh\nexec " + shlex.quote(program) + ' "$@"\n')
+        pending.chmod(0o755)
+        pending.replace(shim)
+    finally:
+        if pending is not None:
+            pending.unlink(missing_ok=True)
+    print("MH_INSTALL_OK " + str(shim))
+    print("MH_INSTALL_TOOL " + program)
+    return 0
 
 
 def main():
@@ -42,6 +80,16 @@ def main():
     if not name.replace("-", "").replace("_", "").replace(".", "").isalnum():
         print("MH_INSTALL_ERROR invalid name")
         return 2
+    try:
+        signed = json.loads(SIGNED_TOOLS.read_text()).get(name)
+    except FileNotFoundError:
+        signed = None
+    if signed and (url, member, argv0) == (signed["url"], signed["member"], name):
+        try:
+            return install_signed(name, signed)
+        except (OSError, subprocess.CalledProcessError) as error:
+            print("MH_INSTALL_ERROR " + str(error)[:300])
+            return 1
     if not os.path.exists(MH_EXEC):
         print("MH_INSTALL_ERROR /usr/bin/mh-exec is missing (store build?)")
         return 2
