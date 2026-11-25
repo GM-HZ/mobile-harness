@@ -16,6 +16,7 @@
       "mh_exec_shim",
       "libguest_lib_",
       "libguest_ext_",
+      "resources/rawfile/dsh-layer.zip",
       "resources/rawfile/dsh-harmony-remote-ssh.cjs"
     ],
     "flag": {

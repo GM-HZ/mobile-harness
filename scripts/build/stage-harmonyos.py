@@ -251,7 +251,7 @@ def main():
             stream.write("\ntarget_compile_definitions(poc PRIVATE MH_SELF_BUILD=1)\n")
     # The stage is reused across builds and branches. Discard overlays removed
     # from the v1 source tree before packing the HAP.
-    for name in appgallery.APPGALLERY_ONLY | {"dsh-settings-client.js", "dsh-harmony-remote-ssh.cjs"}:
+    for name in appgallery.APPGALLERY_ONLY | {"dsh-layer.zip", "dsh-settings-client.js", "dsh-harmony-remote-ssh.cjs"}:
         (RAW / name).unlink(missing_ok=True)
     (RAW / "dsh-self-build.json").write_text(json.dumps({
         "selfBuild": SELF_BUILD,
