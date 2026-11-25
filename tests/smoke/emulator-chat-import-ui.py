@@ -61,17 +61,32 @@ def tap(emulator, row):
 
 
 def open_sidebar(emulator):
-    rows = controls(emulator)
-    if find(rows, {'预览版说明', 'Preview Notice'}, 'dialog'):
-        tap(emulator, wait_control(emulator, {'继续', 'Continue'}, 'button'))
+    deadline = time.monotonic() + 20
+    previous = None
+    retry_at = 0
+    rows = []
+    while time.monotonic() < deadline:
         rows = controls(emulator)
-    if find(rows, {'开始使用', 'Get started'}, 'dialog'):
-        tap(emulator, wait_control(emulator, {'关闭', 'Close'}, 'button'))
-    rows = controls(emulator)
-    opener = find(rows, {'打开侧边栏', 'Open sidebar'}, 'button')
-    if opener is not None:
-        tap(emulator, opener)
-    wait_control(emulator, {'新建会话', 'New session', '新建聊天', 'New chat'}, 'button')
+        new_session = None
+        if find(rows, {'预览版说明', 'Preview Notice'}, 'dialog'):
+            control = find(rows, {'继续', 'Continue'}, 'button')
+        elif find(rows, {'开始使用', 'Get started'}, 'dialog'):
+            control = find(rows, {'关闭', 'Close'}, 'button')
+        else:
+            new_session = find(rows, {'新建会话', 'New session', '新建聊天', 'New chat'}, 'button')
+            control = new_session or find(rows, {'打开侧边栏', 'Open sidebar'}, 'button')
+        if control != previous:
+            retry_at = 0
+        elif control is not None:
+            if new_session is not None:
+                return
+            if time.monotonic() >= retry_at:
+                tap(emulator, control)
+                retry_at = time.monotonic() + 1
+        previous = control
+        time.sleep(.2)
+    types = sorted({row['type'] for row in rows if row['type']})
+    raise AssertionError(f'New Session button did not appear after opening the sidebar ({len(rows)} UI nodes, types {types})')
 
 
 def run(emulator, output):
