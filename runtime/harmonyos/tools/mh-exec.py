@@ -208,7 +208,8 @@ def main():
             target = ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)(page)
             target(start, stack)
         finally:
-            os._exit(0)
+            # A launched program exits the child itself. Reaching here means it could not run.
+            os._exit(126)
     _, status = os.waitpid(pid, 0)
     if os.WIFEXITED(status):
         print("CHILD_EXIT %d" % os.WEXITSTATUS(status))

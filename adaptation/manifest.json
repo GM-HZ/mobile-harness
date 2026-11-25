@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "58b9751cba1a036be283f3ebbe28958cd9d1ef43",
+  "generatedFrom": "5041e12e2dd74ed3c028c4c1cc7e7d91ab348818",
   "layers": [
     "host",
     "web",
@@ -919,8 +919,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/tools/mh-exec.py",
       "role": "guest tools shipped inside the HAP",
-      "sha256": "c37ff861e53ce0bcfc80823b62a5528878558916669596a8bc5f6a4d51b6871a",
-      "bytes": 9723,
+      "sha256": "3dc25b5519d05e7f74c26a137979fb7a14b4fc394968551e227b1c8ab2292287",
+      "bytes": 9820,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
