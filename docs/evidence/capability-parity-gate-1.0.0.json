@@ -1,0 +1,169 @@
+{
+  "kind": "capability parity regression gate",
+  "sourceCommit": "3737f3af3746753ca58440120db840400543f4c2",
+  "version": "1.0.0",
+  "versionCode": 77,
+  "artifact": {
+    "path": ".build/release-check/1.0.0/store.hap",
+    "sha256": "780f0dd7555c930327eac930224b646a0c94fcaea38f37ad658c79d46cbb03ce",
+    "bytes": 675275041
+  },
+  "startedAt": "2026-11-25T23:34:58+0800",
+  "finishedAt": "2026-11-25T23:42:05+0800",
+  "steps": [
+    {
+      "name": "recovery",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 42
+    },
+    {
+      "name": "voice-input",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 50
+    },
+    {
+      "name": "voice-native-capture",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 38
+    },
+    {
+      "name": "ollama-routes",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 84
+    },
+    {
+      "name": "ptc-link-fixture",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 1
+    },
+    {
+      "name": "ptc-boundary",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 38
+    },
+    {
+      "name": "liveshare",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 47
+    },
+    {
+      "name": "liveshare-cross-device",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 46
+    },
+    {
+      "name": "account-entry",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 43
+    },
+    {
+      "name": "native-addon-location",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 14
+    }
+  ],
+  "nightlyGates": [
+    {
+      "id": "capability-parity-gate",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-native-addon",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "startup-warm-budget",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-plugin-git-update",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-mcp-stdio",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-ptc-link-fixture",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-inspector-availability",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-lsp-bundle",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-inspector",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "id": "nightly-recovery",
+      "exit": 0,
+      "passed": true,
+      "skipped": false
+    }
+  ],
+  "warmStartup": {
+    "readyMs": 13058,
+    "budgetMs": 30000
+  },
+  "ollamaToolRoundTripsInFinalRun": {
+    "openai-completions": false,
+    "openai-responses": false
+  },
+  "workingTreeRunnerSha256": {
+    "tests/bench/capability-parity-regression.py": "3310cb2adf4869358a1b4f7f485c9d19f579e78190e051712c009d773e9ce23c",
+    "tests/smoke/emulator-ollama.py": "876e2971a993d45ffd6c7da39e4e35ca303acd5e1a6f1cacd58bd60626f802dd"
+  },
+  "wsFallbackRecheck": {
+    "resolverSha256": "0c1986b42e00f5ef7ccf53631fb3114218ebfcb6c293a8d1bd22922a4061ff00",
+    "source": "staged, production-version DSH chunks without an unpacked ws cache",
+    "passed": [
+      "relay-preflight-self-test",
+      "nightly-native-addon",
+      "nightly-inspector"
+    ]
+  },
+  "initialFailures": {
+    "nightly-native-addon": "Missing the pinned ws test fixture after relocating the workspace",
+    "capability-parity-gate": [
+      "ollama-routes",
+      "ptc-boundary",
+      "liveshare"
+    ]
+  },
+  "appgalleryEvidence": "docs/evidence/device-lab/20261125-v1.0.0-3737f3a-appgallery-emulator.json",
+  "failures": 0,
+  "ok": true
+}

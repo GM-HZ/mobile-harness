@@ -1,5 +1,6 @@
 """Exercise one-shot PTC escalation through the authenticated DSH Remote Event stream."""
 import argparse
+import atexit
 from contextlib import contextmanager
 import json
 import os
@@ -7,6 +8,7 @@ from pathlib import Path
 import queue
 import runpy
 import subprocess
+import tempfile
 import threading
 import time
 import uuid
@@ -25,7 +27,21 @@ def ws_module():
         manifest = candidate / "package.json"
         if manifest.exists() and json.loads(manifest.read_text())["version"] == version:
             return candidate
-    raise RuntimeError("Build the pinned DSH runtime to provide the locked ws dependency")
+
+    layer_reader = runpy.run_path(str(ROOT / "scripts/adaptation/dsh_layer.py"))
+    layer = layer_reader["locate_layer"]()
+    if layer:
+        package = "dsh/node_modules/ws/"
+        with layer_reader["open_layer"](layer) as members:
+            manifest = package + "package.json"
+            if manifest in members and json.loads(members[manifest].read(manifest))["version"] == version:
+                directory = tempfile.TemporaryDirectory(prefix="mh-smoke-ws-")
+                atexit.register(directory.cleanup)
+                for name, archive in members.items():
+                    if name.startswith(package):
+                        archive.extract(name, directory.name)
+                return Path(directory.name) / package
+    raise RuntimeError(f"Prepare the pinned DSH runtime to provide ws {version} for the smoke tests")
 
 
 @contextmanager

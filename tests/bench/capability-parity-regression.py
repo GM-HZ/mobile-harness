@@ -121,8 +121,8 @@ def main():
     parser.add_argument("--account-target", type=loopback_target, default=os.environ.get("MH_ACCOUNT_EMULATOR"),
                         help="Disposable emulator for the account entry reset (MH_ACCOUNT_EMULATOR, defaults to second)")
     parser.add_argument("--forge-target", default=None, help="Emulator without a Forge GitHub config for the public-read step")
-    parser.add_argument("--voice-model-root", default=str(ROOT.parent/"harmonyos-package-management/.build/voice-native/models"))
-    parser.add_argument("--voice-audio", default=str(ROOT.parent/"harmonyos-package-management/.build/voice-native/mandarin-sample.wav"))
+    parser.add_argument("--voice-model-root", default=str(ROOT / ".build/voice-native/models"))
+    parser.add_argument("--voice-audio", default=str(ROOT / ".build/voice-native/mandarin-sample.wav"))
     parser.add_argument("--ollama-model", default="mh-smoke-ollama-079:latest")
     parser.add_argument("--artifact", type=Path, default=os.environ.get("MH_PARITY_HAP", DEFAULT_ARTIFACT),
                         help="Exact HAP already installed on the test targets (MH_PARITY_HAP)")

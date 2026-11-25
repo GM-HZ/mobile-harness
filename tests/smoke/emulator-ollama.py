@@ -258,11 +258,10 @@ def run(device, args):
             evidence['protocols'][api]['postRestartTurn'] = bool(answer)
             evidence['protocols'][api]['recalledAfterRestart'] = token in answer
             evidence['protocols'][api]['recallReply'] = answer
-        tool_calls = [api for api, row in evidence['protocols'].items() if row['toolRoundTrip']]
-        for path in ENDPOINTS.values():
+        for api, path in ENDPOINTS.items():
             wire = [row for row in server.calls if row['path']==path]
             assert any(row['hasTools'] and row['stream'] and row['status']==200 for row in wire), wire
-            if tool_calls:
+            if evidence['protocols'][api]['toolRoundTrip']:
                 assert any(row['hasToolResult'] and row['status']==200 for row in wire), wire
         assert any(row.get('hasImage') and row['status']==200 for row in server.calls)
     finally:

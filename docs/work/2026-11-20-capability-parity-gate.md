@@ -6,6 +6,8 @@
 
 需要两台 API 26 ARM64 Phone 模拟器（主设备 + 账号步骤用的第二设备）、宿主 Ollama 模型与语音夹具。闸门会在语音步骤前重置麦克风权限，在账号步骤前清空第二台设备应用数据，并在每步前启动应用等待启动完成。
 
+PTC 边界和 LiveShare 主人授权用例需要主模拟器已有可用的默认模型，或由 `MH_TEST_DEEPSEEK_API_KEY` 临时提供测试凭据。夹具会在测试结束后移除临时凭据。
+
 ```sh
 python3 tests/bench/capability-parity-regression.py \
   --target 127.0.0.1:5555 --second-target 127.0.0.1:5557 \
@@ -23,7 +25,7 @@ python3 tests/bench/capability-parity-regression.py \
 | recovery | 故障插件注入、安全模式、匿名 401、恢复正常 profile |
 | voice-input | SenseVoice 转写、坏音频拒绝、ArkWeb 草稿、系统麦克风授权生命周期 |
 | voice-native-capture | 模拟器原生麦克风真实声学采集 + 转写（依赖宿主音频，记录但非关键） |
-| ollama-routes | 本机 Ollama 双协议接入、模型发现、流式请求、图片附件、重启保持 |
+| ollama-routes | 本机 Ollama 双协议接入、模型发现、流式请求、各协议命中预定读取调用后的结果回传、图片附件、重启保持 |
 | ptc-link-fixture | 应用数据视图的链接创建前置条件 |
 | ptc-boundary | PTC 自建链接/元数据拒绝、宿主并发父目录移动的越界防护 |
 | liveshare | owner 实际 ArkWeb 授权、分享创建/扩源/重连、reader 拒绝与实时撤销、stop、网关回收 |
