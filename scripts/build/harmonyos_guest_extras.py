@@ -80,6 +80,8 @@ def stage_native_layers(root, stage, raw, lock, cache):
                         "bytes": source.stat().st_size,
                         "member": entry["member"],
                         "guestPath": entry["guestPath"],
+                        "toolSha256": hashlib.sha256(payload).hexdigest(),
+                        "legacyLauncherSha256": entry["legacyLauncherSha256"],
                     }
     for extension in lock.get("extensions", []):
         if extension["group"] not in groups:
@@ -157,10 +159,14 @@ def stage_guest_extras(root, stage, raw):
 
     signed_tools = stage_native_layers(root, stage, raw, lock, cache)
     data[SIGNED_TOOLS] = (json.dumps(signed_tools, sort_keys=True) + "\n").encode()
+    migration = raw / "jq-upgrade.json"
     if "jq" in signed_tools:
         data["usr/share/licenses/jq/COPYING"] = (
             root / "runtime/harmonyos/packaging/licenses/jq-1.8.2.txt"
         ).read_bytes()
+        migration.write_text(json.dumps(signed_tools["jq"], sort_keys=True) + "\n")
+    else:
+        migration.unlink(missing_ok=True)
     (raw / "shell-extras-v1.zip").unlink(missing_ok=True)
     (raw / "shell-extras-v2.zip").unlink(missing_ok=True)
     (raw / "shell-extras-v3.zip").unlink(missing_ok=True)
@@ -171,3 +177,4 @@ def stage_guest_extras(root, stage, raw):
             archive.writestr(ZipInfo(parent.as_posix() + "/"), b"")
         for name, payload in sorted(data.items()):
             archive.writestr(ZipInfo(name), payload, compress_type=ZIP_DEFLATED)
+    (raw / "shell-extras-v4-id.txt").write_text(hashlib.sha256(target.read_bytes()).hexdigest())

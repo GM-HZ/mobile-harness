@@ -13,6 +13,7 @@
     "absent": [
       "mh-exec",
       "mh-install",
+      "resources/rawfile/jq-upgrade.json",
       "mh_exec_shim",
       "libguest_lib_",
       "libguest_ext_",

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "dc0d38ad228948b3adb341d4feb3b020c411160e",
+  "generatedFrom": "58b9751cba1a036be283f3ebbe28958cd9d1ef43",
   "layers": [
     "host",
     "web",
@@ -1039,8 +1039,8 @@
       "kind": "file",
       "source": "variants/lab.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "49f810566cfffbc2946a0e1255a5688334991ccc038182ef0340e6fe5d0e8578",
-      "bytes": 740,
+      "sha256": "675757996efa8e0ec7a3db3e17ee910bac8d34db388854bc9f1a99125855bdd2",
+      "bytes": 783,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1053,8 +1053,8 @@
       "kind": "file",
       "source": "variants/self.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "bf57c0c7dbbad0dc5362f00d1e56c08ac8e1f206d8a94d8c80812403cf0e17ad",
-      "bytes": 807,
+      "sha256": "81aa4861806b7b6a1c98905d3228b522965db5d098126dd6c58114e105bc7655",
+      "bytes": 850,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1067,8 +1067,8 @@
       "kind": "file",
       "source": "variants/store.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "488f1083a6dfb9324134ca8ae90d7d383f42fc7a672ecd0c142a987a2e455211",
-      "bytes": 647,
+      "sha256": "a2320e5af6ef845dbb41e1ca6b46615d2de87e486d069f09311b4edad558f4d1",
+      "bytes": 690,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1254,8 +1254,8 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "0c126d6a1c1c2c22f166cae6f7339e422fb31522817b22c6cfd7506886fd9963",
-      "files": 31,
+      "sha256": "9f085687e484cb6c5664e0188afc98a684f59b8128aa42bc43bcb079f99e4b48",
+      "files": 32,
       "fragility": "medium",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1362,8 +1362,8 @@
       "bytes": 16223
     },
     "docs/guest-tools-lock.json": {
-      "sha256": "9f6fbe297e533c256818a95aa2facdfd2bd415cc61dc381ad5de8515d21bca04",
-      "bytes": 11924
+      "sha256": "04eb4f33dedb4fcfd28d353c9f973f1ca5b1b67031f8bf984dbbae73c2689b74",
+      "bytes": 12026
     },
     "runtime/harmonyos/dsh/package-lock.json": {
       "sha256": "a2ba4190e0ed9b63a991bfd1c5dc32891a5fc846430c2d373ea98c9a9f4ccf0d",

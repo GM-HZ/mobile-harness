@@ -9,6 +9,7 @@
   "hap": {
     "present": [
       "resources/rawfile/mh-exec.py",
+      "resources/rawfile/jq-upgrade.json",
       "libs/arm64-v8a/libguest_mh_exec_shim.so",
       "libs/arm64-v8a/libguest_lib_3c26017340d1.so",
       "libguest_lib_",

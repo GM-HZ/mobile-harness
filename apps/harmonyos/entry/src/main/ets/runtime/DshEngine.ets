@@ -9,6 +9,7 @@ import poc from 'libpoc.so';
 import { BootRecovery } from './BootRecovery';
 import { backgroundKeeper } from './BackgroundKeeper';
 import { isAppGalleryBuild, readAppGalleryLink } from './PrivacyConsent';
+import { migrateSignedJq } from './SignedJqMigration';
 
 interface LayerChunk {
   file: string;
@@ -477,16 +478,13 @@ class DshEngine {
     for (const archive of ['node-layer.zip', 'shell-tools-layer.zip',
       'shell-extras-v4.zip', 'pnpm-layer-v2.zip']) {
       const phase = Date.now();
-      const extracted = await this.unpack(context, archive, root);
+      const identity = archive === 'shell-extras-v4.zip' ? this.layerIdentity(context, 'shell-extras-v4-id.txt') : '';
+      const extracted = await this.unpack(context, archive, root, identity);
       hilog.info(0xD005, 'DSHClient', 'startup archive %{public}s extracted=%{public}s ms=%{public}d',
         archive, String(extracted), Date.now() - phase);
     }
     if (mode !== 'safe') {
-      let wheelId = '';
-      for (const byte of context.resourceManager.getRawFileContentSync('workspace-python-id.txt')) {
-        wheelId += String.fromCharCode(byte);
-      }
-      if (!/^[a-f0-9]{64}$/.test(wheelId)) throw new Error('Invalid packaged Python layer identity');
+      const wheelId = this.layerIdentity(context, 'workspace-python-id.txt');
       const phase = Date.now();
       const extracted = await this.unpack(context, 'workspace-python-v1.zip', root, wheelId);
       hilog.info(0xD005, 'DSHClient', 'startup archive workspace-python-v1.zip extracted=%{public}s ms=%{public}d',
@@ -494,6 +492,13 @@ class DshEngine {
       this.copyGuest(context, 'workspace-python.pth', root + '/usr/lib/python3.12/site-packages/mobile-harness-workspace.pth');
       this.copyGuest(context, 'dsh-harmony-workspace-deps.json', root + '/dsh-harmony-workspace-deps.json');
     }
+  }
+
+  private layerIdentity(context: common.UIAbilityContext, asset: string): string {
+    let identity = '';
+    for (const byte of context.resourceManager.getRawFileContentSync(asset)) identity += String.fromCharCode(byte);
+    if (!/^[a-f0-9]{64}$/.test(identity)) throw new Error('Invalid packaged layer identity: ' + asset);
+    return identity;
   }
 
   private prepareTimezone(root: string): void {
@@ -602,6 +607,7 @@ class DshEngine {
       } finally {
         fileIo.closeSync(installerFd);
       }
+      migrateSignedJq(context, root);
       hilog.info(0xD005, 'DSHClient', 'signed exec bypass enabled: /usr/bin/mh-exec /usr/bin/mh-install');
     } catch (error) {
       hilog.warn(0xD005, 'DSHClient', 'self-build tool setup failed: %{public}s', String(error));

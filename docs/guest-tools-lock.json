@@ -191,7 +191,8 @@
         {
           "member": "usr/bin/jq",
           "guestPath": "/usr/bin/.mh-jq",
-          "installAs": "jq"
+          "installAs": "jq",
+          "legacyLauncherSha256": "777b4ce644d92bfeea635a57385ece55920e01ccf8e8a58e015426da856afa3b"
         }
       ]
     },

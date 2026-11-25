@@ -3,6 +3,7 @@
 - Layer: HarmonyOS packaging (`runtime/harmonyos/native/poc.c`, `scripts/build/harmonyos_guest_extras.py`, `docs/guest-tools-lock.json`).
 - Mechanism: native libs are bound into the guest through `packaged[]` (+ generated `guest-tools.inc` / `guest-libs.inc`); every binding maps a guest path to a signed HAP library.
 - The `common` group packages the jq CLI from the same pinned Alpine APK as libjq. For that APK, `mh-install jq` checks the download digest before switching the command to the signed program path. The extra layer contains the install metadata generated from the lock.
+- Normal self startup migrates a legacy jq registration when the launcher, receipt, downloaded APK and extracted tool match the signed package's metadata. The launcher is replaced atomically and custom registrations stay available. The shell extras identity tracks variant changes during upgrade.
 - jq is distributed under the [jq MIT license](https://github.com/jqlang/jq/blob/jq-1.8.2/COPYING), with [Oniguruma](https://github.com/kkos/oniguruma/blob/v6.9.10/COPYING) linked through the existing native overlay.
 - Our assumptions:
   - binding tables are compiled in; adding a library requires a rebuild;
