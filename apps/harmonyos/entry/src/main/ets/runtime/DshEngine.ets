@@ -1,4 +1,5 @@
 import { common, childProcessManager } from '@kit.AbilityKit';
+import { BusinessError } from '@kit.BasicServicesKit';
 import { fileIo } from '@kit.CoreFileKit';
 import fileIO from '@ohos.fileio';
 import zlib from '@ohos.zlib';
@@ -432,7 +433,7 @@ class DshEngine {
         'dsh-client.patch.yml', 'dsh-seccomp-probe.cjs']) {
         this.copyGuest(context, name, root + '/' + name);
       }
-      if (mode !== 'safe') this.prepareSelfBuildTools(context, root);
+      this.prepareSelfBuildTools(context, root, mode !== 'safe');
       if (mode === 'safe' || !fileIo.accessSync(context.filesDir + '/legacy-proot.enabled')) {
         await this.prepareResolver(root);
         this.runNative(context, root, started, mode);
@@ -568,7 +569,32 @@ class DshEngine {
       return true;
     } finally { fileIo.unlinkSync(archive); }
   }
-  private prepareSelfBuildTools(context: common.UIAbilityContext, root: string): void {
+  private removeRetiredDemoExtensionPlaceholder(root: string): void {
+    const lib = root + '/usr/lib';
+    // Older self builds could leave the PRoot bind target for the demo addon.
+    const target = lib + '/mh-demo.node';
+    try {
+      const parent = fileIo.lstatSync(lib);
+      if (!fileIo.lstatSync(root).isDirectory() || !fileIo.lstatSync(root + '/usr').isDirectory() ||
+        !parent.isDirectory()) {
+        hilog.warn(0xD005, 'DSHClient', 'could not verify the guest overlay directory');
+        return;
+      }
+      const stat = fileIo.lstatSync(target);
+      if (!stat.isFile() || stat.size !== 0 || (stat.mode & 0o7777) !== 0 || stat.uid !== parent.uid) {
+        hilog.warn(0xD005, 'DSHClient', 'preserved an unrecognized demo extension file');
+        return;
+      }
+      fileIo.unlinkSync(target);
+      hilog.info(0xD005, 'DSHClient', 'removed retired demo extension placeholder');
+    } catch (error) {
+      if ((error as BusinessError).code !== 13900002) {
+        hilog.warn(0xD005, 'DSHClient', 'could not remove the retired demo extension placeholder');
+      }
+    }
+  }
+
+  private prepareSelfBuildTools(context: common.UIAbilityContext, root: string, installForMode: boolean): void {
     try {
       let enabled = false;
       try {
@@ -587,9 +613,11 @@ class DshEngine {
             // Not present: nothing to clean up.
           }
         }
+        this.removeRetiredDemoExtensionPlaceholder(root);
         hilog.info(0xD005, 'DSHClient', 'signed exec bypass disabled: store build');
         return;
       }
+      if (!installForMode) return;
       const target = root + '/usr/bin/mh-exec';
       const bytes = context.resourceManager.getRawFileContentSync('mh-exec.py');
       // POSIX-style create with an executable mode: 0o755, O_WRONLY|O_CREAT|O_TRUNC.

@@ -14,6 +14,7 @@ ArkTS 层负责生命周期、rawfile 装配、模式/开关、把 Host 拉起�
 6. **UI/客户端**：优先官方 DSH client plugin/bundle 扩展点；本目录只保留手机壳能力。
 7. **验证**：改变启动流程必须跑真机 G3（verify/exec/overlay）+ 模拟器 nightly；证据落盘。
 8. **运行时策略**：嵌入式 Node 的启动参数由原生层统一设置。ArkTS 的分块解包状态只用于装配、进度和启动计时。
+9. **发行变体切换**。Store 启动清理旧 self/lab 的运行时工具，并仅删除满足历史占位文件特征的 demo 扩展文件。
 
 ## 检查清单
 
