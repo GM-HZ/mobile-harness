@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="在鸿蒙手机上用模型处理文件、调用工具，回到原来的会话继续任务。查看 Mobile Harness 的能力、构建版本和上手方式。">
+  <meta name="theme-color" content="#080d1b">
+  <title>Mobile Harness｜鸿蒙手机上的原生 Agent</title>
+  <link rel="alternate" hreflang="en" href="./en.html">
+  <link rel="icon" href="./assets/whale.webp" type="image/webp">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./"><img src="./assets/whale.webp" width="32" height="32" alt=""><span>Mobile Harness</span></a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#capabilities">能力</a>
+        <a href="#builds">构建版本</a>
+        <a href="#start">开始使用</a>
+      </nav>
+      <a class="locale" href="./en.html" hreflang="en" lang="en">English</a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <img class="hero-image" src="./assets/hero.webp" alt="" fetchpriority="high">
+      <div class="wrap hero-inner">
+        <div class="hero-content">
+          <p class="kicker hero-kicker">面向 HarmonyOS 的原生 Agent</p>
+          <h1 id="hero-title">让手机接下任务，<br>回到原处接着做。</h1>
+          <p class="hero-intro">在鸿蒙手机上启动 DeepSeek Harness。和模型对话，使用工作区文件与工具，把进度留在同一个会话里。</p>
+          <div class="actions">
+            <a class="button button-primary" href="#start">查看如何试用</a>
+            <a class="button button-outline" href="#capabilities">探索产品能力</a>
+          </div>
+          <p class="candidate"><span></span>HarmonyOS 1.0.0 候选版</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap workflow section" aria-labelledby="workflow-title">
+      <div class="workflow-copy">
+        <h2 id="workflow-title">从一句话到一个文件</h2>
+        <p class="lede">以整理项目日志为例。把日志放进工作区后，模型可以检索和读取相关内容，并按会话权限在工作区保存结果。</p>
+        <figure class="example">
+          <figcaption>示例任务</figcaption>
+          <blockquote>找出工作区里最近的错误日志，整理成待办清单，并保存为 <code>checklist.md</code>。</blockquote>
+        </figure>
+      </div>
+      <ol class="steps">
+          <li><h3>交代任务</h3><p>在会话里用自然语言说明目标和输出。</p></li>
+          <li><h3>查看工具请求</h3><p>出现审批提示时，检查将操作的文件并决定是否授权。</p></li>
+          <li><h3>查看结果并继续</h3><p>打开工作区里的清单，或返回原会话补充下一步。</p></li>
+      </ol>
+    </section>
+
+    <section id="capabilities" class="feature-band section" aria-labelledby="features-title">
+      <div class="wrap">
+        <p class="kicker">核心能力</p>
+        <h2 id="features-title">手机上的工作方式</h2>
+        <div class="feature-list">
+          <article class="feature">
+            <div><h3>会话与工作区</h3><p class="feature-meta">对话、附件、搜索与编辑</p></div>
+            <p>会话和工作区保存在当前设备的应用空间。用文件工具读取和编辑资料、查看由模型生成的文件，并回到已有会话继续处理。</p>
+          </article>
+          <article class="feature">
+            <div><h3>本机工具</h3><p class="feature-meta">Bash · Git · Python · JavaScript / TypeScript</p></div>
+            <p>普通开发包随包提供 Alpine 工具环境，由 PRoot 按需运行命令。适合统计 CSV、处理日志、检查本地 Git 改动。程序化工具调用（PTC）可在授权范围内运行脚本和组合工具调用。</p>
+          </article>
+          <article class="feature">
+            <div><h3>模型连接</h3><p class="feature-meta">DeepSeek · 兼容端点</p></div>
+            <p>通过应用里的账号入口或 API Key 配置模型。使用在线模型时，提供商可能收到任务所需的提示词、附件或工具结果。OpenAI 兼容端点已用 Ollama 在模拟器中验证，具体工具调用能力取决于所选模型。</p>
+          </article>
+          <article class="feature">
+            <div><h3>GitHub 协作</h3><p class="feature-meta">Forge · GitHub</p></div>
+            <p>在支持 Forge 的构建中，连接 GitHub 后可读取仓库和 PR，并在授权范围内执行写操作。项目已用真实账号验证私有 PR 流程。</p>
+          </article>
+          <article class="feature">
+            <div><h3>恢复与后台</h3><p class="feature-meta">安全模式 · HarmonyOS 长时任务</p></div>
+            <p>普通构建遇到插件启动故障时可进入安全模式，在恢复页回滚插件配置。后台长时任务默认关闭，开启后需要授予通知权限，运行仍受系统策略约束。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="builds" class="wrap section" aria-labelledby="builds-title">
+      <p class="kicker">构建版本</p>
+      <h2 id="builds-title">按场景选择构建</h2>
+      <div class="builds">
+        <article><h3>普通开发包</h3><p>本机会话、工作区和常用命令行工具。适合使用 Bash、Git、Python 与 PTC 的开发测试。</p></article>
+        <article><h3>AppGallery 候选包</h3><p>独立原生发行变体，包含隐私同意、图片附件和工作区搜索。通用 Shell、第三方插件安装和远程接入在此版本中关闭。</p></article>
+        <article><h3>自建包 / 实验室包</h3><p>供自编译和测试使用，可选构建期签名原生扩展。实验入口支持 HTTPS 直连远程 DSH 主机。</p></article>
+      </div>
+      <div class="scope">
+        <h3>实验能力与平台边界</h3>
+        <div>
+          <details><summary>浏览器共享、语音和文档处理的验证进度如何？</summary><p>LiveShare 已在自建中继和双模拟器浏览器链路验证，公网官方中继及真机链路待验。语音、Office 预览、可选 LSP 和纯 JS 插件均有分项验证，支持范围取决于构建和设备。</p></details>
+          <details><summary>本机命令和远程主机有哪些限制？</summary><p>工作区文件工具遵循 Harness 授权。系统级工作区沙箱、任意下载的原生程序仍受平台限制。动态扩展须在构建期签名。交互式 PTY、容器和图形界面自动化超出当前范围。实验性远程接入限于 HTTPS 直连，连接和重连由用户发起。</p></details>
+          <details><summary>Android 和云端执行什么时候可用？</summary><p>本轮候选版面向 HarmonyOS。Android、云端执行和更完整的跨设备接续属于后续路线图。</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section id="start" class="start section" aria-labelledby="start-title">
+      <div class="wrap">
+        <p class="kicker">开始使用</p>
+        <h2 id="start-title">试用 HarmonyOS 候选版</h2>
+        <p class="lede">0.4.69 的本机启动和工具链已在 Mate 60 上验证。1.0.0 可通过开发构建试用，AppGallery 正式发布仍待验收。</p>
+        <ol class="start-steps">
+          <li><h3>准备安装包</h3><p>使用 DevEco Studio 26、已锁定的构建输入和对应签名配置。ARM64 Phone 模拟器可使用未签名 HAP，真机需要适用的签名包。</p></li>
+          <li><h3>配置模型</h3><p>启动 Mobile Harness，在应用里连接 DeepSeek 账号或配置模型 API Key。</p></li>
+          <li><h3>跑一个小任务</h3><p>加入工作区资料，试着检索文件、写一份摘要并保存。重新打开会话，确认可以继续。</p></li>
+        </ol>
+        <div class="actions">
+          <a class="button button-primary" href="https://github.com/GM-HZ/mobile-harness/blob/main/docs/development.md">构建与验证指南</a>
+          <a class="button button-outline" href="https://github.com/GM-HZ/mobile-harness">GitHub 仓库</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>Mobile Harness · HarmonyOS</span>
+      <a href="./en.html" hreflang="en" lang="en">English</a>
+    </div>
+  </footer>
+</body>
+</html>
