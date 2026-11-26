@@ -427,6 +427,18 @@ def texts(results):
     return "\n".join(item.get("text", "") for result in results for item in result["content"])
 
 
+# The pinned DSH Bash tool can report these in a non-error tool result.
+BASH_COMPLETION_MARKERS = {
+    "nonzeroExit": r"\[exit code: [1-9]\d*\]",
+    "signal": r"\[killed by signal: [^\]]+\]",
+    "timedOut": r"\[timed out after \d+ms\]",
+    "stopped": r"\[stopped: [^\]]+\]",
+    "backgrounded": r"\[still running after \d+ms; moved to background job [^\]]+\]",
+    "truncated": r"\[output truncated; full output: .*\]",
+    "sandboxDenied": r"\[sandbox: file access denied under [^\]]+ mode\]",
+}
+
+
 def record_probe_result(evidence, command, calls, results):
     bash_calls = [call for call in calls if call["name"] == "bash"]
     bash_call = bash_calls[0] if bash_calls else None
@@ -442,6 +454,8 @@ def record_probe_result(evidence, command, calls, results):
     bash_result_ok = len(bash_results) == 1 and bash_results[0].get("isError") is False
     text = texts(bash_results)
     lines = {line.strip() for line in text.splitlines()}
+    completion_errors = [kind for kind, pattern in BASH_COMPLETION_MARKERS.items()
+                         if any(re.fullmatch(pattern, line) for line in lines)]
 
     done = re.search(r"\becho ([A-Z][A-Z0-9_]*_DONE)\b", command)
     markers = {done.group(1): done.group(1) in lines} if done else {}
@@ -472,9 +486,10 @@ def record_probe_result(evidence, command, calls, results):
     command_matched = actual_command == command
     evidence.update(toolCalls=calls, bashCallCount=len(bash_calls), bashResultOk=bash_result_ok,
                     command=actual_command, commandMatched=command_matched,
-                    resultText=text, markers=markers, exits=exits, expectedExits=expected_exits)
+                    resultText=text, markers=markers, exits=exits, expectedExits=expected_exits,
+                    bashCompletionErrors=completion_errors)
     evidence["ok"] = (len(calls) == len(bash_calls) == 1 and command_matched and bash_result_ok
-                      and done is not None and all(markers.values())
+                      and not completion_errors and done is not None and all(markers.values())
                       and all(exits.get(key) == value for key, value in expected_exits.items()))
 
 
@@ -616,7 +631,7 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
             finally:
                 Path(output).write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps({key: evidence.get(key) for key in
-                      ("ok", "selfBuild", "commandMatched", "bashCallCount", "bashResultOk", "markers", "exits", "expectedExits",
+                      ("ok", "selfBuild", "commandMatched", "bashCallCount", "bashResultOk", "bashCompletionErrors", "markers", "exits", "expectedExits",
                        "fixtureCleanupOk")},
                      ensure_ascii=False, indent=1))
     return evidence

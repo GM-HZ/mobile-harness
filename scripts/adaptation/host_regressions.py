@@ -9,8 +9,7 @@ rediscover on hardware:
    signed-exec loader handoff ("embedded loader descriptors").
 2. The bash exit-status cell is ASCII digits + binary padding; the parser must
    extract digits instead of requiring exactly three digits.
-3. Each probe determines success from its own `*_DONE` marker, not the exec
-   probe's markers.
+3. Each probe requires its own `*_DONE` marker and a clean Bash completion.
 4. device_lab requires the probe's `ok:true`, and verify rejects a Host that
    becomes unhealthy after startup.
 5. Embedded Host startup uses jitless, and children keep their intended
@@ -53,6 +52,26 @@ def verify_rejects_unhealthy_host():
     return True
 
 
+def exec_requires_clean_bash_completion():
+    record = runpy.run_path(str(PROBE))["record_probe_result"]
+    command = "echo G3_TEST_DONE"
+    calls = [{"name": "bash", "callId": "fixture", "arguments": json.dumps({"command": command})}]
+    cases = (
+        ("", []),
+        ("\n[exit code: 7]", ["nonzeroExit"]),
+        ("\n[killed by signal: SIGTERM]", ["signal"]),
+        ("\n[timed out after 5000ms]", ["timedOut"]),
+        ("\n[stderr]\n[output truncated; full output: (unavailable)]", ["truncated"]),
+    )
+    for suffix, expected in cases:
+        result = {"toolCallId": "fixture", "isError": False, "content": [{"text": "G3_TEST_DONE" + suffix}]}
+        evidence = {}
+        record(evidence, command, calls, [result])
+        if evidence["bashCompletionErrors"] != expected or evidence["ok"] is not (not expected):
+            return False
+    return True
+
+
 def main():
     host = HOST.read_text()
     probe = PROBE.read_text()
@@ -81,6 +100,8 @@ def main():
         failures.append("forge gh child lifecycle no longer handles exit-only children")
     if "done.group(1) in lines" not in probe or "done is not None and all(markers.values())" not in probe:
         failures.append("probe success no longer uses its own *_DONE marker")
+    if not exec_requires_clean_bash_completion():
+        failures.append("exec probe accepts a failed or incomplete Bash result")
     if 'probe.get("ok") is True' not in device_lab:
         failures.append("device_lab no longer requires the probe's ok:true")
     if not verify_rejects_unhealthy_host():

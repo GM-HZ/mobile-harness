@@ -1,0 +1,45 @@
+{
+  "testedStoreArtifactCommit": "f9a4d30ae151624dda8fcba726d7fe170cfa5eec",
+  "device": "Huawei Mate 60",
+  "bashExitControl": {
+    "exitCode": 7,
+    "sameCommandMatched": true,
+    "stdoutAndStderrPresent": true,
+    "oldProbePassed": true,
+    "updatedProbePassed": false,
+    "updatedCompletionErrors": [
+      "nonzeroExit"
+    ],
+    "fixtureCleanupOk": true
+  },
+  "normalStoreExec": {
+    "passed": true,
+    "selfBuild": false,
+    "fixtureCleanupOk": true
+  },
+  "updatedProbeSha256": "d630e46830d9ed9b3edf80c7ad2e667a6faa295bca89fdf616f5e6a230cb3a82",
+  "historicalCopyNode": {
+    "lastArchivedPass": {
+      "commit": "63f4c97",
+      "checkedAt": "2026-11-21T18:49:01+0800",
+      "copySuccessMarker": true,
+      "copyReportedExit": "0"
+    },
+    "firstArchivedFailure": {
+      "commit": "3e695423e33427095410ad212d50bee8ca5f16ba",
+      "evidence": "docs/evidence/device-lab/20261125-v1.0.0-3e69542-mate60-g3.json"
+    },
+    "lastArchivedDirectCopyFailure": {
+      "commit": "542c510bb4522620ccd852f4246312537594dd7b",
+      "evidence": "docs/evidence/device-lab/20261125-v1.0.0-542c510-mate60-g3.json"
+    },
+    "isolatedToCopyResult": true,
+    "processLevelCause": "unresolved in recorded evidence",
+    "matchingPinnedNodeInputs": 2
+  },
+  "normalStoreOverlay": {
+    "passed": true,
+    "selfBuild": false,
+    "fixtureCleanupOk": true
+  }
+}
