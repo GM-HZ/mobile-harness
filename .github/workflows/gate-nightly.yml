@@ -1,5 +1,5 @@
 # Nightly capability gate on the self-hosted macOS/DevEco lab.
-# Builds the current commit, installs it on an API 26 ARM64 Phone emulator and
+# Builds the current commit, installs it on two API 26 ARM64 Phone emulators and
 # runs the consolidated G2 capability gate, uploading evidence.
 name: Gate Nightly
 
@@ -16,10 +16,14 @@ jobs:
     runs-on: [self-hosted, macOS, ARM64, deveco]
     timeout-minutes: 60
     env:
-      DEVECO_HOME: ${{ vars.DEVECO_HOME }}
+      DEVECO_HOME: ${{ vars.DEVECO_HOME || '/Applications/DevEco-Studio.app/Contents' }}
       HARMONY_INPUTS_DIR: ${{ vars.HARMONY_INPUTS_DIR }}
       HARMONY_UNSIGNED: '1'
+      HARMONY_SELF_BUILD: '0'
       MH_EMULATOR: ${{ vars.MH_EMULATOR || '127.0.0.1:5555' }}
+      MH_SECOND_EMULATOR: ${{ vars.MH_SECOND_EMULATOR || '127.0.0.1:5557' }}
+      MH_VOICE_MODEL_ROOT: ${{ vars.MH_VOICE_MODEL_ROOT }}
+      MH_VOICE_AUDIO: ${{ vars.MH_VOICE_AUDIO }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,19 +35,46 @@ jobs:
         run: ./build.sh --package
       - name: G1 host contracts on the packaged layer
         run: python3 gates/run.py --tier G1 --evidence-dir .build/gate-evidence
-      - name: Install on the emulator
+      - name: Install the same Store package on both emulators
+        shell: bash
         run: |
           HDC="$DEVECO_HOME/sdk/default/openharmony/toolchains/hdc"
           VERSION=$(python3 -c 'import json; print(json.load(open("apps/harmonyos/AppScope/app.json5"))["app"]["versionName"])')
-          "$HDC" -t "$MH_EMULATOR" install -r ".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v$VERSION-unsigned.hap"
-          "$HDC" -t "$MH_EMULATOR" shell aa force-stop org.sayact.nodepoc
-          "$HDC" -t "$MH_EMULATOR" shell aa start -a EntryAbility -b org.sayact.nodepoc
-          sleep 10
+          HAP=".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v$VERSION-unsigned.hap"
+          if [[ "$MH_EMULATOR" == "$MH_SECOND_EMULATOR" ]]; then
+            echo 'G2 requires a separate emulator for the account reset.' >&2
+            exit 1
+          fi
+          for target in "$MH_EMULATOR" "$MH_SECOND_EMULATOR"; do
+            if [[ ! $target =~ ^127[.]0[.]0[.]1:([1-9][0-9]{0,4})$ ]] || (( BASH_REMATCH[1] > 65535 )); then
+              echo "Invalid loopback emulator target: $target" >&2
+              exit 1
+            fi
+            model=$("$HDC" -t "$target" shell 'param get const.product.model' | xargs)
+            if [[ "$model" != emulator ]]; then
+              echo "Required HarmonyOS emulator unavailable at $target" >&2
+              exit 1
+            fi
+          done
+          for target in "$MH_EMULATOR" "$MH_SECOND_EMULATOR"; do
+            installed=$("$HDC" -t "$target" install -r "$HAP")
+            printf '%s\n' "$installed"
+            if [[ "$installed" != *'install bundle successfully'* ]]; then
+              echo "Store installation failed on $target" >&2
+              exit 1
+            fi
+          done
+          printf 'MH_PARITY_HAP=%s\nHARMONY_HDC=%s\nMH_ACCOUNT_EMULATOR=%s\n' "$HAP" "$HDC" "$MH_SECOND_EMULATOR" >> "$GITHUB_ENV"
       - name: G2 capability gate
-        run: python3 gates/run.py --tier G2 --only capability-parity-gate,nightly-recovery,nightly-native-addon,nightly-inspector,nightly-inspector-availability,nightly-lsp-bundle,nightly-mcp-stdio,nightly-ptc-link-fixture,nightly-plugin-git-update,startup-warm-budget --retries 1 --evidence-dir .build/gate-evidence
+        env:
+          MH_TEST_DEEPSEEK_API_KEY: ${{ secrets.MH_TEST_DEEPSEEK_API_KEY }}
+        run: python3 gates/run.py --tier G2 --only capability-parity-gate,nightly-recovery,nightly-native-addon,nightly-inspector,nightly-inspector-availability,nightly-lsp-bundle,nightly-mcp-stdio,nightly-ptc-link-fixture,nightly-plugin-git-update,startup-warm-budget --retries 1 --fail-on-skip --evidence-dir .build/gate-evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: gate-evidence-nightly
-          path: .build/gate-evidence
+          path: |
+            .build/gate-evidence
+            .build/capability-parity-gate.json
+          include-hidden-files: true
           if-no-files-found: ignore

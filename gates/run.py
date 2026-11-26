@@ -6,7 +6,8 @@
     python3 gates/run.py --list
 
 Entries whose command still contains a <placeholder> are skipped and recorded.
-Exit code: 0 all run entries passed (skips allowed); 1 failures; 2 no entries.
+Exit code: 0 all run entries passed; 1 failures; 2 no entries. With
+--fail-on-skip, a selected entry that was skipped also fails the run.
 """
 import argparse
 import json
@@ -67,6 +68,7 @@ def main():
     parser.add_argument("--evidence-dir", type=Path, default=ROOT / "docs/evidence/gates")
     parser.add_argument("--record", action="store_true", help="append the run to the RSI ledger")
     parser.add_argument("--retries", type=int, default=0, help="retry failed entries (flake quarantine policy)")
+    parser.add_argument("--fail-on-skip", action="store_true", help="fail if a selected entry was skipped")
     args = parser.parse_args()
     tiers = load_registry()
     if args.list:
@@ -103,6 +105,9 @@ def main():
         else:
             status = "FAIL"
         print(f"[{tier}] {status} {record['id']} ({record['durationSeconds']}s)")
+        if record["skipped"] and args.fail_on_skip:
+            failures += 1
+            print("    " + record["reason"])
         if not record["skipped"] and not record["passed"]:
             failures += 1
             tail = record.get("outputTail", "").strip().splitlines()

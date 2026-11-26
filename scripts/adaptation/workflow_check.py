@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / ".github/workflows"
 EXPECTED = {
     "gate-pr.yml": ["gates/run.py --tier G0", "gates/run.py --tier G1"],
-    "gate-nightly.yml": ["capability-parity-gate", "nightly-recovery", "nightly-native-addon"],
+    "gate-nightly.yml": ["capability-parity-gate", "nightly-recovery", "nightly-native-addon",
+                         "MH_SECOND_EMULATOR", "--fail-on-skip", ".build/capability-parity-gate.json"],
     "gate-device.yml": ["device_lab.py run --suite verify", "device_lab.py status"],
     "gate-release.yml": ["gates/run.py --tier G0", "gates/run.py --tier G1", "./scripts/adaptation/release_dry_run.sh"],
     "product-website.yml": [

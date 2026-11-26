@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "23bb588331f1da8b6143bed8c208dd6ad0646b19",
+  "generatedFrom": "18288ce247238419f7cbffd671c782e665880d83",
   "layers": [
     "host",
     "web",
@@ -1270,6 +1270,7 @@
       "source": "HARMONY_SELF_BUILD",
       "role": "self-built variant: exec shim, mh-exec, native overlay, self signed-exec bypass",
       "places": [
+        ".github/workflows/gate-nightly.yml",
         ".github/workflows/harmonyos.yml",
         "runtime/harmonyos/native/AGENTS.md",
         "runtime/harmonyos/packaging/AGENTS.md",
@@ -1278,8 +1279,7 @@
         "scripts/adaptation/inventory.py",
         "scripts/adaptation/registry.py",
         "scripts/adaptation/release_dry_run.sh",
-        "scripts/build/harmonyos.sh",
-        "scripts/build/harmonyos_guest_extras.py"
+        "scripts/build/harmonyos.sh"
       ],
       "gates": [
         "G0",

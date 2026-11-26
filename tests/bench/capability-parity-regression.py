@@ -5,7 +5,9 @@ duration and the step's JSON evidence, then writes one consolidated summary so a
 release candidate has a single reproducible regression gate.
 
 Steps that need a second emulator, a host Ollama model or the voice fixtures are
-parameterised; the gate fails if any step fails.
+parameterised. The viewer and account reset use emulators separate from the
+primary, and may share the same second emulator. Invalid gate configuration and
+required step failures exit with status 1.
 """
 import argparse
 import hashlib
@@ -14,6 +16,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,11 +27,18 @@ VERSION = json.loads((ROOT / "apps/harmonyos/AppScope/app.json5").read_text())["
 DEFAULT_ARTIFACT = ROOT / f".build/artifacts/harmonyos/dsh-mh-harmonyos-arm64-v{VERSION}-unsigned.hap"
 
 
+class GateArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        # The gate runner treats exit 2 as an unavailable, skipped check.
+        self.print_usage(sys.stderr)
+        self.exit(1, f"{self.prog}: error: {message}\n")
+
+
 def loopback_target(value):
     match = re.fullmatch(r"127\.0\.0\.1:([0-9]{1,5})", value)
     if match is None or not 0 < int(match[1]) <= 65535:
         raise argparse.ArgumentTypeError("expected a loopback emulator at 127.0.0.1:<port>")
-    return value
+    return f"127.0.0.1:{int(match[1])}"
 
 
 def step(name, script, arguments, output, timeout, critical=True):
@@ -113,7 +123,7 @@ def reset_account_device(target):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = GateArgumentParser(description=__doc__)
     parser.add_argument("--target", type=loopback_target, default=os.environ.get("MH_EMULATOR", "127.0.0.1:5555"))
     parser.add_argument("--second-target", type=loopback_target,
                         default=os.environ.get("MH_SECOND_EMULATOR", "127.0.0.1:5557"),
@@ -121,8 +131,10 @@ def main():
     parser.add_argument("--account-target", type=loopback_target, default=os.environ.get("MH_ACCOUNT_EMULATOR"),
                         help="Disposable emulator for the account entry reset (MH_ACCOUNT_EMULATOR, defaults to second)")
     parser.add_argument("--forge-target", default=None, help="Emulator without a Forge GitHub config for the public-read step")
-    parser.add_argument("--voice-model-root", default=str(ROOT / ".build/voice-native/models"))
-    parser.add_argument("--voice-audio", default=str(ROOT / ".build/voice-native/mandarin-sample.wav"))
+    parser.add_argument("--voice-model-root",
+                        default=os.environ.get("MH_VOICE_MODEL_ROOT") or str(ROOT / ".build/voice-native/models"))
+    parser.add_argument("--voice-audio",
+                        default=os.environ.get("MH_VOICE_AUDIO") or str(ROOT / ".build/voice-native/mandarin-sample.wav"))
     parser.add_argument("--ollama-model", default="mh-smoke-ollama-079:latest")
     parser.add_argument("--artifact", type=Path, default=os.environ.get("MH_PARITY_HAP", DEFAULT_ARTIFACT),
                         help="Exact HAP already installed on the test targets (MH_PARITY_HAP)")
@@ -133,13 +145,17 @@ def main():
     args.forge_target = args.forge_target or args.second_target
     args.output = args.output.resolve()
     directory = args.output.parent
-    directory.mkdir(parents=True, exist_ok=True)
     steps = build_steps(args)
     if args.only:
         wanted = {name.strip() for name in args.only.split(",") if name.strip()}
         if not wanted or not wanted.issubset({row["name"] for row in steps}):
             parser.error("--only must name one or more known capability cases")
         steps = [row for row in steps if row["name"] in wanted]
+    selected = {row["name"] for row in steps}
+    if "account-entry" in selected and args.account_target == args.target:
+        parser.error("the account reset target must differ from the primary emulator")
+    if "liveshare-cross-device" in selected and args.second_target == args.target:
+        parser.error("the LiveShare viewer target must differ from the primary emulator")
     artifact = args.artifact.resolve()
     if not artifact.is_file():
         parser.error(f"HAP artifact not found: {artifact}")
@@ -149,13 +165,17 @@ def main():
             sha256.update(block)
         artifact_size = contents.tell()
     targets = {row["arguments"][0] for row in steps}
-    if any(row["name"] == "liveshare-cross-device" for row in steps):
+    if "liveshare-cross-device" in selected:
         targets.add(args.second_target)
     for target in sorted(targets):
-        product = subprocess.check_output([HDC, "-t", target, "shell", "param get const.product.model"],
-                                          text=True, timeout=30).strip()
+        try:
+            product = subprocess.check_output([HDC, "-t", target, "shell", "param get const.product.model"],
+                                              text=True, timeout=30).strip()
+        except (OSError, subprocess.SubprocessError) as error:
+            parser.error(f"could not check the HarmonyOS emulator at {target}: {error}")
         if product != "emulator":
             parser.error(f"{target} is not a connected HarmonyOS emulator")
+    directory.mkdir(parents=True, exist_ok=True)
     summary = {
         "kind": "capability parity regression gate",
         "startedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),

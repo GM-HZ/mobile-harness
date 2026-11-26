@@ -89,6 +89,8 @@ python3 tests/bench/capability-parity-regression.py --target <primary> --second-
 
 跨设备 LiveShare 使用第二台模拟器的系统浏览器访问宿主测试 Relay。Forge 公开读与真实账号保留独立证据。 [回归闸门记录](work/2026-11-20-capability-parity-gate.md)
 
+GitHub Actions 夜间任务使用仓库变量 `MH_EMULATOR` 和 `MH_SECOND_EMULATOR` 指向两台已启动的专用回环模拟器，默认端口为 5555 和 5557。第二台也用于账号重置。将语音夹具放在 runner 工作区外，并用 `MH_VOICE_MODEL_ROOT` 和 `MH_VOICE_AUDIO` 指定模型目录与录音文件。模型用例可使用仓库密钥 `MH_TEST_DEEPSEEK_API_KEY`。夜间任务遇到跳过项会失败，并归档门禁报告与能力明细。
+
 ## MCP 模拟器回归
 
 普通 HAP 启动后可在隔离的 Phone 模拟器运行 MCP 冒烟测试。测试脚本在退出时清理临时配置。提供 `MH_TEST_DEEPSEEK_API_KEY` 后，脚本会暂存测试凭据，验证模型调用工具并清理凭据。没有配置该变量时，仅验证协议连接、工具列表和探针关闭。
