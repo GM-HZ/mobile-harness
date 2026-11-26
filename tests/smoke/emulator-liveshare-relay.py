@@ -463,6 +463,9 @@ def cross_device_viewer(device, relay_port, share, sessions, target, evidence):
     def hdc(*args):
         return subprocess.check_output([HDC, '-t', target, *args], text=True, timeout=90).strip()
 
+    if not re.fullmatch(r'127\.0\.0\.1:[0-9]+', target) or hdc('shell', 'param get const.product.model') != 'emulator':
+        raise ValueError('The LiveShare viewer requires a loopback HarmonyOS emulator')
+    hdc('shell', 'power-shell', 'wakeup')
     reverse = None
     if DEVICE_BASE:
         reverse = None

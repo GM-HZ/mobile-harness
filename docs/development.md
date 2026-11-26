@@ -80,14 +80,14 @@ python3 tests/smoke/emulator-recovery.py <loopback-target> .build/emulator-recov
 
 ## 能力对齐回归闸门
 
-`tests/bench/capability-parity-regression.py` 在同一制品上按固定顺序跑 9 个验收步骤（恢复、语音、原生采集、Ollama 路由、PTC 链接前置与边界、LiveShare owner 流、账号入口、addon 位置），输出单一 gate JSON。需要两台模拟器、宿主 Ollama 与语音夹具；语音步骤前重置麦克风权限，账号步骤前清空第二台设备应用数据。
+`tests/bench/capability-parity-regression.py` 在同一制品上按固定顺序跑 10 个验收步骤，覆盖恢复、语音及原生采集、Ollama 路由、PTC 链接前置与边界、LiveShare 所有者与跨设备查看者、账号入口及原生扩展加载位置，并输出一份门禁 JSON。两台模拟器需安装同一 Store HAP，宿主需准备 Ollama 与语音夹具。语音步骤重置主模拟器的麦克风权限，账号步骤清空专用账号模拟器的应用数据，默认使用第二台。
 
 ```sh
 python3 tests/bench/capability-parity-regression.py --target <primary> --second-target <second> \
   --output .build/capability-parity-gate.json
 ```
 
-跨设备 LiveShare 与 Forge 公开读/真实账号为独立证据，不放入闸门（原因见 [回归闸门记录](work/2026-11-20-capability-parity-gate.md)）。
+跨设备 LiveShare 使用第二台模拟器的系统浏览器访问宿主测试 Relay。Forge 公开读与真实账号保留独立证据。 [回归闸门记录](work/2026-11-20-capability-parity-gate.md)
 
 ## MCP 模拟器回归
 

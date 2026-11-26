@@ -1,0 +1,105 @@
+{
+  "commit": "9b07d918cc030187803b5ae129585fb7f97b62c8",
+  "artifactSha256": "4c5b57fda5ee56d98cd5094f6316da527de7446d32d5328b3a065f0ef007092c",
+  "device": "Mate 60 BRA-AL00",
+  "variant": "store",
+  "selfBuild": false,
+  "upgrade": {
+    "coverInstallSucceeded": true,
+    "placeholderPresentBeforeInstall": true,
+    "workspaceCountBefore": 86,
+    "placeholderRemovedByFirstStart": true,
+    "existingWorkspaceDirectoriesPreserved": true
+  },
+  "checks": {
+    "verify": {
+      "ok": true,
+      "checkedAt": "2026-11-26T23:16:35+0800",
+      "readyMs": 16891,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      },
+      "web": 200
+    },
+    "exec": {
+      "ok": true,
+      "kind": "store build signed tools and isolation",
+      "selfBuild": false,
+      "commandMatched": true,
+      "bashResultOk": true,
+      "markers": {
+        "STORE_EXEC_PROBE_DONE": true,
+        "EXEC_SH_OK": true,
+        "EXEC_BASH_OK": true,
+        "EXEC_NODE_OK": true,
+        "EXEC_PY_OK": true,
+        "EXEC_SCRIPT_OK": true,
+        "STORE_SELF_BUILD_TOOLS_ABSENT": true,
+        "STORE_SELF_BUILD_OVERLAY_ABSENT": true
+      },
+      "exits": {
+        "SH_EXIT": "0",
+        "BASH_EXIT": "0",
+        "NODE_EXIT": "0",
+        "PY_EXIT": "0",
+        "GIT_EXIT": "0",
+        "SCRIPT_EXIT": "0"
+      },
+      "fixtureCleanupOk": true,
+      "variantError": null
+    },
+    "overlay": {
+      "ok": true,
+      "kind": "store build overlay isolation",
+      "selfBuild": false,
+      "commandMatched": true,
+      "bashResultOk": true,
+      "markers": {
+        "STORE_OVERLAY_PROBE_DONE": true,
+        "STORE_SELF_BUILD_TOOLS_ABSENT": true,
+        "STORE_SELF_BUILD_OVERLAY_ABSENT": true
+      },
+      "exits": {},
+      "fixtureCleanupOk": true,
+      "variantError": null
+    },
+    "restart": {
+      "ok": true,
+      "checkedAt": "2026-11-26T23:17:15+0800",
+      "readyMs": 12183,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      },
+      "web": 200,
+      "placeholderStillAbsent": true
+    }
+  },
+  "finalDeviceState": {
+    "mode": "normal",
+    "pending": false
+  },
+  "checkedAt": "2026-11-26T23:17:33+0800",
+  "ok": true,
+  "artifact": {
+    "signed": true,
+    "sha256": "4c5b57fda5ee56d98cd5094f6316da527de7446d32d5328b3a065f0ef007092c",
+    "sameCertificateAndProfileAsPriorStoreArtifact": true
+  },
+  "reproductionBeforeFix": {
+    "commit": "23bb588331f1da8b6143bed8c208dd6ad0646b19",
+    "artifactSha256": "cede8a95b083311b3a906f16b668042c464ab9f7732a9379b3d7f201c5e25f93",
+    "selfBuild": false,
+    "startupOk": true,
+    "overlayIsolationOk": false,
+    "residualFile": "/usr/lib/mh-demo.node",
+    "residualFileWasRegular": true,
+    "residualFileBytes": 0,
+    "residualFilePermissions": "000"
+  },
+  "selfLabDirectExec": {
+    "status": "unresolved",
+    "evidence": "docs/evidence/device-lab/20261126-mate60-1.0.0-g3-recheck.json"
+  }
+}

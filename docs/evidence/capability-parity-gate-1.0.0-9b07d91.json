@@ -1,0 +1,213 @@
+{
+  "sourceCommit": "9b07d918cc030187803b5ae129585fb7f97b62c8",
+  "ok": true,
+  "failures": 0,
+  "version": "1.0.0",
+  "versionCode": 77,
+  "storeArtifact": {
+    "path": ".build/release-check/1.0.0/store.hap",
+    "sha256": "06679e7007c45300bb23b2093b97299b3871fddac2bfd929fe92d9fa064ffb22",
+    "bytes": 675277985
+  },
+  "capabilityCases": [
+    {
+      "name": "recovery",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 51
+    },
+    {
+      "name": "voice-input",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 97
+    },
+    {
+      "name": "voice-native-capture",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 81
+    },
+    {
+      "name": "ollama-routes",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 96
+    },
+    {
+      "name": "ptc-link-fixture",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 1
+    },
+    {
+      "name": "ptc-boundary",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 44
+    },
+    {
+      "name": "liveshare",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 83
+    },
+    {
+      "name": "liveshare-cross-device",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 117
+    },
+    {
+      "name": "account-entry",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 46
+    },
+    {
+      "name": "native-addon-location",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 15
+    }
+  ],
+  "warmStartup": {
+    "readyMs": 9779,
+    "budgetMs": 30000
+  },
+  "appgalleryEvidence": "docs/evidence/device-lab/20261126-v1.0.0-9b07d91-appgallery-emulator.json",
+  "ollamaToolRoundTrips": {
+    "openai-completions": false,
+    "openai-responses": false
+  },
+  "secondaryEmulatorStopped": true,
+  "setupRecovery": "After an initial Store emulator startup timeout, resumed normal mode through the recovery UI and reran all nine nightly checks.",
+  "gates": [
+    {
+      "id": "capability-parity-gate",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-native-addon",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "startup-warm-budget",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-plugin-git-update",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-mcp-stdio",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-ptc-link-fixture",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-inspector-availability",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-lsp-bundle",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-inspector",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "nightly-recovery",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "appgallery-images",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    },
+    {
+      "id": "appgallery-search",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1
+    }
+  ],
+  "ollamaRecheck": {
+    "routeCheckPassed": true,
+    "toolRoundTrips": {
+      "openai-completions": false,
+      "openai-responses": false
+    },
+    "toolTurnEnds": {
+      "openai-completions": "max-tokens",
+      "openai-responses": "completed"
+    },
+    "originalHttpErrors": [
+      500
+    ],
+    "recheckHttpErrors": [],
+    "evidence": ".build/emulator-acceptance/9b07d91/ollama-recheck/capability-parity-gate.json"
+  },
+  "deepseekFlashToolProbe": {
+    "protocols": {
+      "openai-completions": {
+        "exactToolRoundTrip": true,
+        "recallAfterRestart": true
+      },
+      "openai-responses": {
+        "exactToolRoundTrip": true,
+        "recallAfterRestart": true
+      }
+    },
+    "registeredAndUsedWithoutRestart": true,
+    "testCredentialRemoved": true,
+    "profileRestored": true
+  },
+  "liveshareViewerWakeRegression": {
+    "viewerSuspendedBeforeRun": true,
+    "elapsedSeconds": 51,
+    "passed": true,
+    "viewerSessionListCalls": 1,
+    "viewerAssetsLoaded": 9,
+    "ownerManagementAttempted": false,
+    "viewerStoppedAfterRun": true,
+    "probe": "tests/smoke/emulator-liveshare-relay.py",
+    "probeSha256": "14d163e0ab23988c51774f2c8aeebe73d74db75c624a73683604b89ac49c5c09"
+  }
+}

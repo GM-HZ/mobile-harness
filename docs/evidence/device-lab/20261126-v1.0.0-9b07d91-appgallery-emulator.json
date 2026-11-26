@@ -1,0 +1,38 @@
+{
+  "sourceCommit": "9b07d918cc030187803b5ae129585fb7f97b62c8",
+  "g4Evidence": "docs/evidence/release/1.0.0-9b07d918cc030187803b5ae129585fb7f97b62c8.json",
+  "appSha256": "edbadfa2c56805f910a307c09766e1d01beae4ef6b8278168d267e9870c8c213",
+  "hapSha256": "6b4ef84edc3a53a1ebbfc59bf07bd90550b6267e49770b6257f6658eeeb5a615",
+  "bundle": "org.mobileharness.dshmh",
+  "version": {
+    "name": "1.0.0",
+    "code": 77
+  },
+  "checkedAt": "2026-11-26T23:21:14+08:00",
+  "emulator": "MH_RC5_Translation_Run",
+  "target": "127.0.0.1:15557",
+  "api": 26,
+  "coverInstallSucceeded": true,
+  "priorSyntheticConsentReused": true,
+  "emulatorStopped": true,
+  "checks": {
+    "appgallery-images": {
+      "passed": true,
+      "log": "appgallery-images.log",
+      "outcomes": [
+        "Valid PNG stored with correct dimensions.",
+        "Wide PNG downscaled and stored as image/jpeg.",
+        "Wide PNG downscaled and stored as image/webp.",
+        "Malformed and truncated PNGs rejected."
+      ]
+    },
+    "appgallery-search": {
+      "passed": true,
+      "log": "appgallery-search.log",
+      "outcomes": [
+        "AppGallery glob and grep passed, including invalid regex and workspace boundary."
+      ]
+    }
+  },
+  "ok": true
+}
