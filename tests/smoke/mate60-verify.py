@@ -145,7 +145,7 @@ def run(device, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", default="37R0224115035605")
+    parser.add_argument("--target", required=True, help="HDC connection key for the USB phone")
     parser.add_argument("--port", type=int, default=19670)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-verify.json"))
     args = parser.parse_args()

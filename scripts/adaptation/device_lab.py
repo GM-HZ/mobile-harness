@@ -39,9 +39,18 @@ def hdc(*args):
     return result.stdout.strip() + result.stderr.strip()
 
 
-def detect():
-    targets = [line.strip() for line in hdc("list", "targets").splitlines() if line.strip()]
-    usb = [target for target in targets if not target.startswith("127.0.0.1")]
+def detect(requested=None):
+    output = subprocess.run([hdc_path(), "list", "targets", "-v"], capture_output=True,
+                            text=True, check=True, timeout=30).stdout
+    usb = []
+    for line in output.splitlines():
+        fields = line.split()
+        if fields[1:3] == ["USB", "Connected"]:
+            usb.append(fields[0])
+    if requested is not None:
+        return requested if requested in usb else None
+    if len(usb) > 1:
+        raise ValueError("multiple USB devices connected; choose one with --target")
     return usb[0] if usb else None
 
 
@@ -88,7 +97,7 @@ def run_suite(serial, suite):
                 probe = payload
         except (ValueError, OSError):
             pass
-    # Probe scripts exit 0 even when they report a failed acceptance; require both.
+    # A successful process must also have written passing evidence.
     passed = result.returncode == 0 and probe.get("ok") is True
     return {"suite": suite, "exit": result.returncode, "passed": passed, "probeOk": probe.get("ok"),
             "durationSeconds": elapsed, "outputTail": (result.stdout + result.stderr)[-1500:],
@@ -98,6 +107,7 @@ def run_suite(serial, suite):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--target", help="HDC connection key of a connected USB device")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("status")
     runner = sub.add_parser("run")
@@ -105,9 +115,16 @@ def main():
     runner.add_argument("--wait-unlock", type=int, default=0,
                         help="poll for an unlocked screen up to N seconds before running")
     args = parser.parse_args()
-    serial = detect()
+    try:
+        serial = detect(args.target)
+    except ValueError as error:
+        print(f"SKIP device lab: {error}", file=sys.stderr)
+        return 2
+    except (OSError, subprocess.SubprocessError):
+        print("SKIP device lab: HDC target list unavailable", file=sys.stderr)
+        return 2
     if not serial:
-        print("SKIP device lab: no USB device connected", file=sys.stderr)
+        print("SKIP device lab: no matching USB device connected", file=sys.stderr)
         return 2
     device = status(serial)
     if args.command == "status":

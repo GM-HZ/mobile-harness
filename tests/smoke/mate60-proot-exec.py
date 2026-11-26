@@ -441,7 +441,9 @@ def record_probe_result(evidence, command, calls, results):
 
 def run(device, port, output, probe=None, loader_file=None, payload_file=None, elf_args="", elf_argv0=None):
     name = "proot-exec-" + uuid.uuid4().hex[:8]
-    native = FILES + "/alpine/workspace-native/" + name
+    directory = "alpine/workspace-native/" + name
+    owner_marker = f"{directory}/.g3-fixture-{uuid.uuid4().hex}"
+    native = FILES + "/" + directory
     probe = probe or PROBE
     kinds = {id(PROBE): "real-device PRoot exec semantics probe",
              id(NATIVE_PROBE): "real-device native execution bypass probe",
@@ -466,13 +468,22 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
+    directory_created = False
+    workspace = None
     session = None
     try:
         device.hdc("shell", "aa", "start", "-a", "EntryAbility", "-b", BUNDLE)
         if not device.ready():
             raise SystemExit("The app did not become ready")
-        device.app("mkdir -p alpine/workspace-native/" + name)
-        workspace = device.rpc("workspace/create", {"request": {"path": native}})["workspace"]["workspaceId"]
+        directory_created = device.app(
+            f"mkdir {directory} && touch {owner_marker} && printf G3_FIXTURE_CREATED"
+        ) == "G3_FIXTURE_CREATED"
+        if not directory_created:
+            raise RuntimeError("Could not create a new G3 fixture directory")
+        created = device.rpc("workspace/create", {"request": {"path": native}})
+        if not created.get("created"):
+            raise RuntimeError("Could not register a new G3 fixture workspace")
+        workspace = created["workspace"]["workspaceId"]
         session = device.rpc("session/create", {"request": {"workspaceId": workspace}})["sessionId"]
         catalog = device.rpc("session/modelCatalog", {})
         default = catalog.get("default") or {}
@@ -520,22 +531,49 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
         calls, results, _ = prompt(device, session, instruction)
         record_probe_result(evidence, command, calls, results)
     finally:
+        cleanup_stage = "session"
         try:
             if session:
-                device.rpc("session/cancel", {"request": {"sessionId": session}})
-        except Exception:
-            pass
-        device.hdc("fport", "rm", "tcp:" + str(port), "tcp:19592")
-        Path(output).write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n")
+                archived = device.rpc("workspace/archiveSession", {"request": {
+                    "sessionId": session, "stopActivity": True,
+                }})
+                if session not in archived.get("archivedSessionIds", []):
+                    raise RuntimeError("Could not archive the G3 fixture session")
+            cleanup_stage = "workspace"
+            if directory_created and not workspace:
+                raise RuntimeError("G3 fixture registration was not confirmed")
+            if workspace:
+                deleted = device.rpc("workspace/delete", {"request": {"workspaceId": workspace}})
+                if not deleted.get("deleted"):
+                    raise RuntimeError("Could not delete the G3 fixture workspace")
+            cleanup_stage = "directory"
+            if directory_created:
+                removed = device.app(
+                    f"test -f {owner_marker} && rm -rf {directory} && "
+                    f"test ! -e {directory} && printf G3_FIXTURE_REMOVED"
+                )
+                if removed != "G3_FIXTURE_REMOVED":
+                    raise RuntimeError("Could not remove the G3 fixture directory")
+            evidence["fixtureCleanupOk"] = True
+        except Exception as error:
+            evidence["fixtureCleanupOk"] = False
+            evidence["fixtureCleanupError"] = {"stage": cleanup_stage, "type": type(error).__name__}
+            evidence["ok"] = False
+        finally:
+            try:
+                device.hdc("fport", "rm", "tcp:" + str(port), "tcp:19592")
+            finally:
+                Path(output).write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps({key: evidence.get(key) for key in
-                      ("ok", "commandMatched", "bashCallCount", "bashResultOk", "markers", "exits", "expectedExits")},
+                      ("ok", "commandMatched", "bashCallCount", "bashResultOk", "markers", "exits", "expectedExits",
+                       "fixtureCleanupOk")},
                      ensure_ascii=False, indent=1))
     return evidence
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", default="37R0224115035605")
+    parser.add_argument("--target", required=True, help="HDC connection key for the USB phone")
     parser.add_argument("--port", type=int, default=19671)
     parser.add_argument("--output", type=Path, default=Path(".build/mate60-proot-exec.json"))
     parser.add_argument("--probe", choices=["exec", "native", "bypass", "runtime", "runtime-target", "pip-native", "mmap", "elf-loader", "elf-run", "elf-download", "elf-mhexec", "elf-transparent", "elf-install", "runtime-eval", "elf-debug", "elf-dynamic", "shim-env", "shim-debug", "elf-transparent-mini", "native-overlay"], default="exec")
@@ -554,12 +592,13 @@ def main():
              "elf-dynamic": DYNAMIC_PROBE, "shim-env": SHIM_ENV_PROBE,
              "shim-debug": SHIM_DEBUG_PROBE, "elf-transparent-mini": TRANSPARENT_MINI,
              "native-overlay": NATIVE_OVERLAY_PROBE}.get(args.probe, PROBE)
-    run(Device(args.target, args.port), args.port, args.output, probe,
-        loader_file=(args.loader_file if args.probe == "elf-loader" else None),
-        payload_file=(args.payload_file if args.probe == "elf-run" else None),
-        elf_args=args.elf_args, elf_argv0=args.elf_argv0)
+    evidence = run(Device(args.target, args.port), args.port, args.output, probe,
+                   loader_file=(args.loader_file if args.probe == "elf-loader" else None),
+                   payload_file=(args.payload_file if args.probe == "elf-run" else None),
+                   elf_args=args.elf_args, elf_argv0=args.elf_argv0)
     print(args.output)
+    return 0 if evidence.get("ok") is True else 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

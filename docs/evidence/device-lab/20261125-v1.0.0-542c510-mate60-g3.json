@@ -1,0 +1,100 @@
+{
+  "commit": "542c510bb4522620ccd852f4246312537594dd7b",
+  "device": "HUAWEI Mate 60 (BRA-AL00)",
+  "version": "1.0.0",
+  "versionCode": 77,
+  "package": {
+    "variant": "self",
+    "signed": true,
+    "sha256": "805fd013ed05a58b5f1b85cc6d7c17f9df69e27513e53b0e9d224f0985c037c5"
+  },
+  "coverInstallSucceeded": true,
+  "checks": {
+    "verify-first": {
+      "ok": true,
+      "checkedAt": "2026-11-25T22:00:57+0800",
+      "readyMs": 35929,
+      "web": 200,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      }
+    },
+    "verify-restart": {
+      "ok": true,
+      "checkedAt": "2026-11-25T22:01:39+0800",
+      "readyMs": 9948,
+      "web": 200,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      }
+    },
+    "workflow": {
+      "ok": true,
+      "checkedAt": "2026-11-25T22:01:53+0800",
+      "toolNames": [
+        "workflow"
+      ],
+      "workflowCompleted": true,
+      "workflowReturnedExpectedValue": true
+    },
+    "exec": {
+      "ok": false,
+      "checkedAt": "2026-11-25T22:01:58+0800",
+      "commandMatched": true,
+      "bashCallCount": 1,
+      "bashResultOk": true,
+      "markers": {
+        "PROOT_EXEC_PROBE_DONE": true,
+        "EXEC_SH_OK": true,
+        "EXEC_BASH_OK": true,
+        "EXEC_NODE_OK": true,
+        "EXEC_PY_OK": true,
+        "EXEC_SCRIPT_OK": true,
+        "COPY_NODE_OK": false
+      },
+      "exits": {
+        "SH_EXIT": "0",
+        "BASH_EXIT": "0",
+        "NODE_EXIT": "0",
+        "PY_EXIT": "0",
+        "GIT_EXIT": "0",
+        "SCRIPT_EXIT": "0",
+        "XXD_EXIT": "126",
+        "COPY_BUSYBOX_EXIT": "0",
+        "COPY_NODE_EXIT": "0",
+        "FAKE_EXIT": "1"
+      }
+    },
+    "overlay": {
+      "ok": false,
+      "checkedAt": "2026-11-25T22:02:18+0800",
+      "commandMatched": true,
+      "bashCallCount": 1,
+      "bashResultOk": true,
+      "markers": {
+        "NATIVE_OVERLAY_PROBE_DONE": true,
+        "CTYPES_LIBARCHIVE_OK": true,
+        "EXTENSION_ANSWER 42": true,
+        "MH_INSTALL_OK /usr/bin/jq": true,
+        "jq-1.8.2": false,
+        "1": false
+      },
+      "exits": {
+        "CTYPES_EXIT": "0",
+        "EXT_EXIT": "0",
+        "JQ_INSTALL_EXIT": "0",
+        "JQ_VERSION_EXIT": "0",
+        "JQ_RUN_EXIT": "0"
+      }
+    },
+    "sidebar": {
+      "ok": true,
+      "checkedAt": "2026-11-25T22:14:28+0800",
+      "newSessionControlVisible": true
+    }
+  },
+  "ok": false,
+  "applicationCrashCountSinceFirstVerify": 0
+}

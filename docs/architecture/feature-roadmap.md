@@ -10,9 +10,10 @@
 
 | 能力 | 状态 | 说明 / 证据 |
 | --- | --- | --- |
-| 签名 ELF 加载（静态/动态） | ✅ | `mh-exec`、动态 ELF、透明 exec；真机 vs 模拟器证据 |
-| 透明 exec（`./tool`） | ✅ | LD_PRELOAD shim + packed spawn；真机 G3 exec |
-| 运行时下载静态/动态工具 | ✅ | busybox/jq 等；`docs/evidence/` |
+| 包内签名 ELF 与工作区脚本 | ✅ | Mate 60 已验证随包 Node 运行工作区 JS、Python 原生库和签名 jq。 [真机记录](../evidence/device-lab/20261126-mate60-1.0.0-g3-recheck.json) |
+| 工作区原生文件直接执行（`./tool`） | 🔶 | 旧 self 包 `0.4.69` 曾在同一 Mate 60 固件上跑通 Node 副本直跑。相关实现已并入，v1 G3 `exec` 仍待通过。 [真机记录](../evidence/device-lab/20261126-mate60-1.0.0-g3-recheck.json) |
+| 运行时下载静态/动态工具 | 🔶 | 已验证固定版本 jq 的包校验和随包签名执行路径。其他下载的原生工具仍须按各自路径验收。 |
+| 工作区限定执行（`workspace-write`） | 🔶 | Mate 60 应用内 Landlock 查询返回 `ENOSYS`，该模式仍缺可用的强制沙箱后端。 [真机记录](../evidence/device-lab/20261126-mate60-1.0.0-g3-recheck.json) |
 | 常用动态库覆盖 | ✅ | `patches/`? 不，`docs/guest-tools-lock.json` libraries + `HARMONY_GUEST_LIB_GROUPS` |
 | 构建期签名原生扩展（dlopen） | ✅ | `extensions[]` overlay；node 扩展 dlopen 实测 |
 | 运行时任意未签名 `.so` dlopen | ❌ | 只有构建期签名；需用户态 dlopen 加载器（大工程） |
@@ -36,7 +37,7 @@
 ### A. 增加一个签名库/扩展
 1. `docs/guest-tools-lock.json`：`libraries[]` 或 `extensions[]`（group/base/archive/sha256/files）；
 2. `python3 scripts/adaptation/inventory.py`；G4 `variant_check` 会检查体积预算；
-3. 真机/模拟器用 `tests/smoke/mate60-proot-exec.py --probe native-overlay` 或对应 G2 用例验证。
+3. 真机使用 `tests/smoke/mate60-proot-exec.py --target <usb-key> --probe native-overlay`，模拟器使用对应 G2 用例。
 
 ### B. 增加一个上游包级补丁
 1. `patches/<name>.patch`（git-style diff，node_modules 相对路径）；
@@ -82,8 +83,7 @@
 | D9 | G2/G3 证据（模拟器 + 真机） | loader 用例进 nightly/device lab |
 | D10 | 文档与回滚（支持边界、已知限制） | framework/README 更新 |
 
-当前进度：①exec（main executable）已实现；②动态可执行文件依赖库仅覆盖签名 overlay；
-③dlopen loader 未开始。
+随包签名主程序已通过真机验证，动态库覆盖仍限于签名 overlay。工作区原生文件直接执行仍待 G3 验收，运行时共享库加载器尚未实现。
 
 ## 4. 插件支持策略与稳定性待办
 
