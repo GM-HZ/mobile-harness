@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Use models, files and tools on your HarmonyOS phone. Explore Mobile Harness capabilities, build variants, and the developer preview.">
+  <meta name="theme-color" content="#080d1b">
+  <title>Mobile Harness | A native agent for HarmonyOS</title>
+  <link rel="alternate" hreflang="zh-CN" href="./">
+  <link rel="icon" href="./assets/whale.webp" type="image/webp">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="header">
+    <div class="wrap header-inner">
+      <a class="brand" href="./en.html"><img src="./assets/whale.webp" width="32" height="32" alt=""><span>Mobile Harness</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#capabilities">Capabilities</a>
+        <a href="#builds">Builds</a>
+        <a href="#start">Get started</a>
+      </nav>
+      <a class="locale" href="./" hreflang="zh-CN" lang="zh-CN">简体中文</a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <img class="hero-image" src="./assets/hero.webp" alt="" fetchpriority="high">
+      <div class="wrap hero-inner">
+        <div class="hero-content">
+          <p class="kicker hero-kicker">A native agent for HarmonyOS</p>
+          <h1 id="hero-title">Give your phone<br>a task.</h1>
+          <p class="hero-intro">Run DeepSeek Harness on HarmonyOS. Talk to a model, work with files and tools, and pick up where you left off in the same session.</p>
+          <div class="actions">
+            <a class="button button-primary" href="#start">Get started</a>
+            <a class="button button-outline" href="#capabilities">Explore capabilities</a>
+          </div>
+          <p class="candidate"><span></span>HarmonyOS 1.0.0 candidate</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap workflow section" aria-labelledby="workflow-title">
+      <div class="workflow-copy">
+        <h2 id="workflow-title">From a request to a file</h2>
+        <p class="lede">Take a project log as an example. Add it to the workspace and the model can find and read relevant entries, then save its work under the session’s permissions.</p>
+        <figure class="example">
+          <figcaption>Example task</figcaption>
+          <blockquote>Find the latest error logs in my workspace and save a checklist of follow-up tasks as <code>checklist.md</code>.</blockquote>
+        </figure>
+      </div>
+      <ol class="steps">
+          <li><h3>Give the agent a task</h3><p>Describe the goal and the result you want in a session.</p></li>
+          <li><h3>Review tool requests</h3><p>When prompted, check which files the agent wants to use and decide whether to approve.</p></li>
+          <li><h3>Open the result and continue</h3><p>Read the checklist in the workspace or return to the session to follow up.</p></li>
+      </ol>
+    </section>
+
+    <section id="capabilities" class="feature-band section" aria-labelledby="features-title">
+      <div class="wrap">
+        <p class="kicker">Capabilities</p>
+        <h2 id="features-title">Working on your phone</h2>
+        <div class="feature-list">
+          <article class="feature">
+            <div><h3>Sessions & workspace</h3><p class="feature-meta">Chat, attachments, search and editing</p></div>
+            <p>Sessions and workspaces live in app storage on the device. Read and edit files with workspace tools, open generated files, and resume work in a saved session.</p>
+          </article>
+          <article class="feature">
+            <div><h3>Local tools</h3><p class="feature-meta">Bash · Git · Python · JavaScript / TypeScript</p></div>
+            <p>The standard developer build bundles Alpine tools and runs commands on demand through PRoot. Summarize a CSV, inspect logs or check local Git changes. Programmatic tool calling (PTC) can run scripts and compose tool calls within the authorized scope.</p>
+          </article>
+          <article class="feature">
+            <div><h3>Model connections</h3><p class="feature-meta">DeepSeek · compatible endpoints</p></div>
+            <p>Connect an account or configure an API key in the app. Online models need a network connection and receive the context needed for the task. An OpenAI-compatible endpoint was tested with Ollama in the emulator. Tool use depends on the selected model.</p>
+          </article>
+          <article class="feature">
+            <div><h3>GitHub workflows</h3><p class="feature-meta">Forge · GitHub</p></div>
+            <p>In Forge-enabled builds, connect your GitHub account to read repositories and pull requests or make authorized changes. A private pull request workflow was verified with a real account.</p>
+          </article>
+          <article class="feature">
+            <div><h3>Recovery & background work</h3><p class="feature-meta">Safe mode · HarmonyOS continuous tasks</p></div>
+            <p>If a plugin prevents the standard build from starting, safe mode lets you roll back plugin configuration. Background execution is off by default and asks for notification permission when enabled. HarmonyOS system policies still apply.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="builds" class="wrap section" aria-labelledby="builds-title">
+      <p class="kicker">Builds</p>
+      <h2 id="builds-title">Choose a build</h2>
+      <div class="builds">
+        <article><h3>Standard developer build</h3><p>Local sessions, a workspace and command-line tools. Use it for development and testing with Bash, Git, Python and PTC.</p></article>
+        <article><h3>AppGallery candidate</h3><p>A separate native distribution variant with privacy consent, image attachments and workspace search. General shell access, third-party plugin installation and remote connections are disabled in this variant.</p></article>
+        <article><h3>Self / lab builds</h3><p>Built from source for personal and lab testing, with optional native extensions signed at build time. Experimental remote access connects directly to a DSH host over HTTPS.</p></article>
+      </div>
+      <div class="scope">
+        <h3>Experimental features & platform limits</h3>
+        <div>
+          <details><summary>How far along are sharing, voice and document features?</summary><p>LiveShare has been verified using a self-hosted relay and a browser across two emulators. Device testing and the official public relay are pending. Voice, Office preview, optional LSP and pure JavaScript plugins have scoped tests. Support varies by build and device.</p></details>
+          <details><summary>What are the limits of local commands and remote hosts?</summary><p>Workspace file tools follow Harness permissions. OS-enforced workspace isolation, and arbitrary downloaded native programs face platform limits. Native extensions must be signed at build time. Interactive PTYs, containers and GUI automation are outside the current scope. SSH tunneling and reconnect behavior are still being verified.</p></details>
+          <details><summary>What about Android and cloud execution?</summary><p>The current candidate targets HarmonyOS. Android, cloud execution and broader cross-device continuity are on the roadmap.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section id="start" class="start section" aria-labelledby="start-title">
+      <div class="wrap">
+        <p class="kicker">Get started</p>
+        <h2 id="start-title">Try the HarmonyOS candidate</h2>
+        <p class="lede">On-device startup and tooling were verified on a Mate 60 with 0.4.69. Try 1.0.0 as a developer build while the AppGallery release is in validation.</p>
+        <ol class="start-steps">
+          <li><h3>Prepare a package</h3><p>Use DevEco Studio 26, the pinned build inputs and the matching signing configuration. The ARM64 Phone emulator accepts an unsigned HAP. Physical devices require a suitable signed package.</p></li>
+          <li><h3>Connect a model</h3><p>Launch Mobile Harness and connect your DeepSeek account or configure a model API key in the app.</p></li>
+          <li><h3>Try a small task</h3><p>Add a file to the workspace, then ask the agent to find it, write a summary and save it. Open the session again to continue.</p></li>
+        </ol>
+        <div class="actions">
+          <a class="button button-primary" href="https://github.com/GM-HZ/mobile-harness/blob/main/docs/development.md">Build and validation guide</a>
+          <a class="button button-outline" href="https://github.com/GM-HZ/mobile-harness">GitHub repository</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>Mobile Harness · HarmonyOS</span>
+      <a href="./" hreflang="zh-CN" lang="zh-CN">简体中文</a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G1: keep the gate workflows wired to the gate registry and scripts.
+"""G1: keep the gate and product website workflows wired.
 
 Checks the workflow files structurally (no PyYAML dependency) and fails when a
 workflow loses a required step or references a missing script, so CI and local
@@ -16,6 +16,15 @@ EXPECTED = {
     "gate-nightly.yml": ["capability-parity-gate", "nightly-recovery", "nightly-native-addon"],
     "gate-device.yml": ["device_lab.py run --suite verify", "device_lab.py status"],
     "gate-release.yml": ["gates/run.py --tier G0", "gates/run.py --tier G1", "./scripts/adaptation/release_dry_run.sh"],
+    "product-website.yml": [
+        "branches: [main]",
+        "workflow_dispatch:",
+        "if: github.ref == 'refs/heads/main'",
+        "uses: actions/configure-pages@",
+        "uses: actions/upload-pages-artifact@",
+        "\n          path: site\n",
+        "uses: actions/deploy-pages@",
+    ],
 }
 SCRIPT = re.compile(r"(?:python3\s+|\./)((?:scripts|tests)/[A-Za-z0-9_./-]+?\.(?:py|sh))")
 
@@ -41,7 +50,7 @@ def main():
         for failure in failures:
             print("FAIL", failure, file=sys.stderr)
         return 1
-    print(f"G1 workflows OK: {len(EXPECTED)} gate workflows wired to scripts")
+    print(f"G1 workflows OK: {len(EXPECTED)} workflows wired to required steps")
     return 0
 
 
