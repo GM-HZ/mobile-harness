@@ -727,7 +727,8 @@
           "covers": "real-device acceptance",
           "requires": [
             "USB device",
-            "screen unlocked"
+            "screen unlocked",
+            "installed HAP self-build metadata"
           ],
           "timeout": 1200
         },

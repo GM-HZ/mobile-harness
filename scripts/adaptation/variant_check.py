@@ -22,6 +22,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--variant")
     parser.add_argument("--hap", type=Path)
+    parser.add_argument("--require-self-build-metadata", action="store_true")
     parser.add_argument("--list", action="store_true")
     args = parser.parse_args()
     if args.list:
@@ -61,13 +62,21 @@ def main():
         flag_names = [name for name in names if name.endswith("dsh-self-build.json")]
         expected = variant["hap"].get("flag")
         if expected is not None:
-            if not flag_names:
-                failures.append("missing dsh-self-build.json")
+            if len(flag_names) != 1:
+                failures.append("expected exactly one dsh-self-build.json")
             else:
                 flag = json.loads(archive.read(flag_names[0]))
                 for key, value in expected.items():
-                    if flag.get(key) != value:
-                        failures.append(f"flag {key}={flag.get(key)!r}, expected {value!r}")
+                    actual = flag.get(key)
+                    if actual != value or type(actual) is not type(value):
+                        failures.append(f"flag {key}={actual!r}, expected {value!r}")
+                module = json.loads(archive.read("module.json"))["module"]
+                build_values = [item.get("value") for item in module.get("metadata", [])
+                                if item.get("name") == "org.mobileharness.selfBuild"]
+                if build_values or args.require_self_build_metadata:
+                    expected_value = "true" if expected["selfBuild"] else "false"
+                    if build_values != [expected_value]:
+                        failures.append(f"installed self-build metadata must have one value {expected_value}")
     if failures:
         for failure in failures:
             print("FAIL", failure, file=sys.stderr)

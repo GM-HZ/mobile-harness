@@ -258,6 +258,13 @@ def main():
         "signedExecBypass": SELF_BUILD,
         "note": "Self-built HAPs include the in-memory ELF runner at /usr/bin/mh-exec; store builds never include it.",
     }) + "\n")
+    module_path = STAGE / "entry/src/main/module.json5"
+    module_profile = json.loads(module_path.read_text())
+    module_profile["module"].setdefault("metadata", []).append({
+        "name": "org.mobileharness.selfBuild",
+        "value": "true" if SELF_BUILD else "false",
+    })
+    module_path.write_text(json.dumps(module_profile, indent=2) + "\n")
     loader = RAW / "mh-exec.py"
     installer = RAW / "mh-install.py"
     if SELF_BUILD:

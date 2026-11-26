@@ -21,8 +21,9 @@ HDC = "/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchai
 BUNDLE = "org.sayact.nodepoc"
 FILES = "/data/storage/el2/base/haps/entry/files"
 HOST_HEADER = "127.0.0.1:19592"
+SELF_BUILD_METADATA = "org.mobileharness.selfBuild"
 
-PROBE = """set +e
+PACKAGED_EXEC_PROBE = """set +e
 echo "PWD=$PWD"
 echo "--- guest executables ---"
 ls -l /bin/sh /bin/bash /bin/node /bin/busybox /usr/bin/python3 /usr/bin/git 2>&1 | head -12
@@ -35,7 +36,9 @@ echo "--- bound exec ---"
 echo "--- script exec ---"
 printf '#!/bin/sh\\necho EXEC_SCRIPT_OK\\n' > ./proot-exec.sh; chmod +x ./proot-exec.sh
 ( exec ./proot-exec.sh ); echo "SCRIPT_EXIT=$?"
-echo "--- unbound applet ---"
+"""
+
+PROBE = PACKAGED_EXEC_PROBE + """echo "--- unbound applet ---"
 ( exec /bin/xxd /dev/null ); echo "XXD_EXIT=$?"
 echo "--- copied guest ELF ---"
 cp /bin/busybox ./proot-bx 2>/dev/null; chmod +x ./proot-bx 2>/dev/null
@@ -47,6 +50,17 @@ printf '\\177ELF' > ./proot-fake; chmod +x ./proot-fake
 ( exec ./proot-fake ); echo "FAKE_EXIT=$?"
 echo PROOT_EXEC_PROBE_DONE
 """
+
+STORE_ISOLATION_PROBE = """if [ ! -e /usr/bin/mh-exec ] && [ ! -L /usr/bin/mh-exec ] &&
+   [ ! -e /usr/bin/mh-install ] && [ ! -L /usr/bin/mh-install ]; then
+  echo STORE_SELF_BUILD_TOOLS_ABSENT
+fi
+if [ ! -e /usr/lib/mh-demo.node ] && [ ! -L /usr/lib/mh-demo.node ]; then
+  echo STORE_SELF_BUILD_OVERLAY_ABSENT
+fi
+"""
+STORE_EXEC_PROBE = PACKAGED_EXEC_PROBE + STORE_ISOLATION_PROBE + "echo STORE_EXEC_PROBE_DONE\n"
+STORE_OVERLAY_PROBE = STORE_ISOLATION_PROBE + "echo STORE_OVERLAY_PROBE_DONE\n"
 
 NATIVE_PROBE = """set +e
 echo "PWD=$PWD"
@@ -310,6 +324,25 @@ class Device:
     def state(self):
         return json.loads(self.app("cat mobile-harness-boot.json"))
 
+    def self_build(self):
+        raw = self.hdc("shell", "bm dump -n " + BUNDLE)
+        start = raw.find("{")
+        try:
+            bundle = json.loads(raw[start:])
+            entries = [module for module in bundle.get("hapModuleInfos", [])
+                       if module.get("moduleName") == "entry" and module.get("bundleName") == BUNDLE]
+            values = []
+            if len(entries) == 1:
+                values = [item.get("value") for item in entries[0].get("metadata", [])
+                          if item.get("name") == SELF_BUILD_METADATA]
+        except (ValueError, TypeError, AttributeError):
+            values = []
+        if values == ["true"]:
+            return True
+        if values == ["false"]:
+            return False
+        raise RuntimeError("The installed entry HAP has no unambiguous self-build metadata")
+
     def cookie(self):
         return json.loads(self.app("cat alpine/tmp/dsh-client-native-launch"))["cookie"].split(";", 1)[0]
 
@@ -413,14 +446,16 @@ def record_probe_result(evidence, command, calls, results):
     done = re.search(r"\becho ([A-Z][A-Z0-9_]*_DONE)\b", command)
     markers = {done.group(1): done.group(1) in lines} if done else {}
     expected_exits = {}
-    if command == PROBE:
+    if command in (PROBE, STORE_EXEC_PROBE):
         markers.update({marker: marker in lines for marker in (
-            "EXEC_SH_OK", "EXEC_BASH_OK", "EXEC_NODE_OK", "EXEC_PY_OK", "EXEC_SCRIPT_OK", "COPY_NODE_OK",
+            "EXEC_SH_OK", "EXEC_BASH_OK", "EXEC_NODE_OK", "EXEC_PY_OK", "EXEC_SCRIPT_OK",
         )})
         expected_exits = dict.fromkeys(("SH_EXIT", "BASH_EXIT", "NODE_EXIT", "PY_EXIT", "GIT_EXIT",
-                                        "SCRIPT_EXIT", "COPY_NODE_EXIT"), "0")
+                                        "SCRIPT_EXIT"), "0")
+    if command == PROBE:
+        markers["COPY_NODE_OK"] = "COPY_NODE_OK" in lines
         # Unbound xxd, BusyBox under an unknown applet name, and a truncated ELF should fail.
-        expected_exits.update(XXD_EXIT="126", COPY_BUSYBOX_EXIT="127", FAKE_EXIT="1")
+        expected_exits.update(COPY_NODE_EXIT="0", XXD_EXIT="126", COPY_BUSYBOX_EXIT="127", FAKE_EXIT="1")
     elif command == NATIVE_OVERLAY_PROBE:
         markers.update({marker: marker in lines for marker in (
             "CTYPES_LIBARCHIVE_OK", "EXTENSION_ANSWER 42", "MH_INSTALL_OK /usr/bin/jq",
@@ -428,6 +463,10 @@ def record_probe_result(evidence, command, calls, results):
         )})
         expected_exits = dict.fromkeys(("CTYPES_EXIT", "EXT_EXIT", "JQ_INSTALL_EXIT",
                                         "JQ_VERSION_EXIT", "JQ_RUN_EXIT"), "0")
+    if command in (STORE_EXEC_PROBE, STORE_OVERLAY_PROBE):
+        markers.update({marker: marker in lines for marker in (
+            "STORE_SELF_BUILD_TOOLS_ABSENT", "STORE_SELF_BUILD_OVERLAY_ABSENT",
+        )})
 
     exits = dict(re.findall(r"^([A-Z0-9_]+_EXIT)=([^\r\n]*)", text, re.MULTILINE))
     command_matched = actual_command == command
@@ -467,6 +506,18 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
              "native-overlay": "signed native library and extension overlay"}
     evidence = {"kind": kinds.get(id(probe), "real-device probe"), "target": device.target,
                 "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "workspace": native}
+    if probe in (PROBE, NATIVE_OVERLAY_PROBE):
+        try:
+            evidence["selfBuild"] = device.self_build()
+        except (RuntimeError, OSError, subprocess.SubprocessError) as error:
+            message = str(error) if isinstance(error, RuntimeError) else "Could not read installed HAP metadata"
+            evidence.update(ok=False, selfBuild=None, variantError=message)
+            Path(output).write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n")
+            print(message)
+            return evidence
+        if not evidence["selfBuild"]:
+            evidence["kind"] = "store build signed tools and isolation" if probe == PROBE else "store build overlay isolation"
+            probe = STORE_EXEC_PROBE if probe == PROBE else STORE_OVERLAY_PROBE
     device.hdc("fport", "tcp:" + str(port), "tcp:19592")
     directory_created = False
     workspace = None
@@ -565,7 +616,7 @@ def run(device, port, output, probe=None, loader_file=None, payload_file=None, e
             finally:
                 Path(output).write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps({key: evidence.get(key) for key in
-                      ("ok", "commandMatched", "bashCallCount", "bashResultOk", "markers", "exits", "expectedExits",
+                      ("ok", "selfBuild", "commandMatched", "bashCallCount", "bashResultOk", "markers", "exits", "expectedExits",
                        "fixtureCleanupOk")},
                      ensure_ascii=False, indent=1))
     return evidence

@@ -21,6 +21,7 @@ HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=0 \
 cp ".build/artifacts/harmonyos-appgallery/dsh-mh-arm64-v$build_version-unsigned.app" "$output/appgallery.app"
 echo "== release evidence"
 python3 scripts/adaptation/release_evidence.py --store "$output/store.hap" \
-  --self "$output/self.hap" --appgallery "$output/appgallery.app" --version "$version"
+  --self "$output/self.hap" --appgallery "$output/appgallery.app" --version "$version" \
+  --require-self-build-metadata
 echo "== release gate"
 python3 scripts/adaptation/release_gate.py --version "$version" --require-appgallery

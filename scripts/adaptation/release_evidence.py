@@ -76,6 +76,7 @@ def main():
     parser.add_argument("--self", dest="self_hap", type=Path, required=True)
     parser.add_argument("--appgallery", type=Path)
     parser.add_argument("--version", default=None)
+    parser.add_argument("--require-self-build-metadata", action="store_true")
     args = parser.parse_args()
     inputs = {"store": args.store, "self": args.self_hap}
     if args.appgallery:
@@ -90,10 +91,13 @@ def main():
         match = re.search(r"-v(\d+\.\d+\.\d+)-", args.store.name)
         version = match.group(1) if match else "unknown"
     variants = {name: json.loads((ROOT / f"variants/{name}.json").read_text()) for name in inputs}
+    metadata_check = ["--require-self-build-metadata"] if args.require_self_build_metadata else []
     checks = [
         run_check(["scripts/adaptation/store_build_check.py", "--hap", str(args.store)]),
-        run_check(["scripts/adaptation/variant_check.py", "--variant", "store", "--hap", str(args.store)]),
-        run_check(["scripts/adaptation/variant_check.py", "--variant", "self", "--hap", str(args.self_hap)]),
+        run_check(["scripts/adaptation/variant_check.py", "--variant", "store", "--hap", str(args.store),
+                   *metadata_check]),
+        run_check(["scripts/adaptation/variant_check.py", "--variant", "self", "--hap", str(args.self_hap),
+                   *metadata_check]),
     ]
     if args.appgallery:
         try:

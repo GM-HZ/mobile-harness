@@ -34,6 +34,11 @@ for the exact commit. AppGallery signing and submission use the steps in the
   native image and search adapters and the AppGallery archive. Its package
   assertions rule out Alpine/PRoot and self-build tools.
 
+G3 `exec` and `overlay` read the installed entry HAP's signed `selfBuild`
+metadata. Self and lab packages run the original execution and overlay checks.
+Store packages verify the packaged tools and the absence of self-build tools
+and overlay fixtures. A missing or ambiguous flag is a setup failure.
+
 The emulator gates use separate application identities for the regular and
 AppGallery builds. Select the actual AppGallery simulator using
 `MH_APPGALLERY_EMULATOR` after installing its HAP and completing privacy consent.

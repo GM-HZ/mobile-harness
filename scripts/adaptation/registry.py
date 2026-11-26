@@ -126,8 +126,11 @@ def main():
            "requires": ["USB device connected and unlocked"], "timeout": 900}]
     for name in sorted(device):
         command = f"python3 {name} --target <usb-serial> --output <output>"
+        requires = ["USB device", "screen unlocked"]
+        if Path(name).stem == "mate60-proot-exec":
+            requires.append("installed HAP self-build metadata")
         g3.append({"id": Path(name).stem, "command": command,
-                   "covers": "real-device acceptance", "requires": ["USB device", "screen unlocked"],
+                   "covers": "real-device acceptance", "requires": requires,
                    "timeout": 1200})
     registry = {
         "schema": 1,
