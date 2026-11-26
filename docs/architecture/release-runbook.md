@@ -38,6 +38,8 @@ G3 `exec` and `overlay` read the installed entry HAP's signed `selfBuild`
 metadata. Self and lab packages run the original execution and overlay checks.
 Store packages verify the packaged tools and the absence of self-build tools
 and overlay fixtures. A missing or ambiguous flag is a setup failure.
+G3 `verify` checks normal mode and authenticated HTTP 200 again after collecting
+device diagnostics. A Host that becomes unhealthy after initial startup fails G3.
 
 The emulator gates use separate application identities for the regular and
 AppGallery builds. Select the actual AppGallery simulator using

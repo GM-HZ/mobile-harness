@@ -11,18 +11,46 @@ rediscover on hardware:
    extract digits instead of requiring exactly three digits.
 3. Each probe determines success from its own `*_DONE` marker, not the exec
    probe's markers.
-4. device_lab requires the probe's `ok:true`, not only exit code 0.
+4. device_lab requires the probe's `ok:true`, and verify rejects a Host that
+   becomes unhealthy after startup.
 5. Embedded Host startup uses jitless, and children keep their intended
    descriptors while avoiding an unsupported bulk-close syscall.
 """
-import sys
+import json
 from pathlib import Path
+import runpy
+import sys
+from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[2]
 HOST = ROOT / "packages/dsh-host/dsh-native-web.cjs"
 PROBE = ROOT / "tests/smoke/mate60-proot-exec.py"
 DEVICE_LAB = ROOT / "scripts/adaptation/device_lab.py"
 NATIVE = ROOT / "runtime/harmonyos/native"
+
+
+def verify_rejects_unhealthy_host():
+    verify = runpy.run_path(str(ROOT / "tests/smoke/mate60-verify.py"))
+    normal = {"mode": "normal", "pending": False}
+    cases = (({"mode": "safe", "pending": True}, 200), (normal, 503))
+    with TemporaryDirectory() as directory:
+        output = Path(directory) / "verify.json"
+        for state, status in cases:
+            device = SimpleNamespace(
+                target="fixture", port=19670, start=lambda: "started", ready=lambda: 1,
+                hdc=lambda *_args: "{}", state=lambda: state, web_status=lambda: status,
+                rpc=lambda method, _args: [] if method == "pluginManager/listBundles" else {},
+            )
+            try:
+                verify["run"](device, output)
+            except SystemExit:
+                evidence = json.loads(output.read_text())
+                if evidence.get("ok") is not False or evidence.get("state") != state or evidence.get("web") != status:
+                    return False
+            else:
+                return False
+    return True
 
 
 def main():
@@ -55,6 +83,8 @@ def main():
         failures.append("probe success no longer uses its own *_DONE marker")
     if 'probe.get("ok") is True' not in device_lab:
         failures.append("device_lab no longer requires the probe's ok:true")
+    if not verify_rejects_unhealthy_host():
+        failures.append("device verify does not reject a Host that became unhealthy after startup")
     nativehost = (NATIVE / "nativehost.c").read_text()
     if ('"node", "--jitless", "--expose-internals"' not in nativehost or "MH_SELF_BUILD" in nativehost
             or "dsh-host-jitless" in nativehost or "dsh-host-jitless" in engine):

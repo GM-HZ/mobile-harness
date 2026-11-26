@@ -21,6 +21,7 @@ HDC = "/Applications/DevEco-Studio.app/Contents/sdk/default/openharmony/toolchai
 BUNDLE = "org.sayact.nodepoc"
 FILES = "data/storage/el2/base/haps/entry/files"
 HOST_HEADER = "127.0.0.1:19592"
+READY_STATE = {"mode": "normal", "pending": False}
 
 
 class Device:
@@ -68,7 +69,7 @@ class Device:
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             try:
-                if self.state() == {"mode": "normal", "pending": False} and self.web_status() == 200:
+                if self.state() == READY_STATE and self.web_status() == 200:
                     return round((timeout - (deadline - time.monotonic())) * 1000)
             except Exception:
                 pass
@@ -110,7 +111,7 @@ def microphone_state(device):
 
 def run(device, output):
     evidence = {"kind": "real-device read-only verification", "target": device.target,
-                "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+                "checkedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "ok": False}
     device.hdc("fport", "tcp:" + str(device.port), "tcp:19592")
     try:
         evidence["started"] = device.start()
@@ -119,8 +120,6 @@ def run(device, output):
             raise SystemExit("The app did not become ready")
         evidence["parameters"] = parameters(device)
         evidence["build"] = installed_build(device)
-        evidence["state"] = device.state()
-        evidence["web"] = device.web_status()
         evidence["storage"] = device.hdc("shell", "df -h /data | tail -1")
         evidence["battery"] = battery(device)
         evidence["microphone"] = microphone_state(device)
@@ -134,6 +133,10 @@ def run(device, output):
                 evidence[method] = device.rpc(method, args)
             except Exception as error:
                 evidence[method] = {"error": str(error)[:160]}
+        evidence["state"] = device.state()
+        evidence["web"] = device.web_status()
+        if evidence["state"] != READY_STATE or evidence["web"] != 200:
+            raise SystemExit("The app did not remain ready through verification")
         evidence["ok"] = True
     finally:
         device.hdc("fport", "rm", "tcp:" + str(device.port), "tcp:19592")
