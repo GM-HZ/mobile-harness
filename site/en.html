@@ -72,7 +72,7 @@
           </article>
           <article class="feature">
             <div><h3>Model connections</h3><p class="feature-meta">DeepSeek · compatible endpoints</p></div>
-            <p>Connect an account or configure an API key in the app. Online models need a network connection and receive the context needed for the task. An OpenAI-compatible endpoint was tested with Ollama in the emulator. Tool use depends on the selected model.</p>
+            <p>Connect an account or configure an API key in the app. Online model providers may receive the prompts, attachments or tool results needed for the task. An OpenAI-compatible endpoint was tested with Ollama in the emulator. Tool use depends on the selected model.</p>
           </article>
           <article class="feature">
             <div><h3>GitHub workflows</h3><p class="feature-meta">Forge · GitHub</p></div>
@@ -98,7 +98,7 @@
         <h3>Experimental features & platform limits</h3>
         <div>
           <details><summary>How far along are sharing, voice and document features?</summary><p>LiveShare has been verified using a self-hosted relay and a browser across two emulators. Device testing and the official public relay are pending. Voice, Office preview, optional LSP and pure JavaScript plugins have scoped tests. Support varies by build and device.</p></details>
-          <details><summary>What are the limits of local commands and remote hosts?</summary><p>Workspace file tools follow Harness permissions. OS-enforced workspace isolation, and arbitrary downloaded native programs face platform limits. Native extensions must be signed at build time. Interactive PTYs, containers and GUI automation are outside the current scope. SSH tunneling and reconnect behavior are still being verified.</p></details>
+          <details><summary>What are the limits of local commands and remote hosts?</summary><p>Workspace file tools follow Harness permissions. OS-enforced workspace isolation and arbitrary downloaded native programs face platform limits. Native extensions must be signed at build time. Interactive PTYs, containers and GUI automation are outside the current scope. Experimental remote access uses direct HTTPS. Users initiate connections and reconnect manually.</p></details>
           <details><summary>What about Android and cloud execution?</summary><p>The current candidate targets HarmonyOS. Android, cloud execution and broader cross-device continuity are on the roadmap.</p></details>
         </div>
       </div>

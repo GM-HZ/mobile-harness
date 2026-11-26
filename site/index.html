@@ -72,7 +72,7 @@
           </article>
           <article class="feature">
             <div><h3>模型连接</h3><p class="feature-meta">DeepSeek · 兼容端点</p></div>
-            <p>通过应用里的账号入口或 API Key 配置模型。在线模型需要联网，并接收回答任务所需的上下文。OpenAI 兼容端点已用 Ollama 在模拟器中验证，具体工具调用能力取决于所选模型。</p>
+            <p>通过应用里的账号入口或 API Key 配置模型。使用在线模型时，提供商可能收到任务所需的提示词、附件或工具结果。OpenAI 兼容端点已用 Ollama 在模拟器中验证，具体工具调用能力取决于所选模型。</p>
           </article>
           <article class="feature">
             <div><h3>GitHub 协作</h3><p class="feature-meta">Forge · GitHub</p></div>
@@ -98,7 +98,7 @@
         <h3>实验能力与平台边界</h3>
         <div>
           <details><summary>浏览器共享、语音和文档处理的验证进度如何？</summary><p>LiveShare 已在自建中继和双模拟器浏览器链路验证，公网官方中继及真机链路待验。语音、Office 预览、可选 LSP 和纯 JS 插件均有分项验证，支持范围取决于构建和设备。</p></details>
-          <details><summary>本机命令和远程主机有哪些限制？</summary><p>工作区文件工具遵循 Harness 授权。系统级工作区沙箱、任意下载的原生程序仍受平台限制。动态扩展须在构建期签名。交互式 PTY、容器和图形界面自动化超出当前范围。SSH 隧道和断线续接还在验证。</p></details>
+          <details><summary>本机命令和远程主机有哪些限制？</summary><p>工作区文件工具遵循 Harness 授权。系统级工作区沙箱、任意下载的原生程序仍受平台限制。动态扩展须在构建期签名。交互式 PTY、容器和图形界面自动化超出当前范围。实验性远程接入限于 HTTPS 直连，连接和重连由用户发起。</p></details>
           <details><summary>Android 和云端执行什么时候可用？</summary><p>本轮候选版面向 HarmonyOS。Android、云端执行和更完整的跨设备接续属于后续路线图。</p></details>
         </div>
       </div>
