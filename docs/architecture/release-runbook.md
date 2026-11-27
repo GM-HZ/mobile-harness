@@ -42,6 +42,8 @@ G3 execution checks require a complete Bash result along with the expected
 output markers and per-command exits. A nonzero outer exit fails the gate.
 G3 `verify` checks normal mode and authenticated HTTP 200 again after collecting
 device diagnostics. A Host that becomes unhealthy after initial startup fails G3.
+The extraction marker is invalidated before overwriting a layer and published
+after extraction succeeds. G1 covers a rollback after partial extraction.
 
 The emulator gates use separate application identities for the regular and
 AppGallery builds. Select the actual AppGallery simulator using

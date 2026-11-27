@@ -544,9 +544,12 @@ class DshEngine {
     // to an older build skipped extraction and kept files from the newer layer.
     const marker = root + '/.validated-unpack-v2-' + name;
     if (fileIo.accessSync(marker)) {
-      let previous = '';
-      try { previous = fileIo.readTextSync(marker).trim(); } catch (error) { previous = ''; }
-      if (previous === identity) return false;
+      try {
+        const previous = fileIo.readTextSync(marker).trim();
+        if (previous === identity) return false;
+      } catch (error) {
+        hilog.warn(0xD005, 'HarmonyPRoot', 'could not read extraction marker for %{public}s', name);
+      }
     }
     const raw = context.resourceManager.getRawFdSync(name);
     const output = fileIo.openSync(archive,
@@ -567,20 +570,31 @@ class DshEngine {
       fileIo.closeSync(output.fd);
       context.resourceManager.closeRawFdSync(name);
     }
+    const pendingMarker = marker + '.tmp';
     try {
+      // Decompression modifies the existing tree in place. A failed attempt
+      // must leave no marker that could authorize reusing a partially written tree.
+      if (fileIo.accessSync(marker)) fileIo.unlinkSync(marker);
       await zlib.decompressFile(archive, root, {
         parallel: zlib.ParallelStrategy.PARALLEL_STRATEGY_PARALLEL_DECOMPRESSION,
       });
-      const markerFile = fileIo.openSync(marker,
+      const markerFile = fileIo.openSync(pendingMarker,
         fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.TRUNC);
       try {
-        if (identity) fileIo.writeSync(markerFile.fd, identity);
+        if (identity && fileIo.writeSync(markerFile.fd, identity) !== identity.length) {
+          throw new Error('Incomplete extraction marker for ' + name);
+        }
+        fileIo.fsyncSync(markerFile.fd);
       } finally {
         fileIo.closeSync(markerFile);
       }
+      fileIo.renameSync(pendingMarker, marker);
       hilog.info(0xD005, 'HarmonyPRoot', 'unpacked %{public}s', name);
       return true;
-    } finally { fileIo.unlinkSync(archive); }
+    } finally {
+      if (fileIo.accessSync(pendingMarker)) fileIo.unlinkSync(pendingMarker);
+      fileIo.unlinkSync(archive);
+    }
   }
   private removeRetiredDemoExtensionPlaceholder(root: string): void {
     const lib = root + '/usr/lib';

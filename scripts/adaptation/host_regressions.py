@@ -14,10 +14,12 @@ rediscover on hardware:
    becomes unhealthy after startup.
 5. Embedded Host startup uses jitless, and children keep their intended
    descriptors while avoiding an unsupported bulk-close syscall.
+6. Archive extraction publishes a reusable identity only for a completed layer.
 """
 import json
 from pathlib import Path
 import runpy
+import subprocess
 import sys
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
@@ -87,13 +89,17 @@ def main():
         failures.append("bash status parser regressed to requiring three digits")
     if "proxyEnv" not in host or "'HTTPS_PROXY'" not in host:
         failures.append("guest gh runner no longer forwards proxy environment variables")
-    engine = (ROOT / "apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets").read_text()
+    engine_path = ROOT / "apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets"
+    engine = engine_path.read_text()
     index = (ROOT / "apps/harmonyos/entry/src/main/ets/pages/Index.ets").read_text()
     if "plugin-snapshot" not in engine or "restartWithPluginRollback" not in engine:
         failures.append("plugin snapshot/rollback wiring missing from DshEngine")
-    if ("const marker = root + '/.validated-unpack-v2-' + name;" not in engine or
-            "previous === identity" not in engine):
-        failures.append("unpack markers must store the current layer identity, not accumulate per-identity files")
+    archive_cache = subprocess.run(
+        ["node", str(ROOT / "tests/contract/archive-unpack-cache.cjs"), str(engine_path)],
+        capture_output=True, text=True, timeout=30,
+    )
+    if archive_cache.returncode != 0:
+        failures.append("archive extraction cache contract: " + archive_cache.stderr.strip())
     if "回滚插件配置" not in index:
         failures.append("plugin rollback action missing from the recovery UI")
     compat = (ROOT / "runtime/harmonyos/compat/dsh-harmony-forge.cjs").read_text()
