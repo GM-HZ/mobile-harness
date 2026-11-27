@@ -1,0 +1,25 @@
+{
+  "scope": "Store read-only startup and cache identity recheck after USB reconnect",
+  "device": "BRA-AL00",
+  "candidateCommit": "c59ee85f300df8b7623eca8e2448d0237b1e9be4",
+  "referenceDeviceEvidence": "docs/evidence/device-lab/20261127-v1.0.0-33574c7-store-mate60-g3.json",
+  "referenceArtifactSourceCommit": "33574c7b00fd7abcefa26ae09bc21d34ac6f0236",
+  "variant": "store",
+  "selfBuild": false,
+  "installedVersionName": "1.0.0",
+  "installedVersionCode": 77,
+  "started": "start ability successfully.",
+  "readyMs": 169,
+  "state": {
+    "mode": "normal",
+    "pending": false
+  },
+  "web": 200,
+  "checks": {
+    "ready": true,
+    "cacheMarkerMatchedReferenceArtifact": true,
+    "cacheMarkerIdentityStayedStable": true
+  },
+  "ok": true,
+  "checkedAt": "2026-11-27T19:16:48+08:00"
+}

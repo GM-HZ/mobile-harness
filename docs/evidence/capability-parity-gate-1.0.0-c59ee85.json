@@ -1,0 +1,211 @@
+{
+  "sourceCommit": "c59ee85f300df8b7623eca8e2448d0237b1e9be4",
+  "runtimeSourceCommit": "33574c7b00fd7abcefa26ae09bc21d34ac6f0236",
+  "ok": true,
+  "version": "1.0.0",
+  "versionCode": 77,
+  "storeArtifact": {
+    "path": ".build/v1-gates/33574c7/store.hap",
+    "sha256": "f586fecdb6a37456ded9935021fb95fa34f22c7bb8ae7f5fa074d7c94a31c954",
+    "bytes": 675279764
+  },
+  "appgalleryEvidence": "docs/evidence/device-lab/20261127-v1.0.0-33574c7-appgallery-emulator.json",
+  "nightlyEvidence": ".build/v1-gates/33574c7/nightly/G2/33574c7b00fd7abcefa26ae09bc21d34ac6f0236.json",
+  "warmStartup": {
+    "readyMs": 12916,
+    "initialAttemptTimedOut": true
+  },
+  "capabilityCases": [
+    {
+      "name": "recovery",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 38
+    },
+    {
+      "name": "voice-input",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 50
+    },
+    {
+      "name": "voice-native-capture",
+      "exit": 1,
+      "passed": false,
+      "elapsedSeconds": 39
+    },
+    {
+      "name": "ollama-routes",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 113
+    },
+    {
+      "name": "ptc-link-fixture",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 1
+    },
+    {
+      "name": "ptc-boundary",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 44
+    },
+    {
+      "name": "liveshare",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 52
+    },
+    {
+      "name": "liveshare-cross-device",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 98
+    },
+    {
+      "name": "account-entry",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 44
+    },
+    {
+      "name": "native-addon-location",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 20
+    }
+  ],
+  "voiceTestRepair": {
+    "initialCaseFailed": true,
+    "targetedRetestPassed": true,
+    "completeRetestPassed": true
+  },
+  "optionalAcousticCapturePassed": false,
+  "secondaryEmulatorStopped": true,
+  "gates": [
+    {
+      "id": "capability-parity-gate",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 531.1
+    },
+    {
+      "id": "nightly-native-addon",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 28.9
+    },
+    {
+      "id": "startup-warm-budget",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 2,
+      "flake": true,
+      "durationSeconds": 317.5
+    },
+    {
+      "id": "nightly-plugin-git-update",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 70.1
+    },
+    {
+      "id": "nightly-mcp-stdio",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 14.7
+    },
+    {
+      "id": "nightly-ptc-link-fixture",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 1.0
+    },
+    {
+      "id": "nightly-inspector-availability",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 14.2
+    },
+    {
+      "id": "nightly-lsp-bundle",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 21.9
+    },
+    {
+      "id": "nightly-inspector",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 15.7
+    },
+    {
+      "id": "nightly-recovery",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 34.4
+    },
+    {
+      "id": "appgallery-images",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "evidence": "docs/evidence/device-lab/20261127-v1.0.0-33574c7-appgallery-emulator.json"
+    },
+    {
+      "id": "appgallery-search",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "evidence": "docs/evidence/device-lab/20261127-v1.0.0-33574c7-appgallery-emulator.json"
+    }
+  ],
+  "optionalAcousticRetest": {
+    "passed": false,
+    "actualRms": 0.003617431209291891,
+    "minimumRms": 0.005,
+    "evidence": ".build/v1-gates/33574c7/optional-acoustic-final/capability-parity-gate.json"
+  }
+}
