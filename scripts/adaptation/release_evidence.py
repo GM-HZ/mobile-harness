@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G4: collect release evidence for the store, self and AppGallery variants.
+"""G4: collect release evidence for the variants in scope.
 
 Runs the store shape check and the variant assertions, records artifact hashes and
 sizes, writes docs/evidence/release/<version>-<commit>.json and appends the run to
@@ -35,6 +35,22 @@ def run_check(arguments):
     result = subprocess.run(["python3", *arguments], cwd=ROOT, capture_output=True, text=True)
     return {"command": " ".join(arguments), "exit": result.returncode, "passed": result.returncode == 0,
             "output": (result.stdout + result.stderr).strip()[-1200:]}
+
+
+def store_version_check(package, version):
+    profile = json.loads((ROOT / "apps/harmonyos/AppScope/app.json5").read_text())["app"]
+    expected = {key: profile[key] for key in ("bundleName", "versionName", "versionCode")}
+    try:
+        with ZipFile(package) as archive:
+            packaged = json.loads(archive.read("module.json"))["app"]
+        actual = {key: packaged.get(key) for key in expected}
+        passed = actual == expected and version == expected["versionName"]
+        output = f"{actual}, expected {expected} for release {version}"
+    except (BadZipFile, OSError, ValueError, KeyError) as error:
+        passed = False
+        output = str(error)
+    return {"command": "Store package release metadata", "exit": int(not passed),
+            "passed": passed, "output": output}
 
 
 def appgallery_check(package):
@@ -73,12 +89,19 @@ def archive_scoreboard(staging):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--store", type=Path, required=True)
-    parser.add_argument("--self", dest="self_hap", type=Path, required=True)
+    parser.add_argument("--self", dest="self_hap", type=Path)
     parser.add_argument("--appgallery", type=Path)
+    parser.add_argument("--store-only", action="store_true")
     parser.add_argument("--version", default=None)
     parser.add_argument("--require-self-build-metadata", action="store_true")
     args = parser.parse_args()
-    inputs = {"store": args.store, "self": args.self_hap}
+    if args.store_only and (args.self_hap or args.appgallery):
+        parser.error("--store-only accepts only --store")
+    if not args.store_only and args.self_hap is None:
+        parser.error("--self is required for a multi-variant release")
+    inputs = {"store": args.store}
+    if args.self_hap:
+        inputs["self"] = args.self_hap
     if args.appgallery:
         inputs["appgallery"] = args.appgallery
     for label, path in inputs.items():
@@ -91,14 +114,17 @@ def main():
         match = re.search(r"-v(\d+\.\d+\.\d+)-", args.store.name)
         version = match.group(1) if match else "unknown"
     variants = {name: json.loads((ROOT / f"variants/{name}.json").read_text()) for name in inputs}
-    metadata_check = ["--require-self-build-metadata"] if args.require_self_build_metadata else []
+    metadata_check = ["--require-self-build-metadata"] if args.require_self_build_metadata or args.store_only else []
     checks = [
         run_check(["scripts/adaptation/store_build_check.py", "--hap", str(args.store)]),
         run_check(["scripts/adaptation/variant_check.py", "--variant", "store", "--hap", str(args.store),
                    *metadata_check]),
-        run_check(["scripts/adaptation/variant_check.py", "--variant", "self", "--hap", str(args.self_hap),
-                   *metadata_check]),
     ]
+    if args.store_only:
+        checks.append(store_version_check(args.store, version))
+    else:
+        checks.append(run_check(["scripts/adaptation/variant_check.py", "--variant", "self", "--hap",
+                                 str(args.self_hap), *metadata_check]))
     if args.appgallery:
         try:
             checks.append(appgallery_check(args.appgallery))
@@ -120,6 +146,8 @@ def main():
         rsi = archive_scoreboard(staging)
         evidence = {"version": version, "commit": commit, "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
                     "artifacts": artifacts, "checks": checks, "rsiScoreboard": rsi, "ok": ok}
+        if args.store_only:
+            evidence["scope"] = "store-only"
         pending_evidence = staging / output.name
         pending_evidence.write_text(json.dumps(evidence, indent=2) + "\n")
         pending_evidence.replace(output)
@@ -128,7 +156,8 @@ def main():
                    cwd=ROOT, check=False)
     print(f"release evidence: {output.relative_to(ROOT)}")
     print(f"  store: {artifacts['store']['bytes']:,} B (max {artifacts['store']['maxBytes']:,})")
-    print(f"  self:  {artifacts['self']['bytes']:,} B (max {artifacts['self']['maxBytes']:,})")
+    if "self" in artifacts:
+        print(f"  self:  {artifacts['self']['bytes']:,} B (max {artifacts['self']['maxBytes']:,})")
     for check in checks:
         print(f"  {'OK  ' if check['passed'] else 'FAIL'} {check['command']}")
     return 0 if ok else 1

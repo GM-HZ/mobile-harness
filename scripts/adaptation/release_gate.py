@@ -17,7 +17,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", required=True)
     parser.add_argument("--commit", default=None)
-    parser.add_argument("--require-appgallery", action="store_true")
+    scope = parser.add_mutually_exclusive_group()
+    scope.add_argument("--require-appgallery", action="store_true")
+    scope.add_argument("--store-only", action="store_true")
     args = parser.parse_args()
     commit = args.commit or subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     path = EVIDENCE / f"{args.version}-{commit}.json"
@@ -31,6 +33,10 @@ def main():
         failures.append("release evidence is not green")
     if evidence.get("commit") != commit:
         failures.append(f"evidence commit {evidence.get('commit')} != {commit}")
+    if args.store_only and evidence.get("scope") != "store-only":
+        failures.append("release evidence must record the Store-only scope")
+    if evidence.get("version") != args.version:
+        failures.append(f"evidence version {evidence.get('version')} != {args.version}")
     for check in evidence.get("checks", []):
         if not check.get("passed"):
             failures.append("failed check: " + check.get("command", "?"))
@@ -44,9 +50,11 @@ def main():
             if hashlib.sha256(scoreboard.read_bytes()).hexdigest() != rsi["sha256"]:
                 failures.append("RSI scoreboard hash drifted: " + rsi["path"])
     artifacts = evidence.get("artifacts", {})
-    required = {"store", "self"}
+    required = {"store"} if args.store_only else {"store", "self"}
     if args.require_appgallery:
         required.add("appgallery")
+    if args.store_only and artifacts.keys() - required:
+        failures.append("Store-only release evidence contains other variants")
     for label in sorted(required - artifacts.keys()):
         failures.append(f"missing {label} artifact evidence")
     for label, artifact in artifacts.items():

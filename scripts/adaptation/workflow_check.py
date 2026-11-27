@@ -16,7 +16,9 @@ EXPECTED = {
     "gate-nightly.yml": ["capability-parity-gate", "nightly-recovery", "nightly-native-addon",
                          "MH_SECOND_EMULATOR", "--fail-on-skip", ".build/capability-parity-gate.json"],
     "gate-device.yml": ["device_lab.py run --suite verify", "device_lab.py status"],
-    "gate-release.yml": ["gates/run.py --tier G0", "gates/run.py --tier G1", "./scripts/adaptation/release_dry_run.sh"],
+    "gate-release.yml": ["gates/run.py --tier G0", "gates/run.py --tier G1", "./scripts/adaptation/release_dry_run.sh",
+                         'if [ "$GITHUB_REF" = refs/tags/v0.5.0 ]; then',
+                         "./scripts/adaptation/release_dry_run.sh --store-only 0.5.0"],
     "product-website.yml": [
         "branches: [main]",
         "workflow_dispatch:",

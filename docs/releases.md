@@ -1,5 +1,11 @@
 # 版本记录
 
+## 0.5.0 · 鸿蒙可用预览版（构建号 78）
+
+普通鸿蒙版支持续接会话、访问工作区和运行随包的常用命令。启动页和运行时恢复页统一为白底鲸鱼设计。启动异常时可进入安全模式，并通过恢复页回滚插件配置或正常重开。
+
+GitHub 预览版的未签名 ARM64 HAP 适用于 DevEco Studio 的 HarmonyOS Phone 模拟器。真机安装需要适用的签名及设备授权。[发布手册](architecture/release-runbook.md#harmonyos-05-preview)
+
 ## 1.0.0 候选（构建号 77）
 
 鸿蒙普通包、自建包和 AppGallery 发行包使用同一源码基线。候选修复了 Mate 60 覆盖升级后的 Host 启动崩溃、Workflow 子进程失效和普通包升级后残留的自建工具占位文件。普通包和 AppGallery 版使用各自的包名和应用数据。 [变体与构建手册](architecture/release-runbook.md)

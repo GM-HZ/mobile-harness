@@ -1,5 +1,4 @@
-# Release gate: build store, self and AppGallery, assert package shape and
-# size budgets, and upload the evidence. Triggered manually or on a v* tag.
+# Release gate: validate the variants in scope and upload exact-commit evidence.
 name: Gate Release
 
 on:
@@ -27,8 +26,13 @@ jobs:
         run: |
           python3 gates/run.py --tier G0 --evidence-dir .build/gate-evidence
           python3 gates/run.py --tier G1 --evidence-dir .build/gate-evidence
-      - name: Build and validate all release variants
-        run: ./scripts/adaptation/release_dry_run.sh
+      - name: Build and validate the release
+        run: |
+          if [ "$GITHUB_REF" = refs/tags/v0.5.0 ]; then
+            ./scripts/adaptation/release_dry_run.sh --store-only 0.5.0
+          else
+            ./scripts/adaptation/release_dry_run.sh
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

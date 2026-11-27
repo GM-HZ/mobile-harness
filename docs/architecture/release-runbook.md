@@ -24,6 +24,17 @@ The tag workflow runs the same script. The release gate requires green evidence
 for the exact commit. AppGallery signing and submission use the steps in the
 [AppGallery release guide](../appgallery-release.md).
 
+## HarmonyOS 0.5 preview
+
+The `v0.5.0` tag publishes the ordinary Store HAP for the ARM64 Phone emulator
+as a GitHub prerelease. Local validation and the tag workflow both run
+`./scripts/adaptation/release_dry_run.sh --store-only`. This records the
+artifact hash, checks its package contents and version metadata, and requires
+Store-only evidence for the tagged commit. The public assets are the unsigned
+emulator HAP and its SHA-256 file. Physical-device installation uses a
+provisioning profile that authorizes the device or an official distribution
+channel.
+
 ## Build variants
 
 - `store` is the regular HarmonyOS package. Its checks require the default
