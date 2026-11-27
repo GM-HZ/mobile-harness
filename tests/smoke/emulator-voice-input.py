@@ -158,6 +158,9 @@ def verify_arkweb(emulator,audio,evidence):
         script='''(() => {
           const samples=atob(AUDIO);
           const trace={clicks:[], errors:[]};
+          const contexts=[];
+          const devices=navigator.mediaDevices;
+          const descriptor=Object.getOwnPropertyDescriptor(devices,'getUserMedia');
           const onClick=e=>trace.clicks.push({label:e.target.closest('button')?.getAttribute('aria-label'),
             type:e.target.tagName, trusted:e.isTrusted});
           const onError=e=>trace.errors.push(String(e.reason || e.error || e.message));
@@ -165,12 +168,19 @@ def verify_arkweb(emulator,audio,evidence):
           window.addEventListener('unhandledrejection',onError);
           window.addEventListener('error',onError);
           globalThis.__mhVoiceTest={phase:'waiting', trace, recorder:typeof MediaRecorder,
-            cleanup:()=>{document.removeEventListener('click',onClick,true);
-              window.removeEventListener('unhandledrejection',onError); window.removeEventListener('error',onError);},
+            cleanup:async()=>{document.removeEventListener('click',onClick,true);
+              window.removeEventListener('unhandledrejection',onError); window.removeEventListener('error',onError);
+              if(descriptor) Object.defineProperty(devices,'getUserMedia',descriptor);
+              else delete devices.getUserMedia;
+              await Promise.allSettled(contexts.map(async context => {
+                if(context.state!=='closed') await context.close();
+              }));
+              return contexts.every(context=>context.state==='closed');},
             audioContext:typeof AudioContext, destination:typeof AudioContext==='function'?
               typeof AudioContext.prototype.createMediaStreamDestination:'unavailable'};
-          Object.defineProperty(navigator.mediaDevices,'getUserMedia',{ configurable:true,value:async () => {
+          Object.defineProperty(devices,'getUserMedia',{ configurable:true,value:async () => {
             const context=new AudioContext();
+            contexts.push(context);
             Object.assign(globalThis.__mhVoiceTest,{phase:'resume',context});
             await context.resume();
             globalThis.__mhVoiceTest.phase='decode';
@@ -213,7 +223,10 @@ def verify_arkweb(emulator,audio,evidence):
             })()''')
             raise
         finally:
-            run('globalThis.__mhVoiceTest?.cleanup(); void globalThis.__mhVoiceTest?.context?.close(); delete navigator.mediaDevices.getUserMedia; delete globalThis.__mhVoiceTest; true')
+            assert run('''(async () => {
+              try { return await globalThis.__mhVoiceTest.cleanup(); }
+              finally { delete globalThis.__mhVoiceTest; }
+            })()'''), 'Synthetic recorder contexts did not close'
 
 
 def microphone_permission(emulator):
@@ -223,6 +236,98 @@ def microphone_permission(emulator):
     return {'status': row['grantStatus'], 'flag': row['grantFlag']}
 
 
+def grant_native_microphone(emulator, ui, result):
+    ui['tap'](emulator, ui['wait_control'](emulator, START, 'button'))
+    deadline = time.monotonic() + 15
+    previous = None
+    while time.monotonic() < deadline:
+        rows = ui['controls'](emulator, bundle=None)
+        dialog = any(('麦克风' in row['text'] and '访问' in row['text'])
+                     or 'access your microphone' in row['text'].lower() for row in rows)
+        allow = ui['find'](rows, {'允许', 'Allow', 'While using the app', 'Allow while using the app'}) if dialog else None
+        if allow and allow == previous:
+            break
+        previous = allow
+        time.sleep(.2)
+    else:
+        raise AssertionError('HarmonyOS did not present a stable native microphone permission dialog')
+    ui['tap'](emulator, allow)
+    result['nativePermissionDialog'] = True
+    deadline = time.monotonic() + 5
+    while True:
+        permission = microphone_permission(emulator)
+        result['nativePermissionAfterTap'] = permission
+        if permission['status'] == 0:
+            return
+        if time.monotonic() >= deadline:
+            raise AssertionError(f'HarmonyOS did not grant the microphone after the Allow tap: {permission}')
+        time.sleep(.2)
+
+
+NATIVE_MICROPHONE_HOOK = '''(() => {
+  const devices = navigator.mediaDevices;
+  const descriptor = Object.getOwnPropertyDescriptor(devices, 'getUserMedia');
+  const original = devices.getUserMedia.bind(devices);
+  const trace = { phase: 'not-called', errorName: null, visibility: [] };
+  const recordVisibility = ({type}) => {
+    if (trace.visibility.length < 12) trace.visibility.push({type, state: document.visibilityState});
+  };
+  recordVisibility({type: 'initial'});
+  document.addEventListener('visibilitychange', recordVisibility);
+  window.addEventListener('blur', recordVisibility);
+  window.addEventListener('focus', recordVisibility);
+  let released = false;
+  trace.cleanup = () => {
+    released = true;
+    document.removeEventListener('visibilitychange', recordVisibility);
+    window.removeEventListener('blur', recordVisibility);
+    window.removeEventListener('focus', recordVisibility);
+    globalThis.__mhNativeTracks?.forEach(track => track.stop());
+    delete globalThis.__mhNativeTracks;
+    if (descriptor) Object.defineProperty(devices, 'getUserMedia', descriptor);
+    else delete devices.getUserMedia;
+    delete globalThis.__mhNativeMicTrace;
+  };
+  globalThis.__mhNativeMicTrace = trace;
+  Object.defineProperty(devices, 'getUserMedia', { configurable: true, value: async (constraints) => {
+    trace.phase = 'pending';
+    try {
+      const stream = await original(constraints);
+      if (released) {
+        stream.getTracks().forEach(track => track.stop());
+        throw new DOMException('Fixture ended', 'AbortError');
+      }
+      globalThis.__mhNativeTracks = stream.getAudioTracks();
+      trace.phase = 'resolved';
+      return stream;
+    } catch (error) {
+      trace.phase = 'rejected';
+      trace.errorName = /^[A-Za-z]{1,48}Error$/.test(error?.name) ? error.name : 'UnknownError';
+      throw error;
+    }
+  } });
+  return true;
+})()'''
+
+
+def record_native_microphone_failure(emulator, run, result):
+    diagnostic = result['nativeRecorderDiagnostic'] = {}
+    try:
+        diagnostic['permission'] = microphone_permission(emulator)
+    except Exception as error:
+        diagnostic['permissionProbeError'] = type(error).__name__
+    try:
+        diagnostic['arkWeb'] = run('''(() => {
+          const trace = globalThis.__mhNativeMicTrace;
+          const voiceState = document.querySelector('[data-voice-activity]')?.dataset.voiceActivity;
+          return { visibilityState: document.visibilityState, visibility: trace?.visibility,
+            phase: trace?.phase, errorName: trace?.errorName, voiceState,
+            audioTrackCount: globalThis.__mhNativeTracks?.length ?? 0 };
+        })()''', timeout=5)
+    except Exception as error:
+        diagnostic['arkWebProbeError'] = type(error).__name__
+
+
 def verify_native_arkweb(emulator, evidence):
     assert microphone_permission(emulator) == {'status': -1, 'flag': 0}, 'Expected an unused test permission state'
     ui = browser['ui']
@@ -230,31 +335,9 @@ def verify_native_arkweb(emulator, evidence):
     try:
         with browser['browser'](emulator) as run:
             open_voice_composer(emulator, run)
-            assert run('''(() => {
-              const devices = navigator.mediaDevices;
-              const original = devices.getUserMedia.bind(devices);
-              Object.defineProperty(devices, 'getUserMedia', { configurable: true, value: async (constraints) => {
-                const stream = await original(constraints);
-                globalThis.__mhNativeTracks = stream.getAudioTracks();
-                return stream;
-              } });
-              return true;
-            })()''')
+            assert run(NATIVE_MICROPHONE_HOOK)
             try:
-                ui['tap'](emulator, ui['wait_control'](emulator, START, 'button'))
-                deadline = time.monotonic() + 15
-                while time.monotonic() < deadline:
-                    rows = ui['controls'](emulator, bundle=None)
-                    dialog = next((row for row in rows if '麦克风' in row['text'] and '访问' in row['text']
-                                   or 'access your microphone' in row['text'].lower()), None)
-                    allow = ui['find'](rows, {'允许', 'Allow', 'While using the app', 'Allow while using the app'})
-                    if dialog and allow:
-                        break
-                    time.sleep(.2)
-                else:
-                    raise AssertionError('HarmonyOS did not present the native microphone permission dialog')
-                ui['tap'](emulator, allow)
-                result['nativePermissionDialog'] = True
+                grant_native_microphone(emulator, ui, result)
                 browser['wait'](run, "Boolean(document.querySelector('[data-voice-activity=recording]'))",
                                 'official recorder using the native microphone')
                 active = run('globalThis.__mhNativeTracks.map(t => ({kind:t.kind, state:t.readyState, muted:t.muted}))')
@@ -265,8 +348,11 @@ def verify_native_arkweb(emulator, evidence):
                 browser['wait'](run, '''!document.querySelector('[data-voice-activity]') &&
                   globalThis.__mhNativeTracks.every(t => t.readyState === 'ended')''', 'native tracks ended on cancellation')
                 result['trackEndedOnCancel'] = True
+            except Exception:
+                record_native_microphone_failure(emulator, run, result)
+                raise
             finally:
-                run('globalThis.__mhNativeTracks?.forEach(t => t.stop()); delete globalThis.__mhNativeTracks; delete navigator.mediaDevices.getUserMedia; true')
+                run('globalThis.__mhNativeMicTrace?.cleanup(); true')
     finally:
         emulator.hdc('shell', 'atm', 'perm', '-r', '-b', APP_ID)
         assert microphone_permission(emulator) == {'status': -1, 'flag': 0}
@@ -279,7 +365,6 @@ CAPTURE_HOOK = """(() => {
   const original = devices.getUserMedia.bind(devices);
   Object.defineProperty(devices, 'getUserMedia', { configurable: true, value: async (constraints) => {
     const stream = await original(constraints);
-    globalThis.__mhNativeTracks = stream.getAudioTracks();
     const context = new AudioContext();
     const source = context.createMediaStreamSource(stream);
     const analyser = context.createAnalyser();
@@ -320,22 +405,10 @@ def verify_native_capture(emulator, audio_path, evidence):
     try:
         with browser['browser'](emulator) as run:
             open_voice_composer(emulator, run)
-            assert run(CAPTURE_HOOK)
+            assert run(NATIVE_MICROPHONE_HOOK)
             try:
-                ui['tap'](emulator, ui['wait_control'](emulator, START, 'button'))
-                deadline = time.monotonic() + 15
-                while time.monotonic() < deadline:
-                    rows = ui['controls'](emulator, bundle=None)
-                    dialog = next((row for row in rows if '麦克风' in row['text'] and '访问' in row['text']
-                                   or 'access your microphone' in row['text'].lower()), None)
-                    allow = ui['find'](rows, {'允许', 'Allow', 'While using the app', 'Allow while using the app'})
-                    if dialog and allow:
-                        break
-                    time.sleep(.2)
-                else:
-                    raise AssertionError('HarmonyOS did not present the native microphone permission dialog')
-                ui['tap'](emulator, allow)
-                result['nativePermissionDialog'] = True
+                assert run(CAPTURE_HOOK)
+                grant_native_microphone(emulator, ui, result)
                 browser['wait'](run, "Boolean(document.querySelector('[data-voice-activity=recording]'))",
                                 'official recorder using the native microphone')
                 playback = subprocess.Popen(['afplay', str(audio_path)])
@@ -359,13 +432,23 @@ def verify_native_capture(emulator, audio_path, evidence):
                 assert capture.get('samples', 0) > capture.get('sampleRate', 48000), capture
                 assert capture.get('rms', 0) > 0.005, ['silent native capture', capture]
                 assert result['draftMatched'] is True, result
+            except Exception:
+                record_native_microphone_failure(emulator, run, result)
+                raise
             finally:
                 if playback:
                     playback.terminate()
                     playback.wait(timeout=5)
-                run('globalThis.__mhNativeCapture?.context?.close(); delete globalThis.__mhNativeCapture; '
-                    'globalThis.__mhNativeTracks?.forEach(t => t.stop()); delete globalThis.__mhNativeTracks; '
-                    'delete navigator.mediaDevices.getUserMedia; true')
+                run('''(async () => {
+                  const capture = globalThis.__mhNativeCapture;
+                  delete globalThis.__mhNativeCapture;
+                  globalThis.__mhNativeMicTrace?.cleanup();
+                  if(capture) {
+                    clearInterval(capture.timer);
+                    if(capture.context.state !== 'closed') await capture.context.close();
+                  }
+                  return true;
+                })()''')
     finally:
         emulator.hdc('shell', 'atm', 'perm', '-r', '-b', APP_ID)
         result['permissionRestored'] = microphone_permission(emulator) == {'status': -1, 'flag': 0}
