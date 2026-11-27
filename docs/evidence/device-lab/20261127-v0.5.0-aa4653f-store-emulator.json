@@ -1,0 +1,21 @@
+{
+  "scope": "HarmonyOS ARM64 Phone emulator, ordinary Store package",
+  "commit": "aa4653f8e235f2445091eddc5a1da17e41760c0f",
+  "versionName": "0.5.0",
+  "versionCode": 78,
+  "artifactSha256": "42e8f3c81e8b4deed6305551b1f13944200fea1891f641bf46573a416a26f016",
+  "normalReadyMs": 22509,
+  "anonymousHttp": 401,
+  "authenticatedHttp": 200,
+  "checkedAt": "2026-11-27T22:11:25+08:00",
+  "ok": true,
+  "staticGateCount": 12,
+  "nightlyRecovery": {
+    "actualPluginCrash": true,
+    "sameSessionInSafeMode": true,
+    "normalSnapshotPreservedInSafeMode": true,
+    "rollbackRestoredManifest": true,
+    "sameSessionAfterRollback": true,
+    "normalProfileRestored": true
+  }
+}

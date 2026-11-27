@@ -1,0 +1,39 @@
+{
+  "version": "0.5.0",
+  "commit": "aa4653f8e235f2445091eddc5a1da17e41760c0f",
+  "generatedAt": "2026-11-27T22:08:52+0800",
+  "artifacts": {
+    "store": {
+      "file": "store.hap",
+      "sha256": "42e8f3c81e8b4deed6305551b1f13944200fea1891f641bf46573a416a26f016",
+      "bytes": 675293398,
+      "maxBytes": 790000000
+    }
+  },
+  "checks": [
+    {
+      "command": "scripts/adaptation/store_build_check.py --hap .build/release-check/0.5.0/store.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 store shape OK: store.hap (221 entries)"
+    },
+    {
+      "command": "scripts/adaptation/variant_check.py --variant store --hap .build/release-check/0.5.0/store.hap --require-self-build-metadata",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: store <- store.hap"
+    },
+    {
+      "command": "Store package release metadata",
+      "exit": 0,
+      "passed": true,
+      "output": "{'bundleName': 'org.sayact.nodepoc', 'versionName': '0.5.0', 'versionCode': 78}, expected {'bundleName': 'org.sayact.nodepoc', 'versionName': '0.5.0', 'versionCode': 78} for release 0.5.0"
+    }
+  ],
+  "rsiScoreboard": {
+    "path": "docs/evidence/release/rsi-ea4f001a934351b2edb4628f5829d9851e1026915cc582b1bfe69e143b77e7be.md",
+    "sha256": "ea4f001a934351b2edb4628f5829d9851e1026915cc582b1bfe69e143b77e7be"
+  },
+  "ok": true,
+  "scope": "store-only"
+}
