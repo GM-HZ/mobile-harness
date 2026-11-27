@@ -91,6 +91,9 @@ def main():
     index = (ROOT / "apps/harmonyos/entry/src/main/ets/pages/Index.ets").read_text()
     if "plugin-snapshot" not in engine or "restartWithPluginRollback" not in engine:
         failures.append("plugin snapshot/rollback wiring missing from DshEngine")
+    if ("const marker = root + '/.validated-unpack-v2-' + name;" not in engine or
+            "previous === identity" not in engine):
+        failures.append("unpack markers must store the current layer identity, not accumulate per-identity files")
     if "回滚插件配置" not in index:
         failures.append("plugin rollback action missing from the recovery UI")
     compat = (ROOT / "runtime/harmonyos/compat/dsh-harmony-forge.cjs").read_text()

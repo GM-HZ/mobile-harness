@@ -539,8 +539,15 @@ class DshEngine {
 
   private async unpack(context: common.UIAbilityContext, name: string, root: string, identity: string = ''): Promise<boolean> {
     const archive = context.filesDir + '/' + name;
-    const marker = root + '/.validated-unpack-v2-' + name + (identity ? '-' + identity : '');
-    if (fileIo.accessSync(marker)) return false;
+    // One marker per archive stores the identity of the extracted layer. A
+    // previous identity-suffixed marker accumulated forever, so switching back
+    // to an older build skipped extraction and kept files from the newer layer.
+    const marker = root + '/.validated-unpack-v2-' + name;
+    if (fileIo.accessSync(marker)) {
+      let previous = '';
+      try { previous = fileIo.readTextSync(marker).trim(); } catch (error) { previous = ''; }
+      if (previous === identity) return false;
+    }
     const raw = context.resourceManager.getRawFdSync(name);
     const output = fileIo.openSync(archive,
       fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
@@ -564,7 +571,13 @@ class DshEngine {
       await zlib.decompressFile(archive, root, {
         parallel: zlib.ParallelStrategy.PARALLEL_STRATEGY_PARALLEL_DECOMPRESSION,
       });
-      fileIo.closeSync(fileIo.openSync(marker, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY).fd);
+      const markerFile = fileIo.openSync(marker,
+        fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.TRUNC);
+      try {
+        if (identity) fileIo.writeSync(markerFile.fd, identity);
+      } finally {
+        fileIo.closeSync(markerFile);
+      }
       hilog.info(0xD005, 'HarmonyPRoot', 'unpacked %{public}s', name);
       return true;
     } finally { fileIo.unlinkSync(archive); }
