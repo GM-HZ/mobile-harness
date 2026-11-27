@@ -1,0 +1,224 @@
+{
+  "sourceCommit": "f9a4d30ae151624dda8fcba726d7fe170cfa5eec",
+  "ok": true,
+  "failures": 0,
+  "version": "1.0.0",
+  "versionCode": 77,
+  "storeArtifact": {
+    "path": ".build/release-check/1.0.0/store.hap",
+    "sha256": "20184e77d86c36ac3594fdfb1f9f3185be5cac60541ba8dd47bf8aaed0ed92f0",
+    "bytes": 675277985
+  },
+  "capabilityCases": [
+    {
+      "name": "recovery",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 49
+    },
+    {
+      "name": "voice-input",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 60
+    },
+    {
+      "name": "voice-native-capture",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 45
+    },
+    {
+      "name": "ollama-routes",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 88
+    },
+    {
+      "name": "ptc-link-fixture",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 1
+    },
+    {
+      "name": "ptc-boundary",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 39
+    },
+    {
+      "name": "liveshare",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 50
+    },
+    {
+      "name": "liveshare-cross-device",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 46
+    },
+    {
+      "name": "account-entry",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 42
+    },
+    {
+      "name": "native-addon-location",
+      "exit": 0,
+      "passed": true,
+      "elapsedSeconds": 15
+    }
+  ],
+  "warmStartup": {
+    "readyMs": 6849,
+    "budgetMs": 30000
+  },
+  "appgalleryEvidence": "docs/evidence/device-lab/20261127-v1.0.0-f9a4d30-appgallery-emulator.json",
+  "ollamaToolRoundTrips": {
+    "openai-completions": false,
+    "openai-responses": false
+  },
+  "storePayloadComparison": {
+    "candidateCommit": "f9a4d30ae151624dda8fcba726d7fe170cfa5eec",
+    "mate60TestedCommit": "9b07d918cc030187803b5ae129585fb7f97b62c8",
+    "unsignedPayloadEntries": 221,
+    "priorUnsignedEntriesMatch": true,
+    "mate60SignedEntriesMatch": false,
+    "changedOrExtraMate60Entries": [
+      ".pages.info"
+    ]
+  },
+  "secondaryEmulatorStopped": true,
+  "gates": [
+    {
+      "id": "capability-parity-gate",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 459.2
+    },
+    {
+      "id": "nightly-native-addon",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 13.1
+    },
+    {
+      "id": "startup-warm-budget",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 11.5
+    },
+    {
+      "id": "nightly-plugin-git-update",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 81.9
+    },
+    {
+      "id": "nightly-mcp-stdio",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 18.6
+    },
+    {
+      "id": "nightly-ptc-link-fixture",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 1.1
+    },
+    {
+      "id": "nightly-inspector-availability",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 17.9
+    },
+    {
+      "id": "nightly-lsp-bundle",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 21.2
+    },
+    {
+      "id": "nightly-inspector",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 15.1
+    },
+    {
+      "id": "nightly-recovery",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "flake": false,
+      "durationSeconds": 36.8
+    },
+    {
+      "id": "appgallery-images",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "evidence": "docs/evidence/device-lab/20261127-v1.0.0-f9a4d30-appgallery-emulator.json"
+    },
+    {
+      "id": "appgallery-search",
+      "tier": "G2",
+      "exit": 0,
+      "passed": true,
+      "skipped": false,
+      "attempts": 1,
+      "evidence": "docs/evidence/device-lab/20261127-v1.0.0-f9a4d30-appgallery-emulator.json"
+    }
+  ],
+  "forgePublicRead": {
+    "passed": true,
+    "pullRequest": "https://github.com/GM-HZ/omnix/pull/9",
+    "headCommit": "7d5c177b7044114eab2abf5f8587e0e093ed4083",
+    "contentSha256": "e0cf3690bf168f227a106a51bf8beda7e8e38cc8fafb4b5b14a7461bd169a3f9",
+    "commitsVerified": 1,
+    "readOnlyRequests": 2,
+    "configAndTestCARestored": true
+  },
+  "appgalleryFreshPrivacyEvidence": "docs/evidence/device-lab/20261127-v1.0.0-f9a4d30-appgallery-fresh-privacy.json"
+}

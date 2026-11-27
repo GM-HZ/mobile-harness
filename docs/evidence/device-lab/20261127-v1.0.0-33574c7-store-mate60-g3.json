@@ -1,0 +1,83 @@
+{
+  "sourceCommit": "33574c7b00fd7abcefa26ae09bc21d34ac6f0236",
+  "artifactSha256": "ecd5a797b82b2d5fa351eea1908e0fb690d70081e7f937394b7d2ce6e1dd4eee",
+  "artifact": ".build/v1-gates/33574c7/store-signed.hap",
+  "device": "Huawei Mate 60",
+  "variant": "store",
+  "selfBuild": false,
+  "upgrade": {
+    "fromSelfBuild": true,
+    "coverInstallSucceeded": true,
+    "workspaceCountBefore": 86,
+    "existingWorkspaceDirectoriesPreserved": true
+  },
+  "cacheMarker": {
+    "matchedPackagedIdentity": true,
+    "previousIdentityDiffered": true,
+    "reusedAfterNormalRestart": true
+  },
+  "checks": {
+    "verify": {
+      "ok": true,
+      "checkedAt": "2026-11-27T08:51:24+0800",
+      "readyMs": 16832,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      },
+      "web": 200
+    },
+    "exec": {
+      "ok": true,
+      "selfBuild": false,
+      "commandMatched": true,
+      "bashResultOk": true,
+      "markers": {
+        "STORE_EXEC_PROBE_DONE": true,
+        "EXEC_SH_OK": true,
+        "EXEC_BASH_OK": true,
+        "EXEC_NODE_OK": true,
+        "EXEC_PY_OK": true,
+        "EXEC_SCRIPT_OK": true,
+        "STORE_SELF_BUILD_TOOLS_ABSENT": true,
+        "STORE_SELF_BUILD_OVERLAY_ABSENT": true
+      },
+      "exits": {
+        "SH_EXIT": "0",
+        "BASH_EXIT": "0",
+        "NODE_EXIT": "0",
+        "PY_EXIT": "0",
+        "GIT_EXIT": "0",
+        "SCRIPT_EXIT": "0"
+      },
+      "fixtureCleanupOk": true,
+      "bashCompletionErrors": []
+    },
+    "overlay": {
+      "ok": true,
+      "selfBuild": false,
+      "commandMatched": true,
+      "bashResultOk": true,
+      "markers": {
+        "STORE_OVERLAY_PROBE_DONE": true,
+        "STORE_SELF_BUILD_TOOLS_ABSENT": true,
+        "STORE_SELF_BUILD_OVERLAY_ABSENT": true
+      },
+      "exits": {},
+      "fixtureCleanupOk": true,
+      "bashCompletionErrors": []
+    },
+    "restart": {
+      "ok": true,
+      "checkedAt": "2026-11-27T08:52:06+0800",
+      "readyMs": 12170,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      },
+      "web": 200
+    }
+  },
+  "checkedAt": "2026-11-27T08:52:22+0800",
+  "ok": true
+}

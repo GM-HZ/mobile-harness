@@ -1,0 +1,61 @@
+{
+  "sourceCommit": "33574c7b00fd7abcefa26ae09bc21d34ac6f0236",
+  "scopedPackaging": ".build/v1-gates/33574c7/scoped-packaging.json",
+  "hapSha256": "304e4c8be195f069781fbbb0289ad052049688efa60ee9f1c709dc990973c0e1",
+  "bytes": 262772550,
+  "bundle": "org.mobileharness.dshmh",
+  "version": {
+    "name": "1.0.0",
+    "code": 77
+  },
+  "packagedLayerSha256": "c643e57bf29f763eba7221e8ac766580bc9f554241239a321230c9ff222d8203",
+  "checkedAt": "2026-11-27T08:43:48+08:00",
+  "packagingScope": "local unsigned AppGallery variant (scoped packaging)",
+  "fullG4Claimed": false,
+  "target": "127.0.0.1:15557",
+  "emulator": "MH_RC5_Translation_Run",
+  "api": 26,
+  "coverInstallSucceeded": true,
+  "cacheMarker": {
+    "installedVersion": {
+      "name": "1.0.0",
+      "code": 77
+    },
+    "priorSyntheticConsentReused": true,
+    "packagedLayerSha256": "c643e57bf29f763eba7221e8ac766580bc9f554241239a321230c9ff222d8203",
+    "actualMarkerSha256": "c643e57bf29f763eba7221e8ac766580bc9f554241239a321230c9ff222d8203",
+    "matchAfterCoverStartup": true,
+    "normalRestartReadyMs": 10777,
+    "httpAfterNormalRestart": {
+      "anonymous": 401,
+      "authenticated": 200
+    },
+    "matchAfterNormalRestart": true,
+    "markerUnchangedAcrossRestart": true
+  },
+  "freshPrivacyFlowExercised": false,
+  "checks": {
+    "appgallery-images": {
+      "passed": true,
+      "log": "appgallery-images.log",
+      "outcomes": [
+        "Valid PNG stored with correct dimensions.",
+        "Wide PNG downscaled and stored as image/jpeg.",
+        "Wide PNG downscaled and stored as image/webp.",
+        "Malformed and truncated PNGs rejected."
+      ]
+    },
+    "appgallery-search": {
+      "passed": true,
+      "log": "appgallery-search.log",
+      "outcomes": [
+        "AppGallery glob and grep passed, including invalid regex and workspace boundary."
+      ]
+    }
+  },
+  "appForceStopped": true,
+  "emulatorStopped": true,
+  "hdcOffline": true,
+  "hdcStatus": "Offline",
+  "ok": true
+}

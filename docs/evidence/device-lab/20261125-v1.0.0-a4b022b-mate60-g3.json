@@ -1,0 +1,131 @@
+{
+  "checkedAt": "2026-11-25T21:30:22+08:00",
+  "tier": "G3",
+  "ok": false,
+  "result": "blocked by repeatable on-device startup crash",
+  "device": {
+    "name": "HUAWEI Mate 60",
+    "model": "BRA-AL00",
+    "api": 26,
+    "softwareVersion": "7.0.0.111(SP10C00E111R5P3)"
+  },
+  "package": {
+    "commit": "a4b022b343e60918a9d81c509db51050c5e05bd2",
+    "version": "1.0.0",
+    "build": 77,
+    "variant": "self",
+    "signed": true,
+    "package": "self-1.0.0-a4b022b-signed.hap",
+    "sha256": "9fdc583e24caf95575783363e7bb80ae803a58ac6d365fc7c3da6d7ee5a904c7"
+  },
+  "install": {
+    "fromVersion": "0.4.69",
+    "fromBuild": 76,
+    "toVersion": "1.0.0",
+    "toBuild": 77,
+    "overExistingInstall": true,
+    "dataCleared": false,
+    "launcherIconMatchesSource": true
+  },
+  "suites": {
+    "verify": {
+      "status": "failed",
+      "attempts": [
+        {
+          "checkedAt": "2026-11-25T21:19:45+0800",
+          "screenLocked": false,
+          "bootBeforeProbe": {
+            "mode": "normal",
+            "pending": true
+          },
+          "durationSeconds": 121,
+          "exit": 1,
+          "message": "The app did not become ready"
+        },
+        {
+          "checkedAt": "2026-11-25T21:25:01+0800",
+          "screenLocked": false,
+          "bootBeforeProbe": {
+            "mode": "safe",
+            "pending": true
+          },
+          "durationSeconds": 121,
+          "exit": 1,
+          "message": "The app did not become ready"
+        }
+      ]
+    },
+    "exec": {
+      "status": "blocked",
+      "reason": "Requires the local service to become ready in normal mode"
+    },
+    "overlay": {
+      "status": "blocked",
+      "reason": "Requires the local service to become ready in normal mode"
+    }
+  },
+  "coldProcessRetry": {
+    "startedAt": "2026-11-25T21:26:31+08:00",
+    "bootMarkerBeforeRestart": {
+      "mode": "normal",
+      "pending": false
+    },
+    "chunksExtracted": 0,
+    "chunksTotal": 8,
+    "nativeTimelineCreated": false,
+    "bootMarkerAfterCrash": {
+      "mode": "normal",
+      "pending": true
+    }
+  },
+  "crashes": [
+    {
+      "timestamp": "2026-11-25 21:19:46.359",
+      "version": "1.0.0",
+      "build": 77,
+      "signal": "Signal:SIGTRAP(TRAP_BRKPT)",
+      "detail": "Initial startup; V8 fails while setting memory permissions",
+      "frames": [
+        "v8::base::OS::Abort",
+        "V8_Fatal",
+        "v8::base::OS::SetPermissions",
+        "v8::Isolate::Initialize",
+        "node::Start"
+      ]
+    },
+    {
+      "timestamp": "2026-11-25 21:26:32.051",
+      "version": "1.0.0",
+      "build": 77,
+      "signal": "Signal:SIGTRAP(TRAP_BRKPT)",
+      "detail": "Cold process retry using the cached runtime; same V8 failure before JavaScript startup",
+      "frames": [
+        "v8::base::OS::Abort",
+        "V8_Fatal",
+        "v8::base::OS::SetPermissions",
+        "v8::Isolate::Initialize",
+        "node::Start"
+      ]
+    },
+    {
+      "timestamp": "2026-11-25 21:26:32.084",
+      "version": "1.0.0",
+      "build": 77,
+      "signal": "Signal:SIGSYS(SYS_SECCOMP) syscall number is 436",
+      "detail": "Workflow broker child; denied syscall 436 (close_range)",
+      "frames": [
+        "harmony_workflow_broker_start"
+      ]
+    },
+    {
+      "timestamp": "2026-11-25 09:49:15.797",
+      "version": "0.4.69",
+      "build": 76,
+      "signal": "Signal:SIGSYS(SYS_SECCOMP) syscall number is 436",
+      "detail": "Same Workflow broker crash recorded before the upgrade",
+      "frames": [
+        "harmony_workflow_broker_start"
+      ]
+    }
+  ]
+}

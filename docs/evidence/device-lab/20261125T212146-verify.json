@@ -1,0 +1,22 @@
+{
+  "device": {
+    "serial": "37R0224115035605",
+    "versionName": "1.0.0",
+    "versionCode": 77,
+    "boot": "{\"mode\":\"normal\",\"pending\":true}",
+    "launch": "start ability successfully.",
+    "screenLocked": false,
+    "checkedAt": "2026-11-25T21:19:45+0800"
+  },
+  "run": {
+    "suite": "verify",
+    "exit": 1,
+    "passed": false,
+    "probeOk": null,
+    "durationSeconds": 121,
+    "outputTail": "The app did not become ready\n",
+    "evidence": "docs/evidence/device-lab/verify.json",
+    "requiresModel": false
+  },
+  "ok": false
+}

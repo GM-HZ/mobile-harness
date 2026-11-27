@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "commit": "0e9a96a086d0486fb91954f20f84247e1f806317",
+  "generatedAt": "2026-11-26T00:22:59+0800",
+  "artifacts": {
+    "store": {
+      "file": "store.hap",
+      "sha256": "1f87b49b17fbb82d3dce788d7cb4afa2711c696f2f27bd3e52962ce051abdc00",
+      "bytes": 675275041,
+      "maxBytes": 790000000
+    },
+    "self": {
+      "file": "self.hap",
+      "sha256": "05a399274588671c9f8c76b0251a7d3d2a65329dfd273527814195ad3d52962b",
+      "bytes": 680411993,
+      "maxBytes": 800000000
+    },
+    "appgallery": {
+      "file": "appgallery.app",
+      "sha256": "cdf100b722d2796b971422cfa4daec9675b637a04ebe2b79f5147b89f3fa2c72",
+      "bytes": 174963847,
+      "maxBytes": 300000000
+    }
+  },
+  "checks": [
+    {
+      "command": "scripts/adaptation/store_build_check.py --hap .build/release-check/1.0.0/store.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 store shape OK: store.hap (221 entries)"
+    },
+    {
+      "command": "scripts/adaptation/variant_check.py --variant store --hap .build/release-check/1.0.0/store.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: store <- store.hap"
+    },
+    {
+      "command": "scripts/adaptation/variant_check.py --variant self --hap .build/release-check/1.0.0/self.hap",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: self <- self.hap"
+    },
+    {
+      "command": "AppGallery variant check on appgallery.app",
+      "exit": 0,
+      "passed": true,
+      "output": "G4 variant OK: appgallery <- appgallery.hap"
+    }
+  ],
+  "rsiScoreboard": {
+    "path": "docs/evidence/release/rsi-6f172b3dcff9fa257235b75544cc4604dc24ee6e4a0130a1348e207d9b046a7f.md",
+    "sha256": "6f172b3dcff9fa257235b75544cc4604dc24ee6e4a0130a1348e207d9b046a7f"
+  },
+  "ok": true
+}

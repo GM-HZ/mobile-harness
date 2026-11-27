@@ -1,0 +1,26 @@
+{
+  "emulator": "existing primary API 26 emulator",
+  "target": "127.0.0.1:15555",
+  "bundle": "org.mobileharness.dshmh",
+  "ok": true,
+  "installedVersion": {
+    "name": "1.0.0",
+    "code": 77
+  },
+  "sourceCommit": "f9a4d30ae151624dda8fcba726d7fe170cfa5eec",
+  "hapSha256": "2ffa53bfbf113dd9d10cb50f1129f9e6e89e0ca95e89d966ab7f474b74c630a0",
+  "freshInstall": true,
+  "firstPromptVisible": true,
+  "noHostBeforeConsent": true,
+  "declinedWithoutConsentOrHost": true,
+  "promptReturnedAfterDecline": true,
+  "hostReadyMs": 12167,
+  "consentSaved": true,
+  "httpAfterConsent": {
+    "anonymous": 401,
+    "authenticated": 200
+  },
+  "appForceStopped": true,
+  "checkedAt": "2026-11-27T00:26:20+08:00",
+  "storeNormalModeRestored": true
+}

@@ -1,0 +1,22 @@
+{
+  "device": {
+    "serial": "37R0224115035605",
+    "versionName": "1.0.0",
+    "versionCode": 77,
+    "boot": "{\"mode\":\"normal\",\"pending\":false}",
+    "launch": "start ability successfully.",
+    "screenLocked": false,
+    "checkedAt": "2026-11-25T22:02:18+0800"
+  },
+  "run": {
+    "suite": "overlay",
+    "exit": 0,
+    "passed": false,
+    "probeOk": false,
+    "durationSeconds": 42,
+    "outputTail": "{\n \"ok\": false,\n \"commandMatched\": true,\n \"bashCallCount\": 1,\n \"bashResultOk\": true,\n \"markers\": {\n  \"NATIVE_OVERLAY_PROBE_DONE\": true,\n  \"CTYPES_LIBARCHIVE_OK\": true,\n  \"EXTENSION_ANSWER 42\": true,\n  \"MH_INSTALL_OK /usr/bin/jq\": true,\n  \"jq-1.8.2\": false,\n  \"1\": false\n },\n \"exits\": {\n  \"CTYPES_EXIT\": \"0\",\n  \"EXT_EXIT\": \"0\",\n  \"JQ_INSTALL_EXIT\": \"0\",\n  \"JQ_VERSION_EXIT\": \"0\",\n  \"JQ_RUN_EXIT\": \"0\"\n },\n \"expectedExits\": {\n  \"CTYPES_EXIT\": \"0\",\n  \"EXT_EXIT\": \"0\",\n  \"JQ_INSTALL_EXIT\": \"0\",\n  \"JQ_VERSION_EXIT\": \"0\",\n  \"JQ_RUN_EXIT\": \"0\"\n }\n}\n/Users/gongmeng/dev/acode/mobile-harness/.build/worktrees/main/docs/evidence/device-lab/overlay.json\n",
+    "evidence": "docs/evidence/device-lab/overlay.json",
+    "requiresModel": true
+  },
+  "ok": false
+}
