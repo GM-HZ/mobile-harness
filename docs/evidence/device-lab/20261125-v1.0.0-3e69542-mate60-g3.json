@@ -1,0 +1,106 @@
+{
+  "commit": "3e695423e33427095410ad212d50bee8ca5f16ba",
+  "version": "1.0.0",
+  "versionCode": 77,
+  "device": "HUAWEI Mate 60 (BRA-AL00)",
+  "package": {
+    "variant": "self",
+    "signed": true,
+    "file": "self-1.0.0-startup-fix-signed.hap",
+    "sha256": "28ca080ee08757a16b9b64d576fea6491481c3e0b29e8a206ea3bf1d346de0d4"
+  },
+  "recovery": "Normal restart from the in-app recovery screen after a previous startup crash",
+  "applicationFaultsAfterRecovery": 0,
+  "checks": {
+    "verify-recovery": {
+      "ok": true,
+      "checkedAt": "2026-11-25T21:38:51+0800",
+      "readyMs": 14277,
+      "web": 200,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      }
+    },
+    "verify-warm": {
+      "ok": true,
+      "checkedAt": "2026-11-25T21:40:12+0800",
+      "readyMs": 8814,
+      "web": 200,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      }
+    },
+    "exec-probe": {
+      "ok": false,
+      "checkedAt": "2026-11-25T21:40:25+0800",
+      "commandMatched": true,
+      "bashCallCount": 1,
+      "bashResultOk": true,
+      "markers": {
+        "PROOT_EXEC_PROBE_DONE": true,
+        "EXEC_SH_OK": true,
+        "EXEC_BASH_OK": true,
+        "EXEC_NODE_OK": true,
+        "EXEC_PY_OK": true,
+        "EXEC_SCRIPT_OK": true,
+        "COPY_NODE_OK": false
+      },
+      "exits": {
+        "SH_EXIT": "0",
+        "BASH_EXIT": "0",
+        "NODE_EXIT": "0",
+        "PY_EXIT": "0",
+        "GIT_EXIT": "0",
+        "SCRIPT_EXIT": "0",
+        "XXD_EXIT": "126",
+        "COPY_BUSYBOX_EXIT": "0",
+        "COPY_NODE_EXIT": "0",
+        "FAKE_EXIT": "1"
+      },
+      "expectedExits": {
+        "SH_EXIT": "0",
+        "BASH_EXIT": "0",
+        "NODE_EXIT": "0",
+        "PY_EXIT": "0",
+        "GIT_EXIT": "0",
+        "SCRIPT_EXIT": "0",
+        "COPY_NODE_EXIT": "0",
+        "XXD_EXIT": "126",
+        "COPY_BUSYBOX_EXIT": "127",
+        "FAKE_EXIT": "1"
+      }
+    },
+    "overlay-probe": {
+      "ok": false,
+      "checkedAt": "2026-11-25T21:40:42+0800",
+      "commandMatched": true,
+      "bashCallCount": 1,
+      "bashResultOk": true,
+      "markers": {
+        "NATIVE_OVERLAY_PROBE_DONE": true,
+        "CTYPES_LIBARCHIVE_OK": true,
+        "EXTENSION_ANSWER 42": true,
+        "MH_INSTALL_OK /usr/bin/jq": true,
+        "jq-1.8.2": false,
+        "1": false
+      },
+      "exits": {
+        "CTYPES_EXIT": "0",
+        "EXT_EXIT": "0",
+        "JQ_INSTALL_EXIT": "0",
+        "JQ_VERSION_EXIT": "0",
+        "JQ_RUN_EXIT": "0"
+      },
+      "expectedExits": {
+        "CTYPES_EXIT": "0",
+        "EXT_EXIT": "0",
+        "JQ_INSTALL_EXIT": "0",
+        "JQ_VERSION_EXIT": "0",
+        "JQ_RUN_EXIT": "0"
+      }
+    }
+  },
+  "ok": false
+}

@@ -1,0 +1,18 @@
+{
+  "device": "Huawei Mate 60",
+  "testedArtifactCommit": "f9a4d30ae151624dda8fcba726d7fe170cfa5eec",
+  "kind": "packaged signed Node subprocess diagnostic",
+  "variant": "store",
+  "selfBuild": false,
+  "checks": {
+    "childStartMarkerReadBack": true,
+    "stdoutCaptured": true,
+    "stderrCaptured": true,
+    "childExit7Captured": true,
+    "outerCommandCompleted": true,
+    "exactCommandMatched": true,
+    "fixtureCleanupOk": true
+  },
+  "checkedAt": "2026-11-27T07:59:05+08:00",
+  "ok": true
+}
