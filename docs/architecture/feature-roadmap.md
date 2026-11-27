@@ -11,7 +11,7 @@
 | 能力 | 状态 | 说明 / 证据 |
 | --- | --- | --- |
 | 包内签名 ELF 与工作区脚本 | ✅ | Mate 60 已验证随包 Node 运行工作区 JS、Python 原生库和签名 jq。 [真机记录](../evidence/device-lab/20261126-mate60-1.0.0-g3-recheck.json) |
-| 工作区原生文件直接执行（`./tool`） | 🔶 | 旧 self 包 `0.4.69` 曾在同一 Mate 60 固件上跑通 Node 副本直跑。相关实现已并入，v1 G3 `exec` 仍待通过。 [真机记录](../evidence/device-lab/20261126-mate60-1.0.0-g3-recheck.json) |
+| 工作区原生文件直接执行（`./tool`） | 🔶 | v1 self 构建在 Mate 60 上通过一次 G3 `exec`。该轮复验仍需关联制品 SHA-256 和源码提交。 [self 真机复验](../evidence/device-lab/20261127-v1.0.0-mate60-self-g3-exec.json) |
 | 运行时下载静态/动态工具 | 🔶 | 已验证固定版本 jq 的包校验和随包签名执行路径。其他下载的原生工具仍须按各自路径验收。 |
 | 工作区限定执行（`workspace-write`） | 🔶 | Mate 60 应用内 Landlock 查询返回 `ENOSYS`，该模式仍缺可用的强制沙箱后端。 [真机记录](../evidence/device-lab/20261126-mate60-1.0.0-g3-recheck.json) |
 | 常用动态库覆盖 | ✅ | `patches/`? 不，`docs/guest-tools-lock.json` libraries + `HARMONY_GUEST_LIB_GROUPS` |
@@ -83,7 +83,7 @@
 | D9 | G2/G3 证据（模拟器 + 真机） | loader 用例进 nightly/device lab |
 | D10 | 文档与回滚（支持边界、已知限制） | framework/README 更新 |
 
-随包签名主程序已通过真机验证，动态库覆盖仍限于签名 overlay。工作区原生文件直接执行仍待 G3 验收，运行时共享库加载器尚未实现。
+随包签名主程序已通过真机验证，动态库覆盖仍限于签名 overlay。v1 self 构建的工作区原生文件直接执行已通过一次真机 G3 `exec`。运行时共享库加载器尚未实现。 [self 真机复验](../evidence/device-lab/20261127-v1.0.0-mate60-self-g3-exec.json)
 
 ## 4. 插件支持策略与稳定性待办
 

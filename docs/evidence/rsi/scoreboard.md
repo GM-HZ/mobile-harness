@@ -1,24 +1,32 @@
 # Gate scoreboard
 
-Generated 2026-11-21 10:57 from 75 ledger runs (of 75 recorded).
+Generated 2026-11-27 00:05 from 129 ledger runs (of 129 recorded).
 
 | Tier | Registry entries | Runs | First-pass | Flake-pass | Fail | Last run |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| G0 | 3 | 25 | 24 | 0 | 1 | 3b95bffa39ae PASS 2026-11-21T10:57:01+0800 |
-| G1 | 13 | 25 | 25 | 0 | 0 | 3b95bffa39ae PASS 2026-11-21T10:57:03+0800 |
-| G2 | 70 | 10 | 10 | 0 | 0 | e9d2559e2e70 PASS 2026-11-21T08:42:28+0800 |
-| G3 | 3 | 9 | 8 | 0 | 1 | fc3c6965878c PASS 2026-11-21T10:26:49+0800 |
-| G4 | 7 | 6 | 6 | 0 | 0 | e9d2559e2e70 PASS 2026-11-21T08:39:44+0800 |
+| G0 | 3 | 52 | 45 | 0 | 7 | f9a4d30ae151 PASS 2026-11-27T00:04:50+0800 |
+| G1 | 14 | 52 | 46 | 0 | 6 | f9a4d30ae151 PASS 2026-11-27T00:04:50+0800 |
+| G2 | 73 | 17 | 16 | 0 | 1 | 9b07d918cc03 PASS 2026-11-26T23:44:50+0800 |
+| G3 | 3 | 14 | 8 | 0 | 6 | 3737f3af3746 FAIL 2026-11-25T23:10:45+0800 |
+| G4 | 8 | 21 | 21 | 0 | 0 | 9b07d918cc03 PASS 2026-11-26T23:17:21+0800 |
 
 ## Recent failures
 
-- `a7c7ea53fd94` G0 2026-11-20T22:41:20+0800 — failures=1
-- `9dc724fa8fe0` G3 2026-11-21T07:47:19+0800 — exec/overlay blocked: PRoot 'embedded loader descriptors' / execve(/bin/bash) Permission denied on real-device compat mode
+- `8feba2be1388` G0,G1 2026-11-21T18:56:33+0800 — failures=1
+- `9484278baf1c` G0,G1 2026-11-21T20:50:21+0800 — failures=1
+- `97e4367f904b` G0,G1 2026-11-21T21:43:56+0800 — failures=1
+- `717cc3312ebb` G0,G1 2026-11-22T21:32:32+0800 — failures=2
+- `a4b022b343e6` G3 2026-11-25T21:30:23+0800 — Mate 60 v1.0.0/77 startup crashes in V8 SetPermissions; exec and overlay blocked on startup.
+- `3e695423e334` G3 2026-11-25T21:44:50+0800 — Both verify runs passed. Exec and overlay expected stdout was absent for the copied Node and installed jq probes.
+- `3e695423e334` G2 2026-11-25T21:53:47+0800 — failures=1
+- `542c510bb452` G3 2026-11-25T22:06:44+0800 — Exact signed build on Mate 60. Both starts plus actual Workflow passed. Copied Node and installed jq outputs were absent in the strict exec and overlay probes.
+- `58b9751cba1a` G3 2026-11-25T22:38:51+0800 — Mate 60: verify and overlay pass on the signed candidate. Copied Node exec remains unresolved.
+- `3737f3af3746` G3 2026-11-25T23:10:45+0800 — Mate 60 verify, signed overlay, inert jq upgrade and controlled exit-status tests pass. Original copied Node exec requirement remains unresolved.
 
 ## Gate registry snapshot
 
 - G0 (static/consistency): 3 entries
-- G1 (host contracts): 13 entries
-- G2 (emulator capability): 70 entries
+- G1 (host contracts): 14 entries
+- G2 (emulator capability): 73 entries
 - G3 (real-device lab): 3 entries
-- G4 (build/release): 7 entries
+- G4 (build/release): 8 entries

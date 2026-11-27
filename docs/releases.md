@@ -6,7 +6,8 @@
 
 - **安装与升级**。真机安装使用覆盖设备的签名包。同包名且签名一致时，直接用更高构建号覆盖安装以保留应用数据。`9b07d91` 的普通包在 Mate 60 覆盖安装后保留了原有 86 个工作区目录，并通过启动、工具执行、变体隔离和重启。 [安装说明](development.md) · [真机验收](evidence/device-lab/20261126-v1.0.0-9b07d91-store-mate60-g3.json)
 - **恢复**。启动异常时打开「恢复选项」，选择「以安全模式重开」。应用已启动时，可从「设置 → 通用 → 运行时恢复」进入。同一恢复页可选择「以正常模式重开」。普通包与自建包还可用「回滚插件配置并正常重开」恢复上次正常启动的插件配置。 [恢复手册](architecture/release-runbook.md#plugin-recovery-bad-plugin)
-- **已知限制**。Mate 60 上的 self/lab 仍未通过工作区原生文件直跑验收，`workspace-write` 沙箱也未通过真机验收。当前本机 Ollama 小模型已通过两种协议的聊天路由验收，两轮测试均未完成工具调用。DeepSeek Flash 在两种协议上的工具调用、结果回传和重启续接均通过。AppGallery 的图片和工作区搜索已通过模拟器回归，云签名包仍待真机验收。 [模拟器回归](evidence/capability-parity-gate-1.0.0-9b07d91.json) · [AppGallery 发布指南](appgallery-release.md)
+- **self 真机复验**。Mate 60 上的 `1.0.0 / 77` self 构建通过工作区 Node 副本的 G3 `exec` 复验。本轮记录仍需关联制品 SHA-256 和源码提交。 [self 真机复验](evidence/device-lab/20261127-v1.0.0-mate60-self-g3-exec.json)
+- **已知限制**。`workspace-write` 沙箱未通过 Mate 60 真机验收。当前本机 Ollama 小模型已通过两种协议的聊天路由验收，两轮测试均未完成工具调用。DeepSeek Flash 在两种协议上的工具调用、结果回传和重启续接均通过。AppGallery 的图片和工作区搜索已通过模拟器回归，云签名包仍待真机验收。 [模拟器回归](evidence/capability-parity-gate-1.0.0-9b07d91.json) · [AppGallery 发布指南](appgallery-release.md)
 
 ## 0.4.4
 

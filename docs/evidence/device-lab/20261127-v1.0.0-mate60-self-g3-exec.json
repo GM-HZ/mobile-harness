@@ -1,0 +1,81 @@
+{
+  "device": "Huawei Mate 60",
+  "installedBuildObserved": {
+    "name": "1.0.0",
+    "code": 77,
+    "selfBuild": true
+  },
+  "scope": "User-run self variant G3 verify/exec/overlay",
+  "sourceCommit": "81eea5997ba989a2b8ec37ca521b6d4553100ca5",
+  "artifactSha256": "976705ac327968988ae09f9ddb9e4a1369d840589924c046ed97fd9f57b41534",
+  "checkedAt": "2026-11-27T08:20:25+0800",
+  "checks": {
+    "verify": {
+      "ok": true,
+      "state": {
+        "mode": "normal",
+        "pending": false
+      },
+      "web": 200
+    },
+    "exec": {
+      "ok": true,
+      "markers": {
+        "PROOT_EXEC_PROBE_DONE": true,
+        "EXEC_SH_OK": true,
+        "EXEC_BASH_OK": true,
+        "EXEC_NODE_OK": true,
+        "EXEC_PY_OK": true,
+        "EXEC_SCRIPT_OK": true,
+        "COPY_NODE_OK": true
+      },
+      "exits": {
+        "SH_EXIT": "0",
+        "BASH_EXIT": "0",
+        "NODE_EXIT": "0",
+        "PY_EXIT": "0",
+        "GIT_EXIT": "0",
+        "SCRIPT_EXIT": "0",
+        "XXD_EXIT": "126",
+        "COPY_BUSYBOX_EXIT": "127",
+        "COPY_NODE_EXIT": "0",
+        "FAKE_EXIT": "1"
+      },
+      "expectedExits": {
+        "SH_EXIT": "0",
+        "BASH_EXIT": "0",
+        "NODE_EXIT": "0",
+        "PY_EXIT": "0",
+        "GIT_EXIT": "0",
+        "SCRIPT_EXIT": "0",
+        "COPY_NODE_EXIT": "0",
+        "XXD_EXIT": "126",
+        "COPY_BUSYBOX_EXIT": "127",
+        "FAKE_EXIT": "1"
+      },
+      "fixtureCleanupOk": true
+    },
+    "overlay": {
+      "ok": true,
+      "markers": {
+        "NATIVE_OVERLAY_PROBE_DONE": true,
+        "CTYPES_LIBARCHIVE_OK": true,
+        "EXTENSION_ANSWER 42": true,
+        "MH_INSTALL_OK /usr/bin/jq": true,
+        "MH_INSTALL_TOOL /usr/bin/.mh-jq": true,
+        "jq-1.8.2": true,
+        "1": true
+      },
+      "exits": {
+        "CTYPES_EXIT": "0",
+        "EXT_EXIT": "0",
+        "JQ_INSTALL_EXIT": "0",
+        "JQ_VERSION_EXIT": "0",
+        "JQ_RUN_EXIT": "0"
+      },
+      "fixtureCleanupOk": true
+    }
+  },
+  "markerFix": "DshEngine.unpack stores the current identity in one marker per archive; stale per-identity markers no longer skip re-extraction",
+  "ok": true
+}

@@ -1,0 +1,22 @@
+{
+  "device": {
+    "serial": "37R0224115035605",
+    "versionName": "1.0.0",
+    "versionCode": 77,
+    "boot": "{\"mode\":\"normal\",\"pending\":false}",
+    "launch": "start ability successfully.",
+    "screenLocked": false,
+    "checkedAt": "2026-11-27T08:14:33+0800"
+  },
+  "run": {
+    "suite": "exec",
+    "exit": 0,
+    "passed": true,
+    "probeOk": true,
+    "durationSeconds": 24,
+    "outputTail": "{\n \"ok\": true,\n \"selfBuild\": true,\n \"commandMatched\": true,\n \"bashCallCount\": 1,\n \"bashResultOk\": true,\n \"bashCompletionErrors\": [],\n \"markers\": {\n  \"PROOT_EXEC_PROBE_DONE\": true,\n  \"EXEC_SH_OK\": true,\n  \"EXEC_BASH_OK\": true,\n  \"EXEC_NODE_OK\": true,\n  \"EXEC_PY_OK\": true,\n  \"EXEC_SCRIPT_OK\": true,\n  \"COPY_NODE_OK\": true\n },\n \"exits\": {\n  \"SH_EXIT\": \"0\",\n  \"BASH_EXIT\": \"0\",\n  \"NODE_EXIT\": \"0\",\n  \"PY_EXIT\": \"0\",\n  \"GIT_EXIT\": \"0\",\n  \"SCRIPT_EXIT\": \"0\",\n  \"XXD_EXIT\": \"126\",\n  \"COPY_BUSYBOX_EXIT\": \"127\",\n  \"COPY_NODE_EXIT\": \"0\",\n  \"FAKE_EXIT\": \"1\"\n },\n \"expectedExits\": {\n  \"SH_EXIT\": \"0\",\n  \"BASH_EXIT\": \"0\",\n  \"NODE_EXIT\": \"0\",\n  \"PY_EXIT\": \"0\",\n  \"GIT_EXIT\": \"0\",\n  \"SCRIPT_EXIT\": \"0\",\n  \"COPY_NODE_EXIT\": \"0\",\n  \"XXD_EXIT\": \"126\",\n  \"COPY_BUSYBOX_EXIT\": \"127\",\n  \"FAKE_EXIT\": \"1\"\n },\n \"fixtureCleanupOk\": true\n}\n/Users/gongmeng/dev/acode/mobile-harness/docs/evidence/device-lab/exec.json\n",
+    "evidence": "docs/evidence/device-lab/exec.json",
+    "requiresModel": true
+  },
+  "ok": true
+}
