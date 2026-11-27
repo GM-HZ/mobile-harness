@@ -1,0 +1,30 @@
+{
+  "check": "HarmonyOS startup and recovery UI",
+  "baseCommit": "66863ce32ad810f91c27ec04d049f2694db2c969",
+  "appTreeSha256": "0ec07f57284f0616a0bf855da95136f8f477f7017a627d94e9b5e763d584330e",
+  "target": "HarmonyOS Phone emulator",
+  "variant": "store",
+  "emulatorArtifactSha256": "d1c6cde0a641bf738d1cb73534aeb236494bc9d673beae21d4429449888bb9ad",
+  "staticGateCount": 12,
+  "ui": {
+    "manualRecovery": true,
+    "returnActionLabel": "返回启动页",
+    "systemBackClosedRecovery": true,
+    "safeReadyMs": 4287,
+    "returnedToNormalMs": 4593
+  },
+  "nightlyRecovery": {
+    "firstAttempt": "Normal Host did not become ready within 120 seconds.",
+    "passedAfterApplicationRestart": true,
+    "checks": {
+      "actualPluginCrash": true,
+      "sameSessionInSafeMode": true,
+      "normalSnapshotPreservedInSafeMode": true,
+      "rollbackRestoredManifest": true,
+      "sameSessionAfterRollback": true,
+      "normalProfileRestored": true
+    }
+  },
+  "checkedAt": "2026-11-27T21:42:41+08:00",
+  "ok": true
+}

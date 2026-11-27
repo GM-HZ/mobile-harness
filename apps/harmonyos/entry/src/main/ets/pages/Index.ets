@@ -13,6 +13,11 @@ const RECOVERY_URL = LOCAL_ORIGIN + '/.mobile-harness/recovery';
 const GITHUB_URL = LOCAL_ORIGIN + '/.mobile-harness/github';
 const PRIVACY_URL = LOCAL_ORIGIN + '/.mobile-harness/privacy';
 const NOTICES_URL = LOCAL_ORIGIN + '/.mobile-harness/notices';
+const SHELL_INK = '#132841';
+const SHELL_SECONDARY = '#4D6279';
+const SHELL_BLUE = '#1559C8';
+const SHELL_BLUE_TINT = '#EDF5FF';
+const SHELL_BORDER = '#D6E3F1';
 type LoginFlow = 'unbound' | 'deepseek' | 'liveshare';
 
 @Entry
@@ -35,6 +40,7 @@ struct Index {
   @State remoteHostsOpen: boolean = false;
   @State launchUrl: string = '';
   @State recoveryOpen: boolean = false;
+  @State recoveryFromSplash: boolean = false;
   @State forgeAccountOpen: boolean = false;
   @State safe: boolean = false;
   @State webFailed: boolean = false;
@@ -76,6 +82,7 @@ struct Index {
       }
       this.safe = session?.safe === true;
       if (failed || (this.safe && !this.launchUrl)) {
+        this.recoveryFromSplash = false;
         this.recoveryOpen = true;
         this.splashVisible = false;
       }
@@ -232,8 +239,8 @@ struct Index {
       this.privacyDetails = false;
       return true;
     }
-    if (this.recoveryOpen && this.launchUrl && !this.webFailed) {
-      this.recoveryOpen = false;
+    if (this.recoveryOpen && !this.webFailed && (this.launchUrl || this.recoveryFromSplash)) {
+      if (!this.restarting) this.returnFromRecovery();
       return true;
     }
     if (!this.loginVisible) return false;
@@ -419,6 +426,7 @@ struct Index {
     this.restartError = '';
     try {
       await dshEngine.restart(context, mode);
+      this.recoveryFromSplash = false;
       this.recoveryOpen = false;
       this.restarting = false;
     } catch (_) {
@@ -433,6 +441,7 @@ struct Index {
     this.restartError = '';
     try {
       await dshEngine.restartWithPluginRollback(context);
+      this.recoveryFromSplash = false;
       this.recoveryOpen = false;
     } catch (_) {
       this.restartError = '没有可用的插件快照，或无法自动重开。';
@@ -440,81 +449,148 @@ struct Index {
     this.restarting = false;
   }
 
+  private returnFromRecovery(): void {
+    if (this.recoveryFromSplash && !this.launchUrl) {
+      this.splashOpacity = 1;
+      this.splashVisible = true;
+    }
+    this.recoveryFromSplash = false;
+    this.recoveryOpen = false;
+  }
+
+  @Builder
+  private restartButton(label: string, primary: boolean, mode: string) {
+    Button(label, { type: ButtonType.Normal })
+      .width('100%').constraintSize({ minHeight: 50 })
+      .padding({ left: 16, right: 16, top: 10, bottom: 10 })
+      .fontSize(16).fontWeight(FontWeight.Medium)
+      .fontColor(primary ? Color.White : SHELL_BLUE)
+      .backgroundColor(primary ? SHELL_BLUE : Color.White)
+      .border({ width: 1, radius: 14, color: primary ? SHELL_BLUE : SHELL_BORDER })
+      .enabled(!this.restarting).onClick(() => { this.restart(mode); })
+  }
+
   @Builder
   private recoveryPage() {
-    Column({ space: 12 }) {
-      Text('运行时恢复').fontSize(22).fontWeight(FontWeight.Medium)
-      Text(this.webFailed ? '本机 DSH 页面加载失败。' :
-        (this.status || (this.safe ? '当前处于安全模式。' : '恢复操作会重开应用并保留会话与工作区。')))
-        .fontSize(15)
-      Button('以安全模式重开').enabled(!this.restarting).onClick(() => { this.restart('safe'); })
-      Button('以正常模式重开').enabled(!this.restarting).onClick(() => { this.restart('normal'); })
-      if (!this.appGallery) {
-        Row() {
-          Column({ space: 2 }) {
-            Text('后台常驻').fontSize(16)
-            Text(this.backgroundEnabled ? 'Host 在后台保持运行' : '切到后台后，系统可能暂停任务')
-              .fontSize(12).fontColor('#8A8F9C')
+    Scroll() {
+      Column() {
+        if (!this.webFailed && (this.launchUrl || this.recoveryFromSplash)) {
+          Button(this.launchUrl ? '返回会话' : '返回启动页', { type: ButtonType.Normal })
+            .constraintSize({ minHeight: 44 }).padding({ left: 14, right: 14 })
+            .borderRadius(12).fontSize(14).fontWeight(FontWeight.Medium)
+            .fontColor(SHELL_BLUE).backgroundColor(SHELL_BLUE_TINT)
+            .enabled(!this.restarting).onClick(() => { this.returnFromRecovery(); })
+            .margin({ bottom: 22 })
+        }
+        Row({ space: 16 }) {
+          Column({ space: 7 }) {
+            Text('运行时恢复').fontSize(30).fontWeight(FontWeight.Bold).fontColor(SHELL_INK)
+            Text('重开应用会保留会话与工作区。').fontSize(14).fontColor(SHELL_SECONDARY)
           }.alignItems(HorizontalAlign.Start).layoutWeight(1)
-          Toggle({ type: ToggleType.Switch, isOn: this.backgroundEnabled })
-            .selectedColor('#4D6BFE')
-            .onChange((isOn: boolean) => {
-              this.backgroundEnabled = isOn;
-              const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
-              dshEngine.setBackgroundEnabled(context, isOn);
-            })
-        }.width('100%').padding({ top: 8, bottom: 8 })
-        Button('回滚插件配置并正常重开').enabled(!this.restarting).onClick(() => { this.rollbackPlugins(); })
-      }
-      if (this.remoteHostsEnabled && !this.safe) {
-        Button('远程主机（实验）').onClick(() => { this.remoteHostsOpen = true; })
-      }
-      if (this.restartError) Text(this.restartError).fontSize(14)
-      if (this.launchUrl && !this.webFailed) Button('返回会话').onClick(() => { this.recoveryOpen = false; })
-    }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
+          Image($r('app.media.dsh_mh_whale')).width(62).height(62)
+            .objectFit(ImageFit.Contain).accessibilityLevel('no')
+        }.width('100%')
+        if (this.webFailed || this.safe || this.status) {
+          Row({ space: 10 }) {
+            Circle({ width: 8, height: 8 }).fill(this.webFailed ? '#A95516' : SHELL_BLUE)
+            Text(this.webFailed ? '本机 DSH 页面加载失败。' :
+              (this.safe ? '当前处于安全模式。' : this.status))
+              .fontSize(14).fontColor(this.webFailed ? '#803C16' : SHELL_INK).layoutWeight(1)
+          }.width('100%').padding(14).borderRadius(12).margin({ top: 20 })
+            .backgroundColor(this.webFailed ? '#FFF2E6' : SHELL_BLUE_TINT)
+        }
+        Text('安全模式使用最小配置启动，便于排查启动问题。')
+          .fontSize(14).fontColor(SHELL_SECONDARY).lineHeight(21).margin({ top: 20, bottom: 12 })
+        Column({ space: 10 }) {
+          if (this.safe) {
+            this.restartButton('以正常模式重开', true, 'normal')
+            this.restartButton('以安全模式重开', false, 'safe')
+          } else {
+            this.restartButton('以安全模式重开', true, 'safe')
+            this.restartButton('以正常模式重开', false, 'normal')
+          }
+        }.width('100%')
+        if (this.restarting || this.restartError) {
+          Text(this.restartError || '正在重开应用…')
+            .fontSize(14).fontColor(this.restartError ? '#803C16' : SHELL_SECONDARY)
+            .margin({ top: 14 })
+        }
+        if (!this.appGallery) {
+          Column() {
+            Row({ space: 12 }) {
+              Column({ space: 5 }) {
+                Text('后台常驻').fontSize(15).fontWeight(FontWeight.Medium).fontColor(SHELL_INK)
+                Text(this.backgroundEnabled ? '本机服务在后台保持运行' : '切到后台后，系统可能暂停任务')
+                  .fontSize(13).fontColor(SHELL_SECONDARY)
+              }.alignItems(HorizontalAlign.Start).layoutWeight(1)
+              Toggle({ type: ToggleType.Switch, isOn: this.backgroundEnabled })
+                .selectedColor(SHELL_BLUE).accessibilityText('后台常驻')
+                .onChange((isOn: boolean) => {
+                  this.backgroundEnabled = isOn;
+                  const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+                  dshEngine.setBackgroundEnabled(context, isOn);
+                })
+            }.width('100%').padding(14)
+            Divider().color(SHELL_BORDER).margin({ left: 14, right: 14 })
+            Button('回滚插件配置并正常重开', { type: ButtonType.Normal })
+              .width('100%').constraintSize({ minHeight: 48 }).padding({ left: 14, right: 14 })
+              .fontSize(14).fontWeight(FontWeight.Medium).fontColor(SHELL_BLUE)
+              .backgroundColor(Color.Transparent)
+              .enabled(!this.restarting).onClick(() => { this.rollbackPlugins(); })
+          }.width('100%').backgroundColor('#F4F8FD').borderRadius(16).clip(true)
+            .border({ width: 1, color: SHELL_BORDER }).margin({ top: 22 })
+        }
+        if (this.remoteHostsEnabled && !this.safe) {
+          Button('远程主机（实验）', { type: ButtonType.Normal })
+            .width('100%').constraintSize({ minHeight: 48 }).borderRadius(14)
+            .fontSize(14).fontColor(SHELL_BLUE).backgroundColor(SHELL_BLUE_TINT)
+            .margin({ top: 12 }).onClick(() => { this.remoteHostsOpen = true; })
+        }
+      }.width('100%').constraintSize({ maxWidth: 440 })
+        .alignItems(HorizontalAlign.Start).padding({ top: 24, bottom: 28, left: 24, right: 24 })
+    }.width('100%').height('100%').backgroundColor($r('app.color.start_window_background'))
+      .align(Alignment.Top)
   }
 
   @Builder
   private splashScreen() {
-    Stack({ alignContent: Alignment.Bottom }) {
-      Column() {
-        Stack() {
-          Text('DS').fontSize(30).fontWeight(FontWeight.Bold).fontColor('#FFFFFF')
-            .letterSpacing(1)
-        }.width(88).height(88).borderRadius(24)
-          .linearGradient({ angle: 135, colors: [['#5B7CFF', 0], ['#2B3AA8', 1]] })
-          .border({ width: 1, color: '#607BFF55' })
-        Text('DeepSeek Harness').fontSize(25).fontWeight(FontWeight.Medium)
-          .fontColor('#F5F6FA').margin({ top: 24 }).letterSpacing(0.4)
-        Text('本机 AI 执行环境').fontSize(12).fontColor('#767B8A').margin({ top: 9 }).letterSpacing(0.6)
-        Column() {
-          Row() {
-            Row().width(this.progressPercent + '%').height(4)
-              .backgroundColor('#4D6BFE').borderRadius(2)
-              .animation({ duration: 420, curve: Curve.EaseOut })
-          }.width('100%').height(4).backgroundColor('#20232E').borderRadius(2)
-          Row() {
-            Text(this.progressPhase).fontSize(11).fontColor('#9499A6')
-            Blank()
-            Text(this.progressPercent + '%').fontSize(11).fontColor('#5C6273')
-          }.width('100%').margin({ top: 12 })
-          Row({ space: 18 }) {
-            Text('环境').fontSize(10).fontColor(this.progressPercent >= 5 ? '#4D6BFE' : '#3A3F4E')
-            Text('解包').fontSize(10).fontColor(this.progressPercent >= 8 ? '#4D6BFE' : '#3A3F4E')
-            Text('服务').fontSize(10).fontColor(this.progressPercent >= 66 ? '#4D6BFE' : '#3A3F4E')
-            Text('界面').fontSize(10).fontColor(this.progressPercent >= 90 ? '#4D6BFE' : '#3A3F4E')
-          }.margin({ top: 12 })
-          Text(this.status).fontSize(12).fontColor('#6B7080').margin({ top: 10 })
-            .maxLines(2).textOverflow({ overflow: TextOverflow.Ellipsis })
-        }.width(280).margin({ top: 42 })
-      }.width('100%').height('100%').justifyContent(FlexAlign.Center)
-        .alignItems(HorizontalAlign.Center)
-      Text('恢复选项').fontSize(12).fontColor('#555B6A').padding(14)
-        .margin({ bottom: 16 })
-        .onClick(() => { this.splashVisible = false; this.recoveryOpen = true; })
-    }.width('100%').height('100%').padding({ left: 32, right: 32 })
-      .linearGradient({ angle: 180, colors: [['#090A0F', 0], ['#10121B', 0.55], ['#090A0F', 1]] })
-      .opacity(this.splashOpacity)
+    Column() {
+      Stack({ alignContent: Alignment.Center }) {
+        Scroll() {
+          Column() {
+            Image($r('app.media.dsh_mh_whale')).width(144).height(144)
+              .objectFit(ImageFit.Contain).accessibilityLevel('no')
+            Text('DeepSeek Harness').fontSize(28).fontWeight(FontWeight.Bold).fontColor(SHELL_INK)
+              .textAlign(TextAlign.Center).margin({ top: 8 })
+            Column({ space: 10 }) {
+              Row({ space: 12 }) {
+                Text(this.progressPhase).fontSize(14).fontWeight(FontWeight.Medium).fontColor(SHELL_INK)
+                  .layoutWeight(1)
+                Text(this.progressPercent + '%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(SHELL_BLUE)
+              }.width('100%')
+              Progress({ value: this.progressPercent, total: 100, type: ProgressType.Linear })
+                .width('100%').style({ strokeWidth: 6 }).color('#1886E6').backgroundColor('#D6E7F6')
+              if (this.status) {
+                Text(this.status).fontSize(13).fontColor(SHELL_SECONDARY).width('100%')
+              }
+            }.width('100%').padding(16).borderRadius(16).backgroundColor(SHELL_BLUE_TINT)
+              .alignItems(HorizontalAlign.Start).margin({ top: 30 })
+          }.width('100%').constraintSize({ maxWidth: 368 })
+            .padding({ top: 16, bottom: 16, left: 24, right: 24 }).alignItems(HorizontalAlign.Center)
+        }.width('100%').scrollBar(BarState.Off)
+      }.width('100%').layoutWeight(1)
+      Button('恢复选项', { type: ButtonType.Normal })
+        .constraintSize({ minHeight: 44 }).padding({ left: 20, right: 20 })
+        .fontSize(14).fontWeight(FontWeight.Medium).fontColor(SHELL_BLUE)
+        .backgroundColor(Color.White).border({ width: 1, radius: 22, color: SHELL_BORDER })
+        .margin({ top: 8, bottom: 20 })
+        .onClick(() => {
+          this.recoveryFromSplash = true;
+          this.splashVisible = false;
+          this.recoveryOpen = true;
+        })
+    }.width('100%').height('100%').backgroundColor($r('app.color.start_window_background'))
+      .alignItems(HorizontalAlign.Center).opacity(this.splashOpacity)
   }
 
   build() {
@@ -538,6 +614,7 @@ struct Index {
             if (!event || !event.data.isMainFrame()) return false;
             const url = event.data.getRequestUrl();
             if (url === RECOVERY_URL) {
+              this.recoveryFromSplash = false;
               this.splashVisible = false;
               this.recoveryOpen = true;
               return true;
