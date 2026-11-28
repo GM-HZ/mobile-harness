@@ -153,6 +153,15 @@ def main():
                 {"id": "remote-hosts-contract", "command": "node tests/contract/remote-hosts.cjs",
                  "covers": "self/lab gate, HTTPS origin, same-origin token exchange and metadata-only persistence",
                  "timeout": 120},
+                {"id": "local-llm-agent-probe",
+                 "command": 'test -n "$MH_LOCAL_LLM_MODEL" || exit 2; '
+                            'python3 tests/smoke/local-llm-agent-probe.py '
+                            '--model "$MH_LOCAL_LLM_MODEL" '
+                            '--base-url "${MH_LOCAL_LLM_BASE_URL:-http://127.0.0.1:8080/v1}" '
+                            '--backend "${MH_LOCAL_LLM_BACKEND:-llama.cpp}"',
+                 "covers": "local Chat Completions SSE tool calls, result continuation and no-tool control",
+                 "requires": ["MH_LOCAL_LLM_MODEL env", "running loopback model server"],
+                 "optional": True, "timeout": 200},
                 {"id": "workflow-check", "command": "python3 scripts/adaptation/workflow_check.py",
                  "covers": "gate workflows stay wired to gate scripts and steps", "timeout": 120},
                 {"id": "anchor-coverage", "command": "python3 scripts/adaptation/anchor_scan.py --check",
