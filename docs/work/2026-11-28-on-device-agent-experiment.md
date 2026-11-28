@@ -5,8 +5,8 @@
 ## 验证目标
 
 1. 使用同一 llama.cpp 版本和同一组中文任务，对照两个 4-bit 模型。通过 OpenAI Chat Completions SSE 验证「搜索 → 读取 → 根据工具回填回答」和无需工具的对照任务。探针在内存中模拟工具，验证调用 ID、名称、JSON 参数和最终标记。
-2. 在 Mate 60 上验证原生 ARM64 CPU 推理。仅在手机回环监听模型服务，USB 转发用于观测，不参与推理。记录系统版本、二进制和权重哈希、首个响应时间、峰值内存及退出状态。
-3. 完整 DSH 验收复用 `llm-pi-ai` 的 `openai-completions` 接入点。在隔离应用中通过真实工作区工具验证读操作、结果回填和取消。发布变体评估沿用仓库已有签名、门禁和证据流程。
+2. 在 DevEco HarmonyOS ARM64 虚拟机上验证原生 CPU 推理。模型服务仅绑定虚拟机回环，HDC 转发用于观测。记录系统版本、二进制和权重哈希、首个响应时间及退出状态。真机性能需要另测。
+3. 完整 DSH 验收复用 `llm-pi-ai` 的 `openai-completions` 接入点。在虚拟机通过真实工作区工具验证读操作和结果回填。发布变体评估沿用仓库已有签名、门禁和证据流程。
 
 ## 固定输入
 
@@ -33,7 +33,7 @@ cmake -S . -B ohos-build -G Ninja -DCMAKE_BUILD_TYPE=Release \
 cmake --build ohos-build --target llama-server --parallel 8
 ```
 
-使用本机版 `llama-server`，或由 HDC 转发真机上已启动的模型服务。探针须等 `/health` 返回成功后再运行。两款模型使用相同配置，便于比较。
+使用本机版 `llama-server`，或由 HDC 转发虚拟机上已启动的模型服务。探针须等 `/health` 返回成功后再运行。两款模型使用相同配置，便于比较。
 
 ```sh
 llama-server --host 127.0.0.1 --port 19867 --model "$GGUF" --alias "$MODEL" \

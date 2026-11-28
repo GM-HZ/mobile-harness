@@ -173,16 +173,29 @@ def verify_call(name, arguments, calls, report):
 
 
 def verify_text(expected, content, calls, report):
+    report["resultText"] = content[:200]
+    report["expectedText"] = expected
     if report.get("finishReason") != "stop" or calls or content != expected:
         raise ProbeError("expected exactly the fixture text, no tool call and a stop finish reason")
-    report["resultText"] = content
+
+
+def text_turn(options, evidence, stage, messages, expected):
+    report = {"stage": stage, "ok": False}
+    evidence["turns"].append(report)
+    content, _, calls = request_turn(options.base_url, options.model, messages, options.timeout, report)
+    verify_text(expected, content, calls, report)
+    report["ok"] = True
 
 
 def run_probe(options, evidence):
     note_id = "note-" + secrets.token_hex(4)
     marker = "MH-" + secrets.token_hex(6)
     setup = [{"role": "system", "content": SYSTEM}]
-    messages = setup + [{"role": "user", "content": f"找到标题为 {TITLE} 的笔记，告诉我里面的标记。"}]
+    control = setup + [{"role": "user", "content": "请只回复 CONTROL_OK。这条消息无需调用工具。"}]
+    text_turn(options, evidence, "no_tool", control, "CONTROL_OK")
+    messages = setup + [{"role": "user", "content": (
+        f"找到标题为 {TITLE} 的笔记。请只返回笔记中 marker 字段的原始值，不加引号、反引号或其他文字。"
+    )}]
     fixtures = [
         ("search_notes", {"query": TITLE}, {"note_id": note_id, "title": TITLE}),
         ("read_note", {"note_id": note_id}, {"marker": marker}),
@@ -204,13 +217,7 @@ def run_probe(options, evidence):
             {"role": "tool", "tool_call_id": call["id"], "content": json.dumps(result)},
         ]
         report["ok"] = True
-    control = setup + [{"role": "user", "content": "请只回复 CONTROL_OK。这条消息无需调用工具。"}]
-    for stage, history, expected in (("marker", messages, marker), ("no_tool", control, "CONTROL_OK")):
-        report = {"stage": stage, "ok": False}
-        evidence["turns"].append(report)
-        content, _, calls = request_turn(options.base_url, options.model, history, options.timeout, report)
-        verify_text(expected, content, calls, report)
-        report["ok"] = True
+    text_turn(options, evidence, "marker", messages, marker)
 
 
 def expire(_signum, _frame):
