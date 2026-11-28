@@ -7,6 +7,7 @@ const INFERENCE_URL: string = 'http://127.0.0.1:39765/v1';
 const KEY_REF: string = 'MOBILE_HARNESS_LOCAL_INFERENCE_KEY';
 const PROVIDERS: string = 'llm-pi-ai';
 const DEFAULT: string = 'agent-default-model';
+const LOCAL_STREAM_IDLE_TIMEOUT_MS: number = 480000;
 
 export interface LocalModelRouteModel {
   id: string;
@@ -83,6 +84,7 @@ interface LocalModelProfile extends LocalModelRouteModel {
 interface LocalProviderProfile extends ProviderEntry {
   displayName: string;
   cacheRetention: string;
+  streamIdleTimeoutMs: number;
   compat: LocalCompatibility;
   models: LocalModelProfile[];
   retryPolicy: LocalRetryPolicy;
@@ -181,6 +183,7 @@ function profileFor(model: LocalModelRouteModel): LocalProviderProfile {
     baseURL: INFERENCE_URL,
     displayName: 'Mobile Harness 本地推理',
     cacheRetention: 'none',
+    streamIdleTimeoutMs: LOCAL_STREAM_IDLE_TIMEOUT_MS,
     compat: {
       supportsDeveloperRole: false,
       supportsReasoningEffort: false,

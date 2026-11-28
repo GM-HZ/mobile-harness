@@ -139,6 +139,7 @@ async function main() {
   assert.equal(added.apiKeyEnv, credential);
   assert.equal(added.models[0].id, lfm.id);
   assert.equal(added.models[0].contextWindow, nativeContext);
+  assert.equal(added.streamIdleTimeoutMs, 480000);
   assert.equal(added.retryPolicy.maxRetries, 0);
   assert(!JSON.stringify(added).includes(apiKey));
   assert.equal(credentials.get(credential), apiKey);

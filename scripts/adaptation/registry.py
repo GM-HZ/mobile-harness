@@ -110,6 +110,14 @@ def main():
                "command": "python3 tests/smoke/emulator-recovery.py \"$MH_EMULATOR\" .build/gate-evidence/recovery.json",
                "covers": "plugin crash, safe startup and rollback in the recovery UI", "requires": ["MH_EMULATOR env"],
                "timeout": 1200})
+    g2.append({"id": "emulator-local-inference-e2e",
+               "command": 'test -n "$MH_LOCAL_INFERENCE_EMULATOR" && test -f "$MH_LOCAL_INFERENCE_HAP" || exit 2; '
+                          'python3 tests/smoke/emulator-local-inference-e2e.py "$MH_LOCAL_INFERENCE_EMULATOR" '
+                          '.build/gate-evidence/local-inference-e2e.json --hap "$MH_LOCAL_INFERENCE_HAP" '
+                          '--model "${MH_LOCAL_INFERENCE_MODEL:-lfm3-1.7b-q4}"',
+               "covers": "public model download through the actual HAP, local DSH reply and real tool feedback",
+               "requires": ["dedicated loopback emulator with public HTTPS", "MH_LOCAL_INFERENCE_EMULATOR env",
+                            "MH_LOCAL_INFERENCE_HAP env"], "optional": True, "timeout": 3600})
     for capability in ("images", "search"):
         g2.append({"id": f"appgallery-{capability}",
                    "command": f'python3 tests/smoke/emulator-appgallery-{capability}.py "$MH_APPGALLERY_EMULATOR"',
@@ -117,7 +125,8 @@ def main():
                    "requires": ["MH_APPGALLERY_EMULATOR env", "AppGallery Release HAP after privacy consent"],
                    "optional": True, "timeout": 600})
     for name in sorted(emulator):
-        if name.endswith("emulator-recovery.py") or Path(name).name.startswith("emulator-appgallery-"):
+        if (Path(name).name in {"emulator-recovery.py", "emulator-local-inference-e2e.py"}
+                or Path(name).name.startswith("emulator-appgallery-")):
             continue
         g2.append({"id": Path(name).stem, "command": f"python3 {name} <target> <output> [scenario flags]",
                    "covers": "smoke acceptance", "requires": requirements(name), "timeout": 1800})

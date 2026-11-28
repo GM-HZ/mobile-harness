@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "ac8a1dbd86bdc64ff12d08534e25f89a69f81538",
+  "generatedFrom": "eabb2e5eab1c3b456989e3bb0e977c7ed1846eb8",
   "layers": [
     "host",
     "web",
@@ -569,8 +569,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/dsh-local-inference.cpp",
       "role": "native runtime / adapter",
-      "sha256": "9a7252726df5dd34c40ed26ebf1c34b32a489722a8f13a45131650a2b951c37f",
-      "bytes": 2894,
+      "sha256": "a4a18abf85ce88f8cc596a01d5cb7022a21afbb0bde1e76a657c64c2fd0b8a60",
+      "bytes": 2978,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1310,7 +1310,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "717a0aa88e64d47e71602c8a1f25bd0c98e5d72583138b229dbda39bbaa0e73b",
+      "sha256": "1d03ae69c7f86977a69192f5ce125ddccab6dee2d56664d9b92a24fe47f25274",
       "files": 36,
       "fragility": "medium",
       "upstreamTouchpoints": [],

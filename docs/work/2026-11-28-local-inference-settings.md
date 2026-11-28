@@ -4,7 +4,7 @@
 
 ## 使用流程
 
-用户在设置中选择固定目录中的 LFM3-1.7B 或 Qwen3.5-2B，自行发起线上下载。权重存入 App 私有目录，通过文件大小和 SHA-256 校验后才可启用。取消或失败时保留现有可用模型，推理引擎在同一时间只加载一个模型。
+用户在设置中选择固定目录中的 LFM3-1.7B 或 Qwen3.5-2B，从各自发布者的 ModelScope 仓库下载固定版本。权重存入 App 私有目录，通过文件大小和 SHA-256 校验后才可启用。取消或失败时保留现有可用模型，推理引擎在同一时间只加载一个模型。 [LiquidAI 模型](https://www.modelscope.cn/models/LiquidAI/LFM3-1.7B-GGUF) · [Unsloth 模型](https://www.modelscope.cn/models/unsloth/Qwen3.5-2B-GGUF)
 
 默认推理路径由 DSH 的现有模型设置决定。用户启用「优先使用本地推理」后，为后续会话设置已启动的本地模型。关闭开关或本地模型启动失败时，相同条件下恢复此前的默认模型。已发送的请求继续使用其原有路由，失败由 DSH 正常报告。模型切换由用户发起，可能结束当前的本地生成。
 
@@ -23,9 +23,13 @@ HARMONY_UNSIGNED=1 HARMONY_SELF_BUILD=1 HARMONY_LOCAL_INFERENCE=1 \
   HARMONY_LLAMA_CPP_SOURCE=/path/to/llama.cpp ./build.sh --package
 python3 scripts/adaptation/variant_check.py --variant self --require-local-inference --hap /path/to/experiment.hap
 python3 gates/run.py --tier G1 --only local-inference-settings --fail-on-skip
+MH_LOCAL_INFERENCE_EMULATOR=127.0.0.1:15555 MH_LOCAL_INFERENCE_HAP=/path/to/experiment.hap \
+  python3 gates/run.py --tier G2 --only emulator-local-inference-e2e --fail-on-skip --record
 ```
 
 测试此实验包时，入口在「设置 → 通用设置 → 本地推理」。LFM3 下载约 1.10 GB，Qwen 下载约 1.28 GB。推理配置为 16,384 token 上下文、1,024 token 输出、4 个 CPU 线程。下载、服务运行状态、默认路由和实际 Agent 工具任务分别验收。
+
+G2 验收要求用专用虚拟机和没有该模型缓存的实际 App。测试点击下载并在设备内复核权重 SHA-256，通过界面启动模型并设为默认，再在同一个标准 DSH 会话中完成普通回复和只读文件工具回填。脚本分别记录耗时、路由来源、工具调用和回填结果。
 
 ## 实测
 

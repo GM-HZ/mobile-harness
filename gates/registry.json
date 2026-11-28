@@ -247,6 +247,18 @@
           "timeout": 1200
         },
         {
+          "id": "emulator-local-inference-e2e",
+          "command": "test -n \"$MH_LOCAL_INFERENCE_EMULATOR\" && test -f \"$MH_LOCAL_INFERENCE_HAP\" || exit 2; python3 tests/smoke/emulator-local-inference-e2e.py \"$MH_LOCAL_INFERENCE_EMULATOR\" .build/gate-evidence/local-inference-e2e.json --hap \"$MH_LOCAL_INFERENCE_HAP\" --model \"${MH_LOCAL_INFERENCE_MODEL:-lfm3-1.7b-q4}\"",
+          "covers": "public model download through the actual HAP, local DSH reply and real tool feedback",
+          "requires": [
+            "dedicated loopback emulator with public HTTPS",
+            "MH_LOCAL_INFERENCE_EMULATOR env",
+            "MH_LOCAL_INFERENCE_HAP env"
+          ],
+          "optional": true,
+          "timeout": 3600
+        },
+        {
           "id": "appgallery-images",
           "command": "python3 tests/smoke/emulator-appgallery-images.py \"$MH_APPGALLERY_EMULATOR\"",
           "covers": "AppGallery Release native images through DSH",

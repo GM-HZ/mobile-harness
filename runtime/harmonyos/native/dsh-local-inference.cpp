@@ -37,6 +37,7 @@ void serve(std::string path, std::string model_id, std::string api_key) {
         params.enable_reasoning = 0;
         params.default_template_kwargs["enable_thinking"] = "false";
         params.sampling.temp = 0;
+        params.sampling.user_sampling_config |= COMMON_PARAMS_SAMPLING_CONFIG_TEMP;
         params.cache_ram_mib = 0;
         params.cache_ram_explicit = true;
         params.ui = false;

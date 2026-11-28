@@ -7,6 +7,8 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 const MODEL_DIR = '/local-models';
 const DOWNLOAD_SUFFIX = '.download';
 const MODEL_CONTEXT_WINDOW = 16384;
+const LFM3_REVISION = '20737831be8aec45944198095b67c0b682e3927e';
+const QWEN_REVISION = '90057e31161eb95cc0bc1413c4f53b44de9b49c8';
 
 export interface LocalModelSpec {
   readonly id: string;
@@ -26,8 +28,8 @@ export const LOCAL_MODELS: ReadonlyArray<LocalModelSpec> = [
     label: 'LFM3-1.7B Q4',
     bytes: 1099627808,
     sha256: '3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4',
-    revision: 'cd0c74c',
-    url: 'https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF/resolve/cd0c74c/LFM3-1.7B-Q4_K_M.gguf?download=true',
+    revision: LFM3_REVISION,
+    url: `https://www.modelscope.cn/models/LiquidAI/LFM3-1.7B-GGUF/resolve/${LFM3_REVISION}/LFM3-1.7B-Q4_K_M.gguf`,
     fileName: 'LFM3-1.7B-Q4_K_M.gguf',
     contextWindow: MODEL_CONTEXT_WINDOW,
     maxTokens: 1024,
@@ -37,8 +39,8 @@ export const LOCAL_MODELS: ReadonlyArray<LocalModelSpec> = [
     label: 'Qwen3.5-2B Q4',
     bytes: 1280835840,
     sha256: 'aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223',
-    revision: 'f6d5376',
-    url: 'https://huggingface.co/unsloth/Qwen3.5-2B-GGUF/resolve/f6d5376/Qwen3.5-2B-Q4_K_M.gguf?download=true',
+    revision: QWEN_REVISION,
+    url: `https://www.modelscope.cn/models/unsloth/Qwen3.5-2B-GGUF/resolve/${QWEN_REVISION}/Qwen3.5-2B-Q4_K_M.gguf`,
     fileName: 'Qwen3.5-2B-Q4_K_M.gguf',
     contextWindow: MODEL_CONTEXT_WINDOW,
     maxTokens: 1024,
@@ -166,9 +168,12 @@ export class LocalModelStore {
       if (fileIo.accessSync(target)) fileIo.unlinkSync(target);
       if (await statfs.getFreeSize(this.directory) < model.bytes) throw new Error('可用存储空间不足');
       checkCancelled(active);
+      // The ModelScope CDN requires a User-Agent on the redirected request.
+      const headers: Record<string, string> = { 'User-Agent': 'MobileHarness/0.5 (HarmonyOS)' };
       task = await request.agent.create(this.context, {
         action: request.agent.Action.DOWNLOAD,
         url: model.url,
+        headers,
         saveas: temporary,
         title: model.label,
         mode: request.agent.Mode.FOREGROUND,
