@@ -125,6 +125,8 @@ def request_turn(endpoint, model, messages, timeout, report):
                     raise ProbeError("server returned an SSE error event")
                 if isinstance(chunk.get("model"), str):
                     report["reportedModel"] = chunk["model"]
+                    if chunk["model"] != model:
+                        raise ProbeError("server reported a different model ID than requested")
                 choices = chunk.get("choices", [])
                 if not choices:
                     continue
@@ -144,6 +146,8 @@ def request_turn(endpoint, model, messages, timeout, report):
                     report["finishReason"] = choice["finish_reason"]
             if not report.get("sseDone"):
                 raise ProbeError("stream ended before its [DONE] event")
+            if "reportedModel" not in report:
+                raise ProbeError("server did not identify the response model")
             return "".join(text_parts), "".join(reasoning_parts), calls
     except (AttributeError, TypeError, KeyError, json.JSONDecodeError, UnicodeError):
         raise ProbeError("malformed SSE completion chunk") from None
