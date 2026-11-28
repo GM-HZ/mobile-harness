@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "date": "2026-11-28",
+  "implementationCommit": "4da04923a2cad790776accb7dc6b09c33f9af108",
+  "builds": {
+    "experimentalSelf": {
+      "sha256": "8e54836cd74a78e290a330a9b5fd09707288d9c1ff4ea1df3ccf53968eb8b98a",
+      "target": "OHOS ARM64 unsigned emulator HAP",
+      "variantCheck": true,
+      "llamaUiAssets": 0
+    },
+    "ordinaryStore": {
+      "sha256": "4b8874a338ebcf7ca0ba61dce2134eb4b43bac43adbb2e7a50411e061060fa40",
+      "storeShapeCheck": true,
+      "variantCheck": true
+    }
+  },
+  "gates": {
+    "G0": true,
+    "G1": true,
+    "patchRehearsal": true,
+    "hostContracts": true
+  },
+  "emulatorSettings": {
+    "api": 26,
+    "architecture": "aarch64",
+    "testedHapSha256": "fcc3b6a0aa40c313f613b7005fe491c1f194ec3dbb55f67bc68e1e92425f01e5",
+    "finalRebuildDifference": "the download failure message can include the system task fault category",
+    "weightSource": "preseeded, verified identical LFM3 GGUF",
+    "result": {
+      "target": "127.0.0.1:15869",
+      "operation": "exercise",
+      "ok": true,
+      "baseline": {
+        "writingAllowed": true,
+        "default": {
+          "provider": "mh-local-agent-ab81dd297721",
+          "model": "mh-on-device",
+          "reasoningEffort": null
+        },
+        "defaultOptional": true,
+        "providerCount": 0,
+        "revisionIsInteger": true
+      },
+      "ggufSha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+      "openedFromSettings": true,
+      "routeRegistered": true,
+      "credentialBackedModelDiscovery": true,
+      "preferredDefault": "lfm3-1.7b-q4",
+      "priorDefaultRestored": true,
+      "ownedRouteAndCredentialRemoved": true
+    },
+    "firstDshTextTurn": {
+      "completed": false,
+      "usedLocalSource": false,
+      "reason": "error",
+      "hasExpectedText": false,
+      "toolCalls": 0
+    }
+  },
+  "download": {
+    "test": "harmonyos-local-model-store-download",
+    "date": "2026-11-28",
+    "platform": {
+      "device": "Harmony_DSH_Boot_Bench",
+      "target": "127.0.0.1:15555",
+      "api": 26,
+      "architecture": "aarch64"
+    },
+    "model": {
+      "id": "lfm3-1.7b-q4",
+      "bytes": 1099627808,
+      "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4"
+    },
+    "productionArktsSha256": "8044af9ed6242772ed39f4c9d084c3470e72f6afa149bdc3d8e569c069d545bd",
+    "publicOrigin": {
+      "result": "failed",
+      "elapsedMs": 62053,
+      "receivedBytes": 0,
+      "modelDirectoryEmptyAfterFailure": true,
+      "appMessage": "系统下载失败，可再次尝试",
+      "numericFailureCategory": null
+    },
+    "loopbackFixture": {
+      "sourceDifference": "only the LFM3 URL was substituted with a host test server via HDC reverse port",
+      "cancelled": {
+        "result": "passed",
+        "progressBytes": 8404992,
+        "temporaryFileObserved": true,
+        "modelDirectoryEmptyAfterCancel": true
+      },
+      "fullTransfer": {
+        "result": "passed",
+        "elapsedMs": 14680,
+        "verifyingObserved": true,
+        "readyObserved": true,
+        "publishedBytes": 1099627808,
+        "deviceSha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+        "onlyOneFinalFile": true,
+        "temporaryFilesAfterSuccess": 0
+      }
+    },
+    "cleanup": {
+      "bothTemporaryProbePackagesUninstalled": true,
+      "hostFixtureHttpListenerStopped": true,
+      "hdcReverseForwardAbsent": true,
+      "emulator15555Offline": true,
+      "hostModelFilesRetained": true,
+      "otherEmulatorForwardUntouched": true
+    }
+  }
+}
