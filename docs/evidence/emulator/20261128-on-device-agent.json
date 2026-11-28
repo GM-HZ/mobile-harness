@@ -1,0 +1,699 @@
+{
+  "schema": 1,
+  "date": "2026-11-28",
+  "experiment": "harmonyos-native-local-agent",
+  "engine": {
+    "version": "v1.1.0 (b12774)",
+    "revision": "171527522610996f5f0acf12334e185156ca8f44",
+    "arm64OhosCompilePassed": true,
+    "arm64OhosExecutableSha256": "2de64126fefbbea453be21e83b4c0f4a1ab66e44d91f06cf0d33f565d5b4a7fd"
+  },
+  "configuration": {
+    "threads": 4,
+    "contextTokens": 4096,
+    "slots": 1,
+    "maxOutputTokens": 512,
+    "temperature": 0,
+    "reasoning": "off"
+  },
+  "weights": {
+    "Qwen3.5-2B": {
+      "file": "Qwen3.5-2B-Q4_K_M.gguf",
+      "bytes": 1280835840,
+      "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223"
+    },
+    "LFM3-1.7B": {
+      "file": "LFM3-1.7B-Q4_K_M.gguf",
+      "bytes": 1099627808,
+      "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4"
+    }
+  },
+  "macOS": {
+    "streamingProtocol": {
+      "Qwen3.5-2B": {
+        "schema": 1,
+        "ok": true,
+        "status": "pass",
+        "done": "LOCAL_LLM_AGENT_DONE",
+        "commit": "b25749b3a18a4b27d67d5f60763f7abc81933f8f",
+        "startedAt": "2026-11-28T07:01:43.210276+00:00",
+        "endpoint": {
+          "host": "127.0.0.1",
+          "port": 19867,
+          "path": "/v1/chat/completions"
+        },
+        "backend": "llama.cpp b12774 macOS ARM64 CPU",
+        "model": "qwen35-2b-q4",
+        "timeoutSeconds": 180,
+        "turns": [
+          {
+            "stage": "no_tool",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "qwen35-2b-q4",
+            "firstDeltaMs": 384,
+            "finishReason": "stop",
+            "sseDone": true,
+            "toolCallCount": 0,
+            "durationMs": 629,
+            "resultText": "CONTROL_OK",
+            "expectedText": "CONTROL_OK"
+          },
+          {
+            "stage": "search_notes",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "qwen35-2b-q4",
+            "firstDeltaMs": 2571,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "durationMs": 5290,
+            "toolCalls": [
+              {
+                "id": "iGtGvtwLgVxymtlmBheO4gT0YU7c2O32",
+                "name": "search_notes",
+                "arguments": {
+                  "query": "probe-notebook"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "read_note",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "qwen35-2b-q4",
+            "firstDeltaMs": 1221,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "durationMs": 4643,
+            "toolCalls": [
+              {
+                "id": "XA98zY05iIjhbHSXLefTYdaREcc6HCXg",
+                "name": "read_note",
+                "arguments": {
+                  "note_id": "note-5fea907f"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "marker",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "qwen35-2b-q4",
+            "firstDeltaMs": 477,
+            "finishReason": "stop",
+            "sseDone": true,
+            "toolCallCount": 0,
+            "durationMs": 1275,
+            "resultText": "MH-9960b14945cc",
+            "expectedText": "MH-9960b14945cc"
+          }
+        ],
+        "durationMs": 11838
+      },
+      "LFM3-1.7B": {
+        "schema": 1,
+        "ok": true,
+        "status": "pass",
+        "done": "LOCAL_LLM_AGENT_DONE",
+        "commit": "09d12ed8371a38e7eec86de696d7b44b9d35cf72",
+        "startedAt": "2026-11-28T07:06:02.463645+00:00",
+        "endpoint": {
+          "host": "127.0.0.1",
+          "port": 19868,
+          "path": "/v1/chat/completions"
+        },
+        "backend": "llama.cpp b12774 macOS ARM64 CPU",
+        "model": "lfm3-17b-q4",
+        "timeoutSeconds": 180,
+        "turns": [
+          {
+            "stage": "no_tool",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "lfm3-17b-q4",
+            "firstDeltaMs": 1540,
+            "finishReason": "stop",
+            "sseDone": true,
+            "toolCallCount": 0,
+            "durationMs": 1693,
+            "resultText": "CONTROL_OK",
+            "expectedText": "CONTROL_OK"
+          },
+          {
+            "stage": "search_notes",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "lfm3-17b-q4",
+            "firstDeltaMs": 520,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "durationMs": 1012,
+            "toolCalls": [
+              {
+                "id": "cc8bWwVFilxLYGUK28ERfmMbbIj4gFI3",
+                "name": "search_notes",
+                "arguments": {
+                  "query": "probe-notebook"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "read_note",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "lfm3-17b-q4",
+            "firstDeltaMs": 478,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "durationMs": 1133,
+            "toolCalls": [
+              {
+                "id": "8uNhuE1txJ7iDUZXCL55iuAbAgkiGGHN",
+                "name": "read_note",
+                "arguments": {
+                  "note_id": "note-ddd122b4"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "marker",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "lfm3-17b-q4",
+            "firstDeltaMs": 344,
+            "finishReason": "stop",
+            "sseDone": true,
+            "toolCallCount": 0,
+            "durationMs": 856,
+            "resultText": "MH-e2a26682c084",
+            "expectedText": "MH-e2a26682c084"
+          }
+        ],
+        "durationMs": 4695
+      }
+    },
+    "desktopDshHeadless": {
+      "Qwen3.5-2B": {
+        "schema": 1,
+        "date": "2026-11-28",
+        "ok": true,
+        "probe": "desktop-dsh-local-provider-tool-loop",
+        "platform": "macOS arm64",
+        "dsh": "0.2.2-rc.5",
+        "node": "24.22.3",
+        "protocol": "openai-completions",
+        "provider": "local-llama",
+        "endpoint": "http://127.0.0.1:19867/v1",
+        "model": "qwen35-2b-q4",
+        "artifact": "Unsloth Qwen3.5-2B-Q4_K_M.gguf",
+        "artifactSha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223",
+        "engine": {
+          "name": "llama.cpp",
+          "version": "b12774 v1.1.0",
+          "commit": "171527522610996f5f0acf12334e185156ca8f44"
+        },
+        "profile": "headless",
+        "promptLanguage": "zh",
+        "permissionMode": "read-only",
+        "fixture": "answer.txt with an independent random 16-character hexadecimal marker in each trial",
+        "toolLoopsCompleted": 2,
+        "exactFinalAnswers": 1,
+        "trials": [
+          {
+            "trial": 1,
+            "toolName": "read",
+            "toolCallCount": 1,
+            "soleArgument": [
+              "file_path"
+            ],
+            "ownedFixturePathMatched": true,
+            "toolResultCompleted": true,
+            "toolCallIdMatched": true,
+            "markerInToolResult": true,
+            "markerInFinal": true,
+            "finalExactlyMarker": true,
+            "completionReason": "completed",
+            "agentSteps": 2,
+            "fixtureMarkerSha256": "db4f098dc5a8d829e4222ba33fe9d347be445e1808f70616b4f330885c41aa6b",
+            "durationMs": null,
+            "startupWarning": "Temporary spill plugin initially tried the default path outside the test sandbox"
+          },
+          {
+            "trial": 2,
+            "toolName": "read",
+            "toolCallCount": 1,
+            "soleArgument": [
+              "file_path"
+            ],
+            "ownedFixturePathMatched": true,
+            "toolResultCompleted": true,
+            "toolCallIdMatched": true,
+            "markerInToolResult": true,
+            "markerInFinal": true,
+            "finalExactlyMarker": false,
+            "completionReason": "completed",
+            "agentSteps": 2,
+            "fixtureMarkerSha256": "ef8c00367277ad25012bf94faabcbf79cd2e56b943bfe7ed2ccf5e24fea83f60",
+            "durationMs": 6370,
+            "startupWarning": null
+          }
+        ]
+      },
+      "LFM3-1.7B": {
+        "schema": 1,
+        "date": "2026-11-28",
+        "probe": "desktop-dsh-local-provider-tool-loop",
+        "ok": true,
+        "platform": "macOS arm64",
+        "dsh": "0.2.2-rc.5",
+        "node": "24.22.3",
+        "protocol": "openai-completions",
+        "provider": "local-llama",
+        "endpoint": "http://127.0.0.1:19868/v1",
+        "model": "lfm3-17b-q4",
+        "artifact": "LiquidAI LFM3-1.7B-Q4_K_M.gguf",
+        "engine": {
+          "name": "llama.cpp",
+          "version": "b12774 v1.1.0",
+          "commit": "171527522610996f5f0acf12334e185156ca8f44"
+        },
+        "profile": "headless",
+        "promptLanguage": "zh",
+        "permissionMode": "read-only",
+        "fixture": "answer.txt with an independent random 16-character hexadecimal marker in each trial",
+        "toolLoopsCompleted": 2,
+        "exactFinalAnswers": 2,
+        "trials": [
+          {
+            "trial": 1,
+            "toolNames": [
+              "read",
+              "read"
+            ],
+            "ownedFixturePathMatched": true,
+            "toolCallIdMatched": true,
+            "markerInToolResult": true,
+            "markerInFinal": true,
+            "finalExactlyMarker": true,
+            "completionReason": "completed",
+            "fixtureMarkerSha256": "11ebea075a86229cc4b4474635fce64b1d2f49b202162e98d3f429ade25fa4bb",
+            "dshExit": 0,
+            "durationMs": 14190,
+            "loopCompleted": true,
+            "agentSteps": 3,
+            "toolCallCount": 2,
+            "oneToolCall": false,
+            "strictFixturePass": false
+          },
+          {
+            "trial": 2,
+            "toolNames": [
+              "read",
+              "read"
+            ],
+            "ownedFixturePathMatched": true,
+            "toolCallIdMatched": true,
+            "markerInToolResult": true,
+            "markerInFinal": true,
+            "finalExactlyMarker": true,
+            "completionReason": "completed",
+            "fixtureMarkerSha256": "f46a8810fba41e832c58ce713a94cf20e9bb94f937067760c7267d92fc29bce4",
+            "dshExit": 0,
+            "durationMs": 11470,
+            "loopCompleted": true,
+            "agentSteps": 3,
+            "toolCallCount": 2,
+            "oneToolCall": false,
+            "strictFixturePass": false
+          }
+        ],
+        "oneCallTrials": 0,
+        "allStrictCriteriaPass": 0,
+        "artifactSha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+        "artifactBytes": 1099627808
+      }
+    }
+  },
+  "harmonyOsEmulator": {
+    "name": "MH_Local_Agent_Lab",
+    "softwareVersion": "7.0.0.107",
+    "guestRelease": "OpenHarmony-7.0.0.105",
+    "api": 26,
+    "architecture": "aarch64",
+    "virtualCpuCount": 4,
+    "configuredRamMiB": 8192,
+    "observedMemTotalKiB": 8120584,
+    "inferenceListener": "127.0.0.1:39765",
+    "hostProbeViaHdcForward": "127.0.0.1:23965",
+    "packagedPieSpawn": {
+      "passed": false,
+      "errno": 13,
+      "code": "EACCES"
+    },
+    "engineHost": "llama.cpp linked to the HAP N-API library, running in an application thread",
+    "dshHapSha256": "fff36eae02b7ac16725e320a501af66b805e7f53d67398990f5cec74c2bf4fe1",
+    "Qwen3.5-2B": {
+      "probeBundle": "org.mobileharness.phoneuseprobe",
+      "probeHapSha256": "be231d51dd1273cef692f4765c2dde54c942641e4aa519ffce78ca6a53d094f7",
+      "modelLoadMs": 9735,
+      "observedAppPeakRssKiB": 1808524,
+      "streamingProtocol": {
+        "schema": 1,
+        "ok": false,
+        "status": "fail",
+        "done": null,
+        "commit": "4670b49d82100613f3150680e705bf922e2cc733",
+        "startedAt": "2026-11-28T07:11:13.632632+00:00",
+        "endpoint": {
+          "host": "127.0.0.1",
+          "port": 23965,
+          "path": "/v1/chat/completions"
+        },
+        "backend": "llama.cpp b12774 HarmonyOS 7 API26 ARM64 VM Qwen3.5-2B Q4_K_M",
+        "model": "mh-on-device",
+        "timeoutSeconds": 240.0,
+        "turns": [
+          {
+            "stage": "no_tool",
+            "ok": false,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 1043,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "toolNames": [
+              "search_notes"
+            ],
+            "durationMs": 2447,
+            "resultText": "",
+            "expectedText": "CONTROL_OK"
+          },
+          {
+            "stage": "search_notes",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 1760,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "toolNames": [
+              "search_notes"
+            ],
+            "durationMs": 2836,
+            "toolCalls": [
+              {
+                "id": "mtI0OthGXEI1eO8jIwCUq0y3EYj1TFAV",
+                "name": "search_notes",
+                "arguments": {
+                  "query": "probe-notebook"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "read_note",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 1234,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "toolNames": [
+              "read_note"
+            ],
+            "durationMs": 2593,
+            "toolCalls": [
+              {
+                "id": "1RMPvsw6u6dlcsEfYKrLhyvRgKbs8a57",
+                "name": "read_note",
+                "arguments": {
+                  "note_id": "note-7942fe50"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "marker",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 823,
+            "finishReason": "stop",
+            "sseDone": true,
+            "toolCallCount": 0,
+            "durationMs": 1676,
+            "resultText": "MH-3aa06c46cf38",
+            "expectedText": "MH-3aa06c46cf38"
+          }
+        ],
+        "failures": [
+          {
+            "stage": "no_tool",
+            "type": "ProbeError",
+            "message": "expected exactly the fixture text, no tool call and a stop finish reason"
+          }
+        ],
+        "durationMs": 9553
+      },
+      "nativeDsh": {
+        "schema": 1,
+        "probe": "harmonyos-emulator-dsh-local-provider-tool-loop",
+        "platform": "HarmonyOS Phone emulator",
+        "target": "127.0.0.1:15869",
+        "backend": "native llama.cpp HAP",
+        "model": "mh-on-device",
+        "providerApi": "openai-completions",
+        "endpoint": "http://127.0.0.1:39765/v1",
+        "dshVersion": "0.2.2-rc.5",
+        "contextWindow": 4096,
+        "maxTokens": 512,
+        "promptLanguage": "zh",
+        "fixture": "answer.txt",
+        "ok": false,
+        "agentPreset": "isolated-tool-fs-read",
+        "fixtureMarkerSha256": "d4d72b44b9bbdbc053c0b04bdfe829b556ee9dbaa9d0422e5f708af0ba6ae79a",
+        "dshReadyMs": 400,
+        "nativeModelDiscovered": true,
+        "permissionMode": "read-only",
+        "failure": {
+          "stage": "tool-turn",
+          "type": "AssertionError",
+          "reason": "{'type': 'turn/end', 'seq': 21, 'time': 1795849809870, 'data': {'turn': 1, 'reason': {'kind': 'max-tokens'}}}"
+        },
+        "sessionCancelled": true,
+        "sessionArchived": true,
+        "workspaceRemoved": true,
+        "fixtureRemoved": true,
+        "providerSettingsRestored": true,
+        "placeholderRemoved": true,
+        "isolatedPresetRemoved": true,
+        "dshForwardRemoved": true,
+        "durationMs": 44609,
+        "archivedTrace": {
+          "events": [
+            "session",
+            "permission/preset",
+            "sandbox/mode",
+            "approval/policy",
+            "command/run",
+            "permission/preset",
+            "sandbox/mode",
+            "command/done",
+            "model/selection",
+            "agent/inbox/spliced",
+            "turn/start",
+            "agent/inbox/spliced",
+            "step/start",
+            "system/message",
+            "user/message",
+            "user/message",
+            "request/header",
+            "request/context",
+            "session/title",
+            "session/title-llm-request",
+            "assistant/message",
+            "step/end",
+            "turn/end"
+          ],
+          "toolNames": [],
+          "toolResultCount": 0,
+          "toolResultHadOwnedMarker": false,
+          "finalHadOwnedMarker": false,
+          "assistantMessageCount": 1,
+          "fromNativeRoute": true
+        },
+        "date": "2026-11-28",
+        "engineRevision": "171527522610996f5f0acf12334e185156ca8f44",
+        "artifact": "Unsloth Qwen3.5-2B-Q4_K_M.gguf",
+        "artifactSha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223"
+      }
+    },
+    "LFM3-1.7B": {
+      "probeBundle": "org.mobileharness.localagentprobe",
+      "probeHapSha256": "9f7625bb5d3552bca7da4120bbac7aa13139dd0cbd03d25a5fb77aabaeb079dc",
+      "modelLoadMs": 678,
+      "observedAppPeakRssKiB": 1446232,
+      "streamingProtocol": {
+        "schema": 1,
+        "ok": true,
+        "status": "pass",
+        "done": "LOCAL_LLM_AGENT_DONE",
+        "commit": "4670b49d82100613f3150680e705bf922e2cc733",
+        "startedAt": "2026-11-28T07:12:27.558580+00:00",
+        "endpoint": {
+          "host": "127.0.0.1",
+          "port": 23965,
+          "path": "/v1/chat/completions"
+        },
+        "backend": "llama.cpp b12774 HarmonyOS 7 API26 ARM64 VM LFM3-1.7B Q4_K_M",
+        "model": "mh-on-device",
+        "timeoutSeconds": 240.0,
+        "turns": [
+          {
+            "stage": "no_tool",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 4281,
+            "finishReason": "stop",
+            "sseDone": true,
+            "toolCallCount": 0,
+            "durationMs": 4425,
+            "resultText": "CONTROL_OK",
+            "expectedText": "CONTROL_OK"
+          },
+          {
+            "stage": "search_notes",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 1215,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "toolNames": [
+              "search_notes"
+            ],
+            "durationMs": 1751,
+            "toolCalls": [
+              {
+                "id": "4WIyxFY43PTYzQqhSnpsuL2Zo5IU895i",
+                "name": "search_notes",
+                "arguments": {
+                  "query": "probe-notebook"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "read_note",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 976,
+            "finishReason": "tool_calls",
+            "sseDone": true,
+            "toolCallCount": 1,
+            "toolNames": [
+              "read_note"
+            ],
+            "durationMs": 1667,
+            "toolCalls": [
+              {
+                "id": "p60R65BvVpsXehbEOhmFmeSxBYFX4MeH",
+                "name": "read_note",
+                "arguments": {
+                  "note_id": "note-038c4e05"
+                }
+              }
+            ]
+          },
+          {
+            "stage": "marker",
+            "ok": true,
+            "httpStatus": 200,
+            "reportedModel": "mh-on-device",
+            "firstDeltaMs": 610,
+            "finishReason": "stop",
+            "sseDone": true,
+            "toolCallCount": 0,
+            "durationMs": 875,
+            "resultText": "MH-e4573eb61242",
+            "expectedText": "MH-e4573eb61242"
+          }
+        ],
+        "durationMs": 8718
+      },
+      "nativeDsh": {
+        "schema": 1,
+        "date": "2026-11-28",
+        "probe": "harmonyos-emulator-dsh-local-provider-tool-loop",
+        "platform": "HarmonyOS Phone emulator",
+        "target": "127.0.0.1:15869",
+        "backend": "native llama.cpp HAP",
+        "model": "mh-on-device",
+        "providerApi": "openai-completions",
+        "endpoint": "http://127.0.0.1:39765/v1",
+        "dshVersion": "0.2.2-rc.5",
+        "contextWindow": 4096,
+        "engineRevision": "171527522610996f5f0acf12334e185156ca8f44",
+        "artifact": "LFM3-1.7B-Q4_K_M.gguf",
+        "artifactSha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+        "maxTokens": 512,
+        "promptLanguage": "zh",
+        "fixture": "answer.txt",
+        "ok": false,
+        "agentPreset": "isolated-tool-fs-read",
+        "fixtureMarkerSha256": "bb4d0e402954b2e9e1b2ba996e8f809ae9bf39e31ea78ab152aa2dea9d4bf1fd",
+        "dshReadyMs": 289,
+        "nativeModelDiscovered": true,
+        "permissionMode": "read-only",
+        "turnDurationMs": 12161,
+        "toolNames": [],
+        "assistantMessageCount": 1,
+        "messagesUsedLocalProvider": true,
+        "completionReason": "max-tokens",
+        "toolErrorCount": 0,
+        "oneToolCall": false,
+        "toolCallIdMatched": false,
+        "markerInToolResult": false,
+        "finalExactlyMarker": false,
+        "markerInFinal": false,
+        "toolReadOwnedFixture": false,
+        "toolLoopCompleted": false,
+        "strictFixturePass": false,
+        "failure": {
+          "stage": "tool-turn",
+          "type": "AssertionError",
+          "reason": "DSH ended with max-tokens"
+        },
+        "sessionCancelled": true,
+        "sessionArchived": true,
+        "workspaceRemoved": true,
+        "fixtureRemoved": true,
+        "providerSettingsRestored": true,
+        "placeholderRemoved": true,
+        "isolatedPresetRemoved": true,
+        "dshForwardRemoved": true,
+        "durationMs": 25730
+      }
+    },
+    "cleanup": {
+      "nativeFixtureStopped": true,
+      "hdcForwardRemoved": true,
+      "emulatorStopped": true
+    }
+  }
+}

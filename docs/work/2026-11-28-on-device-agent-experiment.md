@@ -65,6 +65,17 @@ hdc -t "$MH_EMULATOR" fport tcp:23965 tcp:39765
 curl -f http://127.0.0.1:23965/health
 ```
 
-在 `/health` 就绪后，从宿主机通过 USB 转发运行 `local-llm-agent-probe.py --base-url http://127.0.0.1:23965/v1 --model mh-on-device --backend 'llama.cpp HarmonyOS ARM64 VM' --timeout 240`。DSH 在同一虚拟机上的推理 URL 为 `http://127.0.0.1:39765/v1`，走原生 `openai-completions` provider。设 `contextWindow: 4096`、`maxTokens: 512`，以仅读取工具的测试预设运行工作区夹具。HDC 转发只用于宿主机探针和观测。
+在 `/health` 就绪后，从宿主机经 HDC 端口转发运行 `python3 tests/smoke/local-llm-agent-probe.py --base-url http://127.0.0.1:23965/v1 --model mh-on-device --backend 'llama.cpp HarmonyOS ARM64 VM' --timeout 240`。DSH 在同一虚拟机上的推理 URL 为 `http://127.0.0.1:39765/v1`，走原生 `openai-completions` provider。设 `contextWindow: 4096`、`maxTokens: 512`，以仅读取工具的测试预设运行工作区夹具。HDC 转发只用于宿主机探针和观测。
 
 试验结束后执行 `hdc -t "$MH_EMULATOR" fport rm tcp:23965 tcp:39765` 和 `hdc -t "$MH_EMULATOR" shell aa force-stop "$probe_bundle"`。同一虚拟机更换模型时，先结束实验 App，再无参数启动以重新取得文件传输权限。
+
+## 验证结论
+
+HarmonyOS 7 API 26 ARM64 虚拟机使用 4 vCPU、8 GiB 内存。两款权重均由虚拟机内的 N-API HAP 加载，通过模型发现和流式接口验证。HDC 连接将虚拟机端口转给探针宿主机，同机 DSH 使用虚拟机内的回环地址。
+
+| 模型 | 原生模型接口的工具闭环 | 无需工具的对照 | 同机 DSH 只读任务 | 推理 App 峰值 RSS |
+| --- | --- | --- | --- | --- |
+| Qwen3.5-2B Q4 | 搜索、读取和标记回填通过 | 误触发搜索 | 发现并选用模型，512 token 耗尽前无工具调用 | 约 1.72 GiB |
+| LFM3-1.7B Q4 | 搜索、读取和标记回填通过 | 正确直接回答 | 发现并选用模型，512 token 耗尽前无工具调用 | 约 1.38 GiB |
+
+同机 DSH 使用原生 `llm-pi-ai` provider、只读权限和只启用 `read` 的临时预设。两个 DSH 回合均结束为 `max-tokens`，LFM3 试次已关闭会话标题生成。Mac 上同版本 DSH 的对照中，两款模型均能完成真实工具读取与回填，出现过答案格式偏差或重复读取。下一次调试可对照同机 DSH 和通过的原始探针所发送的消息结构、工具 schema 与生成参数。虚拟机的内存数据来自单次实验中的推理 App 进程。 [验证证据](../evidence/emulator/20261128-on-device-agent.json)
