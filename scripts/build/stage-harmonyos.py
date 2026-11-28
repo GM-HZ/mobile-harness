@@ -165,8 +165,6 @@ def stage_appgallery(inputs):
     cmake.write_text("set(MOBILE_HARNESS_APPGALLERY ON)\n" + cmake.read_text())
     appgallery.stage_appgallery_url(RAW, "HARMONY_APPGALLERY_PRIVACY_URL", "appgallery-privacy-url")
     appgallery.stage_appgallery_url(RAW, "HARMONY_APPGALLERY_SOURCE_URL", "appgallery-source-url")
-    for name in ("dsh", "node"):
-        copy(ROOT / "vendor/repos" / name / "LICENSE", RAW / f"LICENSE.{name}.txt")
     with TemporaryDirectory(prefix="prepare-appgallery-", dir=STAGE) as directory:
         full_layer = Path(directory)
         stage_dsh(ROOT, full_layer, inputs / "entry/src/main/resources/rawfile/dsh-layer.zip")
@@ -203,7 +201,8 @@ def main():
                 copy(source, RAW / source.name)
     dshm = ROOT / "vendor/repos/dshm"
     copy(dshm / "hostcore/app/fetch-shim.js", RAW / "fetch-shim.cjs")
-    copy(dshm / "LICENSE", RAW / "LICENSE.dshm.txt")
+    for name in ("dsh", "dshm", "node"):
+        copy(ROOT / "vendor/repos" / name / "LICENSE", RAW / f"LICENSE.{name}.txt")
     for name in ("poc.c", "nativehost.c", "child-descriptors.h", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h",
                  "ptc-supervisor.c", "ptc-supervisor.h", "ptc-file-filter.c", "ptc-file-filter.h"):
         copy(RUNTIME / "native" / name, CPP / name)

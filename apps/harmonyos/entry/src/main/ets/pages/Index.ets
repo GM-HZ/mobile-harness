@@ -20,6 +20,35 @@ const SHELL_BLUE_TINT = '#EDF5FF';
 const SHELL_BORDER = '#D6E3F1';
 type LoginFlow = 'unbound' | 'deepseek' | 'liveshare';
 
+interface ComponentNotice {
+  title: string;
+  asset: string;
+}
+
+const SHARED_NOTICES: ComponentNotice[] = [
+  { title: 'Node.js', asset: 'LICENSE.node.txt' },
+  { title: 'dshm', asset: 'LICENSE.dshm.txt' },
+  { title: 'llhttp', asset: 'LICENSE.llhttp.txt' },
+  { title: 'Undici', asset: 'LICENSE.undici.txt' }
+];
+
+const STORE_NOTICES: ComponentNotice[] = [
+  { title: 'GitHub CLI', asset: 'LICENSE.gh.txt' },
+  { title: 'Amaro', asset: 'LICENSE.amaro.txt' },
+  { title: 'ONNX Runtime', asset: 'LICENSE.onnxruntime.txt' },
+  { title: 'ONNX Runtime 第三方声明', asset: 'NOTICE.onnxruntime.txt' },
+  { title: 'Sherpa-ONNX', asset: 'LICENSE.sherpa-onnx.txt' }
+];
+
+const APPGALLERY_NOTICES: ComponentNotice[] = [
+  { title: 'sharp', asset: 'LICENSE.sharp.txt' },
+  { title: '工作区搜索', asset: 'NOTICE.workspace-search.txt' },
+  { title: 'ripgrep', asset: 'LICENSE.ripgrep.txt' },
+  { title: 'Koffi', asset: 'LICENSE.koffi.txt' },
+  { title: 'DSH System', asset: 'LICENSE.dsh-system.txt' },
+  { title: 'Node.js require-builtin', asset: 'LICENSE.require-builtin.txt' }
+];
+
 @Entry
 @Component
 struct Index {
@@ -30,6 +59,7 @@ struct Index {
   @State noticesOpen: boolean = false;
   @State noticeTitle: string = '';
   @State noticeText: string = '';
+  @State deepSeekCopyright: string = '';
   @State decliningPrivacy: boolean = false;
   @State consentError: string = '';
   @State privacyPolicyUrl: string = '';
@@ -318,11 +348,28 @@ struct Index {
     else this.noticesOpen = false;
   }
 
-  private selectNotice(title: string, filename: string): void {
+  private readNotice(filename: string): string {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    return util.TextDecoder.create('utf-8')
+      .decodeToString(context.resourceManager.getRawFileContentSync(filename));
+  }
+
+  private openNotices(): void {
+    this.noticeTitle = '';
+    this.sourceLinkError = false;
+    this.deepSeekCopyright = '';
     try {
-      this.noticeText = util.TextDecoder.create('utf-8')
-        .decodeToString(context.resourceManager.getRawFileContentSync(filename));
+      this.deepSeekCopyright = this.readNotice('LICENSE.dsh.txt').split('\n')
+        .find((line: string) => line.startsWith('Copyright '))?.trim() || '';
+    } catch (_) {
+      hilog.warn(0xD005, 'DSHClient', 'DeepSeek Harness license could not be read');
+    }
+    this.noticesOpen = true;
+  }
+
+  private selectNotice(title: string, filename: string): void {
+    try {
+      this.noticeText = this.readNotice(filename);
     } catch (_) {
       this.noticeText = '无法读取此声明。';
     }
@@ -334,10 +381,17 @@ struct Index {
     Scroll() {
       Column({ space: 12 }) {
         Button('返回').onClick(() => this.backFromNotices())
-        Text(this.noticeTitle || '开源软件声明').fontSize(24).fontWeight(FontWeight.Medium)
+        Text(this.noticeTitle || '版权与开源声明').fontSize(24).fontWeight(FontWeight.Medium)
         if (this.noticeTitle) {
           Text(this.noticeText).fontSize(14).copyOption(CopyOptions.LocalDevice)
         } else {
+          Text((this.appGallery ? 'DSH-MH' : 'DSH MH') + ' 基于 DeepSeek Harness 适配 HarmonyOS。')
+            .fontSize(15).fontColor(SHELL_INK)
+          if (this.deepSeekCopyright) {
+            Text(this.deepSeekCopyright).fontSize(14).fontColor(SHELL_SECONDARY)
+          }
+          Button('DeepSeek Harness · MIT 许可证').onClick(() =>
+            this.selectNotice('DeepSeek Harness', 'LICENSE.dsh.txt'))
           if (this.sourceDeliveryUrl) {
             Button('获取对应源码').onClick(() => this.openSourceDelivery())
             if (this.sourceLinkError) {
@@ -345,16 +399,13 @@ struct Index {
                 .copyOption(CopyOptions.LocalDevice)
             }
           }
-          Button('DeepSeek Harness').onClick(() => this.selectNotice('DeepSeek Harness', 'LICENSE.dsh.txt'))
-          Button('dshm').onClick(() => this.selectNotice('dshm', 'LICENSE.dshm.txt'))
-          Button('Node.js').onClick(() => this.selectNotice('Node.js', 'LICENSE.node.txt'))
-          Button('sharp').onClick(() => this.selectNotice('sharp', 'LICENSE.sharp.txt'))
-          Button('工作区搜索').onClick(() => this.selectNotice('工作区搜索', 'NOTICE.workspace-search.txt'))
-          Button('ripgrep').onClick(() => this.selectNotice('ripgrep', 'LICENSE.ripgrep.txt'))
-          Button('Koffi').onClick(() => this.selectNotice('Koffi', 'LICENSE.koffi.txt'))
-          Button('DSH System').onClick(() => this.selectNotice('DSH System', 'LICENSE.dsh-system.txt'))
-          Button('Node.js require-builtin').onClick(() =>
-            this.selectNotice('Node.js require-builtin', 'LICENSE.require-builtin.txt'))
+          Text('随包组件许可证').fontSize(16).fontWeight(FontWeight.Medium).margin({ top: 8 })
+          ForEach(SHARED_NOTICES, (notice: ComponentNotice) => {
+            Button(notice.title).onClick(() => this.selectNotice(notice.title, notice.asset))
+          }, (notice: ComponentNotice) => notice.asset)
+          ForEach(this.appGallery ? APPGALLERY_NOTICES : STORE_NOTICES, (notice: ComponentNotice) => {
+            Button(notice.title).onClick(() => this.selectNotice(notice.title, notice.asset))
+          }, (notice: ComponentNotice) => notice.asset)
         }
       }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
     }.width('100%').layoutWeight(1)
@@ -627,10 +678,8 @@ struct Index {
               this.privacyDetails = true;
               return true;
             }
-            if (this.appGallery && url === NOTICES_URL) {
-              this.noticeTitle = '';
-              this.sourceLinkError = false;
-              this.noticesOpen = true;
+            if (url === NOTICES_URL) {
+              this.openNotices();
               return true;
             }
             return !url.startsWith(LOCAL_ORIGIN + '/') && url !== 'about:blank';

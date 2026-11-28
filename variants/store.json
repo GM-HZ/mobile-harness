@@ -8,7 +8,9 @@
   },
   "hap": {
     "present": [
-      "resources/rawfile/dsh-self-build.json"
+      "resources/rawfile/dsh-self-build.json",
+      "resources/rawfile/LICENSE.dsh.txt",
+      "resources/rawfile/LICENSE.node.txt"
     ],
     "absent": [
       "mh-exec",

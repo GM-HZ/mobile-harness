@@ -60,19 +60,16 @@ def main():
         engine = (ROOT / "apps/harmonyos/entry/src/main/ets/runtime/DshEngine.ets").read_text()
         no_stage_override = ('dsh-settings-client.js").write_text' not in stage
                              and "copyGuest(context, 'dsh-settings-client.js'" not in engine)
-        with tempfile.NamedTemporaryFile("w", suffix=".mjs", delete=False) as handle:
-            handle.write(settings)
-            probe = handle.name
-        try:
-            syntax = subprocess.run(["node", "--check", probe], capture_output=True, text=True)
-        finally:
-            Path(probe).unlink(missing_ok=True)
-        ok = marker in settings and no_stage_override and syntax.returncode == 0
+        notices_registered = (settings.count('id: "mobile-harness-notices"') == 1
+                              and settings.count('"/.mobile-harness/notices"') == 1)
+        syntax = node_check(settings)
+        ok = marker in settings and notices_registered and no_stage_override and syntax.returncode == 0
         checked.append({"id": "settings-client-patch", "ok": ok,
-                        "marker": marker in settings, "noStageOverride": no_stage_override})
+                        "marker": marker in settings, "noticesRegistered": notices_registered,
+                        "noStageOverride": no_stage_override})
         if not ok:
             failures.append(f"settings client contract: marker={marker in settings} "
-                            f"noStageOverride={no_stage_override} syntax={syntax.returncode} "
+                            f"notices={notices_registered} noStageOverride={no_stage_override} syntax={syntax.returncode} "
                             f"{syntax.stderr.strip()[:200]}")
         boot_no_replacement = ANCHOR not in (ROOT / "packages/dsh-host/dsh-client.cjs").read_text()
         for module in BASH_MODULES:

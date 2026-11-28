@@ -12,7 +12,7 @@
    cache key 包含补丁 hash；不要恢复"运行时字符串替换"来替代。
 4. **变体**：`HARMONY_SELF_BUILD`、`HARMONY_GUEST_LIB_GROUPS`、signing profile 的语义在
    `variants/*.json` 定义；新增开关先加变体与断言。
-5. **体积/许可证**：overlay 库受 `variants/*.json` 的 maxBytes 限制；新增库要更新 NOTICE/LICENSE。
+5. **体积/许可证**：overlay 库受 `variants/*.json` 的 maxBytes 限制；新增库要更新 NOTICE/LICENSE。公共打包流程从锁定子模块复制 DSH、dshm 和 Node.js 的许可证，供普通版和 AppGallery 版的声明页读取。
 6. **可诊断**：装配日志写 `.build/batch-*/`；失败信息要指出文件/哈希/步骤。
 7. **包内签名工具**：`guest-tools-lock.json` 中的 `installAs` 生成校验清单，CLI 和动态依赖随同组的 HAP 签名。更新附加层后要核对覆盖安装会重新解包。
 

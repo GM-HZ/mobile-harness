@@ -14,7 +14,9 @@
       "libnode.so",
       "libdshimage.so",
       "libdshsearch.so",
-      "NOTICE.workspace-search.txt"
+      "NOTICE.workspace-search.txt",
+      "resources/rawfile/LICENSE.dsh.txt",
+      "resources/rawfile/LICENSE.node.txt"
     ],
     "absent": [
       "dsh-chunks.json",

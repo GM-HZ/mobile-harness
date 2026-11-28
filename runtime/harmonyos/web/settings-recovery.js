@@ -40,6 +40,13 @@ function MobileHarnessGitHubRow() {
 		chinese ? "管理账号" : "Manage account", "/.mobile-harness/github");
 }
 
+function MobileHarnessNoticesRow() {
+	const chinese = document.documentElement.lang.startsWith("zh");
+	return MobileHarnessNavigationRow(chinese ? "版权与开源声明" : "Copyright and open source notices",
+		chinese ? "查看 DeepSeek Harness 和随包组件的许可证。" : "See the licenses for DeepSeek Harness and bundled components.",
+		chinese ? "查看声明" : "View notices", "/.mobile-harness/notices");
+}
+
 function registerMobileHarnessRecovery(ctx) {
 	ctx.slots.inject("settings.general.item", () => ctx.slots.register({
 		name: "settings.general.item",
@@ -53,4 +60,10 @@ function registerMobileHarnessRecovery(ctx) {
 		order: 98,
 		locale: NS,
 	}, MobileHarnessRecoveryRow));
+	ctx.slots.inject("settings.general.item", () => ctx.slots.register({
+		name: "settings.general.item",
+		id: "mobile-harness-notices",
+		order: 100,
+		locale: NS,
+	}, MobileHarnessNoticesRow));
 }

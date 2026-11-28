@@ -1,12 +1,12 @@
 # Seam: web settings client injection
 
 - Upstream package: `@deepseek-ai/dsh-client-ui-settings-general` (`lib/client.js`), npm `0.2.2-rc.5`.
-- Code: `scripts/build/stage-harmonyos.py` (`stage_settings_client`), `runtime/harmonyos/web/settings-recovery.js`.
+- Code: `patches/settings-client-recovery.patch`, `runtime/harmonyos/web/settings-recovery.js`, and `apps/harmonyos/entry/src/main/ets/pages/Index.ets`.
 - Anchor: `function apply(ctx){` must appear exactly once.
-- Our assumption (migrated 2026-11-20): the settings client has a single `apply(ctx)` entry; the recovery row is now inserted by `patches/settings-client-recovery.patch` while assembling `dsh-layer.zip`. No stage-time rewrite and no DshEngine override remain.
-- Failure mode: build aborts with "The pinned DSH General Settings entry point changed"; or recovery disappears silently if the injection point moves but the literal survives elsewhere.
+- The package patch registers the recovery and copyright rows through the `settings.general.item` slot. AppGallery adds its privacy row through its variant overlay. The native app opens the copyright page for either variant and displays the licensed texts from raw resources.
+- Failure mode: the module fails to load or a row is missing or registered twice. The host contract asserts that the bundled copyright row has one registration and one navigation target.
 - Replacement strategy: upstream settings extension point (plugin/slot) if exposed; otherwise `pnpm patch`.
-- Gate: G0 (stage-time check), G1 (planned), G2 (recovery acceptance).
+- Gate: G1 (upstream anchors and host contracts), G2 (recovery acceptance), G4 (packaged license resources).
 - History: 0.2.2-rc.5; previous RC bump changed this entry once.
 
 ### Migration (2026-11-20)

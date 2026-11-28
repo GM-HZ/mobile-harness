@@ -44,7 +44,7 @@
       "path": "lib/client.js",
       "marker": "registerMobileHarnessRecovery(ctx);",
       "removed": null,
-      "reason": "Mount the Mobile Harness recovery row inside the General Settings client instead of rewriting the file at stage time.",
+      "reason": "Register the Mobile Harness recovery and open source notices rows in the General Settings client.",
       "documented": true,
       "gates": [
         "G1 patch-rehearsal"

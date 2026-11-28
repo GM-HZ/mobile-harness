@@ -28,7 +28,8 @@
       "file": "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js",
       "pattern": "function apply(ctx){",
       "count": 1,
-      "contract": "docs/architecture/seams/web-settings-injection.md"
+      "contract": "docs/architecture/seams/web-settings-injection.md",
+      "patch": "patches/settings-client-recovery.patch"
     },
     {
       "id": "native-system-addon",
