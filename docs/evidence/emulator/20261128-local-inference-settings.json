@@ -13,7 +13,7 @@
       "maxOutputTokens": 1024
     },
     "ordinaryStore": {
-      "sha256": "4b8874a338ebcf7ca0ba61dce2134eb4b43bac43adbb2e7a50411e061060fa40",
+      "sha256": "3e59880082b79cc2f920953d57673b5990854abf1ba53e7e91cf45c3c65ef116",
       "storeShapeCheck": true,
       "variantCheck": true
     }
@@ -68,6 +68,35 @@
       "requestTokens": 9548,
       "engineContextTokens": 8192,
       "errorSource": "synthetic session event journal"
+    },
+    "contextRetest": {
+      "testedHapSha256": "641aee8cc5c6aad85ca7551e590125212ae19abb7430904f9da06e17c58a43db",
+      "openedFromSettings": true,
+      "routeRegistered": true,
+      "credentialBackedModelDiscovery": true,
+      "preferredDefault": "lfm3-1.7b-q4",
+      "textTurn": {
+        "outcome": "timeout",
+        "deadlineSeconds": 110,
+        "localRouteHeaderVerified": true,
+        "requestContextWindow": 16384,
+        "terminalFailureObserved": false,
+        "assistantReplyCount": 0,
+        "toolCalls": 0,
+        "cancelledAfterDeadline": true
+      },
+      "dshToolTurnRun": false,
+      "priorDefaultRestored": true,
+      "ownedRouteAndCredentialRemoved": true,
+      "normalRestartPreservedRestoredSettings": true,
+      "testWorkspaceRemoved": true,
+      "hdcForwardRemoved": true
+    },
+    "fixtureRecovery": {
+      "initialProfilePatchBytes": 0,
+      "builtInRollbackRestoredSnapshot": true,
+      "restoredProfilePatchBytes": 149,
+      "restoredProfilePatchIsYamlArray": true
     }
   },
   "download": {
@@ -92,6 +121,18 @@
       "modelDirectoryEmptyAfterFailure": true,
       "appMessage": "系统下载失败，可再次尝试",
       "numericFailureCategory": null
+    },
+    "publicOriginRecheck": {
+      "result": "timeout",
+      "elapsedMs": 63081,
+      "deviceLoggedPhaseElapsedMs": 60376,
+      "receivedBytes": 0,
+      "numericFailureCategory": 16,
+      "sdkFault": "request.agent.Faults.TIMEOUT",
+      "productionArktsSha256": "6b7d48cb09658ec7f2d3e0d62c401b8bbe55eb69e60ddff5443ebd4c926baaaf",
+      "modelDirectoryEmptyAfterFailure": true,
+      "temporaryProbeUninstalled": true,
+      "emulatorStopped": true
     },
     "loopbackFixture": {
       "sourceDifference": "only the LFM3 URL was substituted with a host test server via HDC reverse port",
