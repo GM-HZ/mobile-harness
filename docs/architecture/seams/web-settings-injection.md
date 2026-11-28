@@ -4,6 +4,7 @@
 - Code: `patches/settings-client-recovery.patch`, `runtime/harmonyos/web/settings-recovery.js`, and `apps/harmonyos/entry/src/main/ets/pages/Index.ets`.
 - Anchor: `function apply(ctx){` must appear exactly once.
 - The package patch registers the recovery and copyright rows through the `settings.general.item` slot. AppGallery adds its privacy row through its variant overlay. The native app opens the copyright page for either variant and displays the licensed texts from raw resources.
+- The experimental self build advertises the local inference row in the main loopback WebView's session storage at document start. The slot navigates to `/.mobile-harness/local-inference`, which the native host handles only when its compiled inference binding and normal authenticated session are available. The storage value is a presentation capability only.
 - Failure mode: the module fails to load or a row is missing or registered twice. The host contract asserts that the bundled copyright row has one registration and one navigation target.
 - Replacement strategy: upstream settings extension point (plugin/slot) if exposed; otherwise `pnpm patch`.
 - Gate: G1 (upstream anchors and host contracts), G2 (recovery acceptance), G4 (packaged license resources).

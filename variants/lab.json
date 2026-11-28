@@ -1,6 +1,6 @@
 {
   "name": "lab",
-  "description": "Lab variant: same as self but pins every overlay group and is used for G2/G3 experiments.",
+  "description": "Lab variant: same as self but pins every overlay group and is used for G2/G3 experiments. Experimental local inference requires HARMONY_LOCAL_INFERENCE=1.",
   "env": {
     "HARMONY_UNSIGNED": "1",
     "HARMONY_SELF_BUILD": "1",

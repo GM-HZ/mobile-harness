@@ -1,0 +1,166 @@
+--- a/ggml/src/ggml-cpu/ggml-cpu.c
++++ b/ggml/src/ggml-cpu/ggml-cpu.c
+@@ -2699,5 +2699,5 @@
+     }
+
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(__OHOS__)
+     err = sched_setaffinity(0, sizeof(cpuset), &cpuset);
+     if (err < 0) {
+--- a/tools/server/server-queue.h
++++ b/tools/server/server-queue.h
+@@ -3,4 +3,5 @@
+ #include "server-task.h"
+
++#include <atomic>
+ #include <condition_variable>
+ #include <deque>
+@@ -98,5 +99,5 @@
+      * - Exit sleeping state
+      */
+-    void start_loop(int64_t idle_sleep_ms = -1);
++    void start_loop(int64_t idle_sleep_ms = -1, const std::atomic<bool> * stop = nullptr);
+
+     // while waiting for work() to finish, run process_new_tasks on the worker thread
+--- a/tools/server/server-queue.cpp
++++ b/tools/server/server-queue.cpp
+@@ -281,5 +281,5 @@
+ }
+
+-void server_queue::start_loop(int64_t idle_sleep_ms) {
++void server_queue::start_loop(int64_t idle_sleep_ms, const std::atomic<bool> * stop) {
+     running = true;
+     time_last_task = ggml_time_ms();
+@@ -295,5 +295,5 @@
+     auto should_sleep = [&]() -> bool {
+         // caller must hold mutex_tasks
+-        if (idle_sleep_ms < 0 || n_inflight > 0) {
++        if (stop || idle_sleep_ms < 0 || n_inflight > 0) {
+             return false;
+         }
+@@ -303,4 +303,8 @@
+
+     while (true) {
++        if (stop && stop->load()) {
++            terminate();
++            break;
++        }
+         QUE_DBG("%s", "processing new tasks\n");
+         if (process_new_tasks(false)) {
+@@ -325,5 +329,5 @@
+         while (true) {
+             std::unique_lock<std::mutex> lock(mutex_tasks);
+-            if (!running || !queue_tasks.empty()) {
++            if (!running || (stop && stop->load()) || !queue_tasks.empty()) {
+                 break; // go back to process new tasks or terminate
+             }
+--- a/tools/server/server-context.h
++++ b/tools/server/server-context.h
+@@ -74,5 +74,5 @@
+
+     // this function will block main thread until termination
+-    void start_loop();
++    void start_loop(const std::atomic<bool> * stop = nullptr);
+
+     // terminate main loop (will unblock start_loop)
+--- a/tools/server/server-context.cpp
++++ b/tools/server/server-context.cpp
+@@ -5171,7 +5171,7 @@
+ }
+
+-void server_context::start_loop() {
++void server_context::start_loop(const std::atomic<bool> * stop) {
+     auto & params = impl->params_base;
+-    impl->queue_tasks.start_loop(params.sleep_idle_seconds * 1000);
++    impl->queue_tasks.start_loop(params.sleep_idle_seconds * 1000, stop);
+ }
+
+--- a/tools/server/server.cpp
++++ b/tools/server/server.cpp
+@@ -45,4 +45,6 @@
+     bool install_signal_handlers = true; // off when embedded in llama-cli, which handles them itself
+     bool resolve_model           = true; // download / resolve -hf and docker models; off when the caller did it already
++    const std::atomic<bool> * stop = nullptr; // embedded App owns shutdown
++    std::atomic<bool> * ready = nullptr;
+ };
+
+@@ -680,5 +682,5 @@
+
+     // setup clean up function, to be called before exit
+-    auto clean_up = [&ctx_http, &ctx_server, &mcp_mgr, &sse_stopping]() {
++    auto clean_up = [&ctx_http, &ctx_server, &mcp_mgr, &sse_stopping, &opts]() {
+         SRV_INF("%s: cleaning up before exit...\n", __func__);
+         // stop the session GC first, it finalizes live sessions and wakes pending readers
+@@ -688,5 +690,7 @@
+         ctx_server.terminate();
+         mcp_mgr.shutdown();
+-        llama_backend_free();
++        if (!opts.stop) {
++            llama_backend_free();
++        }
+     };
+
+@@ -743,5 +747,5 @@
+     notify_status(SERVER_MODEL_STATUS_LOADING);
+
+-    if (!ctx_server.load_model(params)) {
++    if ((opts.stop && opts.stop->load()) || !ctx_server.load_model(params)) {
+         notify_status(SERVER_MODEL_STATUS_UNLOADED, {{"exit_code", 1}});
+         clean_up();
+@@ -753,4 +757,7 @@
+     routes.update_meta(ctx_server);
+     ctx_http.is_ready.store(true);
++    if (opts.ready) {
++        opts.ready->store(true);
++    }
+
+     SRV_INF("%s", "model loaded\n");
+@@ -770,10 +777,12 @@
+     }
+
+-    shutdown_handler = [&](int) {
+-        sse_stopping.store(true);
+-        mcp_mgr.shutdown();
+-        // this will unblock start_loop()
+-        ctx_server.terminate();
+-    };
++    if (!opts.stop) {
++        shutdown_handler = [&](int) {
++            sse_stopping.store(true);
++            mcp_mgr.shutdown();
++            // this will unblock start_loop()
++            ctx_server.terminate();
++        };
++    }
+
+     if (opts.install_signal_handlers) {
+@@ -801,5 +810,5 @@
+
+     // this call blocks the main thread until queue_tasks.terminate() is called
+-    ctx_server.start_loop();
++    ctx_server.start_loop(opts.stop);
+
+     clean_up();
+@@ -900,2 +909,22 @@
+     return server_run(params, argc, argv, role, opts);
+ }
++
++int llama_server_mobile(common_params & params, const std::atomic<bool> & stop, std::atomic<bool> & ready);
++int llama_server_mobile(common_params & params, const std::atomic<bool> & stop, std::atomic<bool> & ready) {
++    server_run_opts opts;
++    opts.install_signal_handlers = false;
++    opts.resolve_model = false;
++    opts.stop = &stop;
++    opts.ready = &ready;
++
++    common_init();
++    common_log_pause(common_log_main());
++    llama_backend_init();
++    llama_numa_init(params.numa);
++    server_stream_session_manager_start();
++    server_role role;
++    const int result = server_run(params, 0, nullptr, role, opts);
++    server_stream_session_manager_stop();
++    llama_backend_free();
++    return result;
++}

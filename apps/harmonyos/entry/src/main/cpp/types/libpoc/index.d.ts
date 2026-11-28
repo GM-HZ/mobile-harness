@@ -4,5 +4,9 @@ declare const poc: {
   nativeStatus(): number;
   usesHostProcess(): boolean;
   stopNative(): boolean;
+  localInferenceAvailable(): boolean;
+  localInferenceStart(modelPath: string, modelId: string, apiKey: string): number;
+  localInferenceStop(): number;
+  localInferenceState(): number;
 };
 export default poc;

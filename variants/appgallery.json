@@ -4,7 +4,8 @@
   "env": {
     "HARMONY_APPGALLERY_BUILD": "1",
     "HARMONY_UNSIGNED": "1",
-    "HARMONY_SELF_BUILD": "0"
+    "HARMONY_SELF_BUILD": "0",
+    "HARMONY_LOCAL_INFERENCE": "0"
   },
   "hap": {
     "present": [
@@ -27,6 +28,7 @@
       "libproot",
       "libdshshell",
       "libguest_",
+      "resources/rawfile/LICENSE.llama.cpp.txt",
       "mh-exec",
       "mh-install",
       "dsh-harmony-remote-ssh.cjs"

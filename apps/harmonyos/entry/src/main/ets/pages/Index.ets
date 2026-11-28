@@ -4,7 +4,9 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { BrowserSession, EngineProgress, dshEngine } from '../runtime/DshEngine';
 import { ForgeAccount } from './ForgeAccount';
+import { LocalInferencePage } from './LocalInference';
 import { RemoteHostsPage } from './RemoteHosts';
+import { hasLocalInference, localInference } from '../runtime/LocalInference';
 import { isRemoteHostsEnabled } from '../runtime/RemoteHosts';
 import { hasPrivacyConsent, isAppGalleryBuild, readAppGalleryLink, savePrivacyConsent } from '../runtime/PrivacyConsent';
 
@@ -13,6 +15,7 @@ const RECOVERY_URL = LOCAL_ORIGIN + '/.mobile-harness/recovery';
 const GITHUB_URL = LOCAL_ORIGIN + '/.mobile-harness/github';
 const PRIVACY_URL = LOCAL_ORIGIN + '/.mobile-harness/privacy';
 const NOTICES_URL = LOCAL_ORIGIN + '/.mobile-harness/notices';
+const LOCAL_INFERENCE_URL = LOCAL_ORIGIN + '/.mobile-harness/local-inference';
 const SHELL_INK = '#132841';
 const SHELL_SECONDARY = '#4D6279';
 const SHELL_BLUE = '#1559C8';
@@ -49,6 +52,15 @@ const APPGALLERY_NOTICES: ComponentNotice[] = [
   { title: 'Node.js require-builtin', asset: 'LICENSE.require-builtin.txt' }
 ];
 
+const LOCAL_INFERENCE_NOTICES: ComponentNotice[] = [
+  { title: 'llama.cpp', asset: 'LICENSE.llama.cpp.txt' },
+  { title: 'JSON for Modern C++', asset: 'LICENSE.llama-cpp-jsonhpp.txt' },
+  { title: 'cpp-httplib', asset: 'LICENSE.llama-cpp-httplib.txt' },
+  { title: 'rotate-bits', asset: 'LICENSE.llama-cpp-rotate-bits.txt' },
+  { title: 'SHA-256', asset: 'LICENSE.llama-cpp-sha256.txt' },
+  { title: 'xxHash', asset: 'LICENSE.llama-cpp-xxhash.txt' }
+];
+
 @Entry
 @Component
 struct Index {
@@ -68,6 +80,8 @@ struct Index {
   @State privacyLinkError: boolean = false;
   @State remoteHostsEnabled: boolean = false;
   @State remoteHostsOpen: boolean = false;
+  @State localInferenceOpen: boolean = false;
+  @State localInferenceEnabled: boolean = false;
   @State launchUrl: string = '';
   @State recoveryOpen: boolean = false;
   @State recoveryFromSplash: boolean = false;
@@ -89,6 +103,7 @@ struct Index {
   private loginFlow: LoginFlow = 'unbound';
   private relayOrigin: string = '';
   private detachEngine?: () => void;
+  private openingSession?: BrowserSession;
 
   aboutToAppear(): void {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext;
@@ -118,31 +133,57 @@ struct Index {
       }
       this.backgroundEnabled = dshEngine.isBackgroundEnabled();
       if (!session) {
+        this.openingSession = undefined;
         this.launchUrl = '';
         this.webFailed = false;
         this.forgeAccountOpen = false;
+        this.localInferenceOpen = false;
         this.closeLogin();
-      } else if (!this.launchUrl) {
-        try {
-          webview.WebviewController.initializeWebEngine();
-          webview.WebCookieManager.putAcceptCookieEnabled(true);
-          if (session.cookie) webview.WebCookieManager.configCookieSync(session.url, session.cookie, false, true);
-          const proxy = new webview.ProxyConfig();
-          proxy.insertDirectRule(webview.ProxySchemeFilter.MATCH_HTTP);
-          webview.ProxyController.applyProxyOverride(proxy, () => {
-            if (this.detachEngine) this.launchUrl = session.url;
-          });
-        } catch (e) {
-          this.status = '本机 DSH 页面初始化失败。';
-          hilog.error(0xD005, 'DSHClient', 'browser session setup failed');
-        }
+      } else if (!this.launchUrl && this.openingSession !== session) {
+        this.openingSession = session;
+        void this.openBrowserSession(context, session);
       }
     });
+  }
+
+  private async openBrowserSession(context: common.UIAbilityContext, session: BrowserSession): Promise<void> {
+    const normalSession = !this.appGallery && !session.safe && !!session.cookie;
+    this.localInferenceEnabled = normalSession && hasLocalInference();
+    if (normalSession) {
+      try {
+        await localInference.connect(context, session, this.localInferenceEnabled);
+      } catch (_) {
+        this.localInferenceEnabled = false;
+        hilog.warn(0xD005, 'DSHClient', 'local inference settings unavailable');
+      }
+    }
+    try {
+      if (this.openingSession !== session) return;
+      webview.WebviewController.initializeWebEngine();
+      webview.WebCookieManager.putAcceptCookieEnabled(true);
+      if (session.cookie) webview.WebCookieManager.configCookieSync(session.url, session.cookie, false, true);
+      const proxy = new webview.ProxyConfig();
+      proxy.insertDirectRule(webview.ProxySchemeFilter.MATCH_HTTP);
+      webview.ProxyController.applyProxyOverride(proxy, () => {
+        if (this.detachEngine && this.openingSession === session) this.launchUrl = session.url;
+      });
+    } catch (e) {
+      this.status = '本机 DSH 页面初始化失败。';
+      hilog.error(0xD005, 'DSHClient', 'browser session setup failed');
+    }
+  }
+
+  private localInferenceScripts(): ScriptItem[] {
+    const operation = this.localInferenceEnabled ? '.setItem("mobile-harness.local-inference", "1")' :
+      '.removeItem("mobile-harness.local-inference")';
+    return [{ script: 'if (window === window.top && location.origin === "' + LOCAL_ORIGIN +
+      '") sessionStorage' + operation + ';', scriptRules: [LOCAL_ORIGIN] }];
   }
 
   aboutToDisappear(): void {
     this.detachEngine?.();
     this.detachEngine = undefined;
+    this.openingSession = undefined;
   }
 
   private finishSplash(): void {
@@ -159,7 +200,7 @@ struct Index {
     const session = this.launchUrl;
     if ((origin !== LOCAL_ORIGIN && origin !== LOCAL_ORIGIN + '/') ||
         resources.length !== 1 || resources[0] !== ProtectedResourceType.AUDIO_CAPTURE ||
-        !session || this.safe || this.recoveryOpen || this.loginVisible || this.webFailed) {
+        !session || this.safe || this.recoveryOpen || this.loginVisible || this.webFailed || this.localInferenceOpen) {
       request.deny();
       return;
     }
@@ -174,7 +215,7 @@ struct Index {
       hilog.warn(0xD005, 'DSHClient', 'microphone permission request failed');
     }
     if (granted && this.detachEngine && this.launchUrl === session &&
-        !this.safe && !this.recoveryOpen && !this.loginVisible && !this.webFailed) {
+        !this.safe && !this.recoveryOpen && !this.loginVisible && !this.webFailed && !this.localInferenceOpen) {
       request.grant(resources);
     } else {
       request.deny();
@@ -406,6 +447,11 @@ struct Index {
           ForEach(this.appGallery ? APPGALLERY_NOTICES : STORE_NOTICES, (notice: ComponentNotice) => {
             Button(notice.title).onClick(() => this.selectNotice(notice.title, notice.asset))
           }, (notice: ComponentNotice) => notice.asset)
+          if (hasLocalInference()) {
+            ForEach(LOCAL_INFERENCE_NOTICES, (notice: ComponentNotice) => {
+              Button(notice.title).onClick(() => this.selectNotice(notice.title, notice.asset))
+            }, (notice: ComponentNotice) => notice.asset)
+          }
         }
       }.padding(24).width('100%').alignItems(HorizontalAlign.Start)
     }.width('100%').layoutWeight(1)
@@ -651,8 +697,10 @@ struct Index {
           .layoutWeight(1)
           .width('100%')
           .visibility(this.loginVisible || this.recoveryOpen || this.forgeAccountOpen || this.webFailed ||
-            this.privacyDetails || this.noticesOpen || this.remoteHostsOpen ? Visibility.None : Visibility.Visible)
+            this.privacyDetails || this.noticesOpen || this.remoteHostsOpen || this.localInferenceOpen ?
+            Visibility.None : Visibility.Visible)
           .javaScriptAccess(true)
+          .javaScriptOnDocumentStart(this.localInferenceScripts())
           .domStorageAccess(true)
           .fileAccess(false)
           .multiWindowAccess(true)
@@ -682,6 +730,10 @@ struct Index {
               this.openNotices();
               return true;
             }
+            if (url === LOCAL_INFERENCE_URL) {
+              if (this.localInferenceEnabled) this.localInferenceOpen = true;
+              return true;
+            }
             return !url.startsWith(LOCAL_ORIGIN + '/') && url !== 'about:blank';
           })
           .onPageEnd(() => {
@@ -700,7 +752,7 @@ struct Index {
           })
           .onErrorReceive((event) => {
             if (event?.request.isMainFrame() && event.error.getErrorCode() !== -3 &&
-                ![RECOVERY_URL, GITHUB_URL, PRIVACY_URL, NOTICES_URL].includes(event.request.getRequestUrl())) {
+                ![RECOVERY_URL, GITHUB_URL, PRIVACY_URL, NOTICES_URL, LOCAL_INFERENCE_URL].includes(event.request.getRequestUrl())) {
               this.webFailed = true;
               this.splashVisible = false;
               hilog.error(0xD005, 'DSHClient', 'ArkWeb main error %{public}d', event.error.getErrorCode());
@@ -719,6 +771,8 @@ struct Index {
         this.privacyPage()
       } else if (this.noticesOpen) {
         this.noticesPage()
+      } else if (this.localInferenceOpen && this.localInferenceEnabled) {
+        LocalInferencePage({ onClose: () => { this.localInferenceOpen = false; } })
       } else if (this.remoteHostsOpen && this.remoteHostsEnabled) {
         RemoteHostsPage({ onClose: () => { this.remoteHostsOpen = false; } })
       } else if (this.webFailed || this.recoveryOpen) {

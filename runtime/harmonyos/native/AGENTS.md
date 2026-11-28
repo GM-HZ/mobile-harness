@@ -15,6 +15,7 @@ C/CMake 层：PRoot 桥、shell、workflow、PTC、exec shim、N-API 扩展。AB
 6. **AppGallery**：CMake 禁用 Workflow 和 PTC 编译入口，Image Kit 和原生搜索桥按 Host 的 Node-API ABI 装配。
 7. **证据**：真机 G3 `device_lab` 或对应 `--probe`，记录到 `docs/evidence/device-lab/`。
 8. **Host 启动与子进程**：嵌入式 Node 在正常、安全、冷启动和热启动均使用 `--jitless`。Workflow、PTC 和 shell 子进程在分配 IPC 描述符后用 `child-descriptors.h` 清理继承描述符。Mate 60 的应用沙箱会拦截 `close_range`。
+9. **端侧推理实验**：仅启用 `HARMONY_SELF_BUILD=1 HARMONY_LOCAL_INFERENCE=1` 时将锁定的 llama.cpp 作为静态库链接到 `libpoc.so`。启动和停止均在原生线程完成，只绑定 `127.0.0.1:39765`，每次启动以应用生成的 bearer token 认证。仅在绑定成功且模型加载完成后报告就绪。状态码为 0 已停止、1 就绪、2 正在停止、3 正在加载，负值表示失败。
 
 ## 检查清单
 

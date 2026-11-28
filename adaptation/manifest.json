@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "27a495aaec1fdd496538cb2236b887b32f47156a",
+  "generatedFrom": "362cf4cf19d557ae36403ab2facc27aea652c555",
   "layers": [
     "host",
     "web",
@@ -527,8 +527,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/AGENTS.md",
       "role": "native runtime / adapter",
-      "sha256": "09697066df9c4237900aa641234fc065d376279386dd65ab2ac53e550eb8df28",
-      "bytes": 1710,
+      "sha256": "e91109856a99699a616662c14cf3d66bc4cfcf6c1c443e3b8560eda0b32488d5",
+      "bytes": 2138,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -557,6 +557,20 @@
       "role": "native runtime / adapter",
       "sha256": "b589e8aa673d4bb8b6d24e3f691c028ec71a907820d8c97b9cf1a0aa39f1e3cf",
       "bytes": 10928,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "native:runtime/harmonyos/native/dsh-local-inference.cpp",
+      "layer": "native",
+      "kind": "file",
+      "source": "runtime/harmonyos/native/dsh-local-inference.cpp",
+      "role": "native runtime / adapter",
+      "sha256": "51bda411bc84b9894d3ce0b2d4abbaf8548b17c1c5d31d6aa7ce59a531e91f2e",
+      "bytes": 2893,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -695,8 +709,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/poc.c",
       "role": "native runtime / adapter",
-      "sha256": "a2817c05b9d42d1bf5738d7d8f4e4639564b38fb49db1e92eaaee9f6ee2bdd80",
-      "bytes": 35344,
+      "sha256": "af4f5a499ab1c19bac8a32760f85ffa2a86a05425ab1d651ec2b2d37ba844ae5",
+      "bytes": 38006,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -793,8 +807,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/packaging/AGENTS.md",
       "role": "build and packaging scripts",
-      "sha256": "3459ba31bbc7814b202612b141af8eb55536df624acff7acf1bcea6b507cdd47",
-      "bytes": 1710,
+      "sha256": "9a84cf17ed2d12e9263adfa847c205513e8a2349fcf3bcdb80202220b102fe02",
+      "bytes": 2095,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -851,6 +865,48 @@
       "role": "build and packaging scripts",
       "sha256": "ad2b4a266b2268939c1446979759706077421cf906a203aa188c6f396e8cfd74",
       "bytes": 7887,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/local-inference-llama.patch",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/local-inference-llama.patch",
+      "role": "build and packaging scripts",
+      "sha256": "6a67e091f65b70f97b52c18c30e4623c6b18273c04de750cfbafd348339a046b",
+      "bytes": 5486,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/local-inference-llama.revision",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/local-inference-llama.revision",
+      "role": "build and packaging scripts",
+      "sha256": "c517e1e4737b423bd2b8ad7e8085fc247c6670057a63815faf3d73e3a99e937e",
+      "bytes": 41,
+      "fragility": "low",
+      "upstreamTouchpoints": [],
+      "gates": [
+        "G0"
+      ]
+    },
+    {
+      "id": "packaging:runtime/harmonyos/packaging/local-inference.cmake",
+      "layer": "packaging",
+      "kind": "file",
+      "source": "runtime/harmonyos/packaging/local-inference.cmake",
+      "role": "build and packaging scripts",
+      "sha256": "d40fcdea4a3d604b6808be44298785cf4312d8ac67c759a07bf806e7312afbcf",
+      "bytes": 1089,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1025,8 +1081,8 @@
       "kind": "file",
       "source": "variants/appgallery.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "9903e030e82ee44c67dffba1204183fabbab048d13407dc9f689d191a8e7b3ad",
-      "bytes": 888,
+      "sha256": "8c7f60d24f513601461fdb63ed1f67f9a89087d02fa0c29adac338778be1e2f3",
+      "bytes": 973,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1039,8 +1095,8 @@
       "kind": "file",
       "source": "variants/lab.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "675757996efa8e0ec7a3db3e17ee910bac8d34db388854bc9f1a99125855bdd2",
-      "bytes": 783,
+      "sha256": "53b834a4b653a74affc9f2683e9c3b00501dd0d77387bd270074d1843779a06f",
+      "bytes": 848,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1053,8 +1109,8 @@
       "kind": "file",
       "source": "variants/self.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "81aa4861806b7b6a1c98905d3228b522965db5d098126dd6c58114e105bc7655",
-      "bytes": 850,
+      "sha256": "7a8ce11cdfe1f8905c26c397d436852ccd9d0cbf2babdb38c42af4d2330d5703",
+      "bytes": 915,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1067,8 +1123,8 @@
       "kind": "file",
       "source": "variants/store.json",
       "role": "store/self/lab build variant definitions",
-      "sha256": "f2db877238452d3fb7473560b47e5f6dc17f3ddcf53a50834a5661446463a814",
-      "bytes": 777,
+      "sha256": "619c59f6f0c47ddaa7b11b613de959350078a95d10748023e97643bafc2b6b24",
+      "bytes": 862,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1081,8 +1137,8 @@
       "kind": "file",
       "source": "patches/AGENTS.md",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "a45b48e056f005cc7ecf9f84ea7055f5af2faf36aa8600bb5ee9544fe233ff61",
-      "bytes": 954,
+      "sha256": "6ce99d464cc6173322d3594f6048f35d44649624fd35bd6053b6b7df7e4a0a97",
+      "bytes": 1170,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1109,8 +1165,8 @@
       "kind": "file",
       "source": "patches/TARGETS.md",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "e53619a4008745dd18ff331d9b0493a5be15d2f319aefada01bfc5b559dbf151",
-      "bytes": 2227,
+      "sha256": "07c0c6913fb558829b74b671789a22706becda9c0f2d2b32e02e97520aa5506d",
+      "bytes": 2330,
       "fragility": "low",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-local",
@@ -1180,8 +1236,8 @@
       "kind": "file",
       "source": "patches/series.json",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "f4ef492124191a18b5da74ad57c4911f56cf9f00333f7e9a0d3179bd9ef4717a",
-      "bytes": 1806,
+      "sha256": "769a758ecd986418071f6983051491b04c98ea1070e503fac934111d25f8a099",
+      "bytes": 1817,
       "fragility": "high",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-local",
@@ -1217,8 +1273,8 @@
       "kind": "file",
       "source": "patches/settings-client-recovery.patch",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "92b90414894acdad1e4810bc3e294c53f8926f6ea6579c7efd20f0c1ada8a864",
-      "bytes": 40210,
+      "sha256": "6391151bc8f2b32e8b1b316ca57f682d0c74032259e9ec2f0c32bafb0c1ba56a",
+      "bytes": 40920,
       "fragility": "low",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-client-ui-settings-general",
@@ -1234,8 +1290,8 @@
       "kind": "file",
       "source": "patches/targets.json",
       "role": "npm package patch series applied while assembling the DSH layer",
-      "sha256": "91ed1f595936fdda89fdf0aa1c2a10a6b7d1da6c32f1d1dc8b0cc2e9c6f1321b",
-      "bytes": 2331,
+      "sha256": "91b3df9ba6a6bc674e24c49220d022d53c44b7965b13c724a1c65e7ea8534f9b",
+      "bytes": 2342,
       "fragility": "high",
       "upstreamTouchpoints": [
         "@deepseek-ai/dsh-bash-local",
@@ -1254,8 +1310,8 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "a4e62dfa7581888344c3ab94f3344e8a1b1d0104ef84628dd40447c6f4ec070b",
-      "files": 32,
+      "sha256": "7f52b5670ab31e65d1ba280c9da6d30a05f7b81f0d51752059013ca787bf717f",
+      "files": 36,
       "fragility": "medium",
       "upstreamTouchpoints": [],
       "gates": [

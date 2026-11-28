@@ -4,6 +4,7 @@
   "env": {
     "HARMONY_UNSIGNED": "1",
     "HARMONY_SELF_BUILD": "0",
+    "HARMONY_LOCAL_INFERENCE": "0",
     "HARMONY_GUEST_LIB_GROUPS": ""
   },
   "hap": {
@@ -20,6 +21,7 @@
       "libguest_lib_",
       "libguest_ext_",
       "resources/rawfile/dsh-layer.zip",
+      "resources/rawfile/LICENSE.llama.cpp.txt",
       "resources/rawfile/dsh-harmony-remote-ssh.cjs"
     ],
     "flag": {

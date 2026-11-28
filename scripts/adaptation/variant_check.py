@@ -23,6 +23,7 @@ def main():
     parser.add_argument("--variant")
     parser.add_argument("--hap", type=Path)
     parser.add_argument("--require-self-build-metadata", action="store_true")
+    parser.add_argument("--require-local-inference", action="store_true")
     parser.add_argument("--list", action="store_true")
     args = parser.parse_args()
     if args.list:
@@ -60,6 +61,14 @@ def main():
             if count < minimum:
                 failures.append(f"too few {token}: {count} < {minimum}")
         flag_names = [name for name in names if name.endswith("dsh-self-build.json")]
+        local_notice = "resources/rawfile/LICENSE.llama.cpp.txt" in names
+        local_enabled = len(flag_names) == 1 and json.loads(archive.read(flag_names[0])).get("localInference") is True
+        if local_enabled != local_notice:
+            failures.append("local inference flag and llama.cpp license do not match")
+        if local_enabled and variant["name"] not in {"self", "lab"}:
+            failures.append("local inference requires the self or lab variant")
+        if args.require_local_inference and not local_enabled:
+            failures.append("expected the opt-in local inference engine")
         expected = variant["hap"].get("flag")
         if expected is not None:
             if len(flag_names) != 1:

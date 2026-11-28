@@ -29,7 +29,7 @@
       "package": "@deepseek-ai/dsh-client-ui-settings-general",
       "path": "lib/client.js",
       "marker": "registerMobileHarnessRecovery(ctx);",
-      "reason": "Register the Mobile Harness recovery and open source notices rows in the General Settings client."
+      "reason": "Register recovery, open source notices, and the opt-in local inference entry in the General Settings client."
     },
     {
       "file": "forge-github-guest-runner.patch",

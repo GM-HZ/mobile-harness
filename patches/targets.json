@@ -44,7 +44,7 @@
       "path": "lib/client.js",
       "marker": "registerMobileHarnessRecovery(ctx);",
       "removed": null,
-      "reason": "Register the Mobile Harness recovery and open source notices rows in the General Settings client.",
+      "reason": "Register recovery, open source notices, and the opt-in local inference entry in the General Settings client.",
       "documented": true,
       "gates": [
         "G1 patch-rehearsal"

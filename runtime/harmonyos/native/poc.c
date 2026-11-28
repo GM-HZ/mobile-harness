@@ -1,12 +1,12 @@
 #define _GNU_SOURCE
 #include <napi/native_api.h>
+#include <errno.h>
 #ifndef MOBILE_HARNESS_APPGALLERY
 #include "child-descriptors.h"
 #include <hilog/log.h>
 #include <dlfcn.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -795,6 +795,70 @@ extern napi_value StartNative(napi_env env, napi_callback_info info);
 extern napi_value NativeStatus(napi_env env, napi_callback_info info);
 napi_value UsesHostProcess(napi_env env, napi_callback_info info);
 napi_value StopNative(napi_env env, napi_callback_info info);
+#ifdef MOBILE_HARNESS_LOCAL_INFERENCE
+int dshLocalInferenceStart(const char *path, const char *model, const char *key);
+int dshLocalInferenceStop(void);
+int dshLocalInferenceState(void);
+#endif
+
+static napi_value localInferenceNumber(napi_env env, int number) {
+    napi_value result;
+    return napi_create_int32(env, number, &result) == napi_ok ? result : NULL;
+}
+
+static napi_value LocalInferenceAvailable(napi_env env, napi_callback_info info) {
+    napi_value result;
+#ifdef MOBILE_HARNESS_LOCAL_INFERENCE
+    const bool available = true;
+#else
+    const bool available = false;
+#endif
+    return napi_get_boolean(env, available, &result) == napi_ok ? result : NULL;
+}
+
+#ifdef MOBILE_HARNESS_LOCAL_INFERENCE
+static bool localInferenceString(napi_env env, napi_value value, char *output, size_t capacity) {
+    size_t length;
+    return napi_get_value_string_utf8(env, value, NULL, 0, &length) == napi_ok &&
+           length > 0 && length < capacity &&
+           napi_get_value_string_utf8(env, value, output, capacity, &length) == napi_ok &&
+           strlen(output) == length;
+}
+#endif
+
+static napi_value LocalInferenceStart(napi_env env, napi_callback_info info) {
+#ifdef MOBILE_HARNESS_LOCAL_INFERENCE
+    char path[4096], model[64], key[128];
+    napi_value args[3];
+    size_t argc = 3;
+    if (napi_get_cb_info(env, info, &argc, args, NULL, NULL) != napi_ok || argc != 3 ||
+        !localInferenceString(env, args[0], path, sizeof(path)) ||
+        !localInferenceString(env, args[1], model, sizeof(model)) ||
+        !localInferenceString(env, args[2], key, sizeof(key))) {
+        return localInferenceNumber(env, -EINVAL);
+    }
+    return localInferenceNumber(env, dshLocalInferenceStart(path, model, key));
+#else
+    return localInferenceNumber(env, -ENOTSUP);
+#endif
+}
+
+static napi_value LocalInferenceStop(napi_env env, napi_callback_info info) {
+#ifdef MOBILE_HARNESS_LOCAL_INFERENCE
+    return localInferenceNumber(env, dshLocalInferenceStop());
+#else
+    return localInferenceNumber(env, 0);
+#endif
+}
+
+static napi_value LocalInferenceState(napi_env env, napi_callback_info info) {
+#ifdef MOBILE_HARNESS_LOCAL_INFERENCE
+    return localInferenceNumber(env, dshLocalInferenceState());
+#else
+    return localInferenceNumber(env, 0);
+#endif
+}
+
 static napi_value Init(napi_env env, napi_value exports) {
     napi_property_descriptor methods[] = {
 #ifndef MOBILE_HARNESS_APPGALLERY
@@ -804,6 +868,10 @@ static napi_value Init(napi_env env, napi_value exports) {
         {"nativeStatus", NULL, NativeStatus, NULL, NULL, NULL, napi_default, NULL},
         {"usesHostProcess", NULL, UsesHostProcess, NULL, NULL, NULL, napi_default, NULL},
         {"stopNative", NULL, StopNative, NULL, NULL, NULL, napi_default, NULL},
+        {"localInferenceAvailable", NULL, LocalInferenceAvailable, NULL, NULL, NULL, napi_default, NULL},
+        {"localInferenceStart", NULL, LocalInferenceStart, NULL, NULL, NULL, napi_default, NULL},
+        {"localInferenceStop", NULL, LocalInferenceStop, NULL, NULL, NULL, napi_default, NULL},
+        {"localInferenceState", NULL, LocalInferenceState, NULL, NULL, NULL, napi_default, NULL},
     };
     napi_define_properties(env, exports, sizeof(methods) / sizeof(methods[0]), methods);
     return exports;

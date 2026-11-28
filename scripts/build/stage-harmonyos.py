@@ -15,6 +15,7 @@ from harmonyos_dsh import stage_dsh
 from harmonyos_guest_extras import stage_guest_extras
 from harmonyos_ptc import PORTABLE_ASSETS, portable_assets
 from harmonyos_http import stage_http
+from harmonyos_local_inference import stage_local_inference
 from harmonyos_speech import stage_speech
 from harmonyos_workspace_deps import stage_workspace_dependencies
 
@@ -24,6 +25,7 @@ RUNTIME = ROOT / "runtime/harmonyos"
 EXPERIMENTAL = os.environ.get("HARMONY_EXPERIMENTAL_HOST_PROCESS") == "1"
 SELF_BUILD = os.environ.get("HARMONY_SELF_BUILD") == "1"
 APPGALLERY = os.environ.get("HARMONY_APPGALLERY_BUILD") == "1"
+LOCAL_INFERENCE = os.environ.get("HARMONY_LOCAL_INFERENCE") == "1"
 STAGE = ROOT / ".build/stage" / (
     "harmonyos-appgallery" if APPGALLERY else "harmonyos-process-probe" if EXPERIMENTAL else "harmonyos"
 )
@@ -179,6 +181,8 @@ def stage_appgallery(inputs):
 
 
 def main():
+    if LOCAL_INFERENCE and (not SELF_BUILD or APPGALLERY):
+        raise ValueError("HARMONY_LOCAL_INFERENCE=1 requires a self build")
     if APPGALLERY and (EXPERIMENTAL or SELF_BUILD):
         raise ValueError("AppGallery is a separate build variant")
     if APPGALLERY:
@@ -206,6 +210,7 @@ def main():
     for name in ("poc.c", "nativehost.c", "child-descriptors.h", "guest-tools.inc", "workflow-broker.c", "workflow-broker.h",
                  "ptc-supervisor.c", "ptc-supervisor.h", "ptc-file-filter.c", "ptc-file-filter.h"):
         copy(RUNTIME / "native" / name, CPP / name)
+    stage_local_inference(ROOT, CPP, RAW, LOCAL_INFERENCE)
     if APPGALLERY:
         stage_appgallery(inputs)
         return
@@ -255,6 +260,7 @@ def main():
     (RAW / "dsh-self-build.json").write_text(json.dumps({
         "selfBuild": SELF_BUILD,
         "signedExecBypass": SELF_BUILD,
+        "localInference": LOCAL_INFERENCE,
         "note": "Self-built HAPs include the in-memory ELF runner at /usr/bin/mh-exec; store builds never include it.",
     }) + "\n")
     module_path = STAGE / "entry/src/main/module.json5"

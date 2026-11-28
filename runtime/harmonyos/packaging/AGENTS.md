@@ -15,6 +15,7 @@
 5. **体积/许可证**：overlay 库受 `variants/*.json` 的 maxBytes 限制；新增库要更新 NOTICE/LICENSE。公共打包流程从锁定子模块复制 DSH、dshm 和 Node.js 的许可证，供普通版和 AppGallery 版的声明页读取。
 6. **可诊断**：装配日志写 `.build/batch-*/`；失败信息要指出文件/哈希/步骤。
 7. **包内签名工具**：`guest-tools-lock.json` 中的 `installAs` 生成校验清单，CLI 和动态依赖随同组的 HAP 签名。更新附加层后要核对覆盖安装会重新解包。
+8. **端侧推理实验**：只在 self 构建显式设置 `HARMONY_LOCAL_INFERENCE=1` 时编译。构建用 `HARMONY_LLAMA_CPP_SOURCE` 指定本地 checkout，校验 `local-inference-llama.revision`，再归档精确 Git 提交并应用装配期补丁。常规构建清除旧的推理装配文件。实验 HAP 以 `variant_check.py --variant self --require-local-inference` 验收。
 
 ## 检查清单
 

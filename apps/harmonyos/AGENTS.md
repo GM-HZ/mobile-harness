@@ -15,6 +15,8 @@ ArkTS 层负责生命周期、rawfile 装配、模式/开关、把 Host 拉起�
 7. **验证**：改变启动流程必须跑真机 G3（verify/exec/overlay）+ 模拟器 nightly；证据落盘。
 8. **运行时策略**：嵌入式 Node 的启动参数由原生层统一设置。ArkTS 的分块解包状态只用于装配、进度和启动计时。
 9. **发行变体切换**。Store 启动清理旧 self/lab 的运行时工具，并仅删除满足历史占位文件特征的 demo 扩展文件。
+10. **本地推理实验**。`LocalInference.ets` 在有原生绑定的 self 实验包中协调启动、模型选择和默认路由。`LocalModelStore.ets` 用 App 私有目录缓存并校验固定模型。浏览器只接收设置入口可见标记，DSH 配置通过已认证的设置 RPC 更新。
+10. **端侧推理实验入口**。页面以 `libpoc.localInferenceAvailable()` 判断构建是否提供原生引擎。通过独立设置服务管理模型与 DSH 路由，推理启动仍在原生线程完成。等到原生状态为 1 再访问经 bearer token 认证的回环服务。
 
 ## 检查清单
 

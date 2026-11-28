@@ -153,6 +153,9 @@ def main():
                 {"id": "remote-hosts-contract", "command": "node tests/contract/remote-hosts.cjs",
                  "covers": "self/lab gate, HTTPS origin, same-origin token exchange and metadata-only persistence",
                  "timeout": 120},
+                {"id": "local-inference-settings", "command": "node tests/contract/local-inference-route.cjs",
+                 "covers": "authenticated loopback provider updates, model switching, and reversible local default",
+                 "timeout": 120},
                 {"id": "local-llm-agent-probe",
                  "command": 'test -n "$MH_LOCAL_LLM_MODEL" || exit 2; '
                             'python3 tests/smoke/local-llm-agent-probe.py '

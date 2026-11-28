@@ -72,6 +72,12 @@
           "timeout": 120
         },
         {
+          "id": "local-inference-settings",
+          "command": "node tests/contract/local-inference-route.cjs",
+          "covers": "authenticated loopback provider updates, model switching, and reversible local default",
+          "timeout": 120
+        },
+        {
           "id": "local-llm-agent-probe",
           "command": "test -n \"$MH_LOCAL_LLM_MODEL\" || exit 2; python3 tests/smoke/local-llm-agent-probe.py --model \"$MH_LOCAL_LLM_MODEL\" --base-url \"${MH_LOCAL_LLM_BASE_URL:-http://127.0.0.1:8080/v1}\" --backend \"${MH_LOCAL_LLM_BACKEND:-llama.cpp}\"",
           "covers": "local Chat Completions SSE tool calls, result continuation and no-tool control",

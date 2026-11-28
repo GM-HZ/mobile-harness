@@ -16,7 +16,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-FORBIDDEN = ("mh-exec", "mh-install", "libguest_mh_exec_shim", "libguest_lib_", "libguest_ext_")
+FORBIDDEN = ("mh-exec", "mh-install", "libguest_mh_exec_shim", "libguest_lib_", "libguest_ext_", "LICENSE.llama.cpp.txt")
 
 
 def main():
@@ -36,7 +36,7 @@ def main():
         flags = [name for name in names if name.endswith("dsh-self-build.json")]
         for name in flags:
             payload = json.loads(hap.read(name))
-            if payload.get("signedExecBypass") or payload.get("selfBuild"):
+            if payload.get("signedExecBypass") or payload.get("selfBuild") or payload.get("localInference"):
                 failures.append(f"store HAP enables self build: {payload}")
     if failures:
         for failure in failures:
