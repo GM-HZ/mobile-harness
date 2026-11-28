@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "date": "2026-11-28",
+  "commit": "d0e8ee8dd7b22405a9a8cdd81bd299372d29e128",
+  "hapSha256": "c7f62a4f96f53fda434c82fe8b728082b7a248a8d5c5dbd92b1f3261ede3d91c",
+  "modelDownload": {
+    "source": "public ModelScope publisher repositories over HTTPS",
+    "startedFromEmptyWeightCache": true,
+    "appFlow": "native settings download action, RequestAgent, verification, atomic publication, independent on-device size/SHA",
+    "lfm3-1.7b-q4": {
+      "clickedAppDownload": true,
+      "elapsedMs": 63760,
+      "maxObservedProgressPercent": 97,
+      "maxObservedPartialBytes": 901774080,
+      "uiVerificationObserved": true,
+      "verified": true,
+      "bytes": 1099627808,
+      "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4"
+    },
+    "qwen3.5-2b-q4": {
+      "clickedAppDownload": true,
+      "elapsedMs": 72511,
+      "maxObservedProgressPercent": 97,
+      "maxObservedPartialBytes": 1212152575,
+      "uiVerificationObserved": true,
+      "verified": true,
+      "bytes": 1280835840,
+      "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223"
+    }
+  },
+  "standardProfilePriorDiagnostic": {
+    "hapSha256": "641aee8cc5c6aad85ca7551e590125212ae19abb7430904f9da06e17c58a43db",
+    "elapsedMs": 306538,
+    "error": {
+      "kind": "error",
+      "code": "TIMEOUT",
+      "message": "pi-ai stream idle timeout after 300000ms"
+    },
+    "firstReplyMs": null,
+    "subsequentBehaviorChange": "local-only DSH stream idle watchdog increased to 480000 ms"
+  },
+  "compactPresetDiagnostic": {
+    "temporaryFixturePreset": true,
+    "weightSource": "independently pinned preloaded GGUF for diagnosis",
+    "model": "lfm3-1.7b-q4",
+    "turns": [
+      {
+        "stage": "text",
+        "elapsedMs": 43940,
+        "reason": {
+          "kind": "completed"
+        },
+        "exactReply": true,
+        "localSources": true,
+        "toolNames": [
+          "load_workspace_dependencies"
+        ],
+        "ownedFileRead": false
+      },
+      {
+        "stage": "read",
+        "elapsedMs": 21897,
+        "reason": {
+          "kind": "completed"
+        },
+        "exactReply": true,
+        "localSources": true,
+        "toolNames": [
+          "read"
+        ],
+        "ownedFileRead": true
+      }
+    ],
+    "testPresetRemoved": true
+  },
+  "standardProfileModelScopeGate": {
+    "schema": 1,
+    "probe": "harmonyos-emulator-local-inference-e2e",
+    "commit": "d0e8ee8dd7b22405a9a8cdd81bd299372d29e128",
+    "target": "127.0.0.1:15555",
+    "model": "lfm3-1.7b-q4",
+    "stage": "plainTurn",
+    "ok": false,
+    "download": {
+      "clickedAppDownload": true,
+      "elapsedMs": 63760,
+      "maxObservedProgressPercent": 97,
+      "maxObservedPartialBytes": 901774080,
+      "uiVerificationObserved": true,
+      "verified": true,
+      "bytes": 1099627808,
+      "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4"
+    },
+    "cleanup": [
+      "cancelSession",
+      "archiveSession",
+      "removeWorkspaceRegistration",
+      "removeWorkspaceDirectory",
+      "stopAppAndRemoveOwnedWeight",
+      "removeDshForward"
+    ],
+    "cleanupErrors": [],
+    "hapSha256": "c7f62a4f96f53fda434c82fe8b728082b7a248a8d5c5dbd92b1f3261ede3d91c",
+    "readyMs": 9721,
+    "openedActualSettings": true,
+    "activationMs": 4898,
+    "preferredLocalModel": "lfm3-1.7b-q4",
+    "sharedDshSession": true,
+    "agentPreset": "standard",
+    "plainTurn": {
+      "baselineSeq": 6,
+      "deadlineSeconds": 540,
+      "elapsedMs": 296417,
+      "newEventCount": 17,
+      "completionReason": "max-tokens",
+      "requestRoutedLocally": true,
+      "requestHeaderContinued": false,
+      "allAssistantMessagesLocal": true,
+      "assistantReplyCount": 1,
+      "toolCallCount": 0,
+      "toolCalls": [],
+      "finalContainsExpectedText": true,
+      "finalExactlyExpectedText": false
+    },
+    "failure": {
+      "type": "CheckFailed",
+      "message": "DSH did not complete the requested turn"
+    },
+    "elapsedMs": 411945
+  }
+}

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "eabb2e5eab1c3b456989e3bb0e977c7ed1846eb8",
+  "generatedFrom": "d0e8ee8dd7b22405a9a8cdd81bd299372d29e128",
   "layers": [
     "host",
     "web",
@@ -527,8 +527,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/AGENTS.md",
       "role": "native runtime / adapter",
-      "sha256": "e95809f1cd92721733d1b616b86ca01b25979eff756a23a8997f4f3dbeba87c1",
-      "bytes": 2203,
+      "sha256": "83b7b846391eca914cff2c0cd5c08bb4b780427a915d557018cd84a0930b51f8",
+      "bytes": 2293,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [

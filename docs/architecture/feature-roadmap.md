@@ -27,7 +27,7 @@
 | GUI/手机操控、容器/systemd/dbus | ⏸ 范围外 | 平台边界 |
 | Node JIT | ⏸ 当前 jitless | 构建默认 `--jitless`；可另评估 |
 | 远程主机 | 🔶 | self/lab 提供 HTTPS 直连实验入口。SSH 隧道、断线续接和真机待验 |
-| 本地推理设置 | 🔶 | self 实验分支显式启用。提供固定权重下载、模型切换和 DSH 默认本地路由。见 [设置实验](../work/2026-11-28-local-inference-settings.md)。 |
+| 本地推理设置 | 🔶 | self 实验分支显式启用。两款 ModelScope 权重的 App 下载与设备校验通过，标准 DSH 端到端验收失败。 [设置实验](../work/2026-11-28-local-inference-settings.md) · [复测证据](../evidence/emulator/20261128-local-inference-modelscope.json) |
 | AppGallery 发布变体 | 🔶 | 独立包名与隐私入口、原生图片处理和搜索。发布演练校验原生包形状 |
 | 后台常驻（HarmonyOS 长时任务） | ✅ | 默认关闭，开启后申请通知权限；真机后台 35 分钟/锁屏通过；通知停止 action 待点击验证 |
 | 真机自动化门禁 | 🔶 | device_lab 协议就绪；需解锁/在线，脚本化调度待接 CI |
