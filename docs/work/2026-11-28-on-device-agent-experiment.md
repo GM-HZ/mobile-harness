@@ -44,3 +44,27 @@ MH_LOCAL_LLM_MODEL="$MODEL" MH_LOCAL_LLM_BASE_URL=http://127.0.0.1:19867/v1 \
   MH_LOCAL_LLM_BACKEND='llama.cpp b12774 macOS ARM64 CPU' \
   python3 gates/run.py --tier G1 --only local-llm-agent-probe --fail-on-skip --record
 ```
+
+### DevEco 虚拟机
+
+打包后的独立 PIE 在虚拟机里由 `posix_spawn` 启动时返回 `EACCES`。本实验的独立 HAP 静态链接 llama.cpp，在 N-API 的后台线程启动模型服务。HAP 面向测试虚拟机，模型文件通过 HDC 单独传入。
+
+使用专用的 ARM64 测试虚拟机，先把 `MH_EMULATOR` 指向它的 HDC 回环地址，将 `GGUF` 指向已核验的权重。在仓库根目录执行以下命令，`LLAMA_OHOS_BUILD` 指向上面的 CMake 构建目录。第一次启动后可用 `hdc -t "$MH_EMULATOR" shell -b "$probe_bundle" pwd` 等待 App 沙箱可访问。
+
+```sh
+tests/probes/harmonyos-local-agent/build.sh "$LLAMA_OHOS_BUILD"
+probe_bundle=org.mobileharness.localagentprobe
+probe_hap=.build/stage/harmonyos-local-agent-probe/entry/build/default/outputs/default/entry-default-unsigned.hap
+probe_assets=data/storage/el2/base/haps/entry/files
+
+hdc -t "$MH_EMULATOR" install "$probe_hap"
+hdc -t "$MH_EMULATOR" shell aa start -b "$probe_bundle" -a EntryAbility
+hdc -t "$MH_EMULATOR" file send -b "$probe_bundle" "$GGUF" "$probe_assets/llama-lab.gguf"
+hdc -t "$MH_EMULATOR" shell aa start -b "$probe_bundle" -a EntryAbility --ps operation start
+hdc -t "$MH_EMULATOR" fport tcp:23965 tcp:39765
+curl -f http://127.0.0.1:23965/health
+```
+
+在 `/health` 就绪后，从宿主机通过 USB 转发运行 `local-llm-agent-probe.py --base-url http://127.0.0.1:23965/v1 --model mh-on-device --backend 'llama.cpp HarmonyOS ARM64 VM' --timeout 240`。DSH 在同一虚拟机上的推理 URL 为 `http://127.0.0.1:39765/v1`，走原生 `openai-completions` provider。设 `contextWindow: 4096`、`maxTokens: 512`，以仅读取工具的测试预设运行工作区夹具。HDC 转发只用于宿主机探针和观测。
+
+试验结束后执行 `hdc -t "$MH_EMULATOR" fport rm tcp:23965 tcp:39765` 和 `hdc -t "$MH_EMULATOR" shell aa force-stop "$probe_bundle"`。同一虚拟机更换模型时，先结束实验 App，再无参数启动以重新取得文件传输权限。

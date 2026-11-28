@@ -1,0 +1,7 @@
+{
+  "name": "entry",
+  "version": "1.0.0",
+  "dependencies": {
+    "libmhllamaprobe.so": "file:./src/main/cpp/types/libmhllamaprobe"
+  }
+}

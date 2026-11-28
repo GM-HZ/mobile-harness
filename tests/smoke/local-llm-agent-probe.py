@@ -153,6 +153,8 @@ def request_turn(endpoint, model, messages, timeout, report):
         raise ProbeError("malformed SSE completion chunk") from None
     finally:
         report["toolCallCount"] = len(calls)
+        if calls:
+            report["toolNames"] = [call["name"] for call in calls]
         report["durationMs"] = round((time.monotonic() - started) * 1000)
         connection.close()
 
@@ -191,15 +193,23 @@ def text_turn(options, evidence, stage, messages, expected):
     report["ok"] = True
 
 
-def run_probe(options, evidence):
+def run_control(options, evidence):
+    messages = [
+        {"role": "system", "content": SYSTEM},
+        {"role": "user", "content": "请只回复 CONTROL_OK。这条消息无需调用工具。"},
+    ]
+    text_turn(options, evidence, "no_tool", messages, "CONTROL_OK")
+
+
+def run_tool_loop(options, evidence):
     note_id = "note-" + secrets.token_hex(4)
     marker = "MH-" + secrets.token_hex(6)
-    setup = [{"role": "system", "content": SYSTEM}]
-    control = setup + [{"role": "user", "content": "请只回复 CONTROL_OK。这条消息无需调用工具。"}]
-    text_turn(options, evidence, "no_tool", control, "CONTROL_OK")
-    messages = setup + [{"role": "user", "content": (
-        f"找到标题为 {TITLE} 的笔记。请只返回笔记中 marker 字段的原始值，不加引号、反引号或其他文字。"
-    )}]
+    messages = [
+        {"role": "system", "content": SYSTEM},
+        {"role": "user", "content": (
+            f"找到标题为 {TITLE} 的笔记。请只返回笔记中 marker 字段的原始值，不加引号、反引号或其他文字。"
+        )},
+    ]
     fixtures = [
         ("search_notes", {"query": TITLE}, {"note_id": note_id, "title": TITLE}),
         ("read_note", {"note_id": note_id}, {"marker": marker}),
@@ -253,11 +263,18 @@ def main():
     signal.signal(signal.SIGALRM, expire)
     signal.setitimer(signal.ITIMER_REAL, args.timeout)
     try:
-        run_probe(args, evidence)
-        evidence.update(ok=True, status="pass", done=DONE)
-    except (OSError, http.client.HTTPException, ProbeError) as error:
-        stage = evidence["turns"][-1]["stage"] if evidence["turns"] else "start"
-        evidence["failure"] = {"stage": stage, "type": type(error).__name__, "message": str(error)}
+        for scenario in (run_control, run_tool_loop):
+            try:
+                scenario(args, evidence)
+            except (OSError, http.client.HTTPException, ProbeError) as error:
+                stage = evidence["turns"][-1]["stage"] if evidence["turns"] else "start"
+                evidence.setdefault("failures", []).append({
+                    "stage": stage, "type": type(error).__name__, "message": str(error),
+                })
+                if isinstance(error, OSError):
+                    break
+        if "failures" not in evidence:
+            evidence.update(ok=True, status="pass", done=DONE)
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
         evidence["durationMs"] = round((time.monotonic() - started) * 1000)
