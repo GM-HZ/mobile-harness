@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "date": "2026-11-28",
+  "buildCommit": "af5605ceb5522a69d3d75ddf5afd11de876d5131",
+  "device": {
+    "name": "HUAWEI Mate 60",
+    "model": "BRA-AL00",
+    "api": 26,
+    "transport": "USB"
+  },
+  "artifact": {
+    "sha256": "72997e0651fe7884e129d31f4781872e973350235d3ccb134fcb0ec9175c308a",
+    "signed": true,
+    "selfVariantShapeCheck": true,
+    "versionName": "0.5.0",
+    "versionCode": 80,
+    "sameSigningChainAsPreviousBuild": true
+  },
+  "coverInstall": {
+    "installSucceeded": true,
+    "installMs": 36798,
+    "workspaceCountBefore": 86,
+    "workspaceCountAfter": 86,
+    "existingWorkspacesPreserved": true,
+    "readyMs": 18007,
+    "openedActualSettings": true
+  },
+  "model": {
+    "id": "lfm3-1.7b-q4",
+    "source": "ModelScope publisher repository",
+    "backend": "llama.cpp CPU",
+    "cpuThreads": 4,
+    "contextWindow": 16384,
+    "maxOutputTokens": 1024,
+    "download": {
+      "clickedAppDownload": true,
+      "elapsedMs": 58250,
+      "maxObservedProgressPercent": 96,
+      "maxObservedPartialBytes": 1011137285,
+      "uiVerificationObserved": true,
+      "verified": true,
+      "bytes": 1099627808,
+      "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4"
+    },
+    "activationMs": 7278,
+    "localProviderRegistered": true,
+    "temporaryLocalDefaultVerified": true
+  },
+  "standardSession": {
+    "kind": "HarmonyOS physical local DSH benchmark",
+    "model": "lfm3-1.7b-q4",
+    "stage": "finished",
+    "ok": false,
+    "cleanup": [
+      "removeOwnFiles",
+      "removeOwnForward"
+    ],
+    "cleanupErrors": [
+      {
+        "stage": "archiveOwnSession",
+        "type": "ConnectionResetError"
+      },
+      {
+        "stage": "removeOwnWorkspace",
+        "type": "ConnectionResetError"
+      }
+    ],
+    "appLocalModelRegistered": true,
+    "preservedAppManagedDefault": true,
+    "deviceModel": "BRA-AL00",
+    "inheritsAppLocalDefault": true,
+    "agentPreset": "standard",
+    "permission": "read-only",
+    "plainTurn": {
+      "elapsedMs": 481191,
+      "durableEventCount": 17,
+      "requestRoutedLocally": true,
+      "allAssistantMessagesLocal": false,
+      "assistantMessages": 0,
+      "toolCalls": [],
+      "finalExactlyExpectedText": false,
+      "finalContainsExpectedText": false,
+      "steps": [
+        {
+          "event": "assistant/attempt",
+          "step": 1,
+          "usage": {},
+          "firstTokenMs": null,
+          "firstVisibleTextMs": null,
+          "firstVisibleTextFromTurnStartMs": null,
+          "decodeMs": null
+        }
+      ],
+      "completionReason": "error",
+      "failureCode": "TIMEOUT",
+      "passed": false
+    },
+    "readTurn": {
+      "elapsedMs": 61841,
+      "durableEventCount": 5,
+      "failure": {
+        "type": "ConnectionResetError"
+      }
+    }
+  },
+  "standardPlainTurnProcessSample": {
+    "appCpuPercent": [
+      414,
+      407
+    ],
+    "appRssGiB": 2.0
+  },
+  "toolTurnRecovery": {
+    "stage": "wait-unlock",
+    "osLaunchBlockedByLock": true,
+    "ok": false,
+    "error": {
+      "type": "RuntimeError",
+      "message": "Screen stayed locked"
+    }
+  },
+  "toolTurnRetry": null,
+  "restore": {
+    "ok": false,
+    "forwardRemoved": true
+  },
+  "ok": false
+}
