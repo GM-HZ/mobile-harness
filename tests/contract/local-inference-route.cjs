@@ -108,6 +108,19 @@ async function main() {
   const source = readFileSync(file, 'utf8').replace(/^import .*;\n/gm, '');
   const code = stripTypeScriptTypes('const http = globalThis.localModelRouteSdk;\n' + source);
   const { LocalModelRoute, LOCAL_MODEL_PROVIDER } = await import('data:text/javascript;base64,' + Buffer.from(code).toString('base64'));
+  const storeFile = path.join(path.dirname(file), 'LocalModelStore.ets');
+  const catalogCode = stripTypeScriptTypes(readFileSync(storeFile, 'utf8').replace(/^import .*;\n/gm, ''));
+  const { LOCAL_MODELS } = await import('data:text/javascript;base64,' + Buffer.from(catalogCode).toString('base64'));
+  const nativeFile = path.join(__dirname, '../../runtime/harmonyos/native/dsh-local-inference.cpp');
+  const nativeCode = readFileSync(nativeFile, 'utf8');
+  const nativeContext = Number(nativeCode.match(/params\.n_ctx = (\d+);/)?.[1]);
+  const nativeOutput = Number(nativeCode.match(/params\.n_predict = (\d+);/)?.[1]);
+  const firstPromptTokens = 9548;
+  assert(nativeContext >= firstPromptTokens + nativeOutput, 'native budget must fit the observed DSH first turn');
+  for (const model of LOCAL_MODELS) {
+    assert.equal(model.contextWindow, nativeContext, model.id);
+    assert.equal(model.maxTokens, nativeOutput, model.id);
+  }
 
   const session = { url: origin, cookie: cookie + '; HttpOnly; Path=/' };
   assert.throws(() => new LocalModelRoute({ ...session, url: 'https://example.test/' }));
@@ -116,14 +129,16 @@ async function main() {
   const route = new LocalModelRoute(session);
   assert.deepEqual(await route.readDefault(), portal);
 
-  const lfm = { id: 'lfm3-1.7b-q4', name: 'LFM', contextWindow: 4096, maxTokens: 512 };
-  const qwen = { ...lfm, id: 'qwen3.5-2b-q4', name: 'Qwen' };
+  const [lfm, qwen] = LOCAL_MODELS.map(model => ({
+    id: model.id, name: model.label, contextWindow: model.contextWindow, maxTokens: model.maxTokens,
+  }));
   await assert.rejects(route.prefer(lfm), /启动所选本地模型/);
   await route.register(lfm, apiKey);
   const added = providers[LOCAL_MODEL_PROVIDER];
   assert.equal(added.baseURL, 'http://127.0.0.1:39765/v1');
   assert.equal(added.apiKeyEnv, credential);
   assert.equal(added.models[0].id, lfm.id);
+  assert.equal(added.models[0].contextWindow, nativeContext);
   assert.equal(added.retryPolicy.maxRetries, 0);
   assert(!JSON.stringify(added).includes(apiKey));
   assert.equal(credentials.get(credential), apiKey);

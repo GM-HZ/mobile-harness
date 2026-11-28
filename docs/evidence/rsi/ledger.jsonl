@@ -149,3 +149,4 @@
 {"commit": "8bdfdd13d11cd898e09c7571a2d2b775a2498b3a", "tiers": ["G0", "G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0-G1/8bdfdd13d11cd898e09c7571a2d2b775a2498b3a.json", "note": "", "at": "2026-11-28T15:14:57+0800"}
 {"commit": "4da04923a2cad790776accb7dc6b09c33f9af108", "tiers": ["G0", "G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0-G1/4da04923a2cad790776accb7dc6b09c33f9af108.json", "note": "", "at": "2026-11-28T15:35:47+0800"}
 {"commit": "4da04923a2cad790776accb7dc6b09c33f9af108", "tiers": ["G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G1/4da04923a2cad790776accb7dc6b09c33f9af108.json", "note": "", "at": "2026-11-28T15:35:48+0800"}
+{"commit": "ac8a1dbd86bdc64ff12d08534e25f89a69f81538", "tiers": ["G0", "G1"], "ok": true, "flakes": 0, "evidence": "docs/evidence/gates/G0-G1/ac8a1dbd86bdc64ff12d08534e25f89a69f81538.json", "note": "", "at": "2026-11-28T15:49:48+0800"}

@@ -6,6 +6,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 
 const MODEL_DIR = '/local-models';
 const DOWNLOAD_SUFFIX = '.download';
+const MODEL_CONTEXT_WINDOW = 16384;
 
 export interface LocalModelSpec {
   readonly id: string;
@@ -28,7 +29,7 @@ export const LOCAL_MODELS: ReadonlyArray<LocalModelSpec> = [
     revision: 'cd0c74c',
     url: 'https://huggingface.co/LiquidAI/LFM3-1.7B-GGUF/resolve/cd0c74c/LFM3-1.7B-Q4_K_M.gguf?download=true',
     fileName: 'LFM3-1.7B-Q4_K_M.gguf',
-    contextWindow: 8192,
+    contextWindow: MODEL_CONTEXT_WINDOW,
     maxTokens: 1024,
   },
   {
@@ -39,7 +40,7 @@ export const LOCAL_MODELS: ReadonlyArray<LocalModelSpec> = [
     revision: 'f6d5376',
     url: 'https://huggingface.co/unsloth/Qwen3.5-2B-GGUF/resolve/f6d5376/Qwen3.5-2B-Q4_K_M.gguf?download=true',
     fileName: 'Qwen3.5-2B-Q4_K_M.gguf',
-    contextWindow: 8192,
+    contextWindow: MODEL_CONTEXT_WINDOW,
     maxTokens: 1024,
   },
 ];

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generatedFrom": "362cf4cf19d557ae36403ab2facc27aea652c555",
+  "generatedFrom": "ac8a1dbd86bdc64ff12d08534e25f89a69f81538",
   "layers": [
     "host",
     "web",
@@ -527,8 +527,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/AGENTS.md",
       "role": "native runtime / adapter",
-      "sha256": "e91109856a99699a616662c14cf3d66bc4cfcf6c1c443e3b8560eda0b32488d5",
-      "bytes": 2138,
+      "sha256": "e95809f1cd92721733d1b616b86ca01b25979eff756a23a8997f4f3dbeba87c1",
+      "bytes": 2203,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -569,8 +569,8 @@
       "kind": "file",
       "source": "runtime/harmonyos/native/dsh-local-inference.cpp",
       "role": "native runtime / adapter",
-      "sha256": "51bda411bc84b9894d3ce0b2d4abbaf8548b17c1c5d31d6aa7ce59a531e91f2e",
-      "bytes": 2893,
+      "sha256": "9a7252726df5dd34c40ed26ebf1c34b32a489722a8f13a45131650a2b951c37f",
+      "bytes": 2894,
       "fragility": "low",
       "upstreamTouchpoints": [],
       "gates": [
@@ -1310,7 +1310,7 @@
       "kind": "tree",
       "source": "apps/harmonyos",
       "role": "HarmonyOS app host (ArkTS + native)",
-      "sha256": "7f52b5670ab31e65d1ba280c9da6d30a05f7b81f0d51752059013ca787bf717f",
+      "sha256": "717a0aa88e64d47e71602c8a1f25bd0c98e5d72583138b229dbda39bbaa0e73b",
       "files": 36,
       "fragility": "medium",
       "upstreamTouchpoints": [],

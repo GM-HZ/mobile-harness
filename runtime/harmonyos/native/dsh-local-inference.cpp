@@ -28,7 +28,7 @@ void serve(std::string path, std::string model_id, std::string api_key) {
         params.port = 39765;
         params.cors_origins.clear();
         params.cors_credentials = false;
-        params.n_ctx = 8192;
+        params.n_ctx = 16384;
         params.n_predict = 1024;
         params.n_parallel = 1;
         params.n_gpu_layers = 0;

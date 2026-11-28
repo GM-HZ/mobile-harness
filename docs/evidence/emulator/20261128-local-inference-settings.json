@@ -4,10 +4,13 @@
   "implementationCommit": "4da04923a2cad790776accb7dc6b09c33f9af108",
   "builds": {
     "experimentalSelf": {
-      "sha256": "8e54836cd74a78e290a330a9b5fd09707288d9c1ff4ea1df3ccf53968eb8b98a",
+      "sha256": "641aee8cc5c6aad85ca7551e590125212ae19abb7430904f9da06e17c58a43db",
+      "bytes": 693099412,
       "target": "OHOS ARM64 unsigned emulator HAP",
       "variantCheck": true,
-      "llamaUiAssets": 0
+      "llamaUiAssets": 0,
+      "contextTokens": 16384,
+      "maxOutputTokens": 1024
     },
     "ordinaryStore": {
       "sha256": "4b8874a338ebcf7ca0ba61dce2134eb4b43bac43adbb2e7a50411e061060fa40",
@@ -25,7 +28,10 @@
     "api": 26,
     "architecture": "aarch64",
     "testedHapSha256": "fcc3b6a0aa40c313f613b7005fe491c1f194ec3dbb55f67bc68e1e92425f01e5",
-    "finalRebuildDifference": "the download failure message can include the system task fault category",
+    "rebuildDifferences": [
+      "the download failure message can include the system task fault category",
+      "the DSH model profile and native llama.cpp context were increased from 8192 to 16384 tokens"
+    ],
     "weightSource": "preseeded, verified identical LFM3 GGUF",
     "result": {
       "target": "127.0.0.1:15869",
@@ -55,7 +61,13 @@
       "usedLocalSource": false,
       "reason": "error",
       "hasExpectedText": false,
-      "toolCalls": 0
+      "toolCalls": 0,
+      "nativeEngineReached": true,
+      "code": "CONTEXT_WINDOW_EXCEEDED",
+      "httpStatus": 400,
+      "requestTokens": 9548,
+      "engineContextTokens": 8192,
+      "errorSource": "synthetic session event journal"
     }
   },
   "download": {

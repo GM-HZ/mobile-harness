@@ -23,10 +23,10 @@ python3 scripts/adaptation/variant_check.py --variant self --require-local-infer
 python3 gates/run.py --tier G1 --only local-inference-settings --fail-on-skip
 ```
 
-测试此实验包时，入口在「设置 → 通用 → 本地推理」。LFM3 下载约 1.10 GB，Qwen 下载约 1.28 GB。初始推理配置为 8,192 token 上下文、1,024 token 输出、4 个 CPU 线程。下载、服务运行状态、默认路由和实际 Agent 工具任务分别验收。
+测试此实验包时，入口在「设置 → 通用设置 → 本地推理」。LFM3 下载约 1.10 GB，Qwen 下载约 1.28 GB。推理配置为 16,384 token 上下文、1,024 token 输出、4 个 CPU 线程。下载、服务运行状态、默认路由和实际 Agent 工具任务分别验收。
 
 ## 实测
 
-在 HarmonyOS ARM64 API 26 虚拟机中，通过设置界面启动了预置的 LFM3，DSH 发现了受凭据保护的本地模型。开启开关后模型目录将 LFM3 报告为默认项。关闭后恢复原默认项，停止推理后移除了实验提供方和凭据。首次完整 DSH 文本补测以 `error` 结束，助手回复数为零。
+在 HarmonyOS ARM64 API 26 虚拟机中，通过设置界面启动了预置的 LFM3，DSH 发现了受凭据保护的本地模型。开启开关后模型目录将 LFM3 报告为默认项。关闭后恢复原默认项，停止推理后移除了实验提供方和凭据。首次 DSH 文本请求到达了原生引擎，9,548 token 的输入超过 8,192 token 的上限，返回 HTTP 400。应用和引擎随后同步增大了上限。
 
 另一台同 API 的虚拟机使用受控 HTTP 源，下载并发布了完整的 1,099,627,808 字节 LFM3 权重，设备内 SHA-256 与固定值一致。中途取消和失败后均清理了临时文件。该虚拟机直连当前 Hugging Face 地址的试次在约 62 秒后失败，收到 0 字节。实验包和普通 store 包分别通过对应的形态门禁。 [实测证据](../evidence/emulator/20261128-local-inference-settings.json)
